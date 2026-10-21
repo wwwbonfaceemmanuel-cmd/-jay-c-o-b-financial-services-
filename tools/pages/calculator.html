@@ -1,0 +1,171 @@
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Loan calculator</span></nav>
+      <span class="eyebrow">Plan before you borrow</span>
+      <h1>Loan calculator</h1>
+      <p class="lead">Estimate your repayment in Malawi Kwacha. Choose the product, amount, term, interest method and repayment frequency, then see the instalment, total interest, fees and a full amortisation preview.</p>
+      <div class="flex flex-wrap gap-1 mt-2">
+        <a class="btn btn--gold" href="eligibility.html">Check eligibility</a>
+        <a class="btn btn--ghost" href="apply.html">Apply for a Loan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="calc-page">
+    <div class="container">
+
+      <div class="calc-layout">
+        <div class="calc-panel reveal">
+          <p class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Estimate in MWK</p>
+          <h2 style="font-size:1.35rem;">Build your estimate</h2>
+          <p class="text-small text-muted" style="margin-top:.35rem;">Start from a product preset, then adjust any value.</p>
+
+          <fieldset style="border:0;padding:0;margin:1.2rem 0 0;">
+            <legend class="fieldset-title" style="margin-bottom:.5rem;">Loan type</legend>
+            <div class="calc-products">
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-personal" value="personal" checked><label for="preset-personal">Personal</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-business" value="business"><label for="preset-business">Business</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-emergency" value="emergency"><label for="preset-emergency">Emergency</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-salary" value="salary"><label for="preset-salary">Salary-based</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short" value="short"><label for="preset-short">Short-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long" value="long"><label for="preset-long">Long-term</label></span>
+            </div>
+          </fieldset>
+
+          <div class="form-grid">
+            <div class="field field--full">
+              <label for="calc-amount">Loan amount (MWK)</label>
+              <input id="calc-amount" type="number" inputmode="numeric" min="100000" max="15000000" step="50000" value="5000000">
+              <span class="hint" id="calc-limits">Limits MWK 100,000 – 15,000,000 · 48 months maximum</span>
+            </div>
+            <div class="field">
+              <label for="calc-rate">Annual interest rate (%)</label>
+              <input id="calc-rate" type="number" min="1" max="60" step="0.5" value="24">
+              <span class="hint">Indicative rate for the selected product</span>
+            </div>
+            <div class="field">
+              <label for="calc-term">Repayment period (months)</label>
+              <input id="calc-term" type="number" min="1" max="84" step="1" value="12">
+              <span class="hint">Monthly or fortnightly instalments</span>
+            </div>
+            <div class="field">
+              <label for="calc-method">Interest method</label>
+              <select id="calc-method">
+                <option value="reducing" selected>Reducing balance</option>
+                <option value="flat">Flat rate</option>
+              </select>
+              <span class="hint">Reducing balance costs less overall</span>
+            </div>
+            <div class="field">
+              <label for="calc-frequency">Repayment frequency</label>
+              <select id="calc-frequency">
+                <option value="monthly" selected>Monthly</option>
+                <option value="fortnightly">Fortnightly</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="calc-fee">Processing fee (%)</label>
+              <input id="calc-fee" type="number" min="0" max="10" step="0.1" value="2">
+              <span class="hint">Deducted at disbursement</span>
+            </div>
+            <div class="field">
+              <label for="calc-admin">Admin fee (MWK)</label>
+              <input id="calc-admin" type="number" min="0" step="1000" value="0">
+              <span class="hint">Optional fixed fee</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-1" style="margin-top:1.2rem;">
+            <a class="btn btn--gold" href="apply.html" id="apply-link">Apply for This Loan</a>
+            <button class="btn btn--ghost" type="button" id="calc-reset">Reset</button>
+            <button class="btn btn--ghost" type="button" id="calc-export">Export CSV</button>
+            <button class="btn btn--ghost" type="button" id="calc-print">Print</button>
+          </div>
+          <p class="formula-note text-tiny" style="margin-top:1rem;">Estimates assume a first payment one month (or fortnight) after disbursement and no late payments. Final terms are confirmed in your agreement.</p>
+        </div>
+
+        <div>
+          <div class="calc-result reveal" aria-live="polite">
+            <p class="hero-label">Estimated repayment</p>
+            <p class="hero-figure" id="res-payment">MWK 472,798</p>
+            <p class="text-tiny" id="res-payment-period" style="color:#9db3a4;">per month</p>
+
+            <div class="calc-bar" style="margin-top:1rem;">
+              <i class="p" id="bar-principal" style="width:86.6%"></i>
+              <i class="i" id="bar-interest" style="width:13.4%"></i>
+            </div>
+            <p class="text-tiny" style="color:#9db3a4;margin-top:.35rem;"><span style="color:#f0dcae;">Principal</span> · <span>Interest &amp; fees</span></p>
+
+            <div class="row"><span>Principal</span><strong id="res-principal">MWK 5,000,000</strong></div>
+            <div class="row"><span>Total interest</span><strong id="res-interest">MWK 673,576</strong></div>
+            <div class="row"><span>Fees</span><strong id="res-fees">MWK 100,000</strong></div>
+            <div class="row"><span>Total repayment</span><strong id="res-total">MWK 5,773,576</strong></div>
+            <div class="row"><span>Nominal rate</span><strong id="res-rate">24% p.a.</strong></div>
+            <div class="row"><span>Indicative APR</span><strong id="res-apr">—</strong></div>
+            <div class="row"><span>Instalments</span><strong id="res-instalments">12 × MWK 472,798</strong></div>
+            <div class="row"><span>Method</span><strong id="res-method">Reducing balance</strong></div>
+            <div class="row"><span>Frequency</span><strong id="res-frequency">Monthly</strong></div>
+            <div class="row"><span>First instalment</span><strong id="res-first">—</strong></div>
+            <div class="row"><span>Final instalment</span><strong id="res-last">—</strong></div>
+            <p class="text-tiny" id="res-compare" style="color:#9db3a4;margin-top:.7rem;"></p>
+            <p class="text-tiny" id="calc-aside-note" style="color:#7f9a86;margin-top:.4rem;"></p>
+          </div>
+
+          <div class="card" style="margin-top:1rem;">
+            <h3 style="font-size:1rem;">What is included</h3>
+            <ul class="card-list">
+              <li>Principal, interest, processing fee and any fixed admin fee</li>
+              <li>Monthly or fortnightly instalments, dated from disbursement</li>
+              <li>Full amortisation schedule with opening and closing balances</li>
+              <li>CSV export and printer-friendly schedule</li>
+            </ul>
+            <p class="text-tiny text-muted" style="margin-top:.8rem;">The calculator does not include late payment charges, early repayment charges, insurance or valuation fees. See the <a href="fees-disclosure.html">Fee Disclosure Statement</a>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amortisation preview -->
+      <div class="app-panel" style="margin-top:1.6rem;" id="calc-print-area">
+        <div class="app-panel-head">
+          <div>
+            <h2>Amortisation preview</h2>
+            <p id="amort-count">Showing the first 12 instalments</p>
+          </div>
+          <div class="head-tools">
+            <button class="btn btn--ghost btn--xs" type="button" id="amort-toggle">Show all</button>
+            <button class="btn btn--ghost btn--xs" type="button" onclick="window.print()">Print</button>
+          </div>
+        </div>
+        <div class="app-panel-body app-panel-body--flush">
+          <div class="table-wrap" style="border:0;">
+            <table class="data" id="amort-table">
+              <caption class="sr-only">Estimated repayment schedule in Malawi Kwacha</caption>
+              <thead>
+                <tr><th scope="col">#</th><th scope="col">Due date</th><th scope="col" class="num">Instalment</th><th scope="col" class="num">Principal</th><th scope="col" class="num">Interest</th><th scope="col" class="num">Balance</th></tr>
+              </thead>
+              <tbody id="amort-body"></tbody>
+              <tfoot>
+                <tr><th colspan="2" scope="row">Total repayment</th><td colspan="4" class="num" id="amort-total">—</td></tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top:1.6rem;">
+        <div class="card"><h3>Flat rate explained</h3><p>Interest is charged on the full principal for the whole term, even as the balance falls. It is simpler to calculate but costs more in total.</p></div>
+        <div class="card"><h3>Reducing balance explained</h3><p>Interest is charged on the balance you still owe each period. As the balance falls, the interest portion of each instalment falls too.</p></div>
+        <div class="card"><h3>What is APR?</h3><p>The annual percentage rate expresses the total cost of credit — interest plus disclosed fees — as a yearly rate, so products can be compared fairly.</p></div>
+      </div>
+
+      <div class="notice notice--warn" style="margin-top:1.6rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <div><strong>Borrowing costs money.</strong> This calculator is an estimate, not an offer of credit. Only the signed loan agreement is binding. If you are struggling with debt, read our <a href="responsible-lending.html">Responsible Lending Policy</a> or call us before taking on more credit.</div>
+      </div>
+
+    </div>
+  </section>
+
+</main>

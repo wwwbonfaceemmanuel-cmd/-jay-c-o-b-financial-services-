@@ -1,0 +1,68 @@
+name: Deploy static site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare site
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='tools' \
+            --exclude='supabase' \
+            --exclude='README.md' \
+            --exclude='_site' \
+            ./ _site/
+
+      - name: Verify build output
+        run: |
+          set -euo pipefail
+          for page in index.html about.html loan-products.html apply.html \
+                      calculator.html eligibility.html how-it-works.html \
+                      interest-rates-fees.html support.html dashboard.html \
+                      login.html register.html verify.html privacy.html \
+                      terms.html licensing.html 404.html; do
+            test -f "_site/$page" || { echo "Missing page: $page"; exit 1; }
+          done
+          grep -q "assets/css/styles.css" _site/index.html
+          test -f _site/assets/css/styles.css
+          test -f _site/assets/js/dashboard.js
+          test -f _site/assets/img/logo-full.svg
+          echo "Site output verified: $(find _site -name '*.html' | wc -l) HTML pages."
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
