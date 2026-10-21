@@ -1,5 +1,5 @@
 /* =====================================================================
-   Jay C.O.B Financial Services — runtime configuration
+   JAY C O B FINANCIAL SERVICES — runtime configuration
    ---------------------------------------------------------------------
    The site currently runs in demo mode: the live feed, calculator and
    client portal work entirely in the browser (localStorage), so it can

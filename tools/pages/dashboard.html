@@ -1,0 +1,94 @@
+  <a class="skip-link" href="#app-content">Skip to dashboard content</a>
+
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar" aria-label="Account navigation">
+      <div class="app-side-head">
+        <a class="brand" href="index.html" aria-label="JAY C O B FINANCIAL SERVICES — home">
+          <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+        </a>
+        <span class="app-env"><span aria-hidden="true">●</span> Customer portal</span>
+      </div>
+
+      <nav class="app-nav" id="app-nav"></nav>
+
+      <div class="app-side-foot">
+        <a class="btn btn--ghost btn--sm" href="index.html">Back to website</a>
+        <button class="btn btn--line-gold btn--sm" type="button" data-logout>Sign out securely</button>
+        <p class="text-tiny" style="color:#7f9a86;margin-top:.7rem;">Session ends after 30 minutes of inactivity.</p>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <div class="app-topbar">
+        <button class="app-menu-btn" type="button" data-sidebar-toggle aria-label="Open account menu" aria-controls="app-sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="app-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <label class="sr-only" for="app-search-input">Search your account</label>
+          <input id="app-search-input" type="search" placeholder="Search loans, repayments, documents…" autocomplete="off">
+        </div>
+
+        <div class="app-top-actions">
+          <div class="bell-wrap">
+            <button class="icon-btn-lg" type="button" data-bell aria-label="Notifications" aria-expanded="false" aria-controls="bell-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+              <span class="bell-dot" data-bell-count hidden>0</span>
+            </button>
+            <div class="bell-panel" id="bell-panel">
+              <div class="bell-head">
+                <span>Notifications</span>
+                <a href="#notifications">View all</a>
+              </div>
+              <div class="bell-list" id="bell-list"></div>
+              <div class="bell-head" style="border-top:1px solid var(--line);border-bottom:0;">
+                <button class="linkish" type="button" data-mark-all>Mark all as read</button>
+                <a href="#settings">Preferences</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-menu">
+            <button class="profile-btn" type="button" data-profile-btn aria-label="Account menu" aria-expanded="false" aria-controls="profile-panel">
+              <span class="avatar" data-profile-avatar>MT</span>
+              <span class="profile-name"><span data-profile-name>Memory Tembo</span><small data-profile-email>demo@jaycobfinancial.mw</small></span>
+            </button>
+            <div class="profile-panel" id="profile-panel">
+              <a href="#profile" data-route="profile">My profile</a>
+              <a href="#documents" data-route="documents">KYC &amp; documents</a>
+              <a href="#security" data-route="security">Account security</a>
+              <a href="#settings" data-route="settings">Settings</a>
+              <hr>
+              <a href="support.html">Help centre</a>
+              <button type="button" data-logout>Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main class="app-content" id="app-content" tabindex="-1">
+        <div class="app-page-head"><div><h1>Loading your dashboard…</h1><p>Preparing balances, loans and notifications.</p></div></div>
+        <div class="app-panel"><div class="app-panel-body">
+          <p class="skeleton-line" style="width:60%;"></p>
+          <p class="skeleton-line" style="width:85%;"></p>
+          <p class="skeleton-line" style="width:45%;"></p>
+          <noscript><p class="notice notice--warn">This dashboard needs JavaScript. Enable it, or call {{PHONE}} for account information.</p></noscript>
+        </div></div>
+      </main>
+
+      <footer class="app-content" style="padding-top:0;">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-tiny" style="color:var(--muted);border-top:1px solid var(--line);padding-top:1rem;">
+          <p>© <span data-year>2026</span> JAY C O B FINANCIAL SERVICES · Licensed money lender, Malawi</p>
+          <div class="flex flex-wrap gap-2">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="responsible-lending.html">Responsible lending</a>
+            <a href="complaints.html">Complaints</a>
+            <a href="support.html">Support: {{SUPPORT_EMAIL}}</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  <div class="app-scrim" aria-hidden="true"></div>

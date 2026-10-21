@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Loan calculator (MWK) — Jay C.O.B Financial Services</title>
-  <meta name="description" content="Calculate loan repayments in Malawian Kwacha with monthly or annual basis, flat or reducing balance formulas, dated payment schedules and total repayment.">
-  <meta name="theme-color" content="#071828">
-  <meta property="og:title" content="Loan calculator (MWK) — Jay C.O.B Financial Services">
-  <meta property="og:description" content="Calculate loan repayments in Malawian Kwacha with monthly or annual basis, flat or reducing balance formulas, dated payment schedules and total repayment.">
+  <title>Loan calculator — JAY C O B FINANCIAL SERVICES</title>
+  <meta name="description" content="Estimate your monthly repayment, total interest and fees in MWK. Choose flat or reducing interest, monthly or fortnightly repayment and see a full amortisation preview.">
+  <meta name="theme-color" content="#03170f">
+  <meta property="og:title" content="Loan calculator — JAY C O B FINANCIAL SERVICES">
+  <meta property="og:description" content="Estimate your monthly repayment, total interest and fees in MWK. Choose flat or reducing interest, monthly or fortnightly repayment and see a full amortisation preview.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/img/hero-consultation.jpg">
+  <meta property="og:image" content="assets/img/logo-full.svg">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="calculator.html">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,28 +22,49 @@
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
+    <div class="header-topline">
+      <div class="container">
+        <p>Licensed money lender · Lilongwe, Malawi · All amounts in MWK</p>
+        <div class="topline-right">
+          <a href="tel:+265999123456">+265 999 123 456</a>
+          <span class="sep" aria-hidden="true">|</span>
+          <a href="mailto:hello@jaycobfinancial.mw">hello@jaycobfinancial.mw</a>
+          <span class="sep" aria-hidden="true">|</span>
+          <a href="support.html">Help centre</a>
+        </div>
+      </div>
+    </div>
     <div class="container header-inner">
-      <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-        <img class="brand-logo" src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
+      <a class="brand" href="index.html" aria-label="JAY C O B FINANCIAL SERVICES — home">
+        <img class="brand-logo" src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
       </a>
 
       <nav class="nav" id="primary-nav" aria-label="Primary">
         <ul class="nav-list">
           <li><a class="nav-link" href="index.html">Home</a></li>
           <li><a class="nav-link" href="about.html">About</a></li>
-          <li><a class="nav-link is-active" href="services.html">Services</a></li>
-          <li><a class="nav-link" href="products.html">Products</a></li>
-          <li><a class="nav-link" href="insights.html">Insights</a></li>
-          <li><a class="nav-link" href="live.html">Live</a></li>
-          <li><a class="nav-link" href="contact.html">Contact</a></li>
-          <li class="nav-mobile-only"><a class="nav-link" href="portal.html">Client login</a></li>
-          <li class="nav-mobile-only"><a class="nav-link" href="admin.html">Admin console</a></li>
+          <li><a class="nav-link" href="loan-products.html">Loan products</a></li>
+          <li><a class="nav-link is-active" href="calculator.html">Calculator</a></li>
+          <li><a class="nav-link" href="how-it-works.html">How it works</a></li>
+          <li><a class="nav-link" href="interest-rates-fees.html">Rates &amp; fees</a></li>
+          <li><a class="nav-link" href="support.html">Support</a></li>
+          <li class="nav-dd">
+            <a class="nav-link" href="eligibility.html" aria-haspopup="true">Apply</a>
+            <ul class="nav-dd-menu">
+              <li><a href="apply.html">Loan application<span class="dd-note">Five steps · save and resume</span></a></li>
+              <li><a href="eligibility.html">Eligibility check<span class="dd-note">Two-minute preliminary result</span></a></li>
+              <li><a href="calculator.html">Loan calculator<span class="dd-note">Estimate instalments in MWK</span></a></li>
+              <li><a href="register.html">Create an account<span class="dd-note">New customer registration</span></a></li>
+            </ul>
+          </li>
+          <li class="nav-mobile-only"><a class="nav-link" href="login.html">Customer login</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="dashboard.html">My dashboard</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <a class="btn btn--ghost btn--sm" href="portal.html">Client login</a>
-        <a class="btn btn--gold btn--sm" href="contact.html">Book a call</a>
+        <a class="btn btn--ghost btn--sm" href="login.html">Customer login</a>
+        <a class="btn btn--gold btn--sm" href="apply.html">Apply for a Loan</a>
       </div>
 
       <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
@@ -51,302 +73,269 @@
     </div>
   </header>
 
-  <main id="main">
+<main id="main">
 
-    <section class="page-hero">
-      <div class="container page-hero-inner">
-        <div class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"><span>Jay C.O.B Financial Services</span></div>
-        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Calculator</span></nav>
-        <span class="eyebrow">Free tools · Malawian Kwacha</span>
-        <h1>Loan calculator</h1>
-        <p class="lead">Choose a monthly or annual basis, pick a flat or reducing-balance formula, and see the full dated repayment schedule — in MWK, before you sign anything.</p>
-        <div class="brand-chip" style="margin-top:1.2rem; margin-bottom:0;">
-          <img src="assets/img/logo-mark.svg" alt="" width="22" height="22"><span>All amounts in Malawian Kwacha (MWK)</span>
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Loan calculator</span></nav>
+      <span class="eyebrow">Plan before you borrow</span>
+      <h1>Loan calculator</h1>
+      <p class="lead">Estimate your repayment in Malawi Kwacha. Choose the product, amount, term, interest method and repayment frequency, then see the instalment, total interest, fees and a full amortisation preview.</p>
+      <div class="flex flex-wrap gap-1 mt-2">
+        <a class="btn btn--gold" href="eligibility.html">Check eligibility</a>
+        <a class="btn btn--ghost" href="apply.html">Apply for a Loan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="calc-page">
+    <div class="container">
+
+      <div class="calc-layout">
+        <div class="calc-panel reveal">
+          <p class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Estimate in MWK</p>
+          <h2 style="font-size:1.35rem;">Build your estimate</h2>
+          <p class="text-small text-muted" style="margin-top:.35rem;">Start from a product preset, then adjust any value.</p>
+
+          <fieldset style="border:0;padding:0;margin:1.2rem 0 0;">
+            <legend class="fieldset-title" style="margin-bottom:.5rem;">Loan type</legend>
+            <div class="calc-products">
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-personal" value="personal" checked><label for="preset-personal">Personal</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-business" value="business"><label for="preset-business">Business</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-emergency" value="emergency"><label for="preset-emergency">Emergency</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-salary" value="salary"><label for="preset-salary">Salary-based</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short" value="short"><label for="preset-short">Short-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long" value="long"><label for="preset-long">Long-term</label></span>
+            </div>
+          </fieldset>
+
+          <div class="form-grid">
+            <div class="field field--full">
+              <label for="calc-amount">Loan amount (MWK)</label>
+              <input id="calc-amount" type="number" inputmode="numeric" min="100000" max="15000000" step="50000" value="5000000">
+              <span class="hint" id="calc-limits">Limits MWK 100,000 – 15,000,000 · 48 months maximum</span>
+            </div>
+            <div class="field">
+              <label for="calc-rate">Annual interest rate (%)</label>
+              <input id="calc-rate" type="number" min="1" max="60" step="0.5" value="24">
+              <span class="hint">Indicative rate for the selected product</span>
+            </div>
+            <div class="field">
+              <label for="calc-term">Repayment period (months)</label>
+              <input id="calc-term" type="number" min="1" max="84" step="1" value="12">
+              <span class="hint">Monthly or fortnightly instalments</span>
+            </div>
+            <div class="field">
+              <label for="calc-method">Interest method</label>
+              <select id="calc-method">
+                <option value="reducing" selected>Reducing balance</option>
+                <option value="flat">Flat rate</option>
+              </select>
+              <span class="hint">Reducing balance costs less overall</span>
+            </div>
+            <div class="field">
+              <label for="calc-frequency">Repayment frequency</label>
+              <select id="calc-frequency">
+                <option value="monthly" selected>Monthly</option>
+                <option value="fortnightly">Fortnightly</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="calc-fee">Processing fee (%)</label>
+              <input id="calc-fee" type="number" min="0" max="10" step="0.1" value="2">
+              <span class="hint">Deducted at disbursement</span>
+            </div>
+            <div class="field">
+              <label for="calc-admin">Admin fee (MWK)</label>
+              <input id="calc-admin" type="number" min="0" step="1000" value="0">
+              <span class="hint">Optional fixed fee</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-1" style="margin-top:1.2rem;">
+            <a class="btn btn--gold" href="apply.html" id="apply-link">Apply for This Loan</a>
+            <button class="btn btn--ghost" type="button" id="calc-reset">Reset</button>
+            <button class="btn btn--ghost" type="button" id="calc-export">Export CSV</button>
+            <button class="btn btn--ghost" type="button" id="calc-print">Print</button>
+          </div>
+          <p class="formula-note text-tiny" style="margin-top:1rem;">Estimates assume a first payment one month (or fortnight) after disbursement and no late payments. Final terms are confirmed in your agreement.</p>
+        </div>
+
+        <div>
+          <div class="calc-result reveal" aria-live="polite">
+            <p class="hero-label">Estimated repayment</p>
+            <p class="hero-figure" id="res-payment">MWK 472,798</p>
+            <p class="text-tiny" id="res-payment-period" style="color:#9db3a4;">per month</p>
+
+            <div class="calc-bar" style="margin-top:1rem;">
+              <i class="p" id="bar-principal" style="width:86.6%"></i>
+              <i class="i" id="bar-interest" style="width:13.4%"></i>
+            </div>
+            <p class="text-tiny" style="color:#9db3a4;margin-top:.35rem;"><span style="color:#f0dcae;">Principal</span> · <span>Interest &amp; fees</span></p>
+
+            <div class="row"><span>Principal</span><strong id="res-principal">MWK 5,000,000</strong></div>
+            <div class="row"><span>Total interest</span><strong id="res-interest">MWK 673,576</strong></div>
+            <div class="row"><span>Fees</span><strong id="res-fees">MWK 100,000</strong></div>
+            <div class="row"><span>Total repayment</span><strong id="res-total">MWK 5,773,576</strong></div>
+            <div class="row"><span>Nominal rate</span><strong id="res-rate">24% p.a.</strong></div>
+            <div class="row"><span>Indicative APR</span><strong id="res-apr">—</strong></div>
+            <div class="row"><span>Instalments</span><strong id="res-instalments">12 × MWK 472,798</strong></div>
+            <div class="row"><span>Method</span><strong id="res-method">Reducing balance</strong></div>
+            <div class="row"><span>Frequency</span><strong id="res-frequency">Monthly</strong></div>
+            <div class="row"><span>First instalment</span><strong id="res-first">—</strong></div>
+            <div class="row"><span>Final instalment</span><strong id="res-last">—</strong></div>
+            <p class="text-tiny" id="res-compare" style="color:#9db3a4;margin-top:.7rem;"></p>
+            <p class="text-tiny" id="calc-aside-note" style="color:#7f9a86;margin-top:.4rem;"></p>
+          </div>
+
+          <div class="card" style="margin-top:1rem;">
+            <h3 style="font-size:1rem;">What is included</h3>
+            <ul class="card-list">
+              <li>Principal, interest, processing fee and any fixed admin fee</li>
+              <li>Monthly or fortnightly instalments, dated from disbursement</li>
+              <li>Full amortisation schedule with opening and closing balances</li>
+              <li>CSV export and printer-friendly schedule</li>
+            </ul>
+            <p class="text-tiny text-muted" style="margin-top:.8rem;">The calculator does not include late payment charges, early repayment charges, insurance or valuation fees. See the <a href="fees-disclosure.html">Fee Disclosure Statement</a>.</p>
+          </div>
         </div>
       </div>
-    </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="print-only print-head">
-          <img src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
-          <div><strong>Loan repayment plan</strong><span>Illustration in Malawian Kwacha (MWK)</span></div>
-        </div>
-
-        <div class="tool-layout">
-          <!-- ================= FORM ================= -->
-          <div class="form-card reveal calc-form">
-            <div class="form-logo">
-              <img src="assets/img/logo-mark.svg" alt="Jay C.O.B Financial Services" width="30" height="30">
-              <div>
-                <strong style="display:block; font-size:.86rem; color:var(--ink);">Jay C.O.B Financial Services</strong>
-                <span class="text-tiny text-muted">Loan repayment planner</span>
-              </div>
-            </div>
-
-            <h2 style="font-size:1.35rem;">Build your repayment plan</h2>
-            <p class="text-small text-muted" style="margin-top:.3rem;">Every result is an illustration in MWK. Your lender's own fees and insurance may differ.</p>
-
-            <form id="calc-form" class="mt-3" novalidate>
-              <div class="field">
-                <label for="calc-basis">Calculation basis</label>
-                <select id="calc-basis" name="basis">
-                  <option value="monthly" selected>Monthly — enter the term in months</option>
-                  <option value="annual">Annual — enter the term in years</option>
-                </select>
-                <span class="hint" id="basis-hint">Default: 1 month. Payments are monthly.</span>
-              </div>
-
-              <div class="field mt-2">
-                <label>Interest formula</label>
-                <div class="seg" role="radiogroup" aria-label="Interest formula">
-                  <input type="radio" id="formula-reducing" name="formula" value="reducing" checked>
-                  <label for="formula-reducing">Reducing balance</label>
-                  <input type="radio" id="formula-flat" name="formula" value="flat">
-                  <label for="formula-flat">Flat rate</label>
-                </div>
-                <p class="formula-note" id="formula-note">Reducing balance charges interest on the outstanding balance each month, so the interest portion falls over time. Usually the cheaper method.</p>
-              </div>
-
-              <div class="field mt-2">
-                <label for="calc-amount">Loan amount (MWK)</label>
-                <div class="input-money">
-                  <span>MWK</span>
-                  <input id="calc-amount" name="amount" type="number" inputmode="numeric" min="1000" step="50000" value="5000000" required>
-                </div>
-                <span class="hint">Principal you intend to borrow.</span>
-              </div>
-
-              <div class="calc-row mt-2">
-                <div class="field">
-                  <label for="calc-rate">Interest rate (% per year)</label>
-                  <div class="input-suffix">
-                    <input id="calc-rate" name="rate" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="24" required>
-                    <span class="suffix">% p.a.</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="calc-period">Duration period</label>
-                  <div class="input-suffix">
-                    <input id="calc-period" name="period" type="number" inputmode="numeric" min="1" max="360" step="1" value="1" required>
-                    <span class="suffix" id="period-unit">month</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="calc-row mt-2">
-                <div class="field">
-                  <label for="calc-start">First payment date</label>
-                  <input id="calc-start" name="start" type="date">
-                </div>
-                <div class="field">
-                  <label for="calc-fee">Arrangement fee (%)</label>
-                  <div class="input-suffix">
-                    <input id="calc-fee" name="fee" type="number" inputmode="decimal" min="0" max="15" step="0.25" value="0">
-                    <span class="suffix">%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap gap-2 mt-3">
-                <button class="btn btn--gold" type="submit">Calculate</button>
-                <button class="btn btn--ghost" type="button" id="calc-reset">Reset defaults</button>
-              </div>
-              <p class="text-tiny text-muted mt-2">Results update automatically as you change the figures.</p>
-            </form>
+      <!-- Amortisation preview -->
+      <div class="app-panel" style="margin-top:1.6rem;" id="calc-print-area">
+        <div class="app-panel-head">
+          <div>
+            <h2>Amortisation preview</h2>
+            <p id="amort-count">Showing the first 12 instalments</p>
           </div>
-
-          <!-- ================= SUMMARY ================= -->
-          <aside class="result-panel calc-summary reveal" data-delay="1" aria-live="polite">
-            <div class="flex items-center justify-between gap-2">
-              <img src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64" class="live-logo">
-              <span class="text-tiny" style="color:#9db1c2;">MWK</span>
-            </div>
-
-            <div class="result-hero">
-              <p class="label">Total amount</p>
-              <p class="value" id="res-total">MWK 0</p>
-              <p class="text-tiny" style="color:#9db1c2; margin-top:.35rem;">Principal + interest + fees</p>
-            </div>
-
-            <div class="result-rows">
-              <div class="result-row"><span>Principal</span><strong id="res-principal">MWK 0</strong></div>
-              <div class="result-row"><span>Duration period</span><strong id="res-duration">1 month</strong></div>
-              <div class="result-row"><span>Interest amount</span><strong id="res-interest">MWK 0</strong></div>
-              <div class="result-row"><span>Monthly payment</span><strong id="res-monthly">MWK 0</strong></div>
-              <div class="result-row" id="res-fee-row" hidden><span>Arrangement fee</span><strong id="res-fee">MWK 0</strong></div>
-              <div class="result-row"><span>Total repayment</span><strong id="res-repayment">MWK 0</strong></div>
-            </div>
-
-            <div class="calc-meta">
-              <span>Basis: <strong id="res-basis">Monthly</strong></span>
-              <span>Formula: <strong id="res-formula">Reducing balance</strong></span>
-              <span>Rate: <strong id="res-rate">24% p.a.</strong></span>
-            </div>
-
-            <div class="result-bar">
-              <span class="principal" id="bar-principal" style="width:100%"></span>
-              <span class="interest" id="bar-interest" style="width:0%"></span>
-            </div>
-            <div class="legend">
-              <span><i style="background:var(--gold-400)"></i>Principal</span>
-              <span><i style="background:#5f8ba8"></i>Interest &amp; fees</span>
-            </div>
-
-            <p class="result-note" id="res-note">Choose your figures to see the full schedule below.</p>
-
-            <div class="mt-3" style="border-top:1px solid rgba(255,255,255,.12); padding-top:1.2rem; display:grid; gap:.5rem;">
-              <button class="btn btn--gold btn--block" type="button" id="download-schedule">Download schedule (CSV)</button>
-              <button class="btn btn--ghost-light btn--block" type="button" id="print-plan">Print repayment plan</button>
-            </div>
-          </aside>
-        </div>
-
-        <!-- ================= SCHEDULE ================= -->
-        <div class="schedule-card reveal" id="schedule-card">
-          <div class="schedule-head">
-            <div>
-              <h3>Repayment schedule</h3>
-              <p id="schedule-summary">Monthly payments with due dates, interest and closing balances.</p>
-            </div>
-            <div class="schedule-actions">
-              <button class="btn btn--ghost btn--sm" type="button" id="toggle-rows">Show all rows</button>
-              <button class="btn btn--ghost btn--sm" type="button" id="download-schedule-2">Export CSV</button>
-            </div>
+          <div class="head-tools">
+            <button class="btn btn--ghost btn--xs" type="button" id="amort-toggle">Show all</button>
+            <button class="btn btn--ghost btn--xs" type="button" onclick="window.print()">Print</button>
           </div>
-          <div class="schedule-scroll">
-            <table class="data">
+        </div>
+        <div class="app-panel-body app-panel-body--flush">
+          <div class="table-wrap" style="border:0;">
+            <table class="data" id="amort-table">
+              <caption class="sr-only">Estimated repayment schedule in Malawi Kwacha</caption>
               <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Due date</th>
-                  <th class="num">Opening balance</th>
-                  <th class="num">Payment</th>
-                  <th class="num">Interest</th>
-                  <th class="num">Principal</th>
-                  <th class="num">Closing balance</th>
-                </tr>
+                <tr><th scope="col">#</th><th scope="col">Due date</th><th scope="col" class="num">Instalment</th><th scope="col" class="num">Principal</th><th scope="col" class="num">Interest</th><th scope="col" class="num">Balance</th></tr>
               </thead>
-              <tbody id="schedule-body"></tbody>
+              <tbody id="amort-body"></tbody>
               <tfoot>
-                <tr>
-                  <td colspan="2">Totals</td>
-                  <td class="num" id="foot-opening">—</td>
-                  <td class="num" id="foot-payment">—</td>
-                  <td class="num" id="foot-interest">—</td>
-                  <td class="num" id="foot-principal">—</td>
-                  <td class="num" id="foot-closing">—</td>
-                </tr>
+                <tr><th colspan="2" scope="row">Total repayment</th><td colspan="4" class="num" id="amort-total">—</td></tr>
               </tfoot>
             </table>
           </div>
         </div>
-
-        <div class="callout mt-4 reveal">
-          <strong>How the two formulas differ</strong>
-          <p style="margin-top:.3rem;">A <strong>flat rate</strong> charges interest on the original principal for the whole term, even as the balance falls. A <strong>reducing balance</strong> charges interest only on what is still outstanding. At the same quoted rate, reducing balance normally costs less overall — compare the interest amount above for both settings.</p>
-        </div>
       </div>
-    </section>
 
-    <section class="section section--tight">
-      <div class="container">
-        <div class="cta-band reveal">
-          <img class="brand-watermark" src="assets/img/logo-mark.svg" alt="" width="84" height="84" aria-hidden="true" loading="lazy">
-          <div>
-            <span class="eyebrow eyebrow--light">Start the conversation</span>
-            <h2 class="mt-2">Want the plan checked before you sign?</h2>
-            <p>Bring the lender's offer letter and we will verify the formula, the fees and the schedule against your actual cash flow — free for 30 minutes.</p>
-          </div>
-          <div class="cta-actions">
-            <a class="btn btn--gold" href="contact.html">Book a consultation</a>
-            <a class="btn btn--ghost-light" href="portal.html">Client login</a>
-          </div>
-        </div>
+      <div class="grid-3" style="margin-top:1.6rem;">
+        <div class="card"><h3>Flat rate explained</h3><p>Interest is charged on the full principal for the whole term, even as the balance falls. It is simpler to calculate but costs more in total.</p></div>
+        <div class="card"><h3>Reducing balance explained</h3><p>Interest is charged on the balance you still owe each period. As the balance falls, the interest portion of each instalment falls too.</p></div>
+        <div class="card"><h3>What is APR?</h3><p>The annual percentage rate expresses the total cost of credit — interest plus disclosed fees — as a yearly rate, so products can be compared fairly.</p></div>
       </div>
-    </section>
 
-  </main>
+      <div class="notice notice--warn" style="margin-top:1.6rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <div><strong>Borrowing costs money.</strong> This calculator is an estimate, not an offer of credit. Only the signed loan agreement is binding. If you are struggling with debt, read our <a href="responsible-lending.html">Responsible Lending Policy</a> or call us before taking on more credit.</div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
 
   <footer class="site-footer">
     <div class="container">
       <div class="footer-top">
         <div class="footer-about">
-          <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-            <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
+          <a class="brand" href="index.html" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
           </a>
-          <p>Independent financial planning, credit advisory and business finance support for Malawian households, entrepreneurs and institutions. We turn numbers into confident decisions.</p>
-          <div class="social-row" aria-label="Social links">
-            <a href="https://www.linkedin.com" aria-label="LinkedIn" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.06c.53-.95 1.83-1.95 3.77-1.95C20.3 8.75 21 11 21 14.1V21h-4v-6.1c0-1.45-.03-3.3-2.05-3.3-2.05 0-2.36 1.57-2.36 3.2V21H9V9Z"/></svg></span></a>
-            <a href="https://www.facebook.com" aria-label="Facebook" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V5.5h-3c-2.5 0-4 1.6-4 4.2V12H7v3.5h3V22h3.5v-6.5H17L17.5 12H13.5V9.9c0-.6.2-.9 1-.9Z"/></svg></span></a>
-            <a href="https://wa.me/265999123456" aria-label="WhatsApp" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.3 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a12 12 0 0 1-5.9-5.1c-.5-.8-.8-1.6-.8-2.3 0-.7.4-1.3.8-1.7.2-.2.4-.3.6-.3h.5c.2 0 .4 0 .5.4l.8 1.8c.1.2 0 .4-.1.5l-.4.5c-.1.2-.3.3-.1.6a8 8 0 0 0 3.4 2.9c.2.1.4.1.6-.1l.7-.8c.2-.2.3-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.3.1.7-.1 1.3Z"/></svg></span></a>
-          </div>
+          <p>Licensed money lender providing personal, business, salary-based and agricultural loans across Malawi. Transparent pricing in MWK, responsible lending and a customer dashboard that keeps you in control.</p>
+          <p class="footer-badges"><span class="tag-chip">Licensed lender</span> <span class="tag-chip">MWK lending</span> <span class="tag-chip">Data protected</span></p>
+          
+        <div class="social-row" aria-label="Follow us">
+          <a class="social-icon" href="https://www.facebook.com/" aria-label="Facebook" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6A22 22 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1V9.9H7.6V13h2.7v8z"/></svg></a>
+          <a class="social-icon" href="https://www.linkedin.com/" aria-label="LinkedIn" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.9 8.6H3.6V21h3.3zM5.2 3a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8M21 13.7c0-3.3-1.8-4.8-4.1-4.8a3.5 3.5 0 0 0-3.2 1.8V8.6H10.4V21h3.3v-6.5c0-1.5.6-2.4 1.9-2.4s1.9.9 1.9 2.5V21H21z"/></svg></a>
+          <a class="social-icon" href="https://wa.me/265999123456" aria-label="WhatsApp" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2m0 1.8a8.2 8.2 0 0 1 6.9 12.6l-.4.5.6 2.1-2.2-.6-.5.3A8.2 8.2 0 1 1 12 3.8m-3.1 3.7c-.2 0-.5.1-.7.4s-1 1-1 2.3.9 2.6 1 2.8 1.7 2.8 4.3 3.8c2.1.8 2.6.7 3 .6s1.4-.6 1.6-1.1.2-1 .2-1.1-.2-.2-.4-.3l-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.1-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.1-.2 0-.4.1-.5l.6-.7c.1-.2.1-.3 0-.5l-.7-1.6c-.1-.3-.3-.3-.5-.3z"/></svg></a>
+          <a class="social-icon" href="mailto:hello@jaycobfinancial.mw" aria-label="Email us"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+        </div>
+
         </div>
 
         <div>
-          <h4>Company</h4>
+          <h4>Quick links</h4>
           <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
             <li><a href="about.html">About us</a></li>
-            <li><a href="about.html#team">Our team</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="products.html">Products &amp; packages</a></li>
-            <li><a href="insights.html">Insights</a></li>
-            <li><a href="live.html">Live updates</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="how-it-works.html">How it works</a></li>
+            <li><a href="calculator.html">Loan calculator</a></li>
+            <li><a href="eligibility.html">Eligibility check</a></li>
+            <li><a href="support.html">Help centre</a></li>
           </ul>
         </div>
 
         <div>
-          <h4>Solutions</h4>
+          <h4>Loan products</h4>
           <ul class="footer-links">
-            <li><a href="services.html#personal">Personal financial planning</a></li>
-            <li><a href="services.html#sme">SME finance advisory</a></li>
-            <li><a href="services.html#credit">Loan readiness &amp; credit repair</a></li>
-            <li><a href="services.html#insurance">Insurance &amp; risk cover</a></li>
-            <li><a href="services.html#training">Financial literacy training</a></li>
-            <li><a href="calculator.html">Loan &amp; savings calculator</a></li>
-            <li><a href="portal.html">Client login</a></li>
-            <li><a href="admin.html">Admin console</a></li>
+            <li><a href="loan-products.html#personal">Personal loan</a></li>
+            <li><a href="loan-products.html#business">Business loan</a></li>
+            <li><a href="loan-products.html#emergency">Emergency loan</a></li>
+            <li><a href="loan-products.html#salary">Salary-based loan</a></li>
+            <li><a href="loan-products.html#agricultural">Agricultural loan</a></li>
+            <li><a href="loan-products.html#secured">Secured loan</a></li>
           </ul>
         </div>
 
-        <div class="footer-contact-col">
-          <h4>Get in touch</h4>
-          <ul class="footer-contact">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi<br>P.O. Box 3142, Lilongwe</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg><span><a href="tel:+265999123456">+265 999 123 456</a><br><a href="tel:+265888456789">+265 888 456 789</a></span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span><a href="mailto:hello@jaycobfinancial.mw">hello@jaycobfinancial.mw</a></span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon–Fri, 08:00–17:00 · Sat, 09:00–12:00</span></li>
+        <div>
+          <h4>Legal &amp; policies</h4>
+          <ul class="footer-links">
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="terms.html">Terms &amp; conditions</a></li>
+            <li><a href="loan-agreement-terms.html">Loan agreement terms</a></li>
+            <li><a href="complaints.html">Complaints &amp; disputes</a></li>
+            <li><a href="responsible-lending.html">Responsible lending</a></li>
+            <li><a href="fees-disclosure.html">Fees &amp; charges</a></li>
+            <li><a href="licensing.html">Licensing disclosures</a></li>
           </ul>
+        </div>
 
-          <form class="newsletter" data-newsletter novalidate>
-            <label for="footer-email">Monthly money briefing</label>
-            <div class="newsletter-row">
-              <input id="footer-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-              <button class="btn btn--gold" type="submit">Join</button>
-            </div>
-            <p class="newsletter-note">One practical email a month. No noise, unsubscribe anytime.</p>
-          </form>
+        <div>
+          <h4>Customer care</h4>
+          <ul class="footer-contact">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a16 16 0 0 1-16-16"/></svg><a href="tel:+265999123456">+265 999 123 456</a></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:support@jaycobfinancial.mw">support@jaycobfinancial.mw</a></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11"/><circle cx="12" cy="10" r="2.5"/></svg><span>Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon–Fri 08:00–17:00 · Sat 09:00–12:00</span></li>
+          </ul>
+          <a class="btn btn--gold btn--sm" href="apply.html" style="margin-top:1rem;">Apply for a Loan</a>
+          <a class="btn btn--line-gold btn--sm" href="login.html" style="margin-top:.5rem;">Customer login</a>
         </div>
       </div>
 
-      <p class="disclaimer">Jay C.O.B Financial Services provides financial planning, advisory and training services. We are not a deposit-taking institution and do not lend directly; credit facilities are arranged through licensed partner institutions. Illustrations, rates and figures on this website are indicative and do not constitute a binding offer. This is a demonstration website: registration details, client stories and contact information are placeholders.</p>
+      <p class="disclaimer">JAY C O B FINANCIAL SERVICES is a licensed money lender operating in Malawi. Credit is subject to affordability and credit assessment. Interest rates, fees and charges are disclosed before an agreement is signed. Borrowing costs money — consider whether a loan is right for you, and read the Responsible Lending Policy, Fee Disclosure Statement and Terms and Conditions. This website is a demonstration environment: figures, decisions and reference numbers are illustrative and no real credit is advanced.</p>
 
       <div class="footer-bottom">
-        <p>© <span data-year>2026</span> Jay C.O.B Financial Services. All rights reserved.</p>
+        <p>© <span data-year>2026</span> JAY C O B FINANCIAL SERVICES. All rights reserved.</p>
         <div class="footer-legal">
-          <a href="contact.html">Book a consultation</a>
-          <a href="insights.html">Insights</a>
-          <a href="portal.html">Client portal</a>
-          <a href="#main">Back to top ↑</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="cookies.html">Cookies</a>
+          <a href="complaints.html">Complaints</a>
+          <a href="customer-rights.html">Customer rights</a>
+          <a href="aml.html">AML</a>
+          <a href="licensing.html">Regulatory</a>
         </div>
       </div>
     </div>
   </footer>
 
   <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/finance.js" defer></script>
+  <script src="assets/js/app-data.js" defer></script>
+  <script src="assets/js/ui.js" defer></script>
   <script src="assets/js/main.js" defer></script>
-  <script src="assets/js/live.js" defer></script>
   <script src="assets/js/calculator.js" defer></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 -- =====================================================================
--- Jay C.O.B Financial Services — Supabase schema (starter)
+-- JAY C O B Financial Services — Supabase schema (starter)
 -- Run in the Supabase SQL editor when you connect the backend.
 -- All monetary columns are Malawian Kwacha (MWK), stored as numeric(14,2).
 -- =====================================================================

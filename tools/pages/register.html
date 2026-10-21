@@ -1,0 +1,66 @@
+<main id="main">
+  <section class="auth-split">
+    <aside class="auth-aside">
+      <p class="brand-chip" style="color:#f0dcae;"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> New customer</p>
+      <h2>Open your account in minutes.</h2>
+      <p>Registration is free and does not commit you to borrowing. You need a valid national ID, a phone number and an email address.</p>
+      <ul class="auth-points">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Check eligibility without affecting your credit record</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Apply online and save a draft at any time</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Upload documents securely and track verification</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Manage repayments and statements from your dashboard</span></li>
+      </ul>
+    </aside>
+
+    <div class="auth-main">
+      <div class="auth-box" style="max-width:32rem;">
+        <a class="auth-logo brand" href="index.html" aria-label="JAY C O B FINANCIAL SERVICES — home">
+          <img src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+        </a>
+
+        <div class="auth-card">
+          <h1 style="font-size:1.5rem;">Create your account</h1>
+          <p class="text-small text-muted" style="margin-top:.3rem;">All fields marked * are required. You must be 18 or older.</p>
+
+          <form id="register-form" novalidate style="margin-top:1.2rem;">
+            <div class="form-grid">
+              <div class="field"><label for="reg-first">First name *</label><input id="reg-first" autocomplete="given-name" required><span class="error-msg">Enter your first name</span></div>
+              <div class="field"><label for="reg-last">Surname *</label><input id="reg-last" autocomplete="family-name" required><span class="error-msg">Enter your surname</span></div>
+              <div class="field"><label for="reg-dob">Date of birth *</label><input id="reg-dob" type="date" autocomplete="bday" required><span class="error-msg">You must be at least 18</span></div>
+              <div class="field"><label for="reg-gender">Gender</label>
+                <select id="reg-gender"><option>Female</option><option>Male</option><option>Prefer not to say</option></select>
+              </div>
+              <div class="field field--full"><label for="reg-nid">National ID number *</label><input id="reg-nid" autocomplete="off" required><span class="hint">Masked after submission</span><span class="error-msg">Enter a valid national ID</span></div>
+              <div class="field"><label for="reg-phone">Phone number *</label><input id="reg-phone" type="tel" autocomplete="tel" placeholder="+265 …" required><span class="error-msg">Enter a valid phone number</span></div>
+              <div class="field"><label for="reg-email">Email address *</label><input id="reg-email" type="email" autocomplete="email" required><span class="error-msg">Enter a valid email</span></div>
+              <div class="field"><label for="reg-password">Password *</label>
+                <div class="pw-wrap">
+                  <input id="reg-password" type="password" autocomplete="new-password" required>
+                  <button class="pw-toggle" type="button" data-pw-toggle="reg-password" aria-label="Show password" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <div class="pw-meter" id="pw-meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                <p class="pw-hint" id="pw-hint">Use at least 8 characters, including a number and a symbol.</p>
+                <span class="error-msg">Choose a stronger password</span>
+              </div>
+              <div class="field"><label for="reg-confirm">Confirm password *</label><input id="reg-confirm" type="password" autocomplete="new-password" required><span class="error-msg">Passwords do not match</span></div>
+            </div>
+
+            <label class="check-row" style="margin-top:1rem;"><input type="checkbox" id="reg-consent"><span>I accept the <a href="terms.html">Terms and Conditions</a>, <a href="privacy.html">Privacy Policy</a> and <a href="consent-retention.html">Consent Statement</a>, and confirm that I am 18 or older. *</span></label>
+            <label class="check-row" style="margin-top:.5rem;"><input type="checkbox" id="reg-marketing"><span>Send me product updates and financial literacy invitations (optional).</span></label>
+
+            <button class="btn btn--gold" type="submit" style="width:100%;margin-top:1rem;">Create account</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+
+          <p class="auth-switch">Already registered? <a href="login.html">Sign in</a></p>
+        </div>
+
+        <p class="text-tiny text-muted" style="text-align:center;margin-top:1rem;">
+          Next step: verify your email and phone with a one-time code. Demo code <code>123456</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>

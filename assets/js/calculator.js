@@ -1,380 +1,190 @@
 /* =====================================================================
-   Loan calculator — MWK
-   • Monthly or annual calculation basis
-   • Flat-rate or reducing-balance formula
-   • Dated monthly repayment schedule, CSV export and print plan
+   Public loan calculator (MWK)
+   Product presets · amount · rate · term · method · frequency · fees
+   Estimates monthly repayment, total interest, total repayment and a
+   preview amortization schedule, with CSV/print actions.
    ===================================================================== */
 (function () {
   "use strict";
 
-  var form = document.getElementById("calc-form");
-  if (!form) return;
+  var root = document.getElementById("calc-page");
+  if (!root) return;
 
-  var $ = function (id) { return document.getElementById(id); };
+  var UI = window.JCOB_UI;
+  var DATA = window.JCOB_DATA;
+  var F = window.JCOB_FINANCE;
 
-  var basisEl = $("calc-basis");
-  var amountEl = $("calc-amount");
-  var rateEl = $("calc-rate");
-  var periodEl = $("calc-period");
-  var periodUnit = $("period-unit");
-  var startEl = $("calc-start");
-  var feeEl = $("calc-fee");
-  var formulaEls = document.querySelectorAll('input[name="formula"]');
-  var formulaNote = $("formula-note");
-  var basisHint = $("basis-hint");
+  var PRESETS = {
+    personal: { label: "Personal Loan", rate: 24, min: 100000, max: 15000000, term: 12, maxTerm: 48, fee: 2 },
+    business: { label: "Business Loan", rate: 22, min: 500000, max: 50000000, term: 36, maxTerm: 60, fee: 2.5 },
+    emergency: { label: "Emergency Loan", rate: 28, min: 50000, max: 2000000, term: 6, maxTerm: 12, fee: 2 },
+    salary: { label: "Salary-based Loan", rate: 23, min: 100000, max: 10000000, term: 18, maxTerm: 36, fee: 2 },
+    short: { label: "Short-term Loan", rate: 29, min: 50000, max: 3000000, term: 3, maxTerm: 6, fee: 3 },
+    long: { label: "Long-term Loan", rate: 21, min: 1000000, max: 60000000, term: 60, maxTerm: 84, fee: 2.5 }
+  };
 
-  var MAX_ROWS = 360;
-  var showAll = true;
-  var scheduleRows = [];
+  var state = { preset: "personal", amount: 5000000, rate: 24, term: 12, method: "reducing", frequency: "monthly", fee: 2, adminFee: 0, showAll: false };
 
-  /* ---------------- Helpers ---------------- */
-  function money(value, decimals) {
-    var digits = decimals || 0;
-    return "MWK " + Number(value).toLocaleString("en-US", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits
+  function $(id) { return document.getElementById(id); }
+  function mwk(v) { return F.formatMWK(v); }
+
+  function readInputs() {
+    state.amount = Math.max(Number($("calc-amount").value) || 0, 0);
+    state.rate = Math.max(Number($("calc-rate").value) || 0, 0);
+    state.term = Math.max(Math.round(Number($("calc-term").value) || 1), 1);
+    state.method = $("calc-method").value;
+    state.frequency = $("calc-frequency").value;
+    state.fee = Math.max(Number($("calc-fee").value) || 0, 0);
+    state.adminFee = Math.max(Number($("calc-admin").value) || 0, 0);
+  }
+
+  function compute() {
+    return F.amortize({
+      principal: state.amount, rate: state.rate, termMonths: state.term,
+      method: state.method, frequency: state.frequency,
+      processingFeePct: state.fee, adminFee: state.adminFee
     });
   }
 
-  function num(el, fallback) {
-    var v = parseFloat(el.value);
-    return isFinite(v) ? v : fallback;
-  }
+  function render() {
+    var c = compute();
+    var p = PRESETS[state.preset];
 
-  function formula() {
-    var checked = document.querySelector('input[name="formula"]:checked');
-    return checked ? checked.value : "reducing";
-  }
+    $("res-payment").textContent = mwk(c.payment);
+    $("res-payment-period").textContent = "per " + (state.frequency === "monthly" ? "month" : "fortnight");
+    $("res-principal").textContent = mwk(c.principal);
+    $("res-interest").textContent = mwk(c.totalInterest);
+    $("res-fees").textContent = mwk(c.fees);
+    $("res-total").textContent = mwk(c.totalCost);
+    $("res-rate").textContent = c.rate + "% p.a.";
+    $("res-apr").textContent = c.apr.toFixed(1) + "%";
+    $("res-instalments").textContent = c.periods + " × " + mwk(c.payment);
+    $("res-method").textContent = state.method === "flat" ? "Flat rate" : "Reducing balance";
+    $("res-frequency").textContent = c.frequencyLabel;
+    $("res-first").textContent = F.shortDate(c.firstDue);
+    $("res-last").textContent = F.shortDate(c.lastDue);
 
-  function addMonths(date, months) {
-    var d = new Date(date.getTime());
-    var day = d.getDate();
-    d.setDate(1);
-    d.setMonth(d.getMonth() + months);
-    var daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-    d.setDate(Math.min(day, daysInMonth));
-    return d;
-  }
+    var pct = c.totalCost > 0 ? (c.principal / c.totalCost) * 100 : 100;
+    $("bar-principal").style.width = pct.toFixed(1) + "%";
+    $("bar-interest").style.width = Math.max(100 - pct, 0).toFixed(1) + "%";
 
-  function shortDate(date) {
-    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-  }
-
-  function startDate() {
-    if (startEl.value) {
-      var parsed = new Date(startEl.value + "T00:00:00");
-      if (!isNaN(parsed)) return parsed;
-    }
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
-  }
-
-  function todayISO() {
-    var d = new Date();
-    var m = String(d.getMonth() + 1).padStart(2, "0");
-    var day = String(d.getDate()).padStart(2, "0");
-    return d.getFullYear() + "-" + m + "-" + day;
-  }
-
-  /* ---------------- Basis handling ---------------- */
-  function applyBasis() {
-    var annual = basisEl.value === "annual";
-    periodUnit.textContent = annual ? "year" : "month";
-    periodEl.max = annual ? "30" : "360";
-    periodEl.value = "1"; // defaults: 1 month / 1 year
-    basisHint.textContent = annual
-      ? "Default: 1 year. Repayments are still scheduled monthly."
-      : "Default: 1 month. Repayments are scheduled monthly.";
-    recalc();
-  }
-
-  /* ---------------- Formula copy ---------------- */
-  function updateFormulaNote() {
-    if (formula() === "flat") {
-      formulaNote.textContent =
-        "Flat rate charges interest on the original principal for the whole term, even as the balance falls. Simpler, but usually more expensive overall.";
-    } else {
-      formulaNote.textContent =
-        "Reducing balance charges interest on the outstanding balance each month, so the interest portion falls over time. Usually the cheaper method.";
-    }
-  }
-
-  /* ---------------- Core calculation ---------------- */
-  function recalc() {
-    var principal = Math.max(num(amountEl, 5000000), 0);
-    var annualRate = Math.max(Math.min(num(rateEl, 24), 100), 0);
-    var basis = basisEl.value;
-    var period = Math.max(Math.round(num(periodEl, 1)), 1);
-    var feePct = Math.max(Math.min(num(feeEl, 0), 100), 0) / 100;
-
-    var months = basis === "annual" ? period * 12 : period;
-    months = Math.min(Math.max(months, 1), MAX_ROWS);
-
-    var monthlyRate = annualRate / 100 / 12;
-    var useFlat = formula() === "flat";
-
-    /* Reducing-balance instalment */
-    var reducingPayment;
-    if (monthlyRate === 0) {
-      reducingPayment = principal / months;
-    } else {
-      var factor = Math.pow(1 + monthlyRate, months);
-      reducingPayment = (principal * monthlyRate * factor) / (factor - 1);
-    }
-    var reducingInterest = reducingPayment * months - principal;
-
-    /* Flat-rate instalment */
-    var flatInterest = principal * (annualRate / 100) * (months / 12);
-    var flatPayment = (principal + flatInterest) / months;
-
-    var interest = useFlat ? flatInterest : reducingInterest;
-    var monthlyPayment = useFlat ? flatPayment : reducingPayment;
-    var fee = principal * feePct;
-    var totalRepayment = principal + interest;
-    var totalAmount = totalRepayment + fee;
-
-    /* ---------------- Schedule rows ---------------- */
-    scheduleRows = [];
-    var balance = principal;
-    var first = startDate();
-
-    for (var i = 1; i <= months; i++) {
-      var opening = balance;
-      var rowInterest, rowPrincipal, rowPayment;
-
-      if (useFlat) {
-        rowInterest = flatInterest / months;
-        rowPrincipal = principal / months;
-        rowPayment = flatPayment;
-      } else {
-        rowInterest = opening * monthlyRate;
-        rowPrincipal = reducingPayment - rowInterest;
-        rowPayment = reducingPayment;
-      }
-
-      /* Final row settles any rounding drift exactly */
-      if (i === months) {
-        rowPrincipal = opening;
-        rowPayment = rowPrincipal + rowInterest;
-      }
-
-      balance = Math.max(opening - rowPrincipal, 0);
-
-      scheduleRows.push({
-        n: i,
-        date: addMonths(first, i - 1),
-        opening: opening,
-        payment: rowPayment,
-        interest: rowInterest,
-        principal: rowPrincipal,
-        closing: balance
-      });
-    }
-
-    renderSummary({
-      principal: principal,
-      interest: interest,
-      fee: fee,
-      totalRepayment: totalRepayment,
-      totalAmount: totalAmount,
-      monthlyPayment: monthlyPayment,
-      months: months,
-      period: period,
-      basis: basis,
-      annualRate: annualRate,
-      useFlat: useFlat,
-      flatInterest: flatInterest,
-      reducingInterest: reducingInterest
+    var other = F.amortize({
+      principal: state.amount, rate: state.rate, termMonths: state.term,
+      method: state.method === "flat" ? "reducing" : "flat", frequency: state.frequency,
+      processingFeePct: state.fee, adminFee: state.adminFee
     });
+    var diff = other.totalCost - c.totalCost;
+    $("res-compare").textContent = diff > 0
+      ? "The " + (state.method === "flat" ? "reducing balance" : "flat rate") + " method would cost " + mwk(Math.abs(diff)) + " less."
+      : diff < 0
+        ? "The " + (state.method === "flat" ? "reducing balance" : "flat rate") + " method would cost " + mwk(Math.abs(diff)) + " more."
+        : "Both methods produce the same total at these inputs.";
 
-    renderSchedule(months);
+    $("calc-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · " + p.maxTerm + " months maximum";
+    $("apply-link").href = "apply.html?product=" + encodeURIComponent(p.label) + "&amount=" + state.amount + "&term=" + state.term;
+    $("calc-aside-note").textContent = "Indicative only — final terms follow credit and affordability assessment.";
+    renderSchedule(c);
   }
 
-  /* ---------------- Summary rendering ---------------- */
-  function renderSummary(d) {
-    $("res-total").textContent = money(d.totalAmount);
-    $("res-principal").textContent = money(d.principal);
-    $("res-interest").textContent = money(d.interest);
-    $("res-monthly").textContent = money(d.monthlyPayment);
-    $("res-repayment").textContent = money(d.totalRepayment);
-    $("res-fee").textContent = money(d.fee);
-    $("res-fee-row").hidden = d.fee <= 0;
-
-    var duration;
-    if (d.basis === "annual") {
-      duration = d.period + (d.period === 1 ? " year" : " years") +
-        " (" + d.months + " months)";
-    } else {
-      duration = d.months + (d.months === 1 ? " month" : " months");
-      if (d.months % 12 === 0) duration += " (" + d.months / 12 + (d.months === 12 ? " year" : " years") + ")";
-    }
-    $("res-duration").textContent = duration;
-    $("res-basis").textContent = d.basis === "annual" ? "Annual" : "Monthly";
-    $("res-formula").textContent = d.useFlat ? "Flat rate" : "Reducing balance";
-    $("res-rate").textContent = (Number.isInteger(d.annualRate) ? d.annualRate : d.annualRate.toFixed(2)) + "% p.a.";
-
-    var principalShare = d.totalAmount > 0 ? (d.principal / d.totalAmount) * 100 : 100;
-    $("bar-principal").style.width = principalShare.toFixed(2) + "%";
-    $("bar-interest").style.width = Math.max(100 - principalShare, 0).toFixed(2) + "%";
-
-    var diff = Math.abs(d.flatInterest - d.reducingInterest);
-    var compare;
-    if (diff < 1) {
-      compare = "Both formulas produce the same interest at a 0% rate.";
-    } else if (d.useFlat) {
-      compare = "Reducing balance would charge " + money(d.reducingInterest) +
-        " interest — " + money(diff) + " less than this flat-rate plan.";
-    } else {
-      compare = "A flat rate would charge " + money(d.flatInterest) +
-        " interest — " + money(diff) + " more than this reducing-balance plan.";
-    }
-    $("res-note").textContent = compare + " Figures are indicative; lenders may add insurance, processing fees and different rounding.";
-
-    var first = startDate();
-    var last = addMonths(first, d.months - 1);
-    $("schedule-summary").textContent =
-      d.months + " monthly payment" + (d.months === 1 ? "" : "s") +
-      " from " + shortDate(first) + " to " + shortDate(last) +
-      " · " + (d.useFlat ? "flat rate" : "reducing balance") + " · MWK";
-  }
-
-  /* ---------------- Schedule rendering ---------------- */
-  function renderSchedule(months) {
-    var body = $("schedule-body");
-    var rows = showAll ? scheduleRows : scheduleRows.slice(0, 12);
-
-    body.innerHTML = rows.map(function (r) {
-      return "<tr>" +
-        "<td>" + r.n + "</td>" +
-        "<td>" + shortDate(r.date) + "</td>" +
-        '<td class="num">' + money(r.opening) + "</td>" +
-        '<td class="num"><strong>' + money(r.payment) + "</strong></td>" +
-        '<td class="num">' + money(r.interest) + "</td>" +
-        '<td class="num">' + money(r.principal) + "</td>" +
-        '<td class="num">' + money(r.closing) + "</td>" +
-        "</tr>";
+  function renderSchedule(c) {
+    var rows = state.showAll ? c.rows : c.rows.slice(0, 12);
+    $("amort-body").innerHTML = rows.map(function (r) {
+      return "<tr><td>" + r.n + "</td><td>" + F.shortDate(r.date) + "</td>" +
+        '<td class="num">' + mwk(r.payment) + "</td>" +
+        '<td class="num">' + mwk(r.principal) + "</td>" +
+        '<td class="num">' + mwk(r.interest) + "</td>" +
+        '<td class="num">' + mwk(r.closing) + "</td></tr>";
     }).join("");
-
-    var totals = scheduleRows.reduce(function (acc, r) {
-      acc.payment += r.payment;
-      acc.interest += r.interest;
-      acc.principal += r.principal;
-      return acc;
-    }, { payment: 0, interest: 0, principal: 0 });
-
-    $("foot-opening").textContent = money(scheduleRows.length ? scheduleRows[0].opening : 0);
-    $("foot-payment").textContent = money(totals.payment);
-    $("foot-interest").textContent = money(totals.interest);
-    $("foot-principal").textContent = money(totals.principal);
-    $("foot-closing").textContent = money(0);
-
-    var toggle = $("toggle-rows");
-    if (months <= 12) {
-      toggle.hidden = true;
-    } else {
-      toggle.hidden = false;
-      toggle.textContent = showAll ? "Show first 12 rows" : "Show all " + months + " rows";
-    }
+    $("amort-count").textContent = state.showAll
+      ? "Showing all " + c.periods + " instalments"
+      : "Showing first " + Math.min(12, c.periods) + " of " + c.periods + " instalments";
+    $("amort-toggle").textContent = state.showAll ? "Show first 12" : "Show all " + c.periods;
+    $("amort-toggle").hidden = c.periods <= 12;
+    $("amort-total").textContent = mwk(c.totalCost);
+    window.__calc = c;
   }
 
-  /* ---------------- Export ---------------- */
-  function scheduleCSV() {
+  function applyPreset(key) {
+    var p = PRESETS[key];
+    state.preset = key;
+    state.rate = p.rate;
+    state.fee = p.fee;
+    state.term = p.term;
+    state.amount = Math.min(Math.max(state.amount, p.min), p.max);
+    $("calc-amount").value = state.amount;
+    $("calc-amount").min = p.min;
+    $("calc-amount").max = p.max;
+    $("calc-rate").value = p.rate;
+    $("calc-term").value = state.term;
+    $("calc-term").max = p.maxTerm;
+    $("calc-fee").value = p.fee;
+    render();
+  }
+
+  function exportCSV() {
+    var c = window.__calc || compute();
     var lines = [
-      "Jay C.O.B Financial Services - Loan Repayment Schedule",
-      "Currency,MWK",
-      "Basis," + basisEl.value,
-      "Formula," + (formula() === "flat" ? "Flat rate" : "Reducing balance"),
-      "Principal," + num(amountEl, 0),
-      "Annual interest rate," + num(rateEl, 0) + "%",
-      "Term (months)," + (basisEl.value === "annual" ? num(periodEl, 1) * 12 : num(periodEl, 1)),
-      "Arrangement fee," + num(feeEl, 0) + "%",
+      "JAY C O B Financial Services — loan calculator (MWK)",
+      "Product," + PRESETS[state.preset].label,
+      "Principal," + c.principal,
+      "Annual rate," + c.rate + "%",
+      "Term (months)," + c.termMonths,
+      "Method," + (state.method === "flat" ? "Flat rate" : "Reducing balance"),
+      "Frequency," + c.frequencyLabel,
+      "Instalment," + c.payment.toFixed(2),
+      "Total interest," + c.totalInterest.toFixed(2),
+      "Fees," + c.fees.toFixed(2),
+      "Total repayment," + c.totalCost.toFixed(2),
       "",
-      "No,Due date,Opening balance,Payment,Interest,Principal,Closing balance"
+      UI.tableCSV(["#", "Due date", "Instalment", "Principal", "Interest", "Balance"],
+        c.rows.map(function (r) {
+          return [r.n, new Date(r.date).toISOString().slice(0, 10), r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), r.closing.toFixed(2)];
+        }))
     ];
-    scheduleRows.forEach(function (r) {
-      lines.push([
-        r.n,
-        r.date.toISOString().slice(0, 10),
-        r.opening.toFixed(2),
-        r.payment.toFixed(2),
-        r.interest.toFixed(2),
-        r.principal.toFixed(2),
-        r.closing.toFixed(2)
-      ].join(","));
-    });
-    var totals = scheduleRows.reduce(function (acc, r) {
-      acc.payment += r.payment;
-      acc.interest += r.interest;
-      acc.principal += r.principal;
-      return acc;
-    }, { payment: 0, interest: 0, principal: 0 });
-    lines.push("", "TOTALS,,," + totals.payment.toFixed(2) + "," +
-      totals.interest.toFixed(2) + "," + totals.principal.toFixed(2) + ",0.00");
-    lines.push("", "Generated " + new Date().toISOString().slice(0, 10), "Illustration only - not a binding offer");
-    return lines.join("\n");
+    UI.downloadCSV("JC-loan-estimate.csv", lines.join("\n"));
+    UI.toast({ title: "Estimate exported", message: "Repayment schedule saved as CSV.", type: "success" });
   }
 
-  function downloadCSV() {
-    var blob = new Blob([scheduleCSV()], { type: "text/csv;charset=utf-8;" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "JC-loan-schedule-MWK.csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1200);
+  function reset() {
+    state.showAll = false;
+    applyPreset("personal");
+    $("calc-amount").value = 5000000;
+    $("calc-method").value = "reducing";
+    $("calc-frequency").value = "monthly";
+    $("calc-admin").value = 0;
+    readInputs();
+    render();
+    UI.toast({ title: "Calculator reset", message: "Default personal loan figures restored.", type: "info" });
   }
 
-  /* ---------------- Events ---------------- */
-  basisEl.addEventListener("change", applyBasis);
-  formulaEls.forEach(function (radio) {
-    radio.addEventListener("change", function () {
-      updateFormulaNote();
-      recalc();
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
+      radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
-  });
+    ["calc-amount", "calc-rate", "calc-term", "calc-method", "calc-frequency", "calc-fee", "calc-admin"].forEach(function (id) {
+      var el = $(id);
+      if (!el) return;
+      el.addEventListener("input", function () { readInputs(); render(); });
+      el.addEventListener("change", function () { readInputs(); render(); });
+    });
+    $("calc-reset").addEventListener("click", reset);
+    $("calc-export").addEventListener("click", exportCSV);
+    $("calc-print").addEventListener("click", function () { UI.printElement("calc-print-area"); });
+    $("amort-toggle").addEventListener("click", function () {
+      state.showAll = !state.showAll;
+      renderSchedule(window.__calc || compute());
+    });
 
-  [amountEl, rateEl, periodEl, feeEl, startEl].forEach(function (el) {
-    el.addEventListener("input", recalc);
-    el.addEventListener("change", recalc);
-  });
-
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    recalc();
-    if (window.innerWidth < 960) {
-      $("schedule-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    var params = new URLSearchParams(location.search);
+    if (params.get("product")) {
+      var found = Object.keys(PRESETS).filter(function (k) {
+        return PRESETS[k].label.toLowerCase() === params.get("product").toLowerCase();
+      })[0];
+      if (found) applyPreset(found);
     }
+    if (params.get("amount")) $("calc-amount").value = Number(params.get("amount"));
+    if (params.get("term")) $("calc-term").value = Number(params.get("term"));
+    readInputs();
+    render();
   });
-
-  $("calc-reset").addEventListener("click", function () {
-    basisEl.value = "monthly";
-    amountEl.value = 5000000;
-    rateEl.value = 24;
-    feeEl.value = 0;
-    document.getElementById("formula-reducing").checked = true;
-    startEl.value = todayISO();
-    showAll = true;
-    applyBasis();
-    updateFormulaNote();
-  });
-
-  $("toggle-rows").addEventListener("click", function () {
-    showAll = !showAll;
-    renderSchedule(basisEl.value === "annual" ? num(periodEl, 1) * 12 : num(periodEl, 1));
-  });
-
-  $("download-schedule").addEventListener("click", downloadCSV);
-  $("download-schedule-2").addEventListener("click", downloadCSV);
-  $("print-plan").addEventListener("click", function () {
-    document.body.classList.remove("print-receipt");
-    window.print();
-  });
-
-  /* ---------------- Init ---------------- */
-  startEl.value = todayISO();
-  updateFormulaNote();
-  recalc();
 })();

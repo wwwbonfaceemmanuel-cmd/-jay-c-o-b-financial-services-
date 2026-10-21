@@ -358,7 +358,7 @@
     var s = STATEMENTS[key];
     if (!s) return "";
     var lines = [
-      "Jay C.O.B Financial Services - Client Statement",
+      "JAY C O B FINANCIAL SERVICES - Client Statement",
       "Client reference,JC-2019-0412",
       "Statement reference," + s.reference,
       "Period," + s.period,
@@ -480,7 +480,7 @@
     plan: {
       title: "Household Financial Plan 2026",
       body: [
-        "JAY C.O.B FINANCIAL SERVICES",
+        "JAY C O B FINANCIAL SERVICES",
         "Plot 47/3, Area 47, Sector 3, Lilongwe · hello@jaycobfinancial.mw",
         "",
         "HOUSEHOLD FINANCIAL PLAN 2026",
@@ -512,10 +512,10 @@
     engagement: {
       title: "Engagement letter (signed)",
       body: [
-        "JAY C.O.B FINANCIAL SERVICES",
+        "JAY C O B FINANCIAL SERVICES",
         "",
         "ENGAGEMENT LETTER",
-        "Between Jay C.O.B Financial Services and Memory Tembo",
+        "Between JAY C O B FINANCIAL SERVICES and Memory Tembo",
         "Date: 14 January 2026",
         "",
         "SCOPE",
@@ -536,7 +536,7 @@
     review: {
       title: "Q3 2026 review notes",
       body: [
-        "JAY C.O.B FINANCIAL SERVICES — Q3 2026 REVIEW NOTES",
+        "JAY C O B FINANCIAL SERVICES — Q3 2026 REVIEW NOTES",
         "Client: Memory Tembo | 12 October 2026 | MWK",
         "",
         "PROGRESS",
@@ -558,7 +558,7 @@
     insurance: {
       title: "Insurance schedule",
       body: [
-        "JAY C.O.B FINANCIAL SERVICES — INSURANCE SCHEDULE",
+        "JAY C O B FINANCIAL SERVICES — INSURANCE SCHEDULE",
         "Client: Memory Tembo | Prepared 18 September 2026 | MWK",
         "",
         "LIFE COVER        MWK 15,000,000   Partner insurer A",

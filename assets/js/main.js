@@ -1,5 +1,5 @@
 /* =====================================================================
-   Jay C.O.B Financial Services — shared site behaviour
+   JAY C O B Financial Services — shared site behaviour
    ===================================================================== */
 (function () {
   "use strict";

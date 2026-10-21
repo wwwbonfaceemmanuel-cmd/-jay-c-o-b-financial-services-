@@ -127,7 +127,7 @@
   };
 
   /* ---------------- Feed rendering ---------------- */
-  var LOGO = '<img class="live-logo" src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64" loading="lazy">';
+  var LOGO = '<img class="live-logo" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64" loading="lazy">';
   var MARK = '<img class="live-mark" src="assets/img/logo-mark.svg" alt="" width="18" height="18">';
 
   function slideMarkup(post) {
@@ -170,7 +170,7 @@
       '<article class="live-slide anim-' + anim + '" data-anim="' + anim + '">' +
       inner +
       '<div class="live-meta">' + MARK +
-      "<span>Jay C.O.B Financial Services</span><span class=\"live-dot-sep\"></span>" +
+      "<span>JAY C O B FINANCIAL SERVICES</span><span class=\"live-dot-sep\"></span>" +
       "<time datetime=\"" + escapeHtml(post.date) + "\">" + formatDate(post.date) + "</time>" +
       "</div></article>"
     );
@@ -352,7 +352,7 @@
     wrap.className = "live-toast";
     wrap.setAttribute("role", "status");
     wrap.innerHTML =
-      '<div class="live-toast-head">' + MARK + '<span>Live · Jay C.O.B</span>' +
+      '<div class="live-toast-head">' + MARK + '<span>Live · JAY C O B</span>' +
       '<button type="button" class="live-toast-close" aria-label="Dismiss notification">×</button></div>' +
       "<h4>" + escapeHtml(post.title) + "</h4>" +
       "<p>" + escapeHtml(post.body) + "</p>" +

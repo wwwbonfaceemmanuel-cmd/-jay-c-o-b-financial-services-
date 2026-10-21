@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
-Disallow: /portal.html
+
 Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /portal.html
+Disallow: /404.html
+Disallow: /verify.html
+Disallow: /reset-password.html
 
 Sitemap: https://wwwbonfaceemmanuel-cmd.github.io/-jay-c-o-b-financial-services-/sitemap.xml

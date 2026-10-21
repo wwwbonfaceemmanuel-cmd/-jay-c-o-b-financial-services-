@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Jay C.O.B Financial Services">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="JAY C O B Financial Services">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#143a59"/>
-      <stop offset="1" stop-color="#071828"/>
+      <stop offset="0" stop-color="#0d5038"/>
+      <stop offset="1" stop-color="#03170f"/>
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#d4aa52" stroke-opacity=".45"/>
-  <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="600" fill="#ecd7a6" letter-spacing="-1">JC</text>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#d9b45a" stroke-opacity=".45"/>
+  <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="600" fill="#f0dcae" letter-spacing="-1">JC</text>
 </svg>

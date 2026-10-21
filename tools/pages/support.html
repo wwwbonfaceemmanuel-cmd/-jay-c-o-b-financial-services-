@@ -1,0 +1,210 @@
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Support</span></nav>
+      <span class="eyebrow">Help centre · Mon–Sat</span>
+      <h1>Support &amp; help centre</h1>
+      <p class="lead">Get help with an application, a repayment, your account or a complaint. Call, email, open a ticket or find the answer yourself in the help centre.</p>
+      <div class="flex flex-wrap gap-1 mt-2">
+        <a class="btn btn--gold" href="#contact-form">Contact support</a>
+        <a class="btn btn--ghost" href="#faq">Browse FAQs</a>
+        <a class="btn btn--ghost" href="login.html">Open dashboard support</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight" style="background:#fff;border-bottom:1px solid var(--line);">
+    <div class="container trust-strip" style="border:0;background:transparent;padding:0;">
+      <span class="trust-item"><strong>Mon–Fri</strong> 08:00–17:00</span>
+      <span class="trust-item"><strong>Sat</strong> 09:00–12:00</span>
+      <span class="trust-item"><strong>Email replies</strong> within 1 working day</span>
+      <span class="trust-item"><strong>Complaints</strong> acknowledged in 2 working days</span>
+      <span class="trust-item"><strong>Emergency line</strong> 24/7 for lost cards, fraud &amp; payments</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="section-head">
+        <p class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Choose a channel</p>
+        <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem);">How can we help?</h2>
+      </div>
+
+      <div class="support-options" style="margin-top:1.2rem;">
+        <a class="support-option" href="tel:+265999123456">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a16 16 0 0 1-16-16"/></svg></span>
+          <div><strong>Call us</strong><p class="text-small text-muted">+265 999 123 456 · +265 888 456 789 — Monday to Saturday</p></div>
+        </a>
+        <a class="support-option" href="mailto:support@jaycobfinancial.mw">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+          <div><strong>Email support</strong><p class="text-small text-muted">support@jaycobfinancial.mw — include your application or loan reference</p></div>
+        </a>
+        <a class="support-option" href="https://wa.me/265999123456" rel="noopener">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/></svg></span>
+          <div><strong>WhatsApp</strong><p class="text-small text-muted">Message +265 999 123 456 for quick questions about an application</p></div>
+        </a>
+        <a class="support-option" href="#contact-form">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+          <div><strong>Open a ticket</strong><p class="text-small text-muted">Written record, attachments and a trackable reference number</p></div>
+        </a>
+      </div>
+
+      <div class="support-grid" style="margin-top:1.4rem;">
+        <div class="card"><h3>Application support</h3><p>Help choosing a product, completing a step, uploading documents or understanding a decision.</p><a class="link-arrow" href="#contact-form">Ask about an application</a></div>
+        <div class="card"><h3>Repayment support</h3><p>Payment methods, missing payments, receipts, schedules, early settlement and restructuring.</p><a class="link-arrow" href="#repayments">Repayment help</a></div>
+        <div class="card"><h3>Account &amp; security</h3><p>Password resets, MFA, sessions, suspicious activity, account restriction or closure.</p><a class="link-arrow" href="#security-help">Security help</a></div>
+        <div class="card"><h3>Complaints</h3><p>A formal process with timescales, escalation and independent review if we get it wrong.</p><a class="link-arrow" href="complaints.html">Complaint process</a></div>
+      </div>
+
+      <!-- CONTACT FORM -->
+      <div class="split" style="margin-top:2.4rem;align-items:start;" id="contact-form">
+        <div class="form-card">
+          <p class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Contact form</p>
+          <h2 style="font-size:1.4rem;">Send us a message</h2>
+          <p class="text-small text-muted" style="margin-top:.3rem;">We reply within one working day. For urgent payment or fraud issues, call the emergency line.</p>
+
+          <form id="support-form" novalidate style="margin-top:1rem;">
+            <div class="form-grid">
+              <div class="field"><label for="sf-name">Full name *</label><input id="sf-name" autocomplete="name" required><span class="error-msg">Enter your name</span></div>
+              <div class="field"><label for="sf-email">Email address *</label><input id="sf-email" type="email" autocomplete="email" required><span class="error-msg">Enter a valid email</span></div>
+              <div class="field"><label for="sf-phone">Phone number</label><input id="sf-phone" type="tel" autocomplete="tel" placeholder="+265 …"></div>
+              <div class="field"><label for="sf-ref">Application or loan reference</label><input id="sf-ref" placeholder="APP-2026-… or LN-2026-…"></div>
+              <div class="field field--full"><label for="sf-category">What is this about? *</label>
+                <select id="sf-category" required>
+                  <option value="">Select a category</option>
+                  <option>New application</option>
+                  <option>Application status</option>
+                  <option>Documents or KYC</option>
+                  <option>Repayment or payment</option>
+                  <option>Missing payment</option>
+                  <option>Statement or receipt</option>
+                  <option>Account access</option>
+                  <option>Security or fraud</option>
+                  <option>Complaint</option>
+                  <option>Data request</option>
+                  <option>Other</option>
+                </select><span class="error-msg">Choose a category</span></div>
+              <div class="field field--full"><label for="sf-subject">Subject *</label><input id="sf-subject" required><span class="error-msg">Add a subject</span></div>
+              <div class="field field--full"><label for="sf-message">Message *</label><textarea id="sf-message" rows="5" required placeholder="Tell us what happened, when, and what you need."></textarea><span class="error-msg">Tell us a little more</span></div>
+              <div class="field field--full"><label for="sf-file">Attachment (optional)</label><input id="sf-file" type="file" accept=".pdf,.jpg,.jpeg,.png"><span class="hint">PDF, JPG or PNG up to 5 MB</span></div>
+            </div>
+            <label class="check-row" style="margin-top:.9rem;"><input type="checkbox" id="sf-consent"><span>I consent to my details being used to respond to this request, in line with the <a href="privacy.html">Privacy Policy</a>. *</span></label>
+            <div class="flex flex-wrap items-center gap-1" style="margin-top:1rem;">
+              <button class="btn btn--gold" type="submit">Send message</button>
+              <button class="btn btn--ghost" type="reset">Clear</button>
+            </div>
+            <p class="form-status" id="support-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Emergency &amp; fraud</h3>
+            <p><strong style="color:var(--danger);">24/7 line:</strong> <a href="tel:+265999123456">+265 999 123 456</a></p>
+            <p class="text-small text-muted">Call immediately if you suspect fraud, lost your phone with your SIM, or made a payment that has not appeared after 24 hours.</p>
+            <ul class="card-list">
+              <li>Never share your password or one-time code</li>
+              <li>We never ask you to pay a fee to a personal number</li>
+              <li>Report suspicious messages to <a href="mailto:security@jaycobfinancial.mw">security@jaycobfinancial.mw</a></li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top:1rem;">
+            <h3>Visit our office</h3>
+            <p>Plot 47/3, Area 47, Sector 3<br>Lilongwe, Malawi</p>
+            <p class="text-small text-muted">Bring your national ID. In-person applications, document certification, statements and settlement quotes are available.</p>
+            <p class="text-tiny text-muted">Mon–Fri 08:00–17:00 · Sat 09:00–12:00 · closed public holidays</p>
+          </div>
+
+          <div class="card" style="margin-top:1rem;">
+            <h3>Track a ticket</h3>
+            <form id="ticket-form" novalidate>
+              <div class="field">
+                <label for="ticket-ref">Ticket reference</label>
+                <input id="ticket-ref" placeholder="TKT-2026-0042">
+                <span class="hint">Enter the reference from your confirmation email or SMS</span>
+              </div>
+              <button class="btn btn--ghost btn--sm" type="submit" style="margin-top:.6rem;">Check status</button>
+              <p class="form-status" id="ticket-status" role="status" aria-live="polite"></p>
+            </form>
+            <div id="ticket-result" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPAYMENT HELP -->
+      <div class="grid-3" id="repayments" style="margin-top:2.4rem;">
+        <div class="card">
+          <h3>How to repay</h3>
+          <ul class="card-list">
+            <li><strong>Airtel Money:</strong> pay to merchant code JCOB, reference = loan ID</li>
+            <li><strong>TNM Mpamba:</strong> pay to merchant code 4471, reference = loan ID</li>
+            <li><strong>Bank transfer:</strong> use the account on your agreement</li>
+            <li><strong>Standing order:</strong> download the mandate from your dashboard</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Payment not showing?</h3>
+          <p>Allow up to 2 hours. If it is still missing, use <strong>My transactions → Report a missing payment</strong> or open a ticket with the mobile money reference and time of payment.</p>
+          <a class="link-arrow" href="login.html">Report in dashboard</a>
+        </div>
+        <div class="card">
+          <h3>Struggling to pay?</h3>
+          <p>Call us before the due date. We can discuss a payment plan, a restructure or a short payment holiday where policy allows.</p>
+          <a class="link-arrow" href="responsible-lending.html">Responsible lending</a>
+        </div>
+      </div>
+
+      <!-- SECURITY HELP -->
+      <div class="notice notice--info" style="margin-top:1.6rem;" id="security-help">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+        <div><strong>Account security.</strong> Reset your password from <a href="forgot-password.html">forgot password</a>, review sessions and login activity in the dashboard under <em>Account security</em>, and enable multi-factor authentication in <em>Settings</em>. If someone else may have access to your account, call the emergency line so we can restrict it immediately.</div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="section-head" id="faq" style="margin-top:2.4rem;">
+        <p class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Help centre</p>
+        <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem);">Frequently asked questions.</h2>
+      </div>
+
+      <div class="faq" data-accordion style="margin-top:1.2rem;max-width:none;">
+        <details open>
+          <summary>How do I check the status of my application?</summary>
+          <p>Sign in and open <strong>My loan applications</strong>. Each application shows its stage — pending, under review, information required, approved, rejected or withdrawn — plus reviewer comments and any outstanding documents.</p>
+        </details>
+        <details>
+          <summary>What does “information required” mean?</summary>
+          <p>We need something from you before we can decide — usually a clearer document, a payslip or an explanation. The application page lists exactly what is needed, with an upload or respond action.</p>
+        </details>
+        <details>
+          <summary>Why was my application declined?</summary>
+          <p>The most common reasons are affordability (the instalment is too high relative to income), incomplete documents, or a poor credit record. The decision message gives the reason. You can reapply after addressing it.</p>
+        </details>
+        <details>
+          <summary>How long does disbursement take?</summary>
+          <p>Usually the same working day after a signed agreement, and within 48 hours at the latest. Mobile money is often faster than bank transfer. You receive a disbursement notification with a receipt.</p>
+        </details>
+        <details>
+          <summary>Can I change my repayment date?</summary>
+          <p>In some cases. Ask support at least three working days before the due date. A change may affect the schedule and any accrued interest, and a restructuring fee may apply.</p>
+        </details>
+        <details>
+          <summary>How do I get a statement?</summary>
+          <p>Open <strong>Account statements</strong> in the dashboard, choose the account and period, and download or print. Statements cover loans, savings and wallet activity and carry a verification reference.</p>
+        </details>
+        <details>
+          <summary>How do I close my account?</summary>
+          <p>Loans must be settled first. Then request closure in <strong>Settings → Account closure</strong>. We confirm in writing, retain records required by law, and delete the rest in line with our retention policy.</p>
+        </details>
+        <details>
+          <summary>How do I complain?</summary>
+          <p>Use the contact form above with the category “Complaint”, email complaints@jaycobfinancial.mw, or call. You get a ticket reference, an acknowledgement within two working days and a substantive response within 15 working days.</p>
+        </details>
+      </div>
+
+    </div>
+  </section>
+
+</main>
