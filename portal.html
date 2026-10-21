@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client portal — Jay C.O.B Financial Services</title>
+  <meta name="description" content="Sign in to the Jay C.O.B client portal to review your plan, accounts, statements and documents. Demo access available.">
+  <meta name="theme-color" content="#071828">
+  <meta property="og:title" content="Client portal — Jay C.O.B Financial Services">
+  <meta property="og:description" content="Sign in to the Jay C.O.B client portal to review your plan, accounts, statements and documents. Demo access available.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/hero-consultation.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
+        <span class="brand-mark" aria-hidden="true">JC</span>
+        <span class="brand-text">
+          <span class="brand-name">Jay C.O.B</span>
+          <span class="brand-sub">Financial Services</span>
+        </span>
+      </a>
+
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="index.html">Home</a></li>
+          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="services.html">Services</a></li>
+          <li><a class="nav-link" href="products.html">Products</a></li>
+          <li><a class="nav-link" href="insights.html">Insights</a></li>
+          <li><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn--ghost btn--sm" href="portal.html">Client portal</a>
+        <a class="btn btn--gold btn--sm" href="contact.html">Book a consultation</a>
+      </div>
+
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="portal-shell">
+      <div class="container">
+
+        <!-- ================= SIGN IN ================= -->
+        <div id="portal-auth">
+          <div class="split" style="align-items:center; max-width:62rem; margin-inline:auto;">
+            <div class="reveal">
+              <span class="eyebrow">Client portal</span>
+              <h1 style="font-size:clamp(1.9rem,3.6vw,2.7rem);">Your plan, your documents, one place.</h1>
+              <p class="lead mt-2">Sign in to review plan milestones, check account balances, download statements and message your advisor. Access is issued when your engagement letter is signed.</p>
+              <ul class="checklist mt-3">
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Plan progress and next actions</span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Statements and engagement documents</span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Secure messages with your named advisor</span></li>
+              </ul>
+              <div class="card mt-3" style="padding:1rem 1.1rem; display:flex; gap:.8rem; align-items:flex-start; background:transparent; border-style:dashed;">
+                <span class="icon-badge icon-badge--teal" style="width:34px;height:34px;border-radius:9px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                <p class="text-tiny text-muted" style="margin:0;">This is a demonstration portal. Do not enter real banking credentials, ID numbers or account details. Data entered here stays in your browser only.</p>
+              </div>
+            </div>
+
+            <div class="auth-wrap reveal" data-delay="1">
+              <div class="auth-card">
+                <h2 style="font-size:1.4rem;">Sign in</h2>
+                <p class="text-small text-muted mt-1">Use the demo credentials below to explore.</p>
+
+                <form id="login-form" class="mt-3" novalidate>
+                  <div class="field">
+                    <label for="login-email">Email address</label>
+                    <input id="login-email" name="email" type="email" autocomplete="username" placeholder="you@example.com" required>
+                    <span class="error-msg">Enter a valid email address.</span>
+                  </div>
+                  <div class="field mt-2">
+                    <label for="login-password">Password</label>
+                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+                    <span class="error-msg">Enter your password.</span>
+                  </div>
+                  <div class="flex items-center justify-between gap-2 mt-2">
+                    <label class="check-row" style="margin:0;">
+                      <input type="checkbox" id="login-remember" checked>
+                      <span>Keep me signed in</span>
+                    </label>
+                    <a class="text-tiny" href="contact.html">Forgot password?</a>
+                  </div>
+                  <button class="btn btn--block mt-3" type="submit">Sign in securely</button>
+                  <p class="form-status" id="login-status"></p>
+                </form>
+
+                <div class="demo-note">
+                  <strong>Demo access</strong><br>
+                  Email: <code>demo@jaycobfinancial.mw</code><br>
+                  Password: <code>demo1234</code>
+                </div>
+              </div>
+              <p class="text-tiny text-muted center mt-2">Need access? <a href="contact.html">Contact your advisor</a>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= DASHBOARD ================= -->
+        <div id="portal-dash" hidden>
+          <div class="dash-header">
+            <div>
+              <span class="eyebrow">Client portal</span>
+              <h1 style="font-size:clamp(1.5rem,3vw,2rem); margin-top:.5rem;">Good to see you, <span id="dash-first-name">Memory</span>.</h1>
+              <p class="text-small text-muted">Client reference JC-2019-0412 · Household Financial Plan</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="dash-user">
+                <span class="avatar" id="dash-avatar">MT</span>
+                <div><strong id="dash-name">Memory Tembo</strong><span id="dash-email">demo@jaycobfinancial.mw</span></div>
+              </div>
+              <button class="btn btn--ghost btn--sm" id="logout-btn" type="button">Sign out</button>
+            </div>
+          </div>
+
+          <div class="dash-grid">
+            <nav class="dash-nav" aria-label="Portal sections">
+              <button type="button" class="is-active" data-panel="overview" aria-controls="panel-overview" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></button>
+              <button type="button" data-panel="accounts" aria-controls="panel-accounts" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"/><path d="M16 14h.01"/></svg><span>Accounts</span></button>
+              <button type="button" data-panel="statements" aria-controls="panel-statements" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2V2l-3 2-3-2-3 2-3-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Statements</span></button>
+              <button type="button" data-panel="documents" aria-controls="panel-documents" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span>Documents</span></button>
+              <button type="button" data-panel="messages" aria-controls="panel-messages" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/></svg><span>Messages</span></button>
+            </nav>
+
+            <div>
+              <!-- OVERVIEW -->
+              <section class="panel-tab" id="panel-overview" aria-label="Overview">
+                <div class="panel-title">
+                  <h2>Plan overview</h2>
+                  <span class="pill pill--ok">On track</span>
+                </div>
+
+                <div class="metric-grid">
+                  <div class="metric">
+                    <p class="metric-label">Plan progress</p>
+                    <p class="metric-value">68%</p>
+                    <div class="progress mt-1"><span style="width:68%"></span></div>
+                    <p class="metric-foot up">+9 points since last review</p>
+                  </div>
+                  <div class="metric">
+                    <p class="metric-label">Total saved</p>
+                    <p class="metric-value">MWK 4.86m</p>
+                    <p class="metric-foot up">+MWK 310,000 this quarter</p>
+                  </div>
+                  <div class="metric">
+                    <p class="metric-label">Loan outstanding</p>
+                    <p class="metric-value">MWK 2.34m</p>
+                    <p class="metric-foot">62% repaid · 22 months left</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-2">
+                  <div class="card">
+                    <div class="flex items-center justify-between"><h3 style="font-size:1.05rem;">Goals</h3><a class="text-tiny" href="#goals">Manage</a></div>
+                    <div class="stack mt-2" id="goals">
+                      <div>
+                        <div class="flex items-center justify-between text-small"><strong style="color:var(--ink);">Home deposit</strong><span class="text-muted">78% · MWK 3.9m of 5m</span></div>
+                        <div class="progress mt-1"><span style="width:78%"></span></div>
+                      </div>
+                      <div>
+                        <div class="flex items-center justify-between text-small"><strong style="color:var(--ink);">School fees buffer</strong><span class="text-muted">45% · MWK 900k of 2m</span></div>
+                        <div class="progress mt-1"><span style="width:45%"></span></div>
+                      </div>
+                      <div>
+                        <div class="flex items-center justify-between text-small"><strong style="color:var(--ink);">Emergency fund</strong><span class="text-muted">92% · MWK 1.8m of 2m</span></div>
+                        <div class="progress mt-1"><span style="width:92%"></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <h3 style="font-size:1.05rem;">Next actions</h3>
+                    <ul class="card-list mt-2">
+                      <li>Upload July bank statement for review</li>
+                      <li>Confirm insurance renewal quote by 30 Oct</li>
+                      <li>Quarterly review meeting · 4 Nov, 10:00</li>
+                      <li>Transfer MWK 150,000 to buffer account</li>
+                    </ul>
+                    <a class="btn btn--ghost btn--sm mt-2" href="contact.html">Message your advisor</a>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="flex items-center justify-between"><h3 style="font-size:1.05rem;">Recent activity</h3><span class="text-tiny text-muted">Last 60 days</span></div>
+                  <div class="table-wrap mt-2" style="border:0;">
+                    <table class="data">
+                      <thead><tr><th>Date</th><th>Activity</th><th>Status</th></tr></thead>
+                      <tbody>
+                        <tr><td>12 Oct 2026</td><td>Q3 review notes published</td><td><span class="pill pill--ok">Complete</span></td></tr>
+                        <tr><td>02 Oct 2026</td><td>Loan repayment received</td><td><span class="pill pill--ok">Complete</span></td></tr>
+                        <tr><td>18 Sep 2026</td><td>Insurance quotation requested</td><td><span class="pill pill--warn">In progress</span></td></tr>
+                        <tr><td>05 Sep 2026</td><td>Updated household budget</td><td><span class="pill pill--ok">Complete</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ACCOUNTS -->
+              <section class="panel-tab" id="panel-accounts" aria-label="Accounts" hidden>
+                <div class="panel-title"><h2>Accounts</h2><span class="text-tiny text-muted">Values as at 20 Oct 2026</span></div>
+
+                <div class="metric-grid">
+                  <div class="metric"><p class="metric-label">Savings &amp; deposits</p><p class="metric-value">MWK 1.94m</p><p class="metric-foot up">Rate 12.5% p.a.</p></div>
+                  <div class="metric"><p class="metric-label">Investment holdings</p><p class="metric-value">MWK 2.92m</p><p class="metric-foot up">+6.4% YTD</p></div>
+                  <div class="metric"><p class="metric-label">Loan outstanding</p><p class="metric-value">MWK 2.34m</p><p class="metric-foot down">22 instalments remaining</p></div>
+                </div>
+
+                <div class="table-wrap">
+                  <table class="data">
+                    <thead><tr><th>Account</th><th>Institution</th><th class="num">Balance</th><th>Status</th></tr></thead>
+                    <tbody>
+                      <tr><td><strong>Household buffer</strong><br><span class="text-tiny text-muted">**** 4821</span></td><td>Partner bank</td><td class="num">MWK 1,840,000</td><td><span class="pill pill--ok">Active</span></td></tr>
+                      <tr><td><strong>Treasury bill ladder</strong><br><span class="text-tiny text-muted">91-day rolling</span></td><td>Broker</td><td class="num">MWK 2,420,000</td><td><span class="pill pill--ok">Active</span></td></tr>
+                      <tr><td><strong>Unit trust</strong><br><span class="text-tiny text-muted">Growth mandate</span></td><td>Fund manager</td><td class="num">MWK 500,000</td><td><span class="pill pill--ok">Active</span></td></tr>
+                      <tr><td><strong>Home deposit loan</strong><br><span class="text-tiny text-muted">JC-2019-0412-L</span></td><td>Partner bank</td><td class="num">− MWK 2,340,000</td><td><span class="pill pill--neutral">Servicing</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="card">
+                  <h3 style="font-size:1.05rem;">Loan repayment schedule</h3>
+                  <div class="progress mt-2"><span style="width:62%"></span></div>
+                  <div class="flex items-center justify-between text-small mt-1"><span class="text-muted">22 of 36 instalments remaining</span><strong style="color:var(--ink);">62% repaid</strong></div>
+                  <div class="grid grid-2 mt-3" style="gap:1rem;">
+                    <div><p class="text-tiny text-muted">Monthly instalment</p><strong style="color:var(--ink);">MWK 118,000</strong></div>
+                    <div><p class="text-tiny text-muted">Next due date</p><strong style="color:var(--ink);">2 November 2026</strong></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- STATEMENTS -->
+              <section class="panel-tab" id="panel-statements" aria-label="Statements" hidden>
+                <div class="panel-title">
+                  <h2>Statements</h2>
+                  <button class="btn btn--ghost btn--sm" type="button" id="download-all">Download all (CSV)</button>
+                </div>
+                <p class="text-small text-muted" style="margin-top:-.4rem;">Statements are illustrative and generated locally in your browser for this demonstration.</p>
+
+                <div class="table-wrap">
+                  <table class="data">
+                    <thead><tr><th>Period</th><th>Reference</th><th class="num">Closing balance</th><th></th></tr></thead>
+                    <tbody id="statement-rows">
+                      <tr><td><strong>September 2026</strong></td><td>JC-STM-0926</td><td class="num">MWK 4,841,200</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-09">CSV</button></td></tr>
+                      <tr><td><strong>August 2026</strong></td><td>JC-STM-0826</td><td class="num">MWK 4,512,800</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-08">CSV</button></td></tr>
+                      <tr><td><strong>July 2026</strong></td><td>JC-STM-0726</td><td class="num">MWK 4,190,500</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-07">CSV</button></td></tr>
+                      <tr><td><strong>June 2026</strong></td><td>JC-STM-0626</td><td class="num">MWK 3,908,400</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-06">CSV</button></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="callout">Need a stamped statement for a lender or visa application? Request it through your advisor and allow three working days.</div>
+              </section>
+
+              <!-- DOCUMENTS -->
+              <section class="panel-tab" id="panel-documents" aria-label="Documents" hidden>
+                <div class="panel-title"><h2>Documents</h2><span class="text-tiny text-muted">4 files · 2.1 MB</span></div>
+
+                <div class="doc-list">
+                  <div class="doc-item">
+                    <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg></span>
+                    <div class="doc-meta"><strong>Household Financial Plan 2026</strong><span>PDF · 842 KB · updated 12 Oct 2026</span></div>
+                    <button class="btn btn--ghost btn--sm" type="button" data-doc="plan">Download</button>
+                  </div>
+                  <div class="doc-item">
+                    <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg></span>
+                    <div class="doc-meta"><strong>Engagement letter (signed)</strong><span>PDF · 218 KB · 14 Jan 2026</span></div>
+                    <button class="btn btn--ghost btn--sm" type="button" data-doc="engagement">Download</button>
+                  </div>
+                  <div class="doc-item">
+                    <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg></span>
+                    <div class="doc-meta"><strong>Q3 2026 review notes</strong><span>PDF · 96 KB · 12 Oct 2026</span></div>
+                    <button class="btn btn--ghost btn--sm" type="button" data-doc="review">Download</button>
+                  </div>
+                  <div class="doc-item">
+                    <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg></span>
+                    <div class="doc-meta"><strong>Insurance schedule</strong><span>PDF · 143 KB · 18 Sep 2026</span></div>
+                    <button class="btn btn--ghost btn--sm" type="button" data-doc="insurance">Download</button>
+                  </div>
+                </div>
+
+                <div class="card" style="border-style:dashed; background:transparent;">
+                  <h3 style="font-size:1rem;">Send us a document</h3>
+                  <p class="text-small">Upload bank statements, contracts or policy documents for review. Files are logged against your client reference.</p>
+                  <form class="mt-2" id="upload-form">
+                    <div class="form-grid" style="grid-template-columns:1fr auto; align-items:end;">
+                      <div class="field"><label for="upload-note">Description</label><input id="upload-note" type="text" placeholder="e.g. July bank statement"></div>
+                      <button class="btn btn--ghost" type="button" id="upload-btn">Choose file</button>
+                    </div>
+                    <p class="form-status" id="upload-status"></p>
+                  </form>
+                </div>
+              </section>
+
+              <!-- MESSAGES -->
+              <section class="panel-tab" id="panel-messages" aria-label="Messages" hidden>
+                <div class="panel-title"><h2>Messages</h2><span class="pill pill--neutral">Advisor: Thandiwe M.</span></div>
+
+                <div class="card">
+                  <div class="stack">
+                    <div style="background:var(--cream); border-radius:12px; padding:.9rem 1rem; max-width:85%;">
+                      <p class="text-tiny text-muted" style="margin-bottom:.25rem;">Thandiwe Mwale · 12 Oct 2026, 09:14</p>
+                      <p class="text-small" style="margin:0;">Your Q3 review notes are uploaded. The main change is the school fees buffer — we are about three months ahead. No action needed until November.</p>
+                    </div>
+                    <div style="background:var(--navy-800); color:#e8eef3; border-radius:12px; padding:.9rem 1rem; max-width:85%; margin-left:auto;">
+                      <p class="text-tiny" style="color:#9db1c2; margin-bottom:.25rem;">You · 12 Oct 2026, 11:02</p>
+                      <p class="text-small" style="margin:0;">Thanks. Should I move the extra into the home deposit instead?</p>
+                    </div>
+                    <div style="background:var(--cream); border-radius:12px; padding:.9rem 1rem; max-width:85%;">
+                      <p class="text-tiny text-muted" style="margin-bottom:.25rem;">Thandiwe Mwale · 12 Oct 2026, 11:40</p>
+                      <p class="text-small" style="margin:0;">Keep two months of the buffer first, then yes — the home deposit is the better use of the surplus. I will adjust the plan for November.</p>
+                    </div>
+                  </div>
+
+                  <form class="mt-3" id="message-form">
+                    <div class="field">
+                      <label for="message-text">New message</label>
+                      <textarea id="message-text" placeholder="Write to your advisor…"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 mt-2">
+                      <span class="text-tiny text-muted">Never send passwords or full bank details.</span>
+                      <button class="btn btn--sm" type="submit">Send message</button>
+                    </div>
+                    <p class="form-status" id="message-status"></p>
+                  </form>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-about">
+          <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
+            <span class="brand-mark" aria-hidden="true">JC</span>
+            <span class="brand-text">
+              <span class="brand-name">Jay C.O.B</span>
+              <span class="brand-sub">Financial Services</span>
+            </span>
+          </a>
+          <p>Independent financial planning, credit advisory and business finance support for Malawian households, entrepreneurs and institutions. We turn numbers into confident decisions.</p>
+          <div class="social-row" aria-label="Social links">
+            <a href="https://www.linkedin.com" aria-label="LinkedIn" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.06c.53-.95 1.83-1.95 3.77-1.95C20.3 8.75 21 11 21 14.1V21h-4v-6.1c0-1.45-.03-3.3-2.05-3.3-2.05 0-2.36 1.57-2.36 3.2V21H9V9Z"/></svg></span></a>
+            <a href="https://www.facebook.com" aria-label="Facebook" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V5.5h-3c-2.5 0-4 1.6-4 4.2V12H7v3.5h3V22h3.5v-6.5H17L17.5 12H13.5V9.9c0-.6.2-.9 1-.9Z"/></svg></span></a>
+            <a href="https://wa.me/265999123456" aria-label="WhatsApp" rel="noopener"><span class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.3 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a12 12 0 0 1-5.9-5.1c-.5-.8-.8-1.6-.8-2.3 0-.7.4-1.3.8-1.7.2-.2.4-.3.6-.3h.5c.2 0 .4 0 .5.4l.8 1.8c.1.2 0 .4-.1.5l-.4.5c-.1.2-.3.3-.1.6a8 8 0 0 0 3.4 2.9c.2.1.4.1.6-.1l.7-.8c.2-.2.3-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.3.1.7-.1 1.3Z"/></svg></span></a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About us</a></li>
+            <li><a href="about.html#team">Our team</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="products.html">Products &amp; packages</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Solutions</h4>
+          <ul class="footer-links">
+            <li><a href="services.html#personal">Personal financial planning</a></li>
+            <li><a href="services.html#sme">SME finance advisory</a></li>
+            <li><a href="services.html#credit">Loan readiness &amp; credit repair</a></li>
+            <li><a href="services.html#insurance">Insurance &amp; risk cover</a></li>
+            <li><a href="services.html#training">Financial literacy training</a></li>
+            <li><a href="calculator.html">Loan &amp; savings calculator</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact-col">
+          <h4>Get in touch</h4>
+          <ul class="footer-contact">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi<br>P.O. Box 3142, Lilongwe</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg><span><a href="tel:+265999123456">+265 999 123 456</a><br><a href="tel:+265888456789">+265 888 456 789</a></span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span><a href="mailto:hello@jaycobfinancial.mw">hello@jaycobfinancial.mw</a></span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon–Fri, 08:00–17:00 · Sat, 09:00–12:00</span></li>
+          </ul>
+
+          <form class="newsletter" data-newsletter novalidate>
+            <label for="footer-email">Monthly money briefing</label>
+            <div class="newsletter-row">
+              <input id="footer-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+              <button class="btn btn--gold" type="submit">Join</button>
+            </div>
+            <p class="newsletter-note">One practical email a month. No noise, unsubscribe anytime.</p>
+          </form>
+        </div>
+      </div>
+
+      <p class="disclaimer">Jay C.O.B Financial Services provides financial planning, advisory and training services. We are not a deposit-taking institution and do not lend directly; credit facilities are arranged through licensed partner institutions. Illustrations, rates and figures on this website are indicative and do not constitute a binding offer. This is a demonstration website: registration details, client stories and contact information are placeholders.</p>
+
+      <div class="footer-bottom">
+        <p>© <span data-year>2026</span> Jay C.O.B Financial Services. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="contact.html">Book a consultation</a>
+          <a href="insights.html">Insights</a>
+          <a href="portal.html">Client portal</a>
+          <a href="#main">Back to top ↑</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/portal.js" defer></script>
+</body>
+</html>
