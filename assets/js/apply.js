@@ -247,6 +247,18 @@
       "</div></div>";
   }
 
+  function draftsBlock() {
+    var drafts = (DATA.get().drafts || []).slice(0, 3);
+    if (!drafts.length) return "";
+    return '<div class="card" id="ap-drafts" style="margin-top:1rem;">' +
+      '<h3 style="font-size:.95rem;">Saved drafts</h3>' +
+      '<ul class="card-list" style="margin-top:.6rem;">' + drafts.map(function (d) {
+        return "<li><button class=\"linkish\" type=\"button\" data-resume=\"" + esc(d.id) + "\">Resume " +
+          esc(d.data.product) + " · " + mwk(d.data.amount) + "</button> " +
+          '<span class="text-tiny text-muted">saved ' + esc(F.shortDate(d.saved)) + " · step " + d.step + "</span></li>";
+      }).join("") + "</ul></div>";
+  }
+
   /* ---------------- Shells ---------------- */
   function publicShell() {
     if (state.submitted) {
@@ -269,6 +281,7 @@
             '<h3 style="font-size:.98rem;">Documents you will need</h3>' +
             '<ul class="card-list">' + DOCS.map(function (d) { return "<li>" + esc(d.name) + (d.required ? " (required)" : " (if available)") + "</li>"; }).join("") + "</ul>" +
           "</div>" +
+          draftsBlock() +
           '<div class="notice notice--warn" style="margin-top:1rem;">' + UI.ICONS.info + "<div><strong>Before you apply</strong>You must be 18+, a Malawian resident, and able to show affordable repayment capacity.</div></div>" +
         "</aside>" +
       "</div></div>";
@@ -292,6 +305,7 @@
         "<aside>" + summaryBox() +
           '<div class="app-panel" style="margin-top:1rem;"><div class="app-panel-head"><h2>Affordability check</h2></div>' +
             '<div class="app-panel-body" id="ap-affordability">' + affordabilityBlock() + "</div></div>" +
+          draftsBlock() +
         "</aside>" +
       "</div>";
   }
@@ -442,10 +456,45 @@
     DATA.save();
     DATA.notify("Application submission", "Application " + ref + " received",
       "Your " + app.product + " application for " + mwk(app.amount) + " was submitted. We will verify your documents within one working day.", "In-app + Email + SMS");
+    if (state.draftId && DATA.removeDraft) DATA.removeDraft(state.draftId);
+    state.draftId = null;
     state.submitted = app;
     render();
     if (window.JCOB_DASH) window.JCOB_DASH.render(false);
     UI.toast({ title: "Application submitted", message: "Reference " + ref + ". Track it under My applications.", type: "success" });
+  }
+
+  function resumeDraft(draftId) {
+    var draft = (DATA.get().drafts || []).filter(function (d) { return d.id === draftId; })[0];
+    if (!draft) return;
+    var d = draft.data;
+    state.product = PRODUCTS[d.product] ? d.product : "Personal Loan";
+    state.amount = d.amount;
+    state.term = d.term;
+    state.step = Math.min(Math.max(draft.step || 1, 1), 5);
+    state.draftId = draft.id;
+    render();
+    
+    function setVal(id, value) { var el = $(id); if (el && value != null) el.value = value; }
+    setVal("ap-product", state.product);
+    setVal("ap-amount", state.amount);
+    setVal("ap-term", state.term);
+    var a = d.applicant || {};
+    setVal("ap-first", (a.name || "").split(" ")[0]);
+    setVal("ap-last", (a.name || "").split(" ").slice(1).join(" "));
+    setVal("ap-dob", a.dob); setVal("ap-gender", a.gender); setVal("ap-nid", a.nid);
+    setVal("ap-phone", a.phone); setVal("ap-email", a.email); setVal("ap-address", a.address);
+    setVal("ap-district", a.district); setVal("ap-employment", a.employment);
+    setVal("ap-occupation", a.occupation); setVal("ap-employer", a.employer);
+    setVal("ap-income", a.income); setVal("ap-expenses", a.expenses); setVal("ap-debts", a.debts);
+    if (a.nextOfKin) { setVal("ap-nok-name", a.nextOfKin.name); setVal("ap-nok-rel", a.nextOfKin.relationship); setVal("ap-nok-phone", a.nextOfKin.phone); }
+    var b = d.business || {};
+    setVal("ap-biz-name", b.name); setVal("ap-biz-reg", b.registration); setVal("ap-biz-tin", b.tin);
+    setVal("ap-biz-years", b.years); setVal("ap-biz-turnover", b.turnover); setVal("ap-biz-costs", b.costs);
+    if (d.bank) { setVal("ap-bank-name", d.bank.provider); setVal("ap-bank-branch", d.bank.branch); }
+    if (d.guarantor) { setVal("ap-g-name", d.guarantor.name); setVal("ap-g-phone", d.guarantor.phone); setVal("ap-g-rel", d.guarantor.relationship); }
+    go(state.step);
+    UI.toast({ title: "Draft resumed", message: draft.id + " · step " + state.step, type: "success" });
   }
 
   function bind() {
@@ -512,6 +561,14 @@
       });
     });
 
+    if (!state.resumeBound) {
+      state.resumeBound = true;
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-resume]");
+        if (btn) resumeDraft(btn.getAttribute("data-resume"));
+      });
+    }
+
     document.querySelector("[data-step-next]").addEventListener("click", function () { go(state.step + 1); });
     document.querySelector("[data-step-prev]").addEventListener("click", function () { go(state.step - 1); });
 
@@ -526,6 +583,15 @@
         d.drafts = d.drafts.filter(function (x) { return x.id !== id; });
         d.drafts.unshift({ id: id, saved: new Date().toISOString(), step: state.step, data: draft });
         DATA.save();
+        var existing = document.getElementById("ap-drafts");
+        if (existing) {
+          var holder = document.createElement("div");
+          holder.innerHTML = draftsBlock();
+          existing.replaceWith(holder.firstElementChild);
+        } else {
+          var aside = document.querySelector("aside");
+          if (aside) aside.insertAdjacentHTML("beforeend", draftsBlock());
+        }
         UI.toast({ title: "Draft saved", message: "Resume any time from this browser. Ref " + id, type: "success" });
       });
     }

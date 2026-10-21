@@ -830,7 +830,13 @@
           "</form>") +
         panel("Statement notes", null,
           '<ul class="card-list"><li>Statements show opening and closing balances in MWK</li><li>Includes deposits, withdrawals, disbursements and repayments</li>' +
-          '<li>Fees and interest entries are itemised</li><li>Every statement carries a verification reference</li></ul>') +
+          '<li>Fees and interest entries are itemised</li><li>Every statement carries a verification reference</li></ul>' +
+          '<form id="verify-statement-form" novalidate style="margin-top:1rem;">' +
+            '<div class="field"><label for="verify-statement-ref">Verify a statement</label>' +
+            '<input id="verify-statement-ref" placeholder="STM-2026-…"><span class="hint">Enter the reference printed on a statement we issued</span></div>' +
+            '<button class="btn btn--ghost btn--sm" type="submit" style="margin-top:.6rem;">Verify reference</button>' +
+            '<p class="form-status" id="verify-statement-status" role="status" aria-live="polite"></p>' +
+          "</form>") +
       "</div>" +
       panel("Statement history", null,
         '<div class="table-wrap" style="border:0;border-radius:0;"><table class="data">' +
@@ -1652,6 +1658,24 @@
         DATA.notify("Statement", "Statement generated", "Statement " + ref + " for " + dt(from) + " to " + dt(to) + " is ready.", "In-app");
         DATA.save(); render();
         UI.toast({ title: "Statement generated", message: ref + " is ready to download.", type: "success" });
+      });
+    }
+    var verifyStatement = $("verify-statement-form");
+    if (verifyStatement) {
+      verifyStatement.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var ref = ($("verify-statement-ref").value || "").trim().toUpperCase();
+        var st = $("verify-statement-status");
+        var found = db().statements.filter(function (s) { return s.ref.toUpperCase() === ref; })[0];
+        st.className = "form-status is-visible" + (found ? "" : " form-status--error");
+        if (!found) {
+          st.textContent = ref ? "No statement matches " + ref + ". Check the reference and try again." : "Enter a statement reference.";
+          return;
+        }
+        st.textContent = "Verified: " + found.ref + " · " + found.period + " · opening " + mwk(found.opening) +
+          " · closing " + mwk(found.closing) + " · issued " + dt(found.generated || found.from) + ". This reference was issued by JAY C O B FINANCIAL SERVICES.";
+        DATA.notify("Statement", "Statement verified", "Statement " + found.ref + " was verified in the dashboard.", "In-app");
+        UI.toast({ title: "Statement verified", message: found.ref + " is a valid statement reference.", type: "success" });
       });
     }
     content.querySelectorAll("[data-statement]").forEach(function (btn) {
