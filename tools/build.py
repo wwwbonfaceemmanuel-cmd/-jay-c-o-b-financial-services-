@@ -337,7 +337,8 @@ def legal_body(doc) -> str:
         '            <li><a href="%s.html"%s>%s</a></li>' % (
             d["slug"], ' class="is-active"' if d["slug"] == doc["slug"] else "", d["nav"])
         for d in LEGAL_DOCS)
-    return """    <section class="page-hero">
+    return """    <main id="main">
+    <section class="page-hero">
       <div class="container page-hero-inner">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Legal</span><span class="sep">/</span><span>%(title)s</span></nav>
         <span class="eyebrow">Legal &amp; disclosures</span>
@@ -361,6 +362,7 @@ def legal_body(doc) -> str:
         </article>
       </div>
     </section>
+    </main>
 """ % {
         "title": doc["title"],
         "summary": doc["summary"],
@@ -440,7 +442,8 @@ ALIASES = {
 
 def build_aliases() -> int:
     for slug, (target, label, blurb) in ALIASES.items():
-        body = """    <section class="section">
+        body = """    <main id="main">
+    <section class="section">
       <div class="container" style="max-width:40rem;">
         <div class="card" style="text-align:center;padding:clamp(1.6rem,4vw,2.6rem);">
           <p class="brand-chip" style="justify-content:center;"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> %(brand)s</p>
@@ -451,6 +454,7 @@ def build_aliases() -> int:
         </div>
       </div>
     </section>
+    </main>
     <script>window.location.replace("%(target)s");</script>
 """ % {"brand": BRAND, "label": label, "label_lower": label.lower(), "blurb": blurb, "target": target}
 
