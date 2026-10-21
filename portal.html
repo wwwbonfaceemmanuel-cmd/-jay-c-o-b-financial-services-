@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Client portal — Jay C.O.B Financial Services</title>
-  <meta name="description" content="Sign in to the Jay C.O.B client portal to review your plan, accounts, statements and documents. Demo access available.">
+  <title>Client login — Jay C.O.B Financial Services</title>
+  <meta name="description" content="Sign in to the Jay C.O.B client portal with your email address or phone number. Reset your password, recover your account, and view statements and receipts. Demo access available.">
   <meta name="theme-color" content="#071828">
-  <meta property="og:title" content="Client portal — Jay C.O.B Financial Services">
-  <meta property="og:description" content="Sign in to the Jay C.O.B client portal to review your plan, accounts, statements and documents. Demo access available.">
+  <meta property="og:title" content="Client login — Jay C.O.B Financial Services">
+  <meta property="og:description" content="Sign in to the Jay C.O.B client portal with your email address or phone number. Reset your password, recover your account, and view statements and receipts. Demo access available.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/img/hero-consultation.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,11 +23,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-        <span class="brand-mark" aria-hidden="true">JC</span>
-        <span class="brand-text">
-          <span class="brand-name">Jay C.O.B</span>
-          <span class="brand-sub">Financial Services</span>
-        </span>
+        <img class="brand-logo" src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
       </a>
 
       <nav class="nav" id="primary-nav" aria-label="Primary">
@@ -37,13 +33,16 @@
           <li><a class="nav-link" href="services.html">Services</a></li>
           <li><a class="nav-link" href="products.html">Products</a></li>
           <li><a class="nav-link" href="insights.html">Insights</a></li>
+          <li><a class="nav-link" href="live.html">Live</a></li>
           <li><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="portal.html">Client login</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="admin.html">Admin console</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <a class="btn btn--ghost btn--sm" href="portal.html">Client portal</a>
-        <a class="btn btn--gold btn--sm" href="contact.html">Book a consultation</a>
+        <a class="btn btn--ghost btn--sm" href="portal.html">Client login</a>
+        <a class="btn btn--gold btn--sm" href="contact.html">Book a call</a>
       </div>
 
       <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
@@ -57,17 +56,19 @@
     <section class="portal-shell">
       <div class="container">
 
-        <!-- ================= SIGN IN ================= -->
+        <!-- ================= SIGN IN / RECOVERY ================= -->
         <div id="portal-auth">
           <div class="split" style="align-items:center; max-width:62rem; margin-inline:auto;">
             <div class="reveal">
-              <span class="eyebrow">Client portal</span>
+              <div class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"><span>Jay C.O.B · Client portal</span></div>
+              <span class="eyebrow">Secure area</span>
               <h1 style="font-size:clamp(1.9rem,3.6vw,2.7rem);">Your plan, your documents, one place.</h1>
-              <p class="lead mt-2">Sign in to review plan milestones, check account balances, download statements and message your advisor. Access is issued when your engagement letter is signed.</p>
+              <p class="lead mt-2">Sign in to review plan milestones, check account balances, download statements and receipts, and message your advisor. Access is issued when your engagement letter is signed.</p>
               <ul class="checklist mt-3">
-                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Plan progress and next actions</span></li>
-                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Statements and engagement documents</span></li>
-                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Secure messages with your named advisor</span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Sign in with your <strong>email address or phone number</strong></span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Plan progress, accounts and dated statements</span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Printable receipts and secure documents</span></li>
+                <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Password reset and account recovery</span></li>
               </ul>
               <div class="card mt-3" style="padding:1rem 1.1rem; display:flex; gap:.8rem; align-items:flex-start; background:transparent; border-style:dashed;">
                 <span class="icon-badge icon-badge--teal" style="width:34px;height:34px;border-radius:9px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -77,44 +78,113 @@
 
             <div class="auth-wrap reveal" data-delay="1">
               <div class="auth-card">
-                <h2 style="font-size:1.4rem;">Sign in</h2>
-                <p class="text-small text-muted mt-1">Use the demo credentials below to explore.</p>
+                <div class="auth-logo">
+                  <img src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
+                </div>
 
-                <form id="login-form" class="mt-3" novalidate>
-                  <div class="field">
-                    <label for="login-email">Email address</label>
-                    <input id="login-email" name="email" type="email" autocomplete="username" placeholder="you@example.com" required>
-                    <span class="error-msg">Enter a valid email address.</span>
-                  </div>
-                  <div class="field mt-2">
-                    <label for="login-password">Password</label>
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
-                    <span class="error-msg">Enter your password.</span>
-                  </div>
-                  <div class="flex items-center justify-between gap-2 mt-2">
-                    <label class="check-row" style="margin:0;">
-                      <input type="checkbox" id="login-remember" checked>
-                      <span>Keep me signed in</span>
-                    </label>
-                    <a class="text-tiny" href="contact.html">Forgot password?</a>
-                  </div>
-                  <button class="btn btn--block mt-3" type="submit">Sign in securely</button>
-                  <p class="form-status" id="login-status"></p>
-                </form>
+                <!-- ---------- SIGN IN ---------- -->
+                <div class="auth-panel" id="panel-signin">
+                  <h2>Client login</h2>
+                  <p class="lead-sm">Use your email address <em>or</em> your registered phone number.</p>
 
-                <div class="demo-note">
-                  <strong>Demo access</strong><br>
-                  Email: <code>demo@jaycobfinancial.mw</code><br>
-                  Password: <code>demo1234</code>
+                  <form id="login-form" class="mt-3" novalidate>
+                    <div class="field">
+                      <label for="login-id">Email or phone number</label>
+                      <input id="login-id" name="identifier" type="text" autocomplete="username" inputmode="email" placeholder="you@example.com or +265 999 123 456" required>
+                      <span class="error-msg">Enter a valid email address or phone number.</span>
+                    </div>
+                    <div class="field mt-2">
+                      <label for="login-password">Password</label>
+                      <div class="pw-wrap">
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+                        <button type="button" class="pw-toggle" data-pw-toggle="login-password" aria-pressed="false" aria-label="Show password">
+                          <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.8 9.8 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3 4M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 3.4-.6"/><path d="m2 2 20 20"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                        </button>
+                      </div>
+                      <span class="error-msg">Enter your password.</span>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 mt-2">
+                      <label class="check-row" style="margin:0;">
+                        <input type="checkbox" id="login-remember" checked>
+                        <span>Keep me signed in</span>
+                      </label>
+                    </div>
+
+                    <button class="btn btn--block mt-3" type="submit">Sign in securely</button>
+                    <p class="form-status" id="login-status" role="status"></p>
+                  </form>
+
+                  <div class="auth-alt">
+                    <button class="linkish" type="button" data-auth-target="forgot">Forgot password?</button>
+                    <button class="linkish" type="button" data-auth-target="recover">Recover my account</button>
+                  </div>
+
+                  <div class="demo-note">
+                    <strong>Demo access</strong><br>
+                    Email: <code>demo@jaycobfinancial.mw</code> <span class="text-tiny">or</span> phone: <code>+265 999 123 456</code><br>
+                    Password: <code>demo1234</code>
+                  </div>
+                </div>
+
+                <!-- ---------- FORGOT PASSWORD ---------- -->
+                <div class="auth-panel" id="panel-forgot" hidden>
+                  <h2>Forgot password</h2>
+                  <p class="lead-sm">Enter the email address or phone number on your account. We will send a single-use reset link that expires in 30 minutes.</p>
+
+                  <form id="forgot-form" class="mt-3" novalidate>
+                    <div class="field">
+                      <label for="forgot-id">Email or phone number</label>
+                      <input id="forgot-id" name="identifier" type="text" autocomplete="username" placeholder="you@example.com or +265 999 123 456" required>
+                      <span class="error-msg">Enter a valid email address or phone number.</span>
+                    </div>
+                    <button class="btn btn--block mt-3" type="submit">Send reset link</button>
+                    <p class="form-status" id="forgot-status" role="status"></p>
+                  </form>
+
+                  <p class="auth-back"><button class="linkish" type="button" data-auth-target="signin">← Back to sign in</button></p>
+                </div>
+
+                <!-- ---------- RECOVER ACCOUNT ---------- -->
+                <div class="auth-panel" id="panel-recover" hidden>
+                  <h2>Recover my account</h2>
+                  <p class="lead-sm">Lost access to your email and phone? Send a recovery request and our team will verify your identity before restoring access.</p>
+
+                  <form id="recover-form" class="mt-3" novalidate>
+                    <div class="field">
+                      <label for="recover-id">Email or phone number on the account</label>
+                      <input id="recover-id" name="identifier" type="text" autocomplete="username" placeholder="you@example.com or +265 999 123 456" required>
+                      <span class="error-msg">Enter a valid email address or phone number.</span>
+                    </div>
+                    <div class="field mt-2">
+                      <label for="recover-ref">Client reference</label>
+                      <input id="recover-ref" name="reference" type="text" placeholder="JC-2019-0412" required>
+                      <span class="hint">Shown on your engagement letter and statements.</span>
+                      <span class="error-msg">Enter your client reference, e.g. JC-2019-0412.</span>
+                    </div>
+                    <button class="btn btn--block mt-3" type="submit">Request account recovery</button>
+                    <p class="form-status" id="recover-status" role="status"></p>
+                  </form>
+
+                  <p class="auth-back"><button class="linkish" type="button" data-auth-target="signin">← Back to sign in</button></p>
                 </div>
               </div>
-              <p class="text-tiny text-muted center mt-2">Need access? <a href="contact.html">Contact your advisor</a>.</p>
+
+              <p class="text-tiny text-muted center mt-2">Protected area · <a href="contact.html">Contact support</a> · <a href="admin.html">Admin console</a></p>
             </div>
           </div>
         </div>
 
         <!-- ================= DASHBOARD ================= -->
         <div id="portal-dash" hidden>
+          <div class="form-logo" style="margin-bottom:1rem;">
+            <img src="assets/img/logo-mark.svg" alt="Jay C.O.B Financial Services" width="30" height="30">
+            <div>
+              <strong style="display:block; font-size:.86rem; color:var(--ink);">Jay C.O.B Financial Services</strong>
+              <span class="text-tiny text-muted">Client portal · MWK</span>
+            </div>
+          </div>
+
           <div class="dash-header">
             <div>
               <span class="eyebrow">Client portal</span>
@@ -133,10 +203,10 @@
           <div class="dash-grid">
             <nav class="dash-nav" aria-label="Portal sections">
               <button type="button" class="is-active" data-panel="overview" aria-controls="panel-overview" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></button>
-              <button type="button" data-panel="accounts" aria-controls="panel-accounts" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"/><path d="M16 14h.01"/></svg><span>Accounts</span></button>
-              <button type="button" data-panel="statements" aria-controls="panel-statements" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2V2l-3 2-3-2-3 2-3-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Statements</span></button>
-              <button type="button" data-panel="documents" aria-controls="panel-documents" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span>Documents</span></button>
-              <button type="button" data-panel="messages" aria-controls="panel-messages" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/></svg><span>Messages</span></button>
+              <button type="button" data-panel="accounts" aria-controls="panel-accounts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"/><path d="M16 14h.01"/></svg><span>Accounts</span></button>
+              <button type="button" data-panel="statements" aria-controls="panel-statements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2V2l-3 2-3-2-3 2-3-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Statements</span></button>
+              <button type="button" data-panel="documents" aria-controls="panel-documents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span>Documents</span></button>
+              <button type="button" data-panel="messages" aria-controls="panel-messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/></svg><span>Messages</span></button>
             </nav>
 
             <div>
@@ -215,7 +285,7 @@
 
               <!-- ACCOUNTS -->
               <section class="panel-tab" id="panel-accounts" aria-label="Accounts" hidden>
-                <div class="panel-title"><h2>Accounts</h2><span class="text-tiny text-muted">Values as at 20 Oct 2026</span></div>
+                <div class="panel-title"><h2>Accounts</h2><span class="text-tiny text-muted">Values as at 20 Oct 2026 · MWK</span></div>
 
                 <div class="metric-grid">
                   <div class="metric"><p class="metric-label">Savings &amp; deposits</p><p class="metric-value">MWK 1.94m</p><p class="metric-foot up">Rate 12.5% p.a.</p></div>
@@ -249,19 +319,19 @@
               <!-- STATEMENTS -->
               <section class="panel-tab" id="panel-statements" aria-label="Statements" hidden>
                 <div class="panel-title">
-                  <h2>Statements</h2>
+                  <h2>Statements &amp; receipts</h2>
                   <button class="btn btn--ghost btn--sm" type="button" id="download-all">Download all (CSV)</button>
                 </div>
-                <p class="text-small text-muted" style="margin-top:-.4rem;">Statements are illustrative and generated locally in your browser for this demonstration.</p>
+                <p class="text-small text-muted" style="margin-top:-.4rem;">Open a receipt to print it with the Jay C.O.B letterhead, or download the raw statement. All values in MWK.</p>
 
                 <div class="table-wrap">
                   <table class="data">
                     <thead><tr><th>Period</th><th>Reference</th><th class="num">Closing balance</th><th></th></tr></thead>
                     <tbody id="statement-rows">
-                      <tr><td><strong>September 2026</strong></td><td>JC-STM-0926</td><td class="num">MWK 4,841,200</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-09">CSV</button></td></tr>
-                      <tr><td><strong>August 2026</strong></td><td>JC-STM-0826</td><td class="num">MWK 4,512,800</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-08">CSV</button></td></tr>
-                      <tr><td><strong>July 2026</strong></td><td>JC-STM-0726</td><td class="num">MWK 4,190,500</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-07">CSV</button></td></tr>
-                      <tr><td><strong>June 2026</strong></td><td>JC-STM-0626</td><td class="num">MWK 3,908,400</td><td class="num"><button class="btn btn--ghost btn--sm" type="button" data-statement="2026-06">CSV</button></td></tr>
+                      <tr><td><strong>September 2026</strong></td><td>JC-STM-0926</td><td class="num">MWK 4,841,200</td><td class="num" style="white-space:nowrap;"><button class="btn btn--ghost btn--sm" type="button" data-receipt="2026-09">Receipt</button> <button class="btn btn--ghost btn--sm" type="button" data-statement="2026-09">CSV</button></td></tr>
+                      <tr><td><strong>August 2026</strong></td><td>JC-STM-0826</td><td class="num">MWK 4,512,800</td><td class="num" style="white-space:nowrap;"><button class="btn btn--ghost btn--sm" type="button" data-receipt="2026-08">Receipt</button> <button class="btn btn--ghost btn--sm" type="button" data-statement="2026-08">CSV</button></td></tr>
+                      <tr><td><strong>July 2026</strong></td><td>JC-STM-0726</td><td class="num">MWK 4,190,500</td><td class="num" style="white-space:nowrap;"><button class="btn btn--ghost btn--sm" type="button" data-receipt="2026-07">Receipt</button> <button class="btn btn--ghost btn--sm" type="button" data-statement="2026-07">CSV</button></td></tr>
+                      <tr><td><strong>June 2026</strong></td><td>JC-STM-0626</td><td class="num">MWK 3,908,400</td><td class="num" style="white-space:nowrap;"><button class="btn btn--ghost btn--sm" type="button" data-receipt="2026-06">Receipt</button> <button class="btn btn--ghost btn--sm" type="button" data-statement="2026-06">CSV</button></td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -346,6 +416,38 @@
           </div>
         </div>
 
+        <!-- ================= RECEIPT MODAL ================= -->
+        <div class="modal" id="receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receipt-heading" aria-hidden="true">
+          <div class="modal-card">
+            <button class="modal-close" type="button" data-receipt-close aria-label="Close receipt">×</button>
+            <div class="receipt" id="receipt-content">
+              <div class="receipt-head">
+                <img src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
+                <div class="receipt-title">
+                  <strong id="receipt-heading">Statement receipt</strong>
+                  <span>Client copy · MWK</span>
+                </div>
+              </div>
+              <dl class="receipt-grid" id="receipt-meta"></dl>
+              <table class="receipt-table">
+                <thead><tr><th>Date</th><th>Description</th><th class="num">Amount (MWK)</th><th class="num">Balance</th></tr></thead>
+                <tbody id="receipt-rows"></tbody>
+              </table>
+              <div class="receipt-total"><span>Closing balance</span><span id="receipt-total">MWK 0</span></div>
+              <p class="receipt-foot">
+                Jay C.O.B Financial Services · Plot 47/3, Area 47, Sector 3, Lilongwe · P.O. Box 3142<br>
+                hello@jaycobfinancial.mw · +265 999 123 456 · Monday–Friday 08:00–17:00<br>
+                This receipt is an illustrative demonstration document. It is not a bank statement or a tax invoice.
+              </p>
+            </div>
+            <div class="receipt-actions">
+              <button class="btn btn--gold" type="button" id="print-receipt">Print receipt</button>
+              <button class="btn btn--ghost" type="button" id="download-receipt">Download CSV</button>
+              <button class="btn btn--ghost" type="button" data-receipt-close>Close</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -356,11 +458,7 @@
       <div class="footer-top">
         <div class="footer-about">
           <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-            <span class="brand-mark" aria-hidden="true">JC</span>
-            <span class="brand-text">
-              <span class="brand-name">Jay C.O.B</span>
-              <span class="brand-sub">Financial Services</span>
-            </span>
+            <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
           </a>
           <p>Independent financial planning, credit advisory and business finance support for Malawian households, entrepreneurs and institutions. We turn numbers into confident decisions.</p>
           <div class="social-row" aria-label="Social links">
@@ -378,6 +476,7 @@
             <li><a href="services.html">Services</a></li>
             <li><a href="products.html">Products &amp; packages</a></li>
             <li><a href="insights.html">Insights</a></li>
+            <li><a href="live.html">Live updates</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
@@ -391,6 +490,8 @@
             <li><a href="services.html#insurance">Insurance &amp; risk cover</a></li>
             <li><a href="services.html#training">Financial literacy training</a></li>
             <li><a href="calculator.html">Loan &amp; savings calculator</a></li>
+            <li><a href="portal.html">Client login</a></li>
+            <li><a href="admin.html">Admin console</a></li>
           </ul>
         </div>
 
@@ -428,7 +529,9 @@
     </div>
   </footer>
 
+  <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/live.js" defer></script>
   <script src="assets/js/portal.js" defer></script>
 </body>
 </html>

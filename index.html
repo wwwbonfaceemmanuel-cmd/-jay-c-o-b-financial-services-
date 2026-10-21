@@ -23,11 +23,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-        <span class="brand-mark" aria-hidden="true">JC</span>
-        <span class="brand-text">
-          <span class="brand-name">Jay C.O.B</span>
-          <span class="brand-sub">Financial Services</span>
-        </span>
+        <img class="brand-logo" src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
       </a>
 
       <nav class="nav" id="primary-nav" aria-label="Primary">
@@ -37,13 +33,16 @@
           <li><a class="nav-link" href="services.html">Services</a></li>
           <li><a class="nav-link" href="products.html">Products</a></li>
           <li><a class="nav-link" href="insights.html">Insights</a></li>
+          <li><a class="nav-link" href="live.html">Live</a></li>
           <li><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="portal.html">Client login</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="admin.html">Admin console</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <a class="btn btn--ghost btn--sm" href="portal.html">Client portal</a>
-        <a class="btn btn--gold btn--sm" href="contact.html">Book a consultation</a>
+        <a class="btn btn--ghost btn--sm" href="portal.html">Client login</a>
+        <a class="btn btn--gold btn--sm" href="contact.html">Book a call</a>
       </div>
 
       <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
@@ -103,6 +102,22 @@
             <span class="tag-chip">Professional practices</span>
             <span class="tag-chip">Cooperatives &amp; SACCOs</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LIVE DESK ================= -->
+    <section class="section section--tight" aria-labelledby="live-heading">
+      <div class="container">
+        <div class="flex flex-wrap items-end justify-between gap-2 reveal">
+          <div class="section-head">
+            <span class="eyebrow">Live desk</span>
+            <h2 id="live-heading" style="font-size:clamp(1.6rem,2.9vw,2.25rem);">Announcements as they happen.</h2>
+          </div>
+          <a class="link-arrow" href="live.html">All live updates</a>
+        </div>
+        <div class="mt-3 reveal" data-live-feed data-limit="4" aria-label="Live updates carousel">
+          <p class="live-empty">Loading live updates&hellip;</p>
         </div>
       </div>
     </section>
@@ -418,6 +433,7 @@
     <section class="section section--tight">
       <div class="container">
         <div class="cta-band reveal">
+          <img class="brand-watermark" src="assets/img/logo-mark.svg" alt="" width="84" height="84" aria-hidden="true" loading="lazy">
           <div>
             <span class="eyebrow eyebrow--light">Start the conversation</span>
             <h2 class="mt-2">Let's put your numbers to work.</h2>
@@ -438,11 +454,7 @@
       <div class="footer-top">
         <div class="footer-about">
           <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-            <span class="brand-mark" aria-hidden="true">JC</span>
-            <span class="brand-text">
-              <span class="brand-name">Jay C.O.B</span>
-              <span class="brand-sub">Financial Services</span>
-            </span>
+            <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
           </a>
           <p>Independent financial planning, credit advisory and business finance support for Malawian households, entrepreneurs and institutions. We turn numbers into confident decisions.</p>
           <div class="social-row" aria-label="Social links">
@@ -460,6 +472,7 @@
             <li><a href="services.html">Services</a></li>
             <li><a href="products.html">Products &amp; packages</a></li>
             <li><a href="insights.html">Insights</a></li>
+            <li><a href="live.html">Live updates</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
@@ -473,6 +486,8 @@
             <li><a href="services.html#insurance">Insurance &amp; risk cover</a></li>
             <li><a href="services.html#training">Financial literacy training</a></li>
             <li><a href="calculator.html">Loan &amp; savings calculator</a></li>
+            <li><a href="portal.html">Client login</a></li>
+            <li><a href="admin.html">Admin console</a></li>
           </ul>
         </div>
 
@@ -510,7 +525,9 @@
     </div>
   </footer>
 
+  <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/live.js" defer></script>
 
 </body>
 </html>

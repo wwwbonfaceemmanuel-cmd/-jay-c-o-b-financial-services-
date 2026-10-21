@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Loan &amp; savings calculator — Jay C.O.B Financial Services</title>
-  <meta name="description" content="Estimate monthly loan repayments, total cost of credit and savings growth in Malawian kwacha. Free calculator from Jay C.O.B Financial Services.">
+  <title>Loan calculator (MWK) — Jay C.O.B Financial Services</title>
+  <meta name="description" content="Calculate loan repayments in Malawian Kwacha with monthly or annual basis, flat or reducing balance formulas, dated payment schedules and total repayment.">
   <meta name="theme-color" content="#071828">
-  <meta property="og:title" content="Loan &amp; savings calculator — Jay C.O.B Financial Services">
-  <meta property="og:description" content="Estimate monthly loan repayments, total cost of credit and savings growth in Malawian kwacha. Free calculator from Jay C.O.B Financial Services.">
+  <meta property="og:title" content="Loan calculator (MWK) — Jay C.O.B Financial Services">
+  <meta property="og:description" content="Calculate loan repayments in Malawian Kwacha with monthly or annual basis, flat or reducing balance formulas, dated payment schedules and total repayment.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/img/hero-consultation.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,11 +23,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-        <span class="brand-mark" aria-hidden="true">JC</span>
-        <span class="brand-text">
-          <span class="brand-name">Jay C.O.B</span>
-          <span class="brand-sub">Financial Services</span>
-        </span>
+        <img class="brand-logo" src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
       </a>
 
       <nav class="nav" id="primary-nav" aria-label="Primary">
@@ -37,13 +33,16 @@
           <li><a class="nav-link is-active" href="services.html">Services</a></li>
           <li><a class="nav-link" href="products.html">Products</a></li>
           <li><a class="nav-link" href="insights.html">Insights</a></li>
+          <li><a class="nav-link" href="live.html">Live</a></li>
           <li><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="portal.html">Client login</a></li>
+          <li class="nav-mobile-only"><a class="nav-link" href="admin.html">Admin console</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <a class="btn btn--ghost btn--sm" href="portal.html">Client portal</a>
-        <a class="btn btn--gold btn--sm" href="contact.html">Book a consultation</a>
+        <a class="btn btn--ghost btn--sm" href="portal.html">Client login</a>
+        <a class="btn btn--gold btn--sm" href="contact.html">Book a call</a>
       </div>
 
       <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
@@ -56,170 +55,213 @@
 
     <section class="page-hero">
       <div class="container page-hero-inner">
+        <div class="brand-chip"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"><span>Jay C.O.B Financial Services</span></div>
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span>Calculator</span></nav>
-        <span class="eyebrow">Free tools</span>
-        <h1>Loan &amp; savings calculator</h1>
-        <p class="lead">Turn a quoted rate into a monthly number. Adjust the sliders to see how the term, the rate and the amount change what you actually pay — or what your savings could become.</p>
-        
+        <span class="eyebrow">Free tools · Malawian Kwacha</span>
+        <h1>Loan calculator</h1>
+        <p class="lead">Choose a monthly or annual basis, pick a flat or reducing-balance formula, and see the full dated repayment schedule — in MWK, before you sign anything.</p>
+        <div class="brand-chip" style="margin-top:1.2rem; margin-bottom:0;">
+          <img src="assets/img/logo-mark.svg" alt="" width="22" height="22"><span>All amounts in Malawian Kwacha (MWK)</span>
+        </div>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
+        <div class="print-only print-head">
+          <img src="assets/img/logo-full.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
+          <div><strong>Loan repayment plan</strong><span>Illustration in Malawian Kwacha (MWK)</span></div>
+        </div>
+
         <div class="tool-layout">
-          <div class="form-card reveal">
-            <div class="tabs" role="tablist" aria-label="Calculator mode">
-              <button class="tab" type="button" role="tab" id="tab-loan" aria-controls="panel-loan" aria-selected="true">Loan repayment</button>
-              <button class="tab" type="button" role="tab" id="tab-savings" aria-controls="panel-savings" aria-selected="false">Savings growth</button>
+          <!-- ================= FORM ================= -->
+          <div class="form-card reveal calc-form">
+            <div class="form-logo">
+              <img src="assets/img/logo-mark.svg" alt="Jay C.O.B Financial Services" width="30" height="30">
+              <div>
+                <strong style="display:block; font-size:.86rem; color:var(--ink);">Jay C.O.B Financial Services</strong>
+                <span class="text-tiny text-muted">Loan repayment planner</span>
+              </div>
             </div>
 
-            <!-- ============ LOAN ============ -->
-            <div class="tab-panel" id="panel-loan" role="tabpanel" aria-labelledby="tab-loan">
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="loan-amount">Loan amount</label>
-                  <span class="range-value" id="out-amount">MWK 5,000,000</span>
-                </div>
-                <input id="loan-amount" type="range" min="250000" max="30000000" step="50000" value="5000000">
-                <div class="range-scale"><span>MWK 250,000</span><span>MWK 30,000,000</span></div>
-              </div>
+            <h2 style="font-size:1.35rem;">Build your repayment plan</h2>
+            <p class="text-small text-muted" style="margin-top:.3rem;">Every result is an illustration in MWK. Your lender's own fees and insurance may differ.</p>
 
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="loan-term">Repayment term</label>
-                  <span class="range-value" id="out-term">36 months</span>
-                </div>
-                <input id="loan-term" type="range" min="6" max="84" step="3" value="36">
-                <div class="range-scale"><span>6 months</span><span>84 months</span></div>
-              </div>
-
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="loan-rate">Annual interest rate (APR)</label>
-                  <span class="range-value" id="out-rate">24%</span>
-                </div>
-                <input id="loan-rate" type="range" min="8" max="45" step="0.5" value="24">
-                <div class="range-scale"><span>8%</span><span>45%</span></div>
-              </div>
-
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="loan-fee">Arrangement fee</label>
-                  <span class="range-value" id="out-fee">2%</span>
-                </div>
-                <input id="loan-fee" type="range" min="0" max="6" step="0.25" value="2">
-                <div class="range-scale"><span>0%</span><span>6%</span></div>
+            <form id="calc-form" class="mt-3" novalidate>
+              <div class="field">
+                <label for="calc-basis">Calculation basis</label>
+                <select id="calc-basis" name="basis">
+                  <option value="monthly" selected>Monthly — enter the term in months</option>
+                  <option value="annual">Annual — enter the term in years</option>
+                </select>
+                <span class="hint" id="basis-hint">Default: 1 month. Payments are monthly.</span>
               </div>
 
               <div class="field mt-2">
-                <label for="loan-income">Your monthly net income <span class="text-muted" style="font-weight:400;">(optional, for affordability)</span></label>
-                <input id="loan-income" type="number" min="0" step="10000" placeholder="e.g. 900000" inputmode="numeric">
-                <span class="hint">We use this only to estimate the share of income the instalment would take.</span>
-              </div>
-            </div>
-
-            <!-- ============ SAVINGS ============ -->
-            <div class="tab-panel" id="panel-savings" role="tabpanel" aria-labelledby="tab-savings" hidden>
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="sav-start">Starting balance</label>
-                  <span class="range-value" id="out-start">MWK 500,000</span>
+                <label>Interest formula</label>
+                <div class="seg" role="radiogroup" aria-label="Interest formula">
+                  <input type="radio" id="formula-reducing" name="formula" value="reducing" checked>
+                  <label for="formula-reducing">Reducing balance</label>
+                  <input type="radio" id="formula-flat" name="formula" value="flat">
+                  <label for="formula-flat">Flat rate</label>
                 </div>
-                <input id="sav-start" type="range" min="0" max="20000000" step="50000" value="500000">
-                <div class="range-scale"><span>MWK 0</span><span>MWK 20,000,000</span></div>
+                <p class="formula-note" id="formula-note">Reducing balance charges interest on the outstanding balance each month, so the interest portion falls over time. Usually the cheaper method.</p>
               </div>
 
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="sav-monthly">Monthly contribution</label>
-                  <span class="range-value" id="out-monthly">MWK 150,000</span>
+              <div class="field mt-2">
+                <label for="calc-amount">Loan amount (MWK)</label>
+                <div class="input-money">
+                  <span>MWK</span>
+                  <input id="calc-amount" name="amount" type="number" inputmode="numeric" min="1000" step="50000" value="5000000" required>
                 </div>
-                <input id="sav-monthly" type="range" min="0" max="2000000" step="10000" value="150000">
-                <div class="range-scale"><span>MWK 0</span><span>MWK 2,000,000</span></div>
+                <span class="hint">Principal you intend to borrow.</span>
               </div>
 
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="sav-years">Years to save</label>
-                  <span class="range-value" id="out-years">5 years</span>
+              <div class="calc-row mt-2">
+                <div class="field">
+                  <label for="calc-rate">Interest rate (% per year)</label>
+                  <div class="input-suffix">
+                    <input id="calc-rate" name="rate" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="24" required>
+                    <span class="suffix">% p.a.</span>
+                  </div>
                 </div>
-                <input id="sav-years" type="range" min="1" max="30" step="1" value="5">
-                <div class="range-scale"><span>1 year</span><span>30 years</span></div>
+                <div class="field">
+                  <label for="calc-period">Duration period</label>
+                  <div class="input-suffix">
+                    <input id="calc-period" name="period" type="number" inputmode="numeric" min="1" max="360" step="1" value="1" required>
+                    <span class="suffix" id="period-unit">month</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="sav-rate">Expected annual return</label>
-                  <span class="range-value" id="out-sav-rate">14%</span>
+              <div class="calc-row mt-2">
+                <div class="field">
+                  <label for="calc-start">First payment date</label>
+                  <input id="calc-start" name="start" type="date">
                 </div>
-                <input id="sav-rate" type="range" min="0" max="30" step="0.5" value="14">
-                <div class="range-scale"><span>0%</span><span>30%</span></div>
+                <div class="field">
+                  <label for="calc-fee">Arrangement fee (%)</label>
+                  <div class="input-suffix">
+                    <input id="calc-fee" name="fee" type="number" inputmode="decimal" min="0" max="15" step="0.25" value="0">
+                    <span class="suffix">%</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="range-field">
-                <div class="range-head">
-                  <label for="sav-inflation">Assumed annual inflation</label>
-                  <span class="range-value" id="out-inflation">20%</span>
-                </div>
-                <input id="sav-inflation" type="range" min="0" max="40" step="1" value="20">
-                <div class="range-scale"><span>0%</span><span>40%</span></div>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button class="btn btn--gold" type="submit">Calculate</button>
+                <button class="btn btn--ghost" type="button" id="calc-reset">Reset defaults</button>
               </div>
-              <p class="text-tiny text-muted">Returns are compounded monthly. Inflation is used only to show purchasing power in today's kwacha.</p>
-            </div>
+              <p class="text-tiny text-muted mt-2">Results update automatically as you change the figures.</p>
+            </form>
           </div>
 
-          <div class="result-panel reveal" data-delay="1" aria-live="polite">
-            <!-- Loan output -->
-            <div id="result-loan">
-              <span class="eyebrow eyebrow--light">Your estimate</span>
-              <div class="result-hero">
-                <p class="label">Monthly repayment</p>
-                <p class="value" id="res-monthly">MWK 412,500 <small>/ month</small></p>
-              </div>
-              <div class="result-rows">
-                <div class="result-row"><span>Loan amount</span><strong id="res-principal">MWK 5,000,000</strong></div>
-                <div class="result-row"><span>Total interest</span><strong id="res-interest">MWK 1,687,000</strong></div>
-                <div class="result-row"><span>Arrangement fee</span><strong id="res-fee">MWK 100,000</strong></div>
-                <div class="result-row"><span>Total cost of credit</span><strong id="res-total">MWK 6,787,000</strong></div>
-                <div class="result-row" id="row-afford" hidden><span>Share of monthly income</span><strong id="res-afford">—</strong></div>
-              </div>
-              <div class="result-bar">
-                <span class="principal" id="bar-principal" style="width:75%"></span>
-                <span class="interest" id="bar-interest" style="width:25%"></span>
-              </div>
-              <div class="legend">
-                <span><i style="background:var(--gold-400)"></i>Principal</span>
-                <span><i style="background:#5f8ba8"></i>Interest &amp; fees</span>
-              </div>
-              <p class="result-note" id="res-note">Illustration only. Actual repayments depend on the lender's method, insurance requirements, processing fees and the date of disbursement.</p>
+          <!-- ================= SUMMARY ================= -->
+          <aside class="result-panel calc-summary reveal" data-delay="1" aria-live="polite">
+            <div class="flex items-center justify-between gap-2">
+              <img src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64" class="live-logo">
+              <span class="text-tiny" style="color:#9db1c2;">MWK</span>
             </div>
 
-            <!-- Savings output -->
-            <div id="result-savings" hidden>
-              <span class="eyebrow eyebrow--light">Your projection</span>
-              <div class="result-hero">
-                <p class="label">Projected balance</p>
-                <p class="value" id="sav-future">MWK 13,900,000 <small>in 5 years</small></p>
-              </div>
-              <div class="result-rows">
-                <div class="result-row"><span>Total contributed</span><strong id="sav-contrib">MWK 9,500,000</strong></div>
-                <div class="result-row"><span>Investment growth</span><strong id="sav-growth">MWK 4,400,000</strong></div>
-                <div class="result-row"><span>Value in today's kwacha</span><strong id="sav-real">MWK 5,600,000</strong></div>
-                <div class="result-row"><span>Monthly income if 4% drawdown</span><strong id="sav-income">MWK 46,000</strong></div>
-              </div>
-              <p class="result-note">Assumes contributions at the end of each month and a constant return. Real returns vary; inflation may erode more than shown if prices rise faster than your assumptions.</p>
+            <div class="result-hero">
+              <p class="label">Total amount</p>
+              <p class="value" id="res-total">MWK 0</p>
+              <p class="text-tiny" style="color:#9db1c2; margin-top:.35rem;">Principal + interest + fees</p>
             </div>
 
-            <div class="mt-3" style="border-top:1px solid rgba(255,255,255,.12); padding-top:1.2rem;">
-              <p class="text-tiny" style="color:#9db1c2; margin-bottom:.6rem;">Want these numbers reviewed properly?</p>
-              <a class="btn btn--gold btn--block" href="contact.html">Book a free consultation</a>
+            <div class="result-rows">
+              <div class="result-row"><span>Principal</span><strong id="res-principal">MWK 0</strong></div>
+              <div class="result-row"><span>Duration period</span><strong id="res-duration">1 month</strong></div>
+              <div class="result-row"><span>Interest amount</span><strong id="res-interest">MWK 0</strong></div>
+              <div class="result-row"><span>Monthly payment</span><strong id="res-monthly">MWK 0</strong></div>
+              <div class="result-row" id="res-fee-row" hidden><span>Arrangement fee</span><strong id="res-fee">MWK 0</strong></div>
+              <div class="result-row"><span>Total repayment</span><strong id="res-repayment">MWK 0</strong></div>
             </div>
+
+            <div class="calc-meta">
+              <span>Basis: <strong id="res-basis">Monthly</strong></span>
+              <span>Formula: <strong id="res-formula">Reducing balance</strong></span>
+              <span>Rate: <strong id="res-rate">24% p.a.</strong></span>
+            </div>
+
+            <div class="result-bar">
+              <span class="principal" id="bar-principal" style="width:100%"></span>
+              <span class="interest" id="bar-interest" style="width:0%"></span>
+            </div>
+            <div class="legend">
+              <span><i style="background:var(--gold-400)"></i>Principal</span>
+              <span><i style="background:#5f8ba8"></i>Interest &amp; fees</span>
+            </div>
+
+            <p class="result-note" id="res-note">Choose your figures to see the full schedule below.</p>
+
+            <div class="mt-3" style="border-top:1px solid rgba(255,255,255,.12); padding-top:1.2rem; display:grid; gap:.5rem;">
+              <button class="btn btn--gold btn--block" type="button" id="download-schedule">Download schedule (CSV)</button>
+              <button class="btn btn--ghost-light btn--block" type="button" id="print-plan">Print repayment plan</button>
+            </div>
+          </aside>
+        </div>
+
+        <!-- ================= SCHEDULE ================= -->
+        <div class="schedule-card reveal" id="schedule-card">
+          <div class="schedule-head">
+            <div>
+              <h3>Repayment schedule</h3>
+              <p id="schedule-summary">Monthly payments with due dates, interest and closing balances.</p>
+            </div>
+            <div class="schedule-actions">
+              <button class="btn btn--ghost btn--sm" type="button" id="toggle-rows">Show all rows</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="download-schedule-2">Export CSV</button>
+            </div>
+          </div>
+          <div class="schedule-scroll">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Due date</th>
+                  <th class="num">Opening balance</th>
+                  <th class="num">Payment</th>
+                  <th class="num">Interest</th>
+                  <th class="num">Principal</th>
+                  <th class="num">Closing balance</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">Totals</td>
+                  <td class="num" id="foot-opening">—</td>
+                  <td class="num" id="foot-payment">—</td>
+                  <td class="num" id="foot-interest">—</td>
+                  <td class="num" id="foot-principal">—</td>
+                  <td class="num" id="foot-closing">—</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
 
-        <div class="callout mt-4 reveal" style="max-width:56rem;">
-          <strong>How to read this responsibly</strong>
-          A calculator is a sanity check, not an offer. Lenders in Malawi use different interest methods, compulsory insurance, processing fees and minimum balances, and the kwacha's value can move within a single facility term. Treat the output as a comparison tool: run the same numbers for two offers and see which is genuinely cheaper.
+        <div class="callout mt-4 reveal">
+          <strong>How the two formulas differ</strong>
+          <p style="margin-top:.3rem;">A <strong>flat rate</strong> charges interest on the original principal for the whole term, even as the balance falls. A <strong>reducing balance</strong> charges interest only on what is still outstanding. At the same quoted rate, reducing balance normally costs less overall — compare the interest amount above for both settings.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="cta-band reveal">
+          <img class="brand-watermark" src="assets/img/logo-mark.svg" alt="" width="84" height="84" aria-hidden="true" loading="lazy">
+          <div>
+            <span class="eyebrow eyebrow--light">Start the conversation</span>
+            <h2 class="mt-2">Want the plan checked before you sign?</h2>
+            <p>Bring the lender's offer letter and we will verify the formula, the fees and the schedule against your actual cash flow — free for 30 minutes.</p>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn--gold" href="contact.html">Book a consultation</a>
+            <a class="btn btn--ghost-light" href="portal.html">Client login</a>
+          </div>
         </div>
       </div>
     </section>
@@ -231,11 +273,7 @@
       <div class="footer-top">
         <div class="footer-about">
           <a class="brand" href="index.html" aria-label="Jay C.O.B Financial Services — home">
-            <span class="brand-mark" aria-hidden="true">JC</span>
-            <span class="brand-text">
-              <span class="brand-name">Jay C.O.B</span>
-              <span class="brand-sub">Financial Services</span>
-            </span>
+            <img class="brand-logo brand-logo--light" src="assets/img/logo-full-light.svg" alt="Jay C.O.B Financial Services" width="268" height="64">
           </a>
           <p>Independent financial planning, credit advisory and business finance support for Malawian households, entrepreneurs and institutions. We turn numbers into confident decisions.</p>
           <div class="social-row" aria-label="Social links">
@@ -253,6 +291,7 @@
             <li><a href="services.html">Services</a></li>
             <li><a href="products.html">Products &amp; packages</a></li>
             <li><a href="insights.html">Insights</a></li>
+            <li><a href="live.html">Live updates</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
@@ -266,6 +305,8 @@
             <li><a href="services.html#insurance">Insurance &amp; risk cover</a></li>
             <li><a href="services.html#training">Financial literacy training</a></li>
             <li><a href="calculator.html">Loan &amp; savings calculator</a></li>
+            <li><a href="portal.html">Client login</a></li>
+            <li><a href="admin.html">Admin console</a></li>
           </ul>
         </div>
 
@@ -303,7 +344,9 @@
     </div>
   </footer>
 
+  <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/live.js" defer></script>
   <script src="assets/js/calculator.js" defer></script>
 </body>
 </html>
