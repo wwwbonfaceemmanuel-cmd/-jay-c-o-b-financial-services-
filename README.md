@@ -84,6 +84,7 @@ key is `jcob_session_v1`. Clear site data to reset the demonstration.
 │       ├── dashboard.js        # customer dashboard SPA
 │       ├── live.js / admin.js  # animated live feed and its admin console
 │       └── portal.js           # legacy portal (superseded by dashboard.html)
+├── single/index.html           # entire site in one self-contained file
 ├── tools/
 │   ├── build.py                # static site builder (header/footer/scripts + legal + aliases)
 │   ├── legal_docs.py           # legal document content
@@ -93,6 +94,28 @@ key is `jcob_session_v1`. Clear site data to reset the demonstration.
 ├── sitemap.xml, robots.txt
 └── README.md
 ```
+
+## Single-file edition
+
+`single/index.html` is the whole project in one 2.3 MB HTML document: 37 views (every page plus all
+14 policies), the stylesheet, all JavaScript and every image inlined as data URIs. No assets folder,
+no server, no build step — double-click it, email it, or upload it on its own to any host.
+
+- Every internal link is rewritten to a hash route (`#/about`, `#/loan-products#business`,
+  `#/support`), and links rendered by JavaScript are intercepted so nothing ever leaves the file.
+- The dashboard is mounted inside the same document; its own sub-routes (`#repayments`,
+  `#transactions`, …) still work, and signing out returns to the login view.
+- Storage automatically falls back to memory when `localStorage` is unavailable (`file://`,
+  private windows, sandboxed iframes), so nothing breaks offline.
+- Only optional external request: Google Fonts; without a connection the system serif/sans stack
+  is used.
+
+```bash
+python3 tools/build_single.py          # rebuild single/index.html from the checked-in pages
+python3 tools/build_single.py --check  # also fail on external references / duplicate ids
+```
+
+Demo login inside the bundle: `demo@jaycobfinancial.mw` / `demo1234`, OTP `123456`.
 
 ## Building and checking
 
