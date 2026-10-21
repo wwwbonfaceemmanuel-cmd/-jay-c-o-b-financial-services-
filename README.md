@@ -106,6 +106,22 @@ python3 -m http.server 8000     # preview at http://localhost:8000
 The site can also be served exactly as committed: `tools/build.py` output is checked in, so no
 build step is required to deploy.
 
+## Deploying to GitHub Pages
+
+The site is already built and checked in, so Pages only needs three things:
+
+1. **Settings → Pages → Build and deployment → Source = GitHub Actions** (one click, repo owner only —
+   the API token used by automation cannot create the Pages site).
+2. **Actions → "Deploy static site to GitHub Pages" → Re-run all jobs** (or push any commit to `main`).
+3. Open <https://wwwbonfaceemmanuel-cmd.github.io/-jay-c-o-b-financial-services-/>.
+
+The workflow (`.github/workflows/pages.yml`) copies the site into `_site`, fails the build if any of
+the 17 key pages or the core assets are missing, then uploads and deploys the artifact. All links are
+relative, so the repository sub-path (`/-jay-c-o-b-financial-services-/`) works without configuration.
+
+Alternative hosts: any static host (Netlify, Cloudflare Pages, S3, cPanel) can serve the repository
+root as-is — there is no build step at runtime.
+
 ## Design, accessibility and performance
 
 - Emerald (`#03170f` → `#106648`) with liquid gold (`#8a6a12` → `#f7efd9`) and a cream paper base.
