@@ -26,7 +26,7 @@
   };
 
   /* Follow the catalogue published in the admin console. */
-  (function syncCatalogue() {
+  function syncCatalogue() {
     var store = window.JCOB_SITE;
     if (!store || !store.products) return;
     Object.keys(PRODUCTS).forEach(function (name) {
@@ -38,7 +38,9 @@
       if (isFinite(p.fee) && p.fee >= 0) PRODUCTS[name].fee = Number(p.fee);
       if (isFinite(p.minTerm) && isFinite(p.maxTerm)) PRODUCTS[name].term = [Number(p.minTerm), Number(p.maxTerm)];
     });
-  })();
+  }
+  syncCatalogue();
+  document.addEventListener("jcob:site-updated", syncCatalogue);
 
   var DOCS = [
     { id: "id", name: "National ID or passport", required: true, hint: "Both sides, PDF or image" },

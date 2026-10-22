@@ -356,21 +356,25 @@
     UI.toast({ title: "Calculator reset", message: "Monthly basis, 1 month, annual rate and reducing balance restored.", type: "info" });
   }
 
+  /* Defaults published in the admin console (size, term, fee, method). */
+  function applyAdminDefaults() {
+    var defaults = (window.JCOB_SITE && window.JCOB_SITE.settings.calc) || null;
+    if (!defaults) return;
+    if (defaults.rateBasis && $("calc-rate-basis")) { $("calc-rate-basis").value = defaults.rateBasis; state.rateBasis = defaults.rateBasis; }
+    if (defaults.basis && $("calc-basis")) { $("calc-basis").value = defaults.basis; state.basis = defaults.basis; }
+    if (defaults.amount) $("calc-amount").value = defaults.amount;
+    if (defaults.term) $("calc-term").value = defaults.term;
+    if (defaults.fee !== undefined) $("calc-fee").value = defaults.fee;
+    if (defaults.adminFee !== undefined) $("calc-admin").value = defaults.adminFee;
+    if (defaults.method) setMethod(defaults.method);
+    state.rate = Number($("calc-rate").value) || 24;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     syncCatalogue();
     /* catalogue rate first, then the admin's default size / term / fee */
     applyPreset(state.preset);
-    var defaults = (window.JCOB_SITE && window.JCOB_SITE.settings.calc) || null;
-    if (defaults) {
-      if (defaults.rateBasis && $("calc-rate-basis")) { $("calc-rate-basis").value = defaults.rateBasis; state.rateBasis = defaults.rateBasis; }
-      if (defaults.basis && $("calc-basis")) { $("calc-basis").value = defaults.basis; state.basis = defaults.basis; }
-      if (defaults.amount) $("calc-amount").value = defaults.amount;
-      if (defaults.term) $("calc-term").value = defaults.term;
-      if (defaults.fee !== undefined) $("calc-fee").value = defaults.fee;
-      if (defaults.adminFee !== undefined) $("calc-admin").value = defaults.adminFee;
-      if (defaults.method) setMethod(defaults.method);
-    }
-    state.rate = Number($("calc-rate").value) || 24;
+    applyAdminDefaults();
     document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
       radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
@@ -395,7 +399,16 @@
       });
     }
 
-    if ($("calc-rate-basis")) {
+    document.addEventListener("jcob:site-updated", function () {
+    if (!$("calc-rate")) return;
+    syncCatalogue();
+    applyPreset(state.preset);
+    applyAdminDefaults();
+    readInputs();
+    render();
+  });
+
+  if ($("calc-rate-basis")) {
       $("calc-rate-basis").addEventListener("change", function () {
         state.rateBasis = $("calc-rate-basis").value;
         /* re-quote the same cost in the new unit so nothing changes silently */

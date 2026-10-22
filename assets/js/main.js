@@ -191,8 +191,7 @@
         submitBtn.textContent = "Sending…";
       }
 
-      // No backend is wired up: demonstrate the success state locally.
-      setTimeout(function () {
+      function succeed() {
         if (status) {
           status.className = "form-status is-visible";
           status.textContent =
@@ -204,9 +203,61 @@
           submitBtn.disabled = false;
           submitBtn.textContent = submitBtn.dataset.label || "Send";
         }
-      }, 700);
+      }
+
+      /* Cloud mode: the enquiry is stored in Supabase (enquiries table),
+         where the admin console can review and action it. */
+      var CLOUD = window.JCOB_CLOUD;
+      if (CLOUD && CLOUD.enabled) {
+        var data = {};
+        new FormData(form).forEach(function (value, key) { data[key] = value; });
+        var payload = {
+          name: data.name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          service: data.service || "",
+          location: data.location || "",
+          preference: data.preference || "",
+          message: data.message || "",
+          consent: !!data.consent
+        };
+        if (!payload.name || !payload.email || !payload.message) {
+          if (status) {
+            status.className = "form-status is-visible form-status--error";
+            status.textContent = "Please complete the required fields.";
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtn.dataset.label || "Send";
+          }
+          return;
+        }
+        CLOUD.from("enquiries").insert(payload).run().then(succeed).catch(function () {
+          if (status) {
+            status.className = "form-status is-visible form-status--error";
+            status.textContent = "We could not send that just now. Please try again, or call the office.";
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtn.dataset.label || "Send";
+          }
+        });
+        return;
+      }
+
+      setTimeout(succeed, 700);
     });
   });
+
+  /* ---------- Enquiry note (cloud vs demo wording) ---------- */
+  (function () {
+    var note = document.querySelector("[data-enquiry-note]");
+    if (!note) return;
+    var CLOUD = window.JCOB_CLOUD;
+    if (CLOUD && CLOUD.enabled) {
+      note.textContent = "Your enquiry is sent securely to our client services team and appears in the admin console for follow-up.";
+    }
+  })();
 
   /* ---------- Newsletter ---------- */
   document.querySelectorAll("form[data-newsletter]").forEach(function (form) {

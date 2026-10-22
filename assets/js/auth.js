@@ -10,6 +10,7 @@
   var UI = window.JCOB_UI;
   var DATA = window.JCOB_DATA;
   var F = window.JCOB_FINANCE;
+  var CLOUD = window.JCOB_CLOUD;
   var ACCOUNT_KEY = "jcob_account_v1";
   var PENDING_KEY = "jcob_pending_verify";
   var DEMO_CODE = "123456";
@@ -18,6 +19,9 @@
   function page() {
     return document.body.getAttribute("data-auth-page") || "";
   }
+
+  function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
+  function demoBypass(identifier, password) { return demoMatch(identifier) && password === "demo1234"; }
 
   function readAccount() {
     try { return JSON.parse(localStorage.getItem(ACCOUNT_KEY) || "null"); } catch (e) { return null; }
@@ -118,6 +122,39 @@
         marketing: $("reg-marketing").checked
       };
       saveAccount(account);
+
+      if (cloudOn()) {
+        var status = $("register-status");
+        if (status) {
+          status.className = "form-status is-visible";
+          status.textContent = "Creating your secure account…";
+        }
+        CLOUD.auth.signUp({
+          email: email, password: pw, fullName: account.fullName,
+          phone: phone, nid: nid, dob: dob, gender: gender
+        }).then(function (res) {
+          if (res && res.needsConfirmation) {
+            if (status) {
+              status.className = "form-status is-visible";
+              status.textContent = "Check " + email + " for the confirmation link, then sign in. Your account is created but not yet active.";
+            }
+            UI.toast({ title: "Confirm your email", message: "We sent a confirmation link to " + email + ".", type: "info" });
+            return;
+          }
+          UI.toast({ title: "Account created", message: "Welcome to JAY C O B Financial Services.", type: "success" });
+          window.location.href = "dashboard.html";
+        }).catch(function (err) {
+          var message = String((err && err.message) || "Registration failed");
+          if (/already|exists|registered/i.test(message)) message = "An account with that email already exists. Sign in instead, or reset your password.";
+          if (status) {
+            status.className = "form-status is-visible form-status--error";
+            status.textContent = message;
+          }
+          UI.toast({ title: "Could not create the account", message: message, type: "danger" });
+        });
+        return;
+      }
+
       try {
         sessionStorage.setItem(PENDING_KEY, JSON.stringify({
           mode: "register", identifier: email, phone: phone,
@@ -265,6 +302,49 @@
       if (!password) { fieldError(pwInput, "Enter your password."); ok = false; }
       if (!ok) return;
 
+      /* Cloud mode: real authentication against Supabase. The published
+         demo login still works so the site can be reviewed without an
+         account. */
+      if (cloudOn() && isEmail(identifier) && !demoBypass(identifier, password)) {
+        status.className = "form-status is-visible";
+        status.textContent = "Signing you in…";
+        CLOUD.auth.signIn(identifier, password).then(function (res) {
+          UI.clearTryCount();
+          var name = (res.profile && res.profile.full_name) || identifier;
+          var remember = $("login-remember") && $("login-remember").checked;
+          UI.setSession({
+            authenticated: true,
+            name: name,
+            identifier: identifier,
+            email: identifier,
+            account: (res.profile && res.profile.account_no) || "",
+            cloud: true
+          }, remember);
+          status.textContent = "Signed in. Opening your dashboard…";
+          var next = new URLSearchParams(location.search).get("next");
+          setTimeout(function () {
+            ToastOnLogin(name);
+            window.location.href = next && next.indexOf("dashboard") >= 0 ? next : "dashboard.html";
+          }, 350);
+        }).catch(function (err) {
+          var message = String((err && err.message) || "");
+          if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an account.";
+          else if (/confirm/i.test(message)) message = "Please confirm your email address before signing in.";
+          var tries = UI.tryCount();
+          tries.count = (tries.count || 0) + 1;
+          if (tries.count >= 5) {
+            tries.lockedUntil = Date.now() + 5 * 60 * 1000;
+            UI.setTryCount(tries);
+            lockOut(new Date(tries.lockedUntil));
+            return;
+          }
+          UI.setTryCount(tries);
+          status.className = "form-status is-visible form-status--error";
+          status.textContent = message + " " + (5 - tries.count) + " attempt(s) remaining before a temporary lock.";
+        });
+        return;
+      }
+
       var account = readAccount();
       var registered = account && (
         account.email.toLowerCase() === identifier.toLowerCase() ||
@@ -361,6 +441,18 @@
       }
       status.className = "form-status is-visible";
       status.textContent = "Sending a single-use reset link…";
+
+      if (cloudOn() && isEmail(input.value.trim())) {
+        CLOUD.auth.recover(input.value.trim()).then(function () {
+          status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
+            '</strong>, a reset link has been sent by email and expires in 30 minutes.';
+        }).catch(function () {
+          status.className = "form-status is-visible form-status--error";
+          status.textContent = "We could not send the reset link just now. Please try again.";
+        });
+        return;
+      }
+
       setTimeout(function () {
         status.className = "form-status is-visible";
         status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
@@ -418,6 +510,7 @@
     document.querySelectorAll("[data-logout]").forEach(function (el) {
       el.addEventListener("click", function (e) {
         e.preventDefault();
+        if (cloudOn()) CLOUD.auth.signOut();
         UI.clearSession();
         UI.toast({ title: "Signed out", message: "You have been signed out securely.", type: "success" });
         setTimeout(function () { window.location.href = "login.html"; }, 450);

@@ -390,12 +390,35 @@
   }
 
   function write(posts) {
+    var ok = true;
     try {
       window.localStorage.setItem(KEY, JSON.stringify(posts));
-      return true;
     } catch (e) {
-      return false;
+      ok = false;
     }
+    pushRemote(posts);
+    return ok;
+  }
+
+  /* ---------------- Cloud (Supabase) ---------------- */
+  var CLOUD = window.JCOB_CLOUD;
+  var remote = {
+    enabled: !!(CLOUD && CLOUD.enabled),
+    state: CLOUD && CLOUD.enabled ? "connecting" : "local",
+    error: null
+  };
+
+  function pushRemote(posts) {
+    if (!CLOUD || !CLOUD.enabled) return;
+    if (!CLOUD.auth || !CLOUD.auth.isSignedIn()) return;
+    remote.state = "saving";
+    CLOUD.docs.put("site", "live_posts", posts).then(function () {
+      remote.state = "synced";
+      remote.error = null;
+    }).catch(function (err) {
+      remote.state = "error";
+      remote.error = String((err && err.message) || err);
+    });
   }
 
   function published(posts) {
@@ -453,6 +476,8 @@
     DEFAULTS: DEFAULTS,
     getPosts: read,
     savePosts: write,
+    remote: remote,
+    hydrate: hydrateRemote,
     published: published,
     escapeHtml: escapeHtml,
     animations: ANIMATIONS,
@@ -691,52 +716,33 @@
 
   initFeeds();
 
-  /* ---------------- Supabase-ready loader ---------------- */
-  function remoteEnabled() {
-    var cfg = window.JCOB_CONFIG || {};
-    return !!(cfg.supabaseUrl && cfg.supabaseAnonKey && cfg.useSupabase);
-  }
-
-  function loadRemote() {
-    if (!remoteEnabled()) return;
-    var cfg = window.JCOB_CONFIG;
-    var url = cfg.supabaseUrl.replace(/\/$/, "") + "/rest/v1/" +
-      (cfg.liveTable || "live_posts") +
-      "?select=*&published=eq.true&order=pinned.desc,date.desc";
-    fetch(url, {
-      headers: {
-        apikey: cfg.supabaseAnonKey,
-        Authorization: "Bearer " + cfg.supabaseAnonKey
-      }
-    })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (rows) {
-        if (!Array.isArray(rows) || !rows.length) return;
-        var posts = rows.map(function (r) {
-          return {
-            id: String(r.id),
-            type: r.type || "announcement",
-            title: r.title || "",
-            body: r.body || "",
-            link: r.link || "",
-            linkLabel: r.link_label || r.linkLabel || "Read more",
-            image: r.image || "",
-            animation: r.animation || "slide",
-            pinned: !!r.pinned,
-            published: r.published !== false,
-            date: r.date || r.created_at || new Date().toISOString()
-          };
-        });
-        write(posts);
+  /* ---------------- Cloud loader ---------------- */
+  function hydrateRemote() {
+    if (!CLOUD || !CLOUD.enabled) return Promise.resolve(false);
+    return CLOUD.docs.get("site", "live_posts").then(function (row) {
+      var posts = row && Array.isArray(row.data) ? row.data : null;
+      if (posts && posts.length) {
+        try { window.localStorage.setItem(KEY, JSON.stringify(posts)); } catch (e) {}
+        remote.state = "synced";
+        remote.error = null;
         initFeeds();
-      })
-      .catch(function () { /* stay on local data */ });
+        return true;
+      }
+      /* first run against an empty cloud: publish whatever this browser has */
+      var local = read();
+      if (local.length) pushRemote(local);
+      return false;
+    }).catch(function (err) {
+      remote.state = "offline";
+      remote.error = String((err && err.message) || err);
+      return false;
+    });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadRemote);
+    document.addEventListener("DOMContentLoaded", hydrateRemote);
   } else {
-    loadRemote();
+    hydrateRemote();
   }
 
   /* ---------------- Toast notification ---------------- */

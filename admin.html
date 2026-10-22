@@ -269,6 +269,8 @@ body.locked { overflow: hidden; }
 #admin-gate .gate-foot { margin-top: 14px; font-size: 11px; color: var(--dim); display: flex; justify-content: space-between; gap: 8px; }
 #admin-gate .gate-foot a { color: var(--muted); }
 #gate-status { font-size: 12px; margin-top: 10px; min-height: 16px; }
+#admin-gate [hidden] { display: none !important; }
+#admin-gate .gate-note { margin-top: 2px; margin-bottom: 12px; }
 #gate-status.err { color: #fda4af; }
 </style>
 </head>
@@ -281,12 +283,14 @@ body.locked { overflow: hidden; }
       <text x="32" y="40.5" font-family="Arial, sans-serif" font-size="15" font-weight="900" fill="#7dd3fc" text-anchor="middle">JCB</text>
     </svg>
     <h2>Administrator sign in</h2>
-    <p>JAY C O B management portal. Sign in to manage the website, applications, customers and lending operations.</p>
+    <p id="gate-intro">JAY C O B management portal. Sign in to manage the website, applications, customers and lending operations.</p>
+    <label for="admin-email" id="gate-email-label" hidden>Administrator email</label>
+    <input id="admin-email" type="email" placeholder="you@jaycobfinancial.mw" autocomplete="username" hidden>
     <label for="admin-password">Administrator password</label>
     <input id="admin-password" type="password" placeholder="Enter password" autocomplete="current-password" required>
-    <button class="btn primary" type="submit">Unlock console</button>
+    <button class="btn primary" type="submit" id="gate-submit">Unlock console</button>
     <p id="gate-status" role="status"></p>
-    <div class="gate-foot"><span>Demo password: admin2026</span><a href="index.html">← Back to website</a></div>
+    <div class="gate-foot"><span id="gate-hint">Demo password: admin2026</span><a href="index.html">← Back to website</a></div>
   </form>
 </div>
 
@@ -362,6 +366,9 @@ body.locked { overflow: hidden; }
 <div class="overlay" id="overlay"><div class="modal" id="modalBox"></div></div>
 <div id="toasts"></div>
 
+<script src="env.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cloud.js"></script>
 <script src="assets/js/site-store.js"></script>
 <script src="assets/js/live.js"></script>
 
@@ -652,7 +659,54 @@ return{customers,products,applications,loans,repayments,deposits,withdrawals,tra
 }
 let db;
 try{const raw=localStorage.getItem(DB_KEY);db=raw?JSON.parse(raw):seed()}catch(e){db=seed()}
-function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(db))}catch(e){}}
+
+/* ---------------- cloud persistence (Supabase) ----------------
+   Every console write already funnels through save(), so the whole
+   portal database is mirrored to portal_docs/main without touching the
+   modules. Until an administrator signs in, the local copy is used. */
+const cloud=(()=>{const c=window.JCOB_CLOUD;return{on:!!(c&&c.enabled),state:(c&&c.enabled)?'connecting':'local',at:null,error:null,api:c}})();
+let cloudTimer=null;
+function cloudPush(){
+  if(!cloud.on)return;
+  clearTimeout(cloudTimer);
+  cloud.state='saving';
+  cloudTimer=setTimeout(async()=>{
+    try{await cloud.api.docs.put('portal','main',db);cloud.state='synced';cloud.at=new Date().toISOString();cloud.error=null;}
+    catch(e){cloud.state='error';cloud.error=String(e&&e.message||e);}
+    try{window.JCOB_ADMIN_SITE&&window.JCOB_ADMIN_SITE.refreshCloud&&window.JCOB_ADMIN_SITE.refreshCloud();}catch(e){}
+  },500);
+}
+function save(){
+  try{localStorage.setItem(DB_KEY,JSON.stringify(db))}catch(e){}
+  cloudPush();
+}
+async function cloudLoad(){
+  if(!cloud.on)return false;
+  try{
+    const row=await cloud.api.docs.get('portal','main');
+    if(row&&row.data&&row.data.customers){
+      /* merge over a fresh seed so modules added later still have a shape */
+      db=Object.assign(seed(),row.data);
+      try{localStorage.setItem(DB_KEY,JSON.stringify(db))}catch(e){}
+      cloud.state='synced';cloud.at=row.updated_at;
+      if(typeof render==='function')render(true);
+      return true;
+    }
+    cloud.state='synced';
+    cloudPush();
+    return false;
+  }catch(e){cloud.state='error';cloud.error=String(e&&e.message||e);return false;}
+}
+
+/* Small surface used by the gate script and by site-admin.js. */
+window.JCOB_PORTAL={
+  db:()=>db,
+  replace:next=>{db=next;save();if(typeof render==='function')render(true);},
+  save:save,
+  cloud:cloud,
+  load:cloudLoad,
+  push:cloudPush
+};
 
 /* ---------------- core helpers ---------------- */
 function toast(type,title,msg){const t=document.createElement('div');t.className='toast '+type;
@@ -1825,31 +1879,125 @@ toast('info','Welcome back, Administrator','JAY C O B Admin Control Center loade
 
 <script src="assets/js/site-admin.js"></script>
 <script>
-/* administrator gate — session only, cleared when the tab closes */
+/* ------------------------------------------------------------------
+   Administrator gate
+   Cloud mode : signs in to Supabase Auth and requires a staff role
+                (admin / staff / officer / credit) on the profile row.
+   Demo mode  : the published password, session-scoped only.
+   ------------------------------------------------------------------ */
 (function () {
   var gate = document.getElementById("admin-gate");
   if (!gate) return;
+  var form = document.getElementById("admin-gate-form");
+  var emailField = document.getElementById("admin-email");
+  var emailLabel = document.getElementById("gate-email-label");
   var input = document.getElementById("admin-password");
   var status = document.getElementById("gate-status");
+  var hint = document.getElementById("gate-hint");
+  var submit = document.getElementById("gate-submit");
+  var intro = document.getElementById("gate-intro");
+  var CLOUD = window.JCOB_CLOUD;
+  var cloudOn = !!(CLOUD && CLOUD.enabled);
+
   var ok = false;
   try { ok = sessionStorage.getItem("jcob_admin_ok") === "1"; } catch (e) {}
-  function unlock() { gate.hidden = true; document.body.classList.remove("locked"); if (status) status.textContent = ""; }
-  if (ok) unlock(); else { document.body.classList.add("locked"); setTimeout(function () { if (input) input.focus(); }, 120); }
-  document.getElementById("admin-gate-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (input.value === "admin2026") {
-      try { sessionStorage.setItem("jcob_admin_ok", "1"); } catch (err) {}
-      if (input) input.value = "";
-      unlock();
-    } else if (status) {
-      status.textContent = "That password is not correct. Try again.";
-      status.className = "err";
-      input.select();
+
+  function say(message, isError) {
+    if (!status) return;
+    status.textContent = message || "";
+    status.className = isError ? "err" : "";
+  }
+
+  function unlock() {
+    gate.hidden = true;
+    document.body.classList.remove("locked");
+    say("");
+    if (window.JCOB_PORTAL && CLOUD && CLOUD.enabled) {
+      window.JCOB_PORTAL.load().catch(function () {});
     }
+  }
+
+  if (cloudOn) {
+    if (emailField) { emailField.hidden = false; emailField.required = true; }
+    if (emailLabel) emailLabel.hidden = false;
+    if (hint) hint.textContent = "Cloud sign-in · Supabase";
+    if (intro) intro.textContent = "JAY C O B management portal. Sign in with your administrator account to manage the website, applications, customers and lending operations.";
+    if (window.JCOB_DATA) window.JCOB_DATA.remote.state = window.JCOB_DATA.remote.state;
+  }
+
+  /* A stale demo flag must not open the console when cloud sign-in is on. */
+  if (ok && cloudOn && !(CLOUD.auth.isSignedIn() && CLOUD.auth.isStaff(CLOUD.auth.profile()))) {
+    ok = false;
+    try { sessionStorage.removeItem("jcob_admin_ok"); } catch (e) {}
+  }
+
+  if (ok) {
+    unlock();
+  } else {
+    document.body.classList.add("locked");
+    setTimeout(function () {
+      var first = cloudOn ? emailField : input;
+      if (first) first.focus();
+    }, 120);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    say("");
+
+    if (!cloudOn) {
+      if (input.value === "admin2026") {
+        try { sessionStorage.setItem("jcob_admin_ok", "1"); } catch (err) {}
+        input.value = "";
+        unlock();
+      } else {
+        say("That password is not correct. Try again.", true);
+        input.select();
+      }
+      return;
+    }
+
+    var email = (emailField && emailField.value || "").trim();
+    var password = input.value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      say("Enter the administrator email address.", true);
+      if (emailField) emailField.focus();
+      return;
+    }
+    if (!password) {
+      say("Enter the administrator password.", true);
+      input.focus();
+      return;
+    }
+
+    if (submit) { submit.disabled = true; submit.textContent = "Signing in…"; }
+    CLOUD.auth.signIn(email, password).then(function (res) {
+      var profile = (res && res.profile) || CLOUD.auth.profile();
+      if (!CLOUD.auth.isStaff(profile)) {
+        return CLOUD.auth.signOut().then(function () {
+          throw new Error("That account does not have administrator access.");
+        });
+      }
+      try { sessionStorage.setItem("jcob_admin_ok", "1"); } catch (err) {}
+      input.value = "";
+      return window.JCOB_PORTAL.load().then(function () {
+        unlock();
+        if (typeof window.render === "function") window.render(true);
+      });
+    }).catch(function (err) {
+      var message = String((err && err.message) || "Sign-in failed");
+      if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an administrator account.";
+      say(message, true);
+      input.select();
+    }).then(function () {
+      if (submit) { submit.disabled = false; submit.textContent = "Unlock console"; }
+    });
   });
+
   var out = document.getElementById("signOut");
   if (out) out.addEventListener("click", function () {
     try { sessionStorage.removeItem("jcob_admin_ok"); } catch (err) {}
+    if (cloudOn) CLOUD.auth.signOut();
   });
 })();
 </script>

@@ -120,4 +120,8 @@
   } else {
     run();
   }
+
+  /* Cloud mode fills the store a moment after first paint — re-apply the
+     published content as soon as it lands. */
+  try { S.subscribe(function () { run(); }); } catch (e) {}
 })();
