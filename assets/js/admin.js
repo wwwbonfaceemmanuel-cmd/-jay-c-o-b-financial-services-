@@ -21,6 +21,7 @@
   var list = document.getElementById("admin-list");
   var titleEl = document.getElementById("post-title");
   var typeEl = document.getElementById("post-type");
+  var topicEl = document.getElementById("post-topic");
   var bodyEl = document.getElementById("post-body");
   var linkEl = document.getElementById("post-link");
   var linkLabelEl = document.getElementById("post-link-label");
@@ -159,6 +160,7 @@
     editingId = null;
     form.reset();
     typeEl.value = "announcement";
+    if (topicEl) topicEl.value = "";
     animationEl.value = "slide";
     pinnedEl.checked = false;
     publishedEl.checked = true;
@@ -199,6 +201,7 @@
     var payload = {
       id: editingId || "lv-" + Date.now(),
       type: type,
+      topic: topicEl ? topicEl.value : "",
       title: title,
       body: body,
       link: linkEl.value.trim(),
@@ -259,7 +262,9 @@
       return '<div class="admin-item' + (p.published === false ? " is-hidden" : "") + '" data-id="' + escapeHtml(p.id) + '">' +
         thumb +
         "<div><strong>" + escapeHtml(p.title) + "</strong>" +
-        '<span class="meta">' + (labels[type] || type) + " · " + shortDate(p.date) + " · " +
+        '<span class="meta">' + (labels[type] || type) +
+        (p.topic && (window.JCOB_LIVE.topicLabels || {})[p.topic] ? " · " + window.JCOB_LIVE.topicLabels[p.topic] : "") +
+        " · " + shortDate(p.date) + " · " +
         escapeHtml(anims[p.animation] || p.animation || "slide") +
         " · " + (p.published === false ? "draft" : "published") + (p.pinned ? " · pinned" : "") + "</span></div>" +
         '<div class="admin-actions">' +
@@ -291,6 +296,7 @@
     } else if (action === "edit") {
       editingId = id;
       typeEl.value = post.type || "announcement";
+      if (topicEl) topicEl.value = post.topic || "";
       titleEl.value = post.title || "";
       bodyEl.value = post.body || "";
       linkEl.value = post.link || "";
