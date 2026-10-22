@@ -329,6 +329,26 @@
     }
   });
 
+  var aboutBtn = document.getElementById("add-about-cards");
+  if (aboutBtn) {
+    aboutBtn.addEventListener("click", function () {
+      var posts = window.JCOB_LIVE.getPosts();
+      var have = {};
+      posts.forEach(function (p) { have[p.id] = true; });
+      var cards = (window.JCOB_LIVE.aboutCards || []).filter(function (p) { return !have[p.id]; });
+      if (!cards.length) {
+        statusEl.className = "form-status is-visible";
+        statusEl.textContent = "All About Us cards are already published.";
+        return;
+      }
+      window.JCOB_LIVE.savePosts(posts.concat(cards));
+      refresh();
+      statusEl.className = "form-status is-visible";
+      statusEl.textContent = cards.length + " About Us card" + (cards.length === 1 ? "" : "s") +
+        " published with their motion actions (slide, swap, flap, rotate, spin, swipe, endless).";
+    });
+  }
+
   var resetBtn = document.getElementById("reset-posts");
   if (resetBtn) {
     resetBtn.addEventListener("click", function () {

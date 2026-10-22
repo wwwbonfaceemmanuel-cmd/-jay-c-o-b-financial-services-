@@ -19,7 +19,7 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | `about.html` | Overview, mission & vision, values, history timeline, leadership, registration & licensing, CSR, location & contact |
 | `loan-products.html` | All eleven products with limits, terms, rates, fees, repayment frequency, eligibility, documents, plus a full comparison table |
 | `apply.html` | Five-step application: product & amount → personal/employment → business & bank → documents → review, with draft saving, reference number and confirmation |
-| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **flat / reducing segmented selector**, amount, rate, term, monthly/fortnightly, processing & admin fees, instalment, annual outlay, interest, total repayment, APR, amortisation preview, CSV, print, reset, "Apply for This Loan" |
+| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **interest-rate basis dropdown (annual % p.a. / monthly % per month)**, **flat / reducing segmented selector**, amount, rate, term, monthly/fortnightly, processing & admin fees; **results sheet** in a fixed order — total amount, principal, interest rate, interest amount, duration period, schedule with dates, total repayment — plus fees, APR, first/last instalment, dated schedule, CSV, print, reset and "Apply for This Loan" |
 | `eligibility.html` | Eight-question preliminary check scored out of 100 with per-criterion explanations and an apply link |
 | `how-it-works.html` | Ten steps from account creation to repayment and monitoring, with timings and requirements |
 | `interest-rates-fees.html` | Rate table with indicative APR, flat vs reducing comparison, every charge, three worked examples, total cost of borrowing |
@@ -34,7 +34,8 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 
 ### Live blog, announcements and motion system
 
-Ten seeded posts across four formats — **announcement**, **card**, **photo update** and **live blog** —
+Seventeen seeded posts across five formats — **announcement**, **card**, **photo update**, **live blog**
+and **About us** —
 each with its own motion: **slide, flap, swipe, rotate, spin, swap** and **endless float** (a looping
 motion for standing notices). On top of that:
 
@@ -42,8 +43,12 @@ motion for standing notices). On top of that:
 - an auto-advancing feed (6.5 s) with previous / next / pause controls, dots and a live pulse;
 - a corner **notification toast** that inherits the post's motion on every public page;
 - the full **live-blog stream** on `live.html` and the four newest posts on the home page;
+- seven **About Us cards** (mission, vision, values, history, licensing, CSR, contact) live in the same
+  stream and the same admin list, each with a different motion — slide, swap, flap, rotate, spin,
+  swipe and endless;
 - all of it managed from `admin.html` — password gate, image upload (resized to 1200 px and stored
-  as a data URL) or image URL, text, link + button label, motion, pin, publish/unpublish, edit and delete.
+  as a data URL) or image URL, text, link + button label, motion, pin, publish/unpublish, edit, delete,
+  and a one-click **Add About Us cards** action that publishes or restores the seven story cards.
 
 Posts persist in `localStorage` (`jcob_live_posts_v1`) and read from a Supabase `live_posts` table
 without code changes once `assets/js/config.js` is filled in.
@@ -167,6 +172,10 @@ root as-is — there is no build step at runtime.
 
 - Emerald (`#04171a` → `#0d4a4b`) with blue liquid crystal (`#0a3f6b` → `#e6f3fd`) on an ice-paper base
   (`#eef4fa`), frosted glass surfaces, iridescent facet highlights and a slow ambient drift.
+- **Golden edges (v5):** a fine gold frame around the viewport, a gold rail under the header and above
+  the footer, gold hairline borders and a 3px gold top rail on every card, gold-edged panels, tables,
+  legal documents and dashboard modules, plus gold figures, focus rings and separators. Gold is trim
+  only — every gold-on-surface pair is checked for at least 4.5:1 contrast.
 - Logo lockup in the header, footer, section headers, legal navigation, auth pages, receipts and
   printed documents.
 - Responsive breakpoints at 1180, 1024, 760 and 520 px; the dashboard sidebar collapses to a

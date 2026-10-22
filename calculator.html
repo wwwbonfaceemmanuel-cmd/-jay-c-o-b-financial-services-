@@ -116,9 +116,17 @@
               <span class="hint" id="calc-limits">Limits MWK 100,000 – 15,000,000 · 48 months maximum</span>
             </div>
             <div class="field">
-              <label for="calc-rate">Annual interest rate (%)</label>
-              <input id="calc-rate" type="number" min="1" max="60" step="0.5" value="24">
-              <span class="hint">Indicative rate for the selected product</span>
+              <label for="calc-rate-basis">Interest rate basis</label>
+              <select id="calc-rate-basis">
+                <option value="annual" selected>Annual — % per year (p.a.)</option>
+                <option value="monthly">Monthly — % per month</option>
+              </select>
+              <span class="hint" id="calc-rate-basis-hint">Quoted as an annual percentage rate</span>
+            </div>
+            <div class="field">
+              <label for="calc-rate" id="calc-rate-label">Annual interest rate (%)</label>
+              <input id="calc-rate" type="number" min="0.1" max="60" step="0.1" value="24">
+              <span class="hint" id="calc-rate-hint">= 2.00% per month · indicative for the selected product</span>
             </div>
             <div class="field">
               <label for="calc-basis">Calculation basis</label>
@@ -171,31 +179,73 @@
 
         <div>
           <div class="calc-result reveal" aria-live="polite">
-            <p class="hero-label">Estimated repayment</p>
+            <p class="hero-label" id="res-headline-label">Estimated monthly instalment</p>
             <p class="hero-figure" id="res-payment">MWK 472,798</p>
-            <p class="text-tiny" id="res-payment-period" style="color:#a3c2d6;">per month</p>
+            <p class="text-tiny" id="res-payment-period" style="color:#a3c2d6;">per month · 1 instalment</p>
 
             <div class="calc-bar" style="margin-top:1rem;">
               <i class="p" id="bar-principal" style="width:86.6%"></i>
               <i class="i" id="bar-interest" style="width:13.4%"></i>
             </div>
-            <p class="text-tiny" style="color:#a3c2d6;margin-top:.35rem;"><span style="color:#c4e2fb;">Principal</span> · <span>Interest &amp; fees</span></p>
+            <p class="text-tiny" style="color:#a3c2d6;margin-top:.35rem;"><span style="color:#f2e3b6;">Principal</span> · <span>Interest &amp; fees</span></p>
 
-            <div class="row"><span>Principal</span><strong id="res-principal">MWK 5,000,000</strong></div>
-            <div class="row"><span>Total interest</span><strong id="res-interest">MWK 673,576</strong></div>
-            <div class="row"><span>Fees</span><strong id="res-fees">MWK 100,000</strong></div>
-            <div class="row"><span>Total repayment</span><strong id="res-total">MWK 5,773,576</strong></div>
-            <div class="row"><span>Nominal rate</span><strong id="res-rate">24% p.a.</strong></div>
-            <div class="row"><span>Indicative APR</span><strong id="res-apr">—</strong></div>
-            <div class="row"><span>Instalments</span><strong id="res-instalments">12 × MWK 472,798</strong></div>
-            <div class="row"><span>Annual outlay</span><strong id="res-annual">MWK 5,673,576</strong></div>
-            <div class="row"><span>Basis</span><strong id="res-basis">Monthly</strong></div>
-            <div class="row"><span>Method</span><strong id="res-method">Reducing balance</strong></div>
-            <div class="row"><span>Frequency</span><strong id="res-frequency">Monthly</strong></div>
-            <div class="row"><span>First instalment</span><strong id="res-first">—</strong></div>
-            <div class="row"><span>Final instalment</span><strong id="res-last">—</strong></div>
-            <p class="text-tiny" id="res-compare" style="color:#a3c2d6;margin-top:.7rem;"></p>
-            <p class="text-tiny" id="calc-aside-note" style="color:#8fadbf;margin-top:.4rem;"></p>
+            <div class="sheet" id="results-sheet">
+              <p class="sheet-title"><span>Results sheet</span><span class="sheet-unit" id="res-basis-pill">Monthly</span></p>
+
+              <div class="sheet-row sheet-row--primary">
+                <span class="sheet-label">Total amount</span>
+                <strong class="sheet-value" id="res-total-amount">MWK 5,773,576</strong>
+                <span class="sheet-note" id="res-total-amount-note">principal + interest + fees</span>
+              </div>
+
+              <div class="sheet-row">
+                <span class="sheet-label">Principal</span>
+                <strong class="sheet-value" id="res-principal">MWK 5,000,000</strong>
+                <span class="sheet-note">amount borrowed</span>
+              </div>
+
+              <div class="sheet-row">
+                <span class="sheet-label">Interest rate</span>
+                <strong class="sheet-value" id="res-rate">24.0% p.a.</strong>
+                <span class="sheet-note" id="res-rate-note">reducing balance · 2.00% per month</span>
+              </div>
+
+              <div class="sheet-row">
+                <span class="sheet-label">Interest amount</span>
+                <strong class="sheet-value" id="res-interest">MWK 673,576</strong>
+                <span class="sheet-note" id="res-interest-note">charged over the full term</span>
+              </div>
+
+              <div class="sheet-row">
+                <span class="sheet-label">Duration period</span>
+                <strong class="sheet-value" id="res-duration">12 months</strong>
+                <span class="sheet-note" id="res-instalments">12 × MWK 472,798</span>
+              </div>
+
+              <div class="sheet-row sheet-row--link">
+                <span class="sheet-label">Schedule with dates</span>
+                <strong class="sheet-value" id="res-schedule-range">—</strong>
+                <span class="sheet-note" id="res-schedule-note">instalments due monthly, first one month after disbursement</span>
+              </div>
+
+              <div class="sheet-row sheet-row--total">
+                <span class="sheet-label">Total repayment</span>
+                <strong class="sheet-value" id="res-total">MWK 5,773,576</strong>
+                <span class="sheet-note" id="res-total-note">sum of all scheduled instalments</span>
+              </div>
+
+              <div class="sheet-meta">
+                <div><span>Processing fee</span><strong id="res-fees">MWK 100,000</strong></div>
+                <div><span>Indicative APR</span><strong id="res-apr">—</strong></div>
+                <div><span>Repayment frequency</span><strong id="res-frequency">Monthly</strong></div>
+                <div><span>Annual outlay</span><strong id="res-annual">MWK 5,673,576</strong></div>
+                <div><span>First instalment</span><strong id="res-first">—</strong></div>
+                <div><span>Final instalment</span><strong id="res-last">—</strong></div>
+              </div>
+
+              <p class="text-tiny" id="res-compare" style="color:#a3c2d6;margin-top:.7rem;"></p>
+              <p class="text-tiny" id="calc-aside-note" style="color:#8fadbf;margin-top:.4rem;"></p>
+            </div>
           </div>
 
           <div class="card" style="margin-top:1rem;">
@@ -215,7 +265,7 @@
       <div class="app-panel" style="margin-top:1.6rem;" id="calc-print-area">
         <div class="app-panel-head">
           <div>
-            <h2>Amortisation preview</h2>
+            <h2>Repayment schedule — dates and amounts</h2>
             <p id="amort-count">Showing the first 12 instalments</p>
           </div>
           <div class="head-tools">

@@ -26,6 +26,7 @@
   var state = {
     preset: "personal", amount: 5000000, rate: 24,
     term: 1, termMonths: 1, basis: "monthly",
+    rateBasis: "annual",
     method: "reducing", frequency: "monthly",
     fee: 2, adminFee: 0, showAll: false
   };
@@ -86,6 +87,7 @@
   function readInputs() {
     state.amount = Math.max(Number($("calc-amount").value) || 0, 0);
     state.rate = Math.max(Number($("calc-rate").value) || 0, 0);
+    state.rateBasis = $("calc-rate-basis") ? $("calc-rate-basis").value : "annual";
     state.basis = $("calc-basis") ? $("calc-basis").value : "monthly";
     state.term = Math.max(Math.round(Number($("calc-term").value) || 1), 1);
     state.termMonths = termMonths();
@@ -97,44 +99,106 @@
 
   function compute() {
     return F.amortize({
-      principal: state.amount, rate: state.rate, termMonths: state.termMonths,
+      principal: state.amount, rate: state.rate, rateBasis: state.rateBasis,
+      termMonths: state.termMonths,
       method: state.method, frequency: state.frequency,
       processingFeePct: state.fee, adminFee: state.adminFee
     });
+  }
+
+  /* Keep the rate field's label and hint in step with the chosen basis */
+  function syncRateField() {
+    var label = $("calc-rate-label");
+    var hint = $("calc-rate-hint");
+    var basisHint = $("calc-rate-basis-hint");
+    var el = $("calc-rate");
+    if (!el) return;
+    if (state.rateBasis === "monthly") {
+      if (label) label.textContent = "Monthly interest rate (%)";
+      el.max = "60";
+      if (basisHint) basisHint.textContent = "Quoted as a percentage per month";
+    } else {
+      if (label) label.textContent = "Annual interest rate (%)";
+      el.max = "60";
+      if (basisHint) basisHint.textContent = "Quoted as an annual percentage rate (p.a.)";
+    }
+    var annual = state.rateBasis === "monthly" ? state.rate * 12 : state.rate;
+    var monthly = annual / 12;
+    if (hint) {
+      hint.textContent = state.rateBasis === "monthly"
+        ? "= " + annual.toFixed(2) + "% per year · " + (state.method === "flat" ? "flat rate" : "reducing balance")
+        : "= " + monthly.toFixed(2) + "% per month · " + (state.method === "flat" ? "flat rate" : "reducing balance");
+    }
   }
 
   function render() {
     var c = compute();
     var p = PRESETS[state.preset];
 
-    $("res-payment").textContent = mwk(c.payment);
-    $("res-payment-period").textContent = "per " + (state.frequency === "monthly" ? "month" : "fortnight");
-    $("res-principal").textContent = mwk(c.principal);
-    $("res-interest").textContent = mwk(c.totalInterest);
-    $("res-fees").textContent = mwk(c.fees);
-    $("res-total").textContent = mwk(c.totalCost);
-    $("res-rate").textContent = c.rate + "% p.a.";
-    $("res-apr").textContent = c.apr.toFixed(1) + "%";
-    $("res-instalments").textContent = c.periods + " × " + mwk(c.payment);
     var perYear = state.frequency === "fortnightly" ? 26 : 12;
-    var annual = c.payment * perYear;
-    if ($("res-annual")) $("res-annual").textContent = mwk(annual);
-    if ($("res-basis")) {
-      $("res-basis").textContent = state.basis === "annual"
-        ? "Annually · " + state.term + (state.term === 1 ? " year" : " years") + " (" + c.periods + " instalments)"
-        : "Monthly · " + state.term + (state.term === 1 ? " month" : " months");
+    var annualBasis = state.basis === "annual";
+    var unitLabel = state.frequency === "fortnightly" ? "fortnight" : "month";
+    var headline = annualBasis ? c.payment * 12 : c.payment;
+
+    $("res-payment").textContent = mwk(headline);
+    $("res-payment-period").textContent = annualBasis
+      ? "per year · " + c.periods + " instalments of " + mwk(c.payment)
+      : "per " + unitLabel + " · " + c.periods + (c.periods === 1 ? " instalment" : " instalments");
+    if ($("res-headline-label")) {
+      $("res-headline-label").textContent = annualBasis ? "Estimated repayment per year" : "Estimated monthly instalment";
     }
-    $("res-method").textContent = state.method === "flat" ? "Flat rate" : "Reducing balance";
+    if ($("res-basis-pill")) {
+      $("res-basis-pill").textContent = annualBasis ? "Annual basis" : "Monthly basis";
+    }
+
+    /* ---- Results sheet: total amount · principal · rate · interest · duration · schedule · total repayment ---- */
+    $("res-total-amount").textContent = mwk(c.totalCost);
+    $("res-total-amount-note").textContent = "principal + interest + fees · " + (annualBasis ? "annual basis" : "monthly basis");
+
+    $("res-principal").textContent = mwk(c.principal);
+
+    $("res-rate").textContent = state.rateBasis === "monthly"
+      ? c.monthlyRate.toFixed(2) + "% per month"
+      : c.rate.toFixed(1) + "% p.a.";
+    $("res-rate-note").textContent = (state.method === "flat" ? "flat rate" : "reducing balance") + " · " +
+      (state.rateBasis === "monthly"
+        ? c.rate.toFixed(2) + "% p.a. equivalent"
+        : c.monthlyRate.toFixed(2) + "% per month");
+
+    $("res-interest").textContent = mwk(c.totalInterest);
+    $("res-interest-note").textContent = "charged over " + (annualBasis
+      ? state.term + (state.term === 1 ? " year" : " years")
+      : state.term + (state.term === 1 ? " month" : " months"));
+
+    $("res-duration").textContent = annualBasis
+      ? state.term + (state.term === 1 ? " year" : " years") + " · " + c.periods + " months"
+      : state.term + (state.term === 1 ? " month" : " months") + " · " + c.periods +
+        (c.periods === 1 ? " instalment" : " instalments");
+    $("res-instalments").textContent = c.periods + " × " + mwk(c.payment) + " per " + unitLabel;
+
+    $("res-schedule-range").textContent = F.shortDate(c.firstDue) + " → " + F.shortDate(c.lastDue);
+    $("res-schedule-note").textContent = c.periods + " instalments, " + c.frequencyLabel.toLowerCase() +
+      ", first due one " + unitLabel + " after disbursement";
+
+    $("res-total").textContent = mwk(c.totalRepayment);
+    $("res-total-note").textContent = "sum of all scheduled instalments" + (c.fees > 0 ? " · fees of " + mwk(c.fees) + " shown below" : "");
+
+    $("res-fees").textContent = mwk(c.fees);
+    $("res-apr").textContent = c.apr.toFixed(1) + "%";
     $("res-frequency").textContent = c.frequencyLabel;
+    $("res-annual").textContent = mwk(c.payment * perYear);
     $("res-first").textContent = F.shortDate(c.firstDue);
     $("res-last").textContent = F.shortDate(c.lastDue);
+
+    syncRateField();
 
     var pct = c.totalCost > 0 ? (c.principal / c.totalCost) * 100 : 100;
     $("bar-principal").style.width = pct.toFixed(1) + "%";
     $("bar-interest").style.width = Math.max(100 - pct, 0).toFixed(1) + "%";
 
     var other = F.amortize({
-      principal: state.amount, rate: state.rate, termMonths: state.termMonths,
+      principal: state.amount, rate: state.rate, rateBasis: state.rateBasis,
+      termMonths: state.termMonths,
       method: state.method === "flat" ? "reducing" : "flat", frequency: state.frequency,
       processingFeePct: state.fee, adminFee: state.adminFee
     });
@@ -213,6 +277,8 @@
     state.showAll = false;
     if ($("calc-basis")) $("calc-basis").value = "monthly";
     state.basis = "monthly";
+    if ($("calc-rate-basis")) $("calc-rate-basis").value = "annual";
+    state.rateBasis = "annual";
     applyPreset("personal");
     $("calc-amount").value = 5000000;
     setMethod("reducing");
@@ -220,7 +286,8 @@
     $("calc-admin").value = 0;
     readInputs();
     render();
-    UI.toast({ title: "Calculator reset", message: "Monthly basis, 1 month, reducing balance restored.", type: "info" });
+    syncRateField();
+    UI.toast({ title: "Calculator reset", message: "Monthly basis, 1 month, annual rate and reducing balance restored.", type: "info" });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -243,6 +310,30 @@
         UI.toast({
           title: state.basis === "annual" ? "Annual basis" : "Monthly basis",
           message: state.basis === "annual" ? "Repayment period is now in years — 1 year (12 instalments)." : "Repayment period is now in months — 1 month.",
+          type: "info"
+        });
+      });
+    }
+
+    if ($("calc-rate-basis")) {
+      $("calc-rate-basis").addEventListener("change", function () {
+        state.rateBasis = $("calc-rate-basis").value;
+        /* convert the figure so the real cost stays the same when switching basis */
+        var current = Math.max(Number($("calc-rate").value) || 0, 0);
+        if (state.rateBasis === "monthly") {
+          $("calc-rate").value = Math.max(Math.round((current / 12) * 100) / 100, 0.1);
+        } else {
+          $("calc-rate").value = Math.round(current * 12 * 100) / 100;
+        }
+        state.rate = Number($("calc-rate").value);
+        syncRateField();
+        readInputs();
+        render();
+        UI.toast({
+          title: state.rateBasis === "monthly" ? "Monthly rate basis" : "Annual rate basis",
+          message: state.rateBasis === "monthly"
+            ? "Interest is now quoted per month and converted to an annual rate for the calculation."
+            : "Interest is now quoted per year (p.a.).",
           type: "info"
         });
       });
@@ -272,6 +363,10 @@
     }
     if (params.get("amount")) $("calc-amount").value = Number(params.get("amount"));
     if (params.get("term")) $("calc-term").value = Number(params.get("term"));
+    if (params.get("rateBasis") === "monthly" && $("calc-rate-basis")) {
+      $("calc-rate-basis").value = "monthly";
+      state.rateBasis = "monthly";
+    }
     if (params.get("basis") === "annual" && $("calc-basis")) {
       $("calc-basis").value = "annual";
       state.basis = "annual";
@@ -285,5 +380,6 @@
     }
     readInputs();
     render();
+    syncRateField();
   });
 })();
