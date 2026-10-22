@@ -19,7 +19,7 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | `about.html` | Overview, mission & vision, values, history timeline, leadership, registration & licensing, CSR, location & contact |
 | `loan-products.html` | All eleven products with limits, terms, rates, fees, repayment frequency, eligibility, documents, plus a full comparison table |
 | `apply.html` | Five-step application: product & amount → personal/employment → business & bank → documents → review, with draft saving, reference number and confirmation |
-| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **interest-rate basis dropdown (annual % p.a. / monthly % per month)**, **flat / reducing segmented selector**, amount, rate, term, monthly/fortnightly, processing & admin fees; **results sheet** in a fixed order — total amount, principal, interest rate, interest amount, duration period, schedule with dates, total repayment — plus fees, APR, first/last instalment, dated schedule, CSV, print, reset and "Apply for This Loan" |
+| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **interest-rate basis dropdown (annual % p.a. / monthly % per month — applied exactly as quoted)**, **flat / reducing segmented selector**, amount, rate, term, disbursement date, monthly/fortnightly, processing & admin fees; **results sheet** in a fixed order — total amount, principal, interest rate, interest amount, duration period, schedule with dates, total repayment — plus a worked formula line, fees, APR, interest method, first/last instalment, dated schedule, CSV, print, reset and "Apply for This Loan" |
 | `eligibility.html` | Eight-question preliminary check scored out of 100 with per-criterion explanations and an apply link |
 | `how-it-works.html` | Ten steps from account creation to repayment and monitoring, with timings and requirements |
 | `interest-rates-fees.html` | Rate table with indicative APR, flat vs reducing comparison, every charge, three worked examples, total cost of borrowing |
@@ -31,6 +31,22 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | `admin.html` | Administrator console: publish / edit / delete announcements, cards, photo posts and blog posts, upload or link an image, choose one of seven motions, pin, unpublish |
 | `services.html`, `insights.html`, `insight-*.html`, `contact.html`, `404.html` | Retained pages, re-skinned with the current header, footer and brand |
 | `products.html`, `portal.html` | Aliases that forward old links to the loan products page and the dashboard login |
+
+### Loan maths and rate quoting
+
+`assets/js/finance.js` is the single engine behind the calculator, the application summary, the rates page and the dashboard. It applies the rate in the unit the customer selects:
+
+| Selection | Meaning | Example (MWK 100,000) |
+| --- | --- | --- |
+| Rate basis: **Monthly**, method: flat, 1 month | 25% of principal, charged once | Interest MWK 25,000 · repayment MWK 125,000 · one instalment due one month after disbursement |
+| Rate basis: **Monthly**, method: reducing, 1 month | 25% on the opening balance | Interest MWK 25,000 · repayment MWK 125,000 |
+| Rate basis: **Annual**, method: flat, 12 months | 25% of principal for the year, split into instalments | Interest MWK 25,000 · 12 × MWK 10,416.67 · repayment MWK 125,000 |
+
+- There is **no hidden cap or re-quoting**: switching the rate-basis dropdown re-expresses the same cost (2% per month ⇄ 24% p.a.), and the figure you see is the figure used.
+- **Calculation basis** only changes the unit of the term field: monthly = months (default 1), annually = years (default 1 year = 12 instalments) with the headline result shown per year.
+- The **first instalment always falls one full period after the disbursement date**; the schedule table and CSV show each dated instalment, with opening/closing balances.
+- Fees stay separate from the repayment figure: *Total repayment* is principal + interest, *Total amount* adds the processing/admin fees.
+- Every figure is MWK and rounded for display only; the engine keeps full precision, adjusting the final instalment.
 
 ### Live blog, announcements and motion system
 

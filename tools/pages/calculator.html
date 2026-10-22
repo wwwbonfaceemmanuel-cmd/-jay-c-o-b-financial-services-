@@ -66,6 +66,11 @@
               <input id="calc-term" type="number" min="1" max="84" step="1" value="1">
               <span class="hint" id="calc-term-hint">1 monthly instalment</span>
             </div>
+            <div class="field">
+              <label for="calc-start">Disbursement date</label>
+              <input id="calc-start" type="date">
+              <span class="hint" id="calc-start-hint">The first instalment falls one period after this date</span>
+            </div>
             <div class="field field--full">
               <span class="field-label" id="calc-method-label">Interest method</span>
               <div class="segmented" role="radiogroup" aria-labelledby="calc-method-label">
@@ -99,13 +104,13 @@
             <button class="btn btn--ghost" type="button" id="calc-export">Export CSV</button>
             <button class="btn btn--ghost" type="button" id="calc-print">Print</button>
           </div>
-          <p class="formula-note text-tiny" style="margin-top:1rem;">Estimates assume a first payment one month (or fortnight) after disbursement and no late payments. Final terms are confirmed in your agreement.</p>
+          <p class="formula-note text-tiny" style="margin-top:1rem;">The rate is applied in the unit you select: <strong>per month</strong> (25% per month × 1 month on MWK 100,000 = MWK 25,000 interest) or <strong>per year</strong> (25% p.a. × 12 months = the same MWK 25,000). Estimates assume the first payment one month (or fortnight) after disbursement, no late payments, and are confirmed in your agreement.</p>
         </div>
 
         <div>
           <div class="calc-result reveal" aria-live="polite">
             <p class="hero-label" id="res-headline-label">Estimated monthly instalment</p>
-            <p class="hero-figure" id="res-payment">MWK 472,798</p>
+            <p class="hero-figure" id="res-payment">MWK 5,100,000</p>
             <p class="text-tiny" id="res-payment-period" style="color:#a3c2d6;">per month · 1 instalment</p>
 
             <div class="calc-bar" style="margin-top:1rem;">
@@ -119,8 +124,8 @@
 
               <div class="sheet-row sheet-row--primary">
                 <span class="sheet-label">Total amount</span>
-                <strong class="sheet-value" id="res-total-amount">MWK 5,773,576</strong>
-                <span class="sheet-note" id="res-total-amount-note">principal + interest + fees</span>
+                <strong class="sheet-value" id="res-total-amount">MWK 5,200,000</strong>
+                <span class="sheet-note" id="res-total-amount-note">principal + interest + fees MWK 100,000 · monthly basis</span>
               </div>
 
               <div class="sheet-row">
@@ -137,14 +142,14 @@
 
               <div class="sheet-row">
                 <span class="sheet-label">Interest amount</span>
-                <strong class="sheet-value" id="res-interest">MWK 673,576</strong>
-                <span class="sheet-note" id="res-interest-note">charged over the full term</span>
+                <strong class="sheet-value" id="res-interest">MWK 100,000</strong>
+                <span class="sheet-note" id="res-interest-note">reducing balance over 1 instalment</span>
               </div>
 
               <div class="sheet-row">
                 <span class="sheet-label">Duration period</span>
-                <strong class="sheet-value" id="res-duration">12 months</strong>
-                <span class="sheet-note" id="res-instalments">12 × MWK 472,798</span>
+                <strong class="sheet-value" id="res-duration">1 month · 1 instalment</strong>
+                <span class="sheet-note" id="res-instalments">1 × MWK 5,100,000 per month</span>
               </div>
 
               <div class="sheet-row sheet-row--link">
@@ -155,18 +160,20 @@
 
               <div class="sheet-row sheet-row--total">
                 <span class="sheet-label">Total repayment</span>
-                <strong class="sheet-value" id="res-total">MWK 5,773,576</strong>
-                <span class="sheet-note" id="res-total-note">sum of all scheduled instalments</span>
+                <strong class="sheet-value" id="res-total">MWK 5,100,000</strong>
+                <span class="sheet-note" id="res-total-note">sum of all scheduled instalments · fees of MWK 100,000 charged separately</span>
               </div>
 
               <div class="sheet-meta">
                 <div><span>Processing fee</span><strong id="res-fees">MWK 100,000</strong></div>
                 <div><span>Indicative APR</span><strong id="res-apr">—</strong></div>
                 <div><span>Repayment frequency</span><strong id="res-frequency">Monthly</strong></div>
-                <div><span>Annual outlay</span><strong id="res-annual">MWK 5,673,576</strong></div>
+                <div><span>Interest method</span><strong id="res-method">Reducing balance</strong></div>
                 <div><span>First instalment</span><strong id="res-first">—</strong></div>
                 <div><span>Final instalment</span><strong id="res-last">—</strong></div>
               </div>
+
+              <p class="calc-formula" id="res-formula">Flat rate: MWK 100,000 × 25% per month × 1 month = MWK 25,000 interest · 1 × MWK 125,000 = MWK 125,000 total repayment.</p>
 
               <p class="text-tiny" id="res-compare" style="color:#a3c2d6;margin-top:.7rem;"></p>
               <p class="text-tiny" id="calc-aside-note" style="color:#8fadbf;margin-top:.4rem;"></p>
@@ -177,7 +184,8 @@
             <h3 style="font-size:1rem;">What is included</h3>
             <ul class="card-list">
               <li>Principal, interest, processing fee and any fixed admin fee</li>
-              <li>Monthly or fortnightly instalments, dated from disbursement</li>
+              <li>The rate applied in the unit you select — per month or per year, with no conversion surprises</li>
+              <li>Monthly or fortnightly instalments, dated from the disbursement date you choose</li>
               <li>Full amortisation schedule with opening and closing balances</li>
               <li>CSV export and printer-friendly schedule</li>
             </ul>

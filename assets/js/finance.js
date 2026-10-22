@@ -63,14 +63,23 @@
      method      string  — 'reducing' | 'flat'
      frequency   string  — 'monthly' | 'fortnightly'
      processingFeePct / adminFee — fees in percent / MWK
-     startDate   Date|null
+     startDate   Date|null — disbursement date; the first instalment falls one
+                             period after it
+
+     The quoted rate is always applied in the unit the customer selected:
+       • monthly basis → the figure is a percentage per month
+         (25% per month on MWK 100,000 for 1 month = MWK 25,000 interest)
+       • annual basis  → the figure is a percentage per year
+         (25% per year on MWK 100,000 for 12 months = MWK 25,000 interest)
+     No cap and no silent re-quoting: the chosen function is the function used.
      ------------------------------------------------------------------ */
   function amortize(opts) {
     var principal = Math.max(Number(opts.principal) || 0, 0);
     var rateBasis = opts.rateBasis === "monthly" ? "monthly" : "annual";
     var rateInput = Math.max(Number(opts.rate) || 0, 0);
-    /* resolve the quoted rate to an annual rate, capped at 100% p.a. */
-    var rate = rateBasis === "monthly" ? Math.min(rateInput * 12, 100) : Math.min(rateInput, 100);
+    /* Resolve the quote to a monthly rate, then to an annual equivalent. */
+    var monthlyRate = rateBasis === "monthly" ? rateInput : rateInput / 12;
+    var rate = monthlyRate * 12;
     var termMonths = Math.max(Math.round(Number(opts.termMonths) || 1), 1);
     var method = opts.method === "flat" ? "flat" : "reducing";
     var freqKey = FREQUENCIES[opts.frequency] ? opts.frequency : "monthly";
@@ -80,11 +89,14 @@
     var start = opts.startDate ? new Date(opts.startDate) : new Date();
 
     var periods = Math.max(Math.round((termMonths / 12) * freq.perYear), 1);
-    var ratePerPeriod = rate / 100 / freq.perYear;
+    /* rate for one instalment period, in decimal (monthly quote ⇒ 25% = 0.25) */
+    var ratePerPeriod = (monthlyRate / 100) * (12 / freq.perYear);
 
     var payment, totalInterest;
     if (method === "flat") {
-      totalInterest = principal * (rate / 100) * (termMonths / 12);
+      /* Flat: interest is charged on the full principal for every month of
+         the term, using the monthly rate exactly as quoted. */
+      totalInterest = principal * (monthlyRate / 100) * termMonths;
       payment = (principal + totalInterest) / periods;
     } else {
       if (ratePerPeriod === 0) {
@@ -98,8 +110,6 @@
 
     var processingFee = principal * processingFeePct;
     var fees = processingFee + adminFee;
-    var totalRepayment = principal + totalInterest;
-    var totalCost = totalRepayment + fees;
 
     /* Schedule */
     var rows = [];
@@ -125,7 +135,8 @@
 
       rows.push({
         n: i,
-        date: freqKey === "fortnightly" ? addFortnights(start, i - 1) : addMonths(start, i - 1),
+        /* first instalment falls one full period after disbursement */
+        date: freqKey === "fortnightly" ? addFortnights(start, i) : addMonths(start, i),
         opening: opening,
         payment: rowPayment,
         interest: rowInterest,
@@ -134,14 +145,29 @@
       });
     }
 
+    /* Totals are taken from the schedule itself, so the sheet, the table and
+       the CSV can never disagree by a rounding unit — the final instalment
+       absorbs any residual balance. */
+    var scheduledTotal = 0;
+    var scheduledInterest = 0;
+    for (var r = 0; r < rows.length; r += 1) {
+      scheduledTotal += rows[r].payment;
+      scheduledInterest += rows[r].interest;
+    }
+    var totalRepayment = scheduledTotal;
+    totalInterest = scheduledInterest;
+    var totalCost = totalRepayment + fees;
+
     var apr = aprEstimate(Math.max(principal - fees, 1), payment, periods, freq.perYear);
 
     return {
       principal: principal,
-      rate: rate,                 /* annual rate actually used */
+      rate: rate,                 /* annual equivalent actually used */
       rateInput: rateInput,       /* figure the customer typed */
       rateBasis: rateBasis,       /* 'annual' | 'monthly' */
-      monthlyRate: rate / 12,
+      monthlyRate: monthlyRate,   /* rate per month in percent */
+      ratePerPeriod: ratePerPeriod * 100,
+      periodsPerYear: freq.perYear,
       apr: apr,
       termMonths: termMonths,
       periods: periods,

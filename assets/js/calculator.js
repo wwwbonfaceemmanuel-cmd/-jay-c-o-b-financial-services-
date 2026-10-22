@@ -28,11 +28,37 @@
     term: 1, termMonths: 1, basis: "monthly",
     rateBasis: "annual",
     method: "reducing", frequency: "monthly",
-    fee: 2, adminFee: 0, showAll: false
+    fee: 2, adminFee: 0, showAll: false,
+    startDate: null
   };
 
   function $(id) { return document.getElementById(id); }
   function mwk(v) { return F.formatMWK(v); }
+  function round2(n) { return Math.round(n * 100) / 100; }
+  /* Percent, trimmed: 25 → "25%", 24.5 → "24.5%", 2.0833 → "2.08%" */
+  function pct(n, maxDp) {
+    var dp = maxDp === undefined ? 2 : maxDp;
+    var v = Number(n) || 0;
+    var s = v.toFixed(dp);
+    if (s.indexOf(".") > -1) s = s.replace(/0+$/, "").replace(/\.$/, "");
+    return s + "%";
+  }
+  /* Convert a rate quoted per year into whatever basis the customer picked */
+  function rateForBasis(annualRate) {
+    return state.rateBasis === "monthly" ? round2(annualRate / 12) : round2(annualRate);
+  }
+  function isoDate(date) {
+    var d = new Date(date);
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+  function todayISO() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
 
   /* Radial/segmented selector for flat vs reducing */
   function methodValue() {
@@ -95,6 +121,9 @@
     state.frequency = $("calc-frequency").value;
     state.fee = Math.max(Number($("calc-fee").value) || 0, 0);
     state.adminFee = Math.max(Number($("calc-admin").value) || 0, 0);
+    if ($("calc-start")) {
+      state.startDate = $("calc-start").value ? new Date($("calc-start").value + "T00:00:00") : null;
+    }
   }
 
   function compute() {
@@ -102,7 +131,8 @@
       principal: state.amount, rate: state.rate, rateBasis: state.rateBasis,
       termMonths: state.termMonths,
       method: state.method, frequency: state.frequency,
-      processingFeePct: state.fee, adminFee: state.adminFee
+      processingFeePct: state.fee, adminFee: state.adminFee,
+      startDate: state.startDate
     });
   }
 
@@ -116,18 +146,18 @@
     if (state.rateBasis === "monthly") {
       if (label) label.textContent = "Monthly interest rate (%)";
       el.max = "60";
-      if (basisHint) basisHint.textContent = "Quoted as a percentage per month";
+      if (basisHint) basisHint.textContent = "Quoted as a percentage per month — used exactly as entered";
     } else {
       if (label) label.textContent = "Annual interest rate (%)";
-      el.max = "60";
-      if (basisHint) basisHint.textContent = "Quoted as an annual percentage rate (p.a.)";
+      el.max = "720";
+      if (basisHint) basisHint.textContent = "Quoted as a percentage per year (p.a.) — used exactly as entered";
     }
     var annual = state.rateBasis === "monthly" ? state.rate * 12 : state.rate;
     var monthly = annual / 12;
     if (hint) {
       hint.textContent = state.rateBasis === "monthly"
-        ? "= " + annual.toFixed(2) + "% per year · " + (state.method === "flat" ? "flat rate" : "reducing balance")
-        : "= " + monthly.toFixed(2) + "% per month · " + (state.method === "flat" ? "flat rate" : "reducing balance");
+        ? "= " + pct(annual, 1) + " p.a. equivalent · " + (state.method === "flat" ? "flat rate" : "reducing balance")
+        : "= " + pct(monthly) + " per month equivalent · " + (state.method === "flat" ? "flat rate" : "reducing balance");
     }
   }
 
@@ -135,7 +165,6 @@
     var c = compute();
     var p = PRESETS[state.preset];
 
-    var perYear = state.frequency === "fortnightly" ? 26 : 12;
     var annualBasis = state.basis === "annual";
     var unitLabel = state.frequency === "fortnightly" ? "fortnight" : "month";
     var headline = annualBasis ? c.payment * 12 : c.payment;
@@ -152,23 +181,28 @@
     }
 
     /* ---- Results sheet: total amount · principal · rate · interest · duration · schedule · total repayment ---- */
+    var basisWord = annualBasis ? "annual basis" : "monthly basis";
+    var quoted = state.rateBasis === "monthly"
+      ? pct(c.monthlyRate) + " per month"
+      : pct(c.rate, 1) + " p.a.";
+    var equivalent = state.rateBasis === "monthly"
+      ? pct(c.rate, 1) + " p.a. equivalent"
+      : pct(c.monthlyRate) + " per month equivalent";
+
     $("res-total-amount").textContent = mwk(c.totalCost);
-    $("res-total-amount-note").textContent = "principal + interest + fees · " + (annualBasis ? "annual basis" : "monthly basis");
+    $("res-total-amount-note").textContent = "principal + interest" +
+      (c.fees > 0 ? " + fees " + mwk(c.fees) : "") + " · " + basisWord;
 
     $("res-principal").textContent = mwk(c.principal);
 
-    $("res-rate").textContent = state.rateBasis === "monthly"
-      ? c.monthlyRate.toFixed(2) + "% per month"
-      : c.rate.toFixed(1) + "% p.a.";
-    $("res-rate-note").textContent = (state.method === "flat" ? "flat rate" : "reducing balance") + " · " +
-      (state.rateBasis === "monthly"
-        ? c.rate.toFixed(2) + "% p.a. equivalent"
-        : c.monthlyRate.toFixed(2) + "% per month");
+    $("res-rate").textContent = quoted;
+    $("res-rate-note").textContent = (c.method === "flat" ? "flat rate" : "reducing balance") + " · " + equivalent;
 
     $("res-interest").textContent = mwk(c.totalInterest);
-    $("res-interest-note").textContent = "charged over " + (annualBasis
-      ? state.term + (state.term === 1 ? " year" : " years")
-      : state.term + (state.term === 1 ? " month" : " months"));
+    $("res-interest-note").textContent = c.method === "flat"
+      ? mwk(c.principal) + " × " + pct(c.monthlyRate) + " × " +
+        c.termMonths + (c.termMonths === 1 ? " month" : " months")
+      : "reducing balance over " + c.periods + (c.periods === 1 ? " instalment" : " instalments");
 
     $("res-duration").textContent = annualBasis
       ? state.term + (state.term === 1 ? " year" : " years") + " · " + c.periods + " months"
@@ -177,24 +211,34 @@
     $("res-instalments").textContent = c.periods + " × " + mwk(c.payment) + " per " + unitLabel;
 
     $("res-schedule-range").textContent = F.shortDate(c.firstDue) + " → " + F.shortDate(c.lastDue);
-    $("res-schedule-note").textContent = c.periods + " instalments, " + c.frequencyLabel.toLowerCase() +
-      ", first due one " + unitLabel + " after disbursement";
+    $("res-schedule-note").textContent = c.periods + (c.periods === 1 ? " instalment" : " instalments") + ", " +
+      c.frequencyLabel.toLowerCase() + ", first due " + F.shortDate(c.firstDue) + " (one " + unitLabel + " after disbursement)";
 
     $("res-total").textContent = mwk(c.totalRepayment);
-    $("res-total-note").textContent = "sum of all scheduled instalments" + (c.fees > 0 ? " · fees of " + mwk(c.fees) + " shown below" : "");
+    $("res-total-note").textContent = "sum of all scheduled instalments" + (c.fees > 0 ? " · fees of " + mwk(c.fees) + " charged separately" : "");
+
+    if ($("res-formula")) {
+      $("res-formula").textContent = c.method === "flat"
+        ? "Flat rate: " + mwk(c.principal) + " × " + (state.rateBasis === "monthly"
+            ? pct(c.monthlyRate) + " per month × " + c.termMonths + (c.termMonths === 1 ? " month" : " months")
+            : pct(c.rate, 1) + " p.a. × " + (c.termMonths / 12) + ((c.termMonths === 12) ? " year" : " years")) +
+          " = " + mwk(c.totalInterest) + " interest · " + c.periods + " × " + mwk(c.payment) + " = " + mwk(c.totalRepayment) + " total repayment."
+        : "Reducing balance: " + pct(c.ratePerPeriod) + " per " + unitLabel + " on the falling balance over " +
+          c.periods + (c.periods === 1 ? " instalment" : " instalments") + " = " + mwk(c.totalInterest) + " interest · total repayment " + mwk(c.totalRepayment) + ".";
+    }
 
     $("res-fees").textContent = mwk(c.fees);
     $("res-apr").textContent = c.apr.toFixed(1) + "%";
     $("res-frequency").textContent = c.frequencyLabel;
-    $("res-annual").textContent = mwk(c.payment * perYear);
+    if ($("res-method")) $("res-method").textContent = c.method === "flat" ? "Flat rate" : "Reducing balance";
     $("res-first").textContent = F.shortDate(c.firstDue);
     $("res-last").textContent = F.shortDate(c.lastDue);
 
     syncRateField();
 
-    var pct = c.totalCost > 0 ? (c.principal / c.totalCost) * 100 : 100;
-    $("bar-principal").style.width = pct.toFixed(1) + "%";
-    $("bar-interest").style.width = Math.max(100 - pct, 0).toFixed(1) + "%";
+    var principalShare = c.totalCost > 0 ? (c.principal / c.totalCost) * 100 : 100;
+    $("bar-principal").style.width = principalShare.toFixed(1) + "%";
+    $("bar-interest").style.width = Math.max(100 - principalShare, 0).toFixed(1) + "%";
 
     var other = F.amortize({
       principal: state.amount, rate: state.rate, rateBasis: state.rateBasis,
@@ -229,7 +273,7 @@
       : "Showing first " + Math.min(12, c.periods) + " of " + c.periods + " instalments";
     $("amort-toggle").textContent = state.showAll ? "Show first 12" : "Show all " + c.periods;
     $("amort-toggle").hidden = c.periods <= 12;
-    $("amort-total").textContent = mwk(c.totalCost);
+    $("amort-total").textContent = mwk(c.totalRepayment);
     window.__calc = c;
   }
 
@@ -242,7 +286,9 @@
     $("calc-amount").value = state.amount;
     $("calc-amount").min = p.min;
     $("calc-amount").max = p.max;
-    $("calc-rate").value = p.rate;
+    var shownRate = rateForBasis(p.rate);
+    state.rate = shownRate;
+    $("calc-rate").value = shownRate;
     $("calc-fee").value = p.fee;
     syncTermField(true);
     state.termMonths = termMonths();
@@ -255,18 +301,20 @@
       "JAY C O B Financial Services — loan calculator (MWK)",
       "Product," + PRESETS[state.preset].label,
       "Principal," + c.principal,
-      "Annual rate," + c.rate + "%",
+      "Rate quoted," + pct(c.rateInput) + (c.rateBasis === "monthly" ? " per month" : " per year (p.a.)"),
+      "Annual equivalent," + c.rate.toFixed(2) + "%",
       "Term (months)," + c.termMonths,
-      "Method," + (state.method === "flat" ? "Flat rate" : "Reducing balance"),
+      "Method," + (c.method === "flat" ? "Flat rate" : "Reducing balance"),
       "Frequency," + c.frequencyLabel,
       "Instalment," + c.payment.toFixed(2),
       "Total interest," + c.totalInterest.toFixed(2),
       "Fees," + c.fees.toFixed(2),
-      "Total repayment," + c.totalCost.toFixed(2),
+      "Total repayment," + c.totalRepayment.toFixed(2),
+      "Total including fees," + c.totalCost.toFixed(2),
       "",
       UI.tableCSV(["#", "Due date", "Instalment", "Principal", "Interest", "Balance"],
         c.rows.map(function (r) {
-          return [r.n, new Date(r.date).toISOString().slice(0, 10), r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), r.closing.toFixed(2)];
+          return [r.n, isoDate(r.date), r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), r.closing.toFixed(2)];
         }))
     ];
     UI.downloadCSV("JC-loan-estimate.csv", lines.join("\n"));
@@ -284,6 +332,8 @@
     setMethod("reducing");
     $("calc-frequency").value = "monthly";
     $("calc-admin").value = 0;
+    if ($("calc-start")) $("calc-start").value = todayISO();
+    state.startDate = new Date(todayISO() + "T00:00:00");
     readInputs();
     render();
     syncRateField();
@@ -294,7 +344,7 @@
     document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
       radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
-    ["calc-amount", "calc-rate", "calc-term", "calc-frequency", "calc-fee", "calc-admin"].forEach(function (id) {
+    ["calc-amount", "calc-rate", "calc-term", "calc-frequency", "calc-fee", "calc-admin", "calc-start"].forEach(function (id) {
       var el = $(id);
       if (!el) return;
       el.addEventListener("input", function () { readInputs(); render(); });
@@ -318,22 +368,19 @@
     if ($("calc-rate-basis")) {
       $("calc-rate-basis").addEventListener("change", function () {
         state.rateBasis = $("calc-rate-basis").value;
-        /* convert the figure so the real cost stays the same when switching basis */
+        /* re-quote the same cost in the new unit so nothing changes silently */
         var current = Math.max(Number($("calc-rate").value) || 0, 0);
-        if (state.rateBasis === "monthly") {
-          $("calc-rate").value = Math.max(Math.round((current / 12) * 100) / 100, 0.1);
-        } else {
-          $("calc-rate").value = Math.round(current * 12 * 100) / 100;
-        }
-        state.rate = Number($("calc-rate").value);
+        var converted = state.rateBasis === "monthly" ? round2(current / 12) : round2(current * 12);
+        $("calc-rate").value = converted;
+        state.rate = converted;
         syncRateField();
         readInputs();
         render();
         UI.toast({
           title: state.rateBasis === "monthly" ? "Monthly rate basis" : "Annual rate basis",
           message: state.rateBasis === "monthly"
-            ? "Interest is now quoted per month and converted to an annual rate for the calculation."
-            : "Interest is now quoted per year (p.a.).",
+            ? "The rate is now a percentage per month. " + pct(current) + " p.a. is quoted as " + pct(converted) + " per month, and the calculation uses that monthly figure directly."
+            : "The rate is now a percentage per year. " + pct(current) + " per month is quoted as " + pct(converted) + " p.a.",
           type: "info"
         });
       });
@@ -354,6 +401,13 @@
       renderSchedule(window.__calc || compute());
     });
 
+    if ($("calc-start") && !$("calc-start").value) {
+      $("calc-start").value = todayISO();
+    }
+    state.startDate = $("calc-start") && $("calc-start").value
+      ? new Date($("calc-start").value + "T00:00:00")
+      : new Date(todayISO() + "T00:00:00");
+
     var params = new URLSearchParams(location.search);
     if (params.get("product")) {
       var found = Object.keys(PRESETS).filter(function (k) {
@@ -364,8 +418,22 @@
     if (params.get("amount")) $("calc-amount").value = Number(params.get("amount"));
     if (params.get("term")) $("calc-term").value = Number(params.get("term"));
     if (params.get("rateBasis") === "monthly" && $("calc-rate-basis")) {
+      /* the preset figure is annual — re-quote it per month for this view */
       $("calc-rate-basis").value = "monthly";
       state.rateBasis = "monthly";
+      $("calc-rate").value = round2((Number($("calc-rate").value) || 0) / 12);
+      state.rate = Number($("calc-rate").value);
+    }
+    if (params.get("rate")) {
+      $("calc-rate").value = Number(params.get("rate"));
+      state.rate = Number($("calc-rate").value);
+    }
+    if (params.get("method") === "flat") setMethod("flat");
+    if (params.get("fee") !== null && params.get("fee") !== "") {
+      $("calc-fee").value = Math.max(Number(params.get("fee")) || 0, 0);
+    }
+    if (params.get("start") && $("calc-start")) {
+      $("calc-start").value = params.get("start");
     }
     if (params.get("basis") === "annual" && $("calc-basis")) {
       $("calc-basis").value = "annual";

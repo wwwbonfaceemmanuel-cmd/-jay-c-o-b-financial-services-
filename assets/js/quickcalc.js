@@ -19,6 +19,11 @@
   var rateBasisEl = $("qc-rate-basis");
   var rateEl = $("qc-rate");
 
+  function trimPct(n) {
+    var s = (Number(n) || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    return s + "%";
+  }
+
   function clampAmount(v) {
     var n = Number(v) || 0;
     if (n < 50000) n = 50000;
@@ -30,7 +35,9 @@
     var amount = clampAmount(amountEl.value);
     var term = Number(termEl.value) || 12;
     var rateBasis = rateBasisEl ? rateBasisEl.value : "annual";
-    var rate = Math.max(0.1, Math.min(60, Number(rateEl.value) || 24));
+    /* the quote is used in its own unit: % per month or % per year */
+    var rateCeiling = rateBasis === "monthly" ? 60 : 720;
+    var rate = Math.max(0, Math.min(rateCeiling, Number(rateEl.value) || 0));
     var method = methodEl.value;
     var frequency = freqEl.value;
 
@@ -52,8 +59,8 @@
     if (rateLabel) rateLabel.textContent = rateBasis === "monthly" ? "Monthly interest rate (%)" : "Annual interest rate (%)";
     if ($("qc-rate-out")) {
       $("qc-rate-out").textContent = rateBasis === "monthly"
-        ? c.monthlyRate.toFixed(2) + "% per month"
-        : c.rate.toFixed(1) + "% p.a.";
+        ? trimPct(c.monthlyRate) + " per month"
+        : trimPct(c.rate) + " p.a.";
     }
     var perYear = frequency === "fortnightly" ? 26 : 12;
     if ($("qc-annual")) $("qc-annual").textContent = F.formatMWK(c.payment * perYear);
@@ -75,7 +82,15 @@
     });
   }
 
-  if (rateBasisEl) rateBasisEl.addEventListener("change", update);
+  if (rateBasisEl) {
+    rateBasisEl.addEventListener("change", function () {
+      /* re-quote the same cost in the new unit */
+      var current = Math.max(Number(rateEl.value) || 0, 0);
+      var converted = rateBasisEl.value === "monthly" ? current / 12 : current * 12;
+      rateEl.value = String(Math.round(converted * 100) / 100);
+      update();
+    });
+  }
 
   [amountEl, termEl, methodEl, freqEl, rateEl].forEach(function (el) {
     if (!el) return;
