@@ -1,21 +1,23 @@
 # Deploying JAY C O B on Railway + Supabase
 
-Everything in this repository now runs against Supabase. The browser
-layer is finished; what is left is creating the two accounts, pasting
-three values and running one SQL file.
+Everything in this repository runs against Supabase. The database and the
+browser layer are both live; what remains is putting the site on Railway so
+the public can reach it.
 
-**Status: the project is already configured.**
-`assets/js/config.js` carries the public URL and anon key for
-`cybaejegytnvtitznofp.supabase.co`, so the site is in cloud mode as soon as
-it is served. Two things remain, and both need your Supabase login:
+**Status — Supabase: done.**
+Project `cybaejegytnvtitznofp` holds every table, policy, trigger and
+storage bucket, the seeded content (settings, eleven products, ten live
+posts) and a promoted administrator. `assets/js/config.js` carries the
+public URL and anon key, so any static host serves the site in cloud mode.
 
-1. **Run `supabase/install.sql`** in the SQL editor — one paste that
-   creates every table, policy, trigger and bucket *and* publishes the
-   website's settings, the eleven products and the live posts.
-2. **Create your administrator** and promote it with `promote_staff`.
+**Status — Railway: not deployed yet.** Phase 2 below is the remaining work.
 
-After that, open **`system-check.html`** on the deployed site: it tests the
-connection live and tells you exactly what to fix if a line is red.
+Two checks prove the install at any time:
+
+| Where | What it does |
+| --- | --- |
+| `supabase/verify.sql` (SQL editor) | one table listing every table, policy, function, trigger, bucket, seeded document and administrator, with PASS / MISSING |
+| `system-check.html` (browser) | same picture from the client, plus a real administrator sign-in and a write test |
 
 This page is the checklist. Work top to bottom — each step says who does
 what, and how to tell it worked.
@@ -71,6 +73,7 @@ Visitor / customer            Admin console (admin.html)
 
 2. Open **SQL Editor → New query**, paste the whole of
    [`supabase/install.sql`](supabase/install.sql) and press **Run**.
+   *(Already done for this project — `supabase/verify.sql` reports it.)*
 
    That one file is the schema **plus** the seed: tables, policies,
    triggers and storage buckets, then the website's settings, the eleven

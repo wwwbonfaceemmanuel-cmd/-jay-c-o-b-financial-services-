@@ -184,9 +184,9 @@ Operational details:
 - **Fallback**: if the cloud is unreachable the site uses its local cache; the console shows a
   `Cloud error` badge in the Website connection panel.
 
-The project is already pointed at Supabase (`cybaejegytnvtitznofp`). Two steps remain:
-run `supabase/install.sql` (schema + seeded content in one paste), then promote your
-administrator. Open
+The project runs against Supabase (`cybaejegytnvtitznofp`): schema, seeded content and a
+promoted administrator are installed. `supabase/verify.sql` prints a PASS/MISSING report for
+every table, policy, trigger, bucket and document. Open
 **`system-check.html`** on the deployed site for a live diagnosis — it tests the configuration,
 every table, the website documents, the media bucket and a real administrator sign-in, and prints
 the exact fix for anything red.
@@ -216,6 +216,8 @@ persistence, registration, sign-in, recovery, enquiries, dashboard guard) and th
 ├── supabase/install.sql        # ONE PASTE: schema + seed (generated)
 ├── supabase/schema.sql         # tables, RLS policies, triggers, storage buckets
 ├── supabase/seed.sql           # settings, catalogue and live posts (generated)
+├── supabase/verify.sql         # PASS/MISSING installation report
+├── supabase/promote-admin.sql  # make an account a Super Admin
 ├── supabase/migrations/        # same schema for the Supabase CLI
 ├── system-check.html           # live connection diagnostic (noindex)
 ├── tools/dev/mock-cloud.js     # in-memory Supabase stand-in for local testing
