@@ -23,6 +23,22 @@
     long: { label: "Long-term Loan", rate: 21, min: 1000000, max: 60000000, term: 60, maxTerm: 84, fee: 2.5 }
   };
 
+  /* The admin console publishes the catalogue (rate, limits, fee, terms).
+     Re-point the presets at it so the calculator always quotes the site. */
+  function syncCatalogue() {
+    var store = window.JCOB_SITE;
+    if (!store || !store.products) return;
+    Object.keys(PRESETS).forEach(function (key) {
+      var p = store.product(PRESETS[key].label);
+      if (!p) return;
+      if (isFinite(p.rate) && p.rate > 0) PRESETS[key].rate = Number(p.rate);
+      if (isFinite(p.min) && p.min > 0) PRESETS[key].min = Number(p.min);
+      if (isFinite(p.max) && p.max > 0) PRESETS[key].max = Number(p.max);
+      if (isFinite(p.fee) && p.fee >= 0) PRESETS[key].fee = Number(p.fee);
+      if (isFinite(p.maxTerm) && p.maxTerm > 0) PRESETS[key].maxTerm = Number(p.maxTerm);
+    });
+  }
+
   var state = {
     preset: "personal", amount: 5000000, rate: 24,
     term: 1, termMonths: 1, basis: "monthly",
@@ -341,6 +357,20 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    syncCatalogue();
+    /* catalogue rate first, then the admin's default size / term / fee */
+    applyPreset(state.preset);
+    var defaults = (window.JCOB_SITE && window.JCOB_SITE.settings.calc) || null;
+    if (defaults) {
+      if (defaults.rateBasis && $("calc-rate-basis")) { $("calc-rate-basis").value = defaults.rateBasis; state.rateBasis = defaults.rateBasis; }
+      if (defaults.basis && $("calc-basis")) { $("calc-basis").value = defaults.basis; state.basis = defaults.basis; }
+      if (defaults.amount) $("calc-amount").value = defaults.amount;
+      if (defaults.term) $("calc-term").value = defaults.term;
+      if (defaults.fee !== undefined) $("calc-fee").value = defaults.fee;
+      if (defaults.adminFee !== undefined) $("calc-admin").value = defaults.adminFee;
+      if (defaults.method) setMethod(defaults.method);
+    }
+    state.rate = Number($("calc-rate").value) || 24;
     document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
       radio.addEventListener("change", function () { applyPreset(radio.value); });
     });

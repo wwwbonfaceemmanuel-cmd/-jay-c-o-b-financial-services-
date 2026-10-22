@@ -25,6 +25,21 @@
     "Unsecured Loan": { min: 100000, max: 10000000, rate: 26, term: [6, 36], fee: 2.5 }
   };
 
+  /* Follow the catalogue published in the admin console. */
+  (function syncCatalogue() {
+    var store = window.JCOB_SITE;
+    if (!store || !store.products) return;
+    Object.keys(PRODUCTS).forEach(function (name) {
+      var p = store.product(name);
+      if (!p) return;
+      if (isFinite(p.rate) && p.rate > 0) PRODUCTS[name].rate = Number(p.rate);
+      if (isFinite(p.min) && p.min > 0) PRODUCTS[name].min = Number(p.min);
+      if (isFinite(p.max) && p.max > 0) PRODUCTS[name].max = Number(p.max);
+      if (isFinite(p.fee) && p.fee >= 0) PRODUCTS[name].fee = Number(p.fee);
+      if (isFinite(p.minTerm) && isFinite(p.maxTerm)) PRODUCTS[name].term = [Number(p.minTerm), Number(p.maxTerm)];
+    });
+  })();
+
   var DOCS = [
     { id: "id", name: "National ID or passport", required: true, hint: "Both sides, PDF or image" },
     { id: "income", name: "Proof of income", required: true, hint: "Payslip or 3 months of takings" },

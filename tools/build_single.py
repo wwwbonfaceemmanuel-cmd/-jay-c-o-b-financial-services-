@@ -20,7 +20,7 @@ OUT = ROOT / "single" / "index.html"
 IMG_OPT = ROOT / ".cache" / "single-img"
 
 # Views in navigation order. Aliases (portal/products) are redirects and are skipped.
-SKIP = {"portal", "products", "404"}
+SKIP = {"portal", "products", "404", "admin"}
 
 NAV = [
     ("index", "Home"),
@@ -37,9 +37,9 @@ NAV = [
 FOOTER_EXTRA = ["apply", "login", "register", "privacy", "terms", "complaints", "licensing"]
 
 JS_ORDER = [
-    "config.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
+    "config.js", "site-store.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
     "auth.js", "apply.js", "calculator.js", "quickcalc.js", "eligibility.js",
-    "rates.js", "support.js", "dashboard.js", "admin.js",
+    "rates.js", "support.js", "dashboard.js", "site-content.js",
 ]
 
 AUTH_PAGES = {"register": "register", "login": "login", "verify": "verify",
@@ -431,7 +431,7 @@ try {
 __CSS__
 </style>
 </head>
-<body data-page="index">
+<body data-page="index" data-single="true">
 <a class="skip-link" href="#main">Skip to content</a>
 <p class="sf-note"><strong>Single-file edition</strong> &mdash; every page, the calculator and the full customer dashboard in one HTML document. Demo login: demo@jaycobfinancial.mw &middot; demo1234 &middot; OTP 123456</p>
 __HEADER__

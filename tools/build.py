@@ -30,8 +30,9 @@ EMAIL = "hello@jaycobfinancial.mw"
 SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
-BASE_SCRIPTS = ["assets/js/config.js", "assets/js/finance.js", "assets/js/app-data.js",
-                "assets/js/ui.js", "assets/js/main.js", "assets/js/live.js"]
+BASE_SCRIPTS = ["assets/js/config.js", "assets/js/site-store.js", "assets/js/finance.js",
+                "assets/js/app-data.js", "assets/js/ui.js", "assets/js/main.js",
+                "assets/js/live.js", "assets/js/site-content.js"]
 
 
 def esc(value: str) -> str:
