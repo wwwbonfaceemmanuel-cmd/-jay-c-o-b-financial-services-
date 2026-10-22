@@ -107,7 +107,14 @@ Visitor / customer            Admin console (admin.html)
      select public.promote_staff('you@jaycobfinancial.mw');
      ```
 
-     The reply should say `… is now an administrator.`
+     The reply should say `… is now an administrator.` (role `admin`, shown
+     in the console as **Super Admin**).
+
+     If that replies *"No profile matched"* — for example because the user
+     was created before the schema was installed — run
+     [`supabase/promote-admin.sql`](supabase/promote-admin.sql) instead: it
+     creates the missing profile row and promotes the account, then prints
+     a verification table.
 
 6. Create the customer you will use for testing (either register through
    the website, or **Add user** the same way).
