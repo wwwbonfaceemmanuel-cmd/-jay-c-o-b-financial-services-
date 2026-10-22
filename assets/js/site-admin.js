@@ -83,8 +83,38 @@
   /* ------------------------------------------------------------------
      BRIDGE — website submissions ↔ console records
      ------------------------------------------------------------------ */
+  var CLOUD = window.JCOB_CLOUD;
+  function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
+
   function siteData() {
     try { return JSON.parse(window.localStorage.getItem(SITE_KEY) || "null"); } catch (e) { return null; }
+  }
+
+  /* In cloud mode every customer document in Supabase is a website record;
+     in demo mode there is a single local document. */
+  var siteDocs = null;
+  var docsAt = 0;
+  var loading = false;
+
+  function loadSiteDocs(force) {
+    if (!cloudOn()) return Promise.resolve([{ owner: null, data: siteData() }].filter(function (d) { return d.data; }));
+    if (loading) return Promise.resolve(siteDocs || []);
+    if (!force && siteDocs && Date.now() - docsAt < 8000) return Promise.resolve(siteDocs);
+    loading = true;
+    return CLOUD.customer.all().then(function (rows) {
+      siteDocs = rows
+        .filter(function (r) { return r.data && r.data.profile; })
+        .map(function (r) { return { owner: r.owner, data: r.data }; });
+      docsAt = Date.now();
+      loading = false;
+      return siteDocs;
+    }).catch(function () { loading = false; return siteDocs || []; });
+  }
+
+  function allDocs() {
+    if (cloudOn()) return siteDocs || [];
+    var single = siteData();
+    return single ? [{ owner: null, data: single }] : [];
   }
 
   var STATUS_FROM_SITE = {
@@ -96,102 +126,144 @@
     "Info Required": "info_required", Pending: "pending", Disbursed: "approved"
   };
 
+  function customerIdFor(doc, index) {
+    if (doc.owner) return "CUS-WEB-" + String(doc.owner).slice(0, 4).toUpperCase();
+    return "CUS-WEB" + (index ? index + 1 : "1");
+  }
+
   function importSiteData() {
-    var site = siteData();
-    if (!site) return;
-    var profile = site.profile || {};
+    var docs = allDocs();
+    if (!docs.length) return;
     var changed = false;
 
-    if (profile.fullName && !db.customers.some(function (c) { return c.name === profile.fullName; })) {
-      db.customers.unshift({
-        id: "CUS-WEB1", name: profile.fullName, phone: profile.phone || "—",
-        email: profile.email || "—", nid: profile.nid || "NID-PENDING",
-        district: profile.district || "Lilongwe", status: "Active",
-        kyc: profile.kyc === "Verified" ? "Verified" : "Pending",
-        balance: 0, savings: 0, employer: profile.employer || "—",
-        occupation: profile.occupation || "—", income: profile.monthlyIncome || 0,
-        kin: { name: (profile.nextOfKin || {}).name || "—", phone: (profile.nextOfKin || {}).phone || "—", rel: (profile.nextOfKin || {}).relationship || "—" },
-        joined: profile.memberSince || new Date().toISOString(),
-        origin: "website"
-      });
-      changed = true;
-    }
+    docs.forEach(function (doc, index) {
+      var site = doc.data || {};
+      var profile = site.profile || {};
+      var id = customerIdFor(doc, index);
+      var existingCustomer = db.customers.filter(function (c) {
+        return (doc.owner && c.siteUid === doc.owner) || (!doc.owner && c.origin === "website" && c.name === profile.fullName);
+      })[0];
 
-    (site.applications || []).forEach(function (a) {
-      var existing = db.applications.filter(function (x) { return x.siteRef === a.ref; })[0];
-      if (existing) {
-        var mapped = STATUS_FROM_SITE[a.status] || existing.status;
-        if (existing.status !== mapped) { existing.status = mapped; changed = true; }
-        return;
+      if (profile.fullName && !existingCustomer && !db.customers.some(function (c) { return c.name === profile.fullName && c.origin === "website"; })) {
+        db.customers.unshift({
+          id: id, siteUid: doc.owner || null,
+          name: profile.fullName, phone: profile.phone || "—",
+          email: profile.email || "—", nid: profile.nid || "NID-PENDING",
+          district: profile.district || "Lilongwe", status: "Active",
+          kyc: profile.kyc === "Verified" ? "Verified" : "Pending",
+          balance: 0, savings: 0, employer: profile.employer || "—",
+          occupation: profile.occupation || "—", income: profile.monthlyIncome || 0,
+          kin: { name: (profile.nextOfKin || {}).name || "—", phone: (profile.nextOfKin || {}).phone || "—", rel: (profile.nextOfKin || {}).relationship || "—" },
+          joined: profile.memberSince || new Date().toISOString(),
+          origin: "website"
+        });
+        changed = true;
       }
-      db.applications.unshift({
-        id: a.ref, siteRef: a.ref, cust: profile.fullName || "Website applicant",
-        product: a.product, amount: a.amount, term: a.term,
-        date: a.submitted || new Date().toISOString(),
-        status: STATUS_FROM_SITE[a.status] || "Pending",
-        officer: "Unassigned", score: 70, purpose: a.purpose || "—",
-        origin: "website"
-      });
-      changed = true;
-    });
 
-    (site.tickets || []).forEach(function (t) {
-      if (db.tickets.some(function (x) { return x.siteRef === t.ref; })) return;
-      var first = (t.messages || [])[0] || {};
-      db.tickets.unshift({
-        id: t.ref, siteRef: t.ref, cust: profile.fullName || first.from || "Website visitor",
-        subject: t.subject, cat: t.category || "General",
-        pri: /complaint|dispute/i.test(t.category || "") ? "High" : "Normal",
-        status: t.status === "Resolved" ? "Resolved" : t.status === "Open" ? "Open" : "In Progress",
-        agent: "Unassigned", date: t.created || new Date().toISOString(),
-        origin: "website", body: first.text || ""
+      (site.applications || []).forEach(function (a) {
+        var existing = db.applications.filter(function (x) { return x.siteRef === a.ref; })[0];
+        if (existing) {
+          var mapped = STATUS_FROM_SITE[a.status] || existing.status;
+          if (existing.status !== mapped) { existing.status = mapped; changed = true; }
+          return;
+        }
+        db.applications.unshift({
+          id: a.ref, siteRef: a.ref, siteUid: doc.owner || null,
+          cust: profile.fullName || "Website applicant",
+          product: a.product, amount: a.amount, term: a.term,
+          date: a.submitted || new Date().toISOString(),
+          status: STATUS_FROM_SITE[a.status] || "Pending",
+          officer: "Unassigned", score: 70, purpose: a.purpose || "—",
+          origin: "website"
+        });
+        changed = true;
       });
-      changed = true;
+
+      (site.tickets || []).forEach(function (t) {
+        if (db.tickets.some(function (x) { return x.siteRef === t.ref; })) return;
+        var first = (t.messages || [])[0] || {};
+        db.tickets.unshift({
+          id: t.ref, siteRef: t.ref, siteUid: doc.owner || null,
+          cust: profile.fullName || first.from || "Website visitor",
+          subject: t.subject, cat: t.category || "General",
+          pri: /complaint|dispute/i.test(t.category || "") ? "High" : "Normal",
+          status: t.status === "Resolved" ? "Resolved" : t.status === "Open" ? "Open" : "In Progress",
+          agent: "Unassigned", date: t.created || new Date().toISOString(),
+          origin: "website", body: first.text || ""
+        });
+        changed = true;
+      });
     });
 
     if (changed) save();
   }
 
   function syncBackToSite() {
-    var site = siteData();
-    if (!site) return;
-    var dirty = false;
+    var docs = allDocs();
+    if (!docs.length) return;
+    var dirty = [];
 
-    (db.applications || []).forEach(function (a) {
-      if (!a.siteRef) return;
-      var target = (site.applications || []).filter(function (x) { return x.ref === a.siteRef; })[0];
-      if (!target) return;
-      var next = STATUS_TO_SITE[a.status];
-      if (next && target.status !== next) {
-        target.status = next;
-        target.reviewer = a.status === "Rejected"
-          ? (a.reason || "Declined after affordability and document review.")
-          : a.status === "Info Required"
-            ? (a.reason || "Additional information required — see your dashboard.")
-            : "Approved at " + (a.rate || "the agreed") + (a.term ? " over " + a.term + " months." : "");
-        site.notifications = site.notifications || [];
-        site.notifications.unshift({
-          id: "N-ADM" + Date.now().toString(36).toUpperCase(),
-          type: "Application " + a.status.toLowerCase(),
-          title: "Application " + a.siteRef + " — " + a.status,
-          body: "Your " + a.product + " application " + a.siteRef + " is now " + a.status.toLowerCase() + ".",
-          date: new Date().toISOString(), read: false, channel: "In-app + SMS"
-        });
-        dirty = true;
-      }
+    docs.forEach(function (doc) {
+      var site = doc.data || {};
+      var touched = false;
+
+      (db.applications || []).forEach(function (a) {
+        if (!a.siteRef) return;
+        if (doc.owner && a.siteUid && a.siteUid !== doc.owner) return;
+        var target = (site.applications || []).filter(function (x) { return x.ref === a.siteRef; })[0];
+        if (!target) return;
+        var next = STATUS_TO_SITE[a.status];
+        if (next && target.status !== next) {
+          target.status = next;
+          target.reviewer = a.status === "Rejected"
+            ? (a.reason || "Declined after affordability and document review.")
+            : a.status === "Info Required"
+              ? (a.reason || "Additional information required — see your dashboard.")
+              : "Approved at " + (a.rate || "the agreed") + (a.term ? " over " + a.term + " months." : ".");
+          site.notifications = site.notifications || [];
+          site.notifications.unshift({
+            id: "N-ADM" + Date.now().toString(36).toUpperCase(),
+            type: "Application " + a.status.toLowerCase(),
+            title: "Application " + a.siteRef + " — " + a.status,
+            body: "Your " + a.product + " application " + a.siteRef + " is now " + a.status.toLowerCase() + ".",
+            date: new Date().toISOString(), read: false, channel: "In-app + SMS"
+          });
+          touched = true;
+        }
+      });
+
+      (db.tickets || []).forEach(function (t) {
+        if (!t.siteRef) return;
+        if (doc.owner && t.siteUid && t.siteUid !== doc.owner) return;
+        var target = (site.tickets || []).filter(function (x) { return x.ref === t.siteRef; })[0];
+        if (!target) return;
+        var next = t.status === "Resolved" ? "Resolved" : t.status === "Open" ? "Open" : "In Progress";
+        if (target.status !== next) { target.status = next; target.updated = new Date().toISOString(); touched = true; }
+      });
+
+      if (touched) dirty.push(doc);
     });
 
-    (db.tickets || []).forEach(function (t) {
-      if (!t.siteRef) return;
-      var target = (site.tickets || []).filter(function (x) { return x.ref === t.siteRef; })[0];
-      if (!target) return;
-      var next = t.status === "Resolved" ? "Resolved" : t.status === "Open" ? "Open" : "In Progress";
-      if (target.status !== next) { target.status = next; target.updated = new Date().toISOString(); dirty = true; }
-    });
+    if (!dirty.length) return;
 
-    if (dirty) {
-      try { window.localStorage.setItem(SITE_KEY, JSON.stringify(site)); } catch (e) {}
+    if (cloudOn()) {
+      dirty.forEach(function (doc) {
+        if (!doc.owner) return;
+        CLOUD.customer.saveFor(doc.owner, doc.data);
+      });
+    } else {
+      try { window.localStorage.setItem(SITE_KEY, JSON.stringify(dirty[0].data)); } catch (e) {}
     }
+  }
+
+  /* Pull customer documents once the console signs in, then bridge them. */
+  function refreshCloud() {
+    if (!cloudOn()) return Promise.resolve(false);
+    return loadSiteDocs(true).then(function (docs) {
+      importSiteData();
+      if (typeof window.render === "function") window.render(false);
+      return docs.length > 0;
+    }).catch(function () { return false; });
   }
 
   /* run the bridge on every console render (decisions land immediately) */
@@ -203,6 +275,10 @@
     };
   } catch (e) {}
   setInterval(function () { try { syncBackToSite(); } catch (e) {} }, 2500);
+  if (cloudOn()) {
+    setTimeout(function () { refreshCloud(); }, 800);
+    setInterval(function () { loadSiteDocs().then(function () { importSiteData(); }); }, 30000);
+  }
 
   /* settings mirror */
   try {
@@ -459,21 +535,45 @@
           var src = String(reader.result || "");
           var img = new Image();
           img.onload = function () {
+            var canvas = null;
             try {
               var max = 1200;
               var scale = Math.min(1, max / Math.max(img.width, img.height));
-              var cv = document.createElement("canvas");
-              cv.width = Math.round(img.width * scale);
-              cv.height = Math.round(img.height * scale);
-              var ctx = cv.getContext && cv.getContext("2d");
-              if (ctx) { ctx.drawImage(img, 0, 0, cv.width, cv.height); src = cv.toDataURL("image/jpeg", 0.82); }
-            } catch (e) {}
-            document.getElementById("lvImage").value = src;
-            var prev = document.getElementById("lvPreview");
-            if (prev) prev.innerHTML = '<img src="' + src + '" alt="Preview" style="max-height:120px;border-radius:10px;border:1px solid var(--line2)">';
+              canvas = document.createElement("canvas");
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              var ctx = canvas.getContext && canvas.getContext("2d");
+              if (ctx) { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); src = canvas.toDataURL("image/jpeg", 0.82); }
+              else canvas = null;
+            } catch (e) { canvas = null; }
+
+            function apply(value) {
+              var field = document.getElementById("lvImage");
+              if (field) field.value = value;
+              var prev = document.getElementById("lvPreview");
+              if (prev) prev.innerHTML = '<img src="' + value + '" alt="Preview" style="max-height:120px;border-radius:10px;border:1px solid var(--line2)">';
+            }
+
+            /* Cloud mode stores the photo in Supabase Storage, so pages stay
+               small and the image is shared with every visitor. */
+            var bucket = (window.JCOB_CONFIG && window.JCOB_CONFIG.buckets && window.JCOB_CONFIG.buckets.media) || "site-media";
+            if (cloudOn() && CLOUD.storage && canvas && canvas.toBlob) {
+              apply(src);
+              canvas.toBlob(function (blob) {
+                if (!blob) return;
+                var path = "live/" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6) + ".jpg";
+                CLOUD.storage.upload(bucket, path, blob).then(function (res) {
+                  apply(res.publicUrl);
+                  toast("ok", "Photo uploaded", "Stored in the site media bucket.");
+                }).catch(function () { /* keep the embedded copy */ });
+              }, "image/jpeg", 0.82);
+              return;
+            }
+            apply(src);
           };
           img.onerror = function () {
-            document.getElementById("lvImage").value = src;
+            var field = document.getElementById("lvImage");
+            if (field) field.value = src;
           };
           img.src = src;
         };
@@ -744,8 +844,14 @@
       var hiddenSections = Object.keys(S.get().sections || {}).reduce(function (n, k) {
         return n + Object.keys(S.get().sections[k] || {}).length;
       }, 0);
-      var panel = '<div class="panel"><div class="ph"><h3>Website connection</h3><span class="bdg g">Connected</span></div><div class="pb">' +
-        '<p class="tsub" style="margin:0 0 12px;line-height:1.7">Brand, contact details, hours, socials, calculator defaults and lending policy are published to the public website from <b>Website Settings</b>. Page text, cards and section visibility live under <b>Website Pages</b>.</p>' +
+      var cloudState = (window.JCOB_PORTAL && window.JCOB_PORTAL.cloud) || { on: false, state: "local" };
+      var cloudLabel = cloudState.on
+        ? (cloudState.state === "error" ? "Cloud error" : cloudState.state === "saving" ? "Saving to cloud…" : "Supabase connected")
+        : "Local demo data";
+      var cloudTone = cloudState.on ? (cloudState.state === "error" ? "r" : "g") : "n";
+      var panel = '<div class="panel"><div class="ph"><h3>Website connection</h3><span class="bdg ' + cloudTone + '">' + cloudLabel + '</span></div><div class="pb">' +
+        '<p class="tsub" style="margin:0 0 12px;line-height:1.7">Brand, contact details, hours, socials, calculator defaults and lending policy are published to the public website from <b>Website Settings</b>. Page text, cards and section visibility live under <b>Website Pages</b>. ' +
+        (cloudState.on ? "Everything on this screen is stored in Supabase and shared with every visitor." : "Supabase keys are not configured yet, so edits stay in this browser.") + '</p>' +
         '<div class="calc-res" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">' +
         '<div class="cr"><span>Pages edited</span><b>' + edits + '</b></div>' +
         '<div class="cr"><span>Sections hidden</span><b>' + hiddenSections + '</b></div>' +
@@ -774,6 +880,9 @@
   window.JCOB_ADMIN_SITE = {
     importSiteData: importSiteData,
     syncBackToSite: syncBackToSite,
+    refreshCloud: refreshCloud,
+    loadSiteDocs: loadSiteDocs,
+    cloud: cloudOn,
     pages: PAGES,
     state: cmsState,
     loadPage: loadPage

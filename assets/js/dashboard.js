@@ -2210,9 +2210,30 @@
     document.querySelectorAll("[data-logout]").forEach(function (el) {
       el.addEventListener("click", function (e) {
         e.preventDefault();
+        if (window.JCOB_CLOUD && window.JCOB_CLOUD.enabled) window.JCOB_CLOUD.auth.signOut();
         UI.clearSession();
         window.location.href = "login.html";
       });
+    });
+
+    /* Cloud mode: never leave a signed-out visitor on a dashboard that is
+       showing someone else's cached document. */
+    if (window.JCOB_CLOUD && window.JCOB_CLOUD.enabled) {
+      window.JCOB_CLOUD.ready.then(function (profile) {
+        if (!profile) {
+          UI.clearSession();
+          window.location.replace("login.html?next=dashboard.html");
+          return;
+        }
+        if (window.JCOB_DATA && window.JCOB_DATA.hydrate) {
+          window.JCOB_DATA.hydrate().then(function () { render(); });
+        }
+      });
+    }
+
+    /* Re-render whenever the cloud document lands. */
+    document.addEventListener("jcob:data-ready", function () {
+      if (render) render();
     });
 
     /* session expiry: 30 minutes of inactivity */

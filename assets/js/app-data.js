@@ -256,10 +256,36 @@
     };
   }
 
-  /* ---------------- Storage ---------------- */
+  /* ---------------- Storage ----------------
+     Demo mode keeps one document in localStorage.
+     Cloud mode keeps one document per signed-in customer in Supabase
+     (customer_docs) and mirrors it to localStorage as an offline cache.
+     Every function in the dashboard goes through persist(), so nothing
+     else in the project needs to know which mode is active.
+     ------------------------------------------------------------------ */
+  var CLOUD = window.JCOB_CLOUD;
+  var remote = {
+    enabled: !!(CLOUD && CLOUD.enabled),
+    state: CLOUD && CLOUD.enabled ? "connecting" : "local",
+    at: null,
+    error: null
+  };
+  var hydrating = !!(CLOUD && CLOUD.enabled);
+  var pushTimer = null;
+
+  function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
+  function uid() {
+    var user = CLOUD && CLOUD.auth && CLOUD.auth.user();
+    return user && user.id ? user.id : null;
+  }
+  function cacheKey() {
+    var id = cloudOn() ? uid() : null;
+    return id ? KEY + ":" + id : KEY;
+  }
+
   function read() {
     try {
-      var raw = window.localStorage.getItem(KEY);
+      var raw = window.localStorage.getItem(cacheKey());
       if (!raw) return null;
       var parsed = JSON.parse(raw);
       return parsed && parsed.profile ? parsed : null;
@@ -270,13 +296,37 @@
 
   var db = read() || seed();
 
-  function persist() {
+  function saveCache() {
     try {
-      window.localStorage.setItem(KEY, JSON.stringify(db));
+      window.localStorage.setItem(cacheKey(), JSON.stringify(db));
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  function pushCloud() {
+    if (!cloudOn() || !uid()) return Promise.resolve(null);
+    remote.state = "saving";
+    return CLOUD.customer.save(db).then(function (row) {
+      remote.state = "synced";
+      remote.at = new Date().toISOString();
+      remote.error = null;
+      return row;
+    }).catch(function (err) {
+      remote.state = "error";
+      remote.error = String((err && err.message) || err);
+      return null;
+    });
+  }
+
+  function persist() {
+    var ok = saveCache();
+    if (cloudOn() && !hydrating) {
+      if (pushTimer) clearTimeout(pushTimer);
+      pushTimer = setTimeout(function () { pushTimer = null; pushCloud(); }, 400);
+    }
+    return ok;
   }
 
   function get() { return db; }
@@ -285,6 +335,74 @@
     db = seed();
     persist();
     return db;
+  }
+
+  /* Empty but valid document for a brand-new cloud account. */
+  function blank(meta) {
+    var shape = seed();
+    var profile = Object.assign({}, shape.profile, meta || {});
+    return {
+      profile: profile,
+      applications: [], loans: [], transactions: [], deposits: [], withdrawals: [],
+      transfers: [], savings: [], notifications: [], tickets: [], documents: [],
+      sessions: shape.sessions || [], logins: [],
+      security: shape.security, settings: shape.settings,
+      statements: [], drafts: [], wallet: shape.wallet || {}
+    };
+  }
+
+  /* Fill in any keys an older cloud document may not have yet. */
+  function normalise(data) {
+    var shape = seed();
+    var out = Object.assign({}, data);
+    ["applications", "loans", "transactions", "deposits", "withdrawals", "transfers",
+      "savings", "notifications", "tickets", "documents", "statements", "drafts",
+      "sessions", "logins"].forEach(function (k) {
+      if (!Array.isArray(out[k])) out[k] = [];
+    });
+    if (!out.profile) out.profile = shape.profile;
+    if (!out.security) out.security = shape.security;
+    if (!out.settings) out.settings = shape.settings;
+    if (!out.wallet) out.wallet = shape.wallet || {};
+    return out;
+  }
+
+  function hydrate() {
+    if (!cloudOn() || !uid()) return Promise.resolve(false);
+    hydrating = true;
+    return CLOUD.customer.load().then(function (row) {
+      if (row && row.data && row.data.profile) {
+        db = normalise(row.data);
+        saveCache();
+        remote.state = "synced";
+        remote.at = row.updated_at || new Date().toISOString();
+        remote.error = null;
+      } else {
+        var user = CLOUD.auth.user() || {};
+        var meta = user.user_metadata || {};
+        db = blank({
+          fullName: meta.full_name || (CLOUD.auth.profile() || {}).full_name || "",
+          phone: meta.phone || "",
+          email: user.email || "",
+          nid: meta.nid || "",
+          dob: meta.dob || "",
+          gender: meta.gender || "",
+          accountNumber: (CLOUD.auth.profile() || {}).account_no || ""
+        });
+        db.profile.avatar = (db.profile.fullName || "?").split(" ").map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
+        saveCache();
+        hydrating = false;
+        return pushCloud().then(function () { return true; });
+      }
+      hydrating = false;
+      try { document.dispatchEvent(new CustomEvent("jcob:data-ready", { detail: db })); } catch (e) {}
+      return true;
+    }).catch(function (err) {
+      hydrating = false;
+      remote.state = "offline";
+      remote.error = String((err && err.message) || err);
+      return false;
+    });
   }
 
   /* ---------------- Helpers ---------------- */
@@ -392,9 +510,20 @@
     addTransaction: addTransaction,
     findLoan: findLoan,
     findApplication: findApplication,
-    removeDraft: removeDraft
+    removeDraft: removeDraft,
+    hydrate: hydrate,
+    remote: remote,
+    cloud: cloudOn,
+    cacheKey: cacheKey
   };
 
-  /* Seed the store on first visit so every panel has content to show. */
-  if (!read()) persist();
+  /* Demo mode: seed on first visit so every panel has content to show.
+     Cloud mode: pull this customer's document first — never publish a
+     seed over a real record. */
+  if (cloudOn()) {
+    hydrate();
+    document.addEventListener("jcob:auth", function () { hydrate(); });
+  } else if (!read()) {
+    persist();
+  }
 })();

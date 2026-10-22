@@ -137,6 +137,7 @@
     try {
       window.sessionStorage.removeItem(SESSION_KEY);
       window.localStorage.removeItem(SESSION_KEY);
+      document.dispatchEvent(new CustomEvent("jcob:signout"));
     } catch (e) {}
   }
 

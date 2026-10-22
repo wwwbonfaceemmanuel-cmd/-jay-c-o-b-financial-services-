@@ -1,59 +1,259 @@
 -- =====================================================================
--- JAY C O B Financial Services — Supabase schema (starter)
--- Run in the Supabase SQL editor when you connect the backend.
--- All monetary columns are Malawian Kwacha (MWK), stored as numeric(14,2).
+-- JAY C O B FINANCIAL SERVICES — Supabase schema
+-- ---------------------------------------------------------------------
+-- Run this whole file once in the Supabase SQL editor
+-- (Dashboard → SQL Editor → New query → paste → Run).
+-- Safe to run again: every statement is idempotent.
+--
+-- All money is Malawian Kwacha (MWK) and is stored inside the JSON
+-- documents as numbers, so nothing is rounded on the way in or out.
+--
+-- Layout
+--   1. helpers            is_staff(), is_admin(), touch()
+--   2. profiles           one row per Supabase Auth user (carries role)
+--   3. site_docs          public website content (catalogue, settings,
+--                         page overrides, live feed)
+--   4. portal_docs        the admin console database (staff only)
+--   5. customer_docs      one dashboard document per customer
+--   6. enquiries          contact-form submissions
+--   7. audit_log          append-only staff activity trail
+--   8. storage            site-media (public) + kyc-documents (private)
+--   9. staff helpers      make someone an administrator
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- 1. LIVE UPDATES
---    Powers the live feed, carousel animations and corner notifications.
---    The front end already posts/selects these exact field names —
---    see assets/js/live.js and assets/js/config.js.
+-- 1. HELPERS
 -- ---------------------------------------------------------------------
-create table if not exists public.live_posts (
-  id          uuid primary key default gen_random_uuid(),
-  type        text        not null default 'announcement'
-              check (type in ('announcement', 'card', 'image')),
-  title       text        not null,
-  body        text        not null,
-  link        text,
-  link_label  text        default 'Read more',
-  image       text,
-  animation   text        not null default 'slide'
-              check (animation in ('slide', 'flap', 'swipe', 'rotate', 'spin')),
-  pinned      boolean     not null default false,
-  published   boolean     not null default true,
-  date        timestamptz not null default now(),
-  created_by  uuid        references auth.users (id) on delete set null,
-  created_at  timestamptz not null default now()
+create or replace function public.is_staff()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+     where id = auth.uid()
+       and role in ('admin', 'staff', 'officer', 'credit')
+  );
+$$;
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+     where id = auth.uid() and role = 'admin'
+  );
+$$;
+
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+-- ---------------------------------------------------------------------
+-- 2. PROFILES
+-- ---------------------------------------------------------------------
+create table if not exists public.profiles (
+  id          uuid primary key references auth.users (id) on delete cascade,
+  full_name   text not null default '',
+  email       text,
+  phone       text,
+  account_no  text,
+  role        text not null default 'customer'
+              check (role in ('customer', 'officer', 'credit', 'staff', 'admin')),
+  status      text not null default 'active'
+              check (status in ('active', 'suspended', 'closed')),
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
 );
 
-create index if not exists live_posts_feed_idx
-  on public.live_posts (published, pinned desc, date desc);
+create unique index if not exists profiles_account_no_idx
+  on public.profiles (account_no) where account_no is not null;
 
-alter table public.live_posts enable row level security;
+alter table public.profiles enable row level security;
 
--- Anyone may read published updates.
-create policy "live posts are publicly readable"
-  on public.live_posts for select
-  using (published = true);
+drop policy if exists "read own profile" on public.profiles;
+create policy "read own profile" on public.profiles
+  for select to authenticated
+  using (id = auth.uid());
 
--- Only signed-in administrators may write.
-create policy "admins insert live posts"
-  on public.live_posts for insert to authenticated
-  with check ((auth.jwt() ->> 'role') = 'admin');
+drop policy if exists "staff read profiles" on public.profiles;
+create policy "staff read profiles" on public.profiles
+  for select to authenticated
+  using (public.is_staff());
 
-create policy "admins update live posts"
-  on public.live_posts for update to authenticated
-  using ((auth.jwt() ->> 'role') = 'admin');
+drop policy if exists "create own profile" on public.profiles;
+create policy "create own profile" on public.profiles
+  for insert to authenticated
+  with check (id = auth.uid() and role = 'customer');
 
-create policy "admins delete live posts"
-  on public.live_posts for delete to authenticated
-  using ((auth.jwt() ->> 'role') = 'admin');
+drop policy if exists "update own profile" on public.profiles;
+create policy "update own profile" on public.profiles
+  for update to authenticated
+  using (id = auth.uid() or public.is_staff())
+  with check (id = auth.uid() or public.is_staff());
+
+grant select, insert, update on public.profiles to authenticated;
+
+-- Nobody can promote themselves through the API.
+create or replace function public.guard_profile_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.role is distinct from old.role and not public.is_staff() then
+    raise exception 'Only administrators can change a role';
+  end if;
+  if new.status is distinct from old.status and not public.is_staff() then
+    raise exception 'Only administrators can change an account status';
+  end if;
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_guard_role on public.profiles;
+create trigger profiles_guard_role
+  before update on public.profiles
+  for each row execute function public.guard_profile_role();
+
+-- Every new auth user gets a customer profile automatically.
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, full_name, email, phone, account_no, role)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data ->> 'full_name', ''),
+    new.email,
+    coalesce(new.raw_user_meta_data ->> 'phone', ''),
+    coalesce(new.raw_user_meta_data ->> 'account_no', 'JC-ACC-' || upper(substr(new.id::text, 1, 6))),
+    'customer'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
 
 -- ---------------------------------------------------------------------
--- 2. ENQUIRIES
---    Backs the contact form (assets/js/main.js, contact.html).
+-- 3. SITE DOCUMENTS — the public website
+--    ids: settings | products | content | sections | live_posts
+-- ---------------------------------------------------------------------
+create table if not exists public.site_docs (
+  id          text primary key,
+  data        jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now(),
+  updated_by  uuid references auth.users (id) on delete set null
+);
+
+alter table public.site_docs enable row level security;
+
+drop policy if exists "site documents are public" on public.site_docs;
+create policy "site documents are public" on public.site_docs
+  for select to anon, authenticated
+  using (true);
+
+drop policy if exists "staff write site documents" on public.site_docs;
+create policy "staff write site documents" on public.site_docs
+  for all to authenticated
+  using (public.is_staff())
+  with check (public.is_staff());
+
+drop trigger if exists site_docs_touch on public.site_docs;
+create trigger site_docs_touch
+  before update on public.site_docs
+  for each row execute function public.touch_updated_at();
+
+grant select on public.site_docs to anon, authenticated;
+grant insert, update, delete on public.site_docs to authenticated;
+
+-- ---------------------------------------------------------------------
+-- 4. PORTAL DOCUMENT — the admin console database (staff only)
+-- ---------------------------------------------------------------------
+create table if not exists public.portal_docs (
+  id          text primary key,
+  data        jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now(),
+  updated_by  uuid references auth.users (id) on delete set null
+);
+
+alter table public.portal_docs enable row level security;
+
+drop policy if exists "staff use the portal document" on public.portal_docs;
+create policy "staff use the portal document" on public.portal_docs
+  for all to authenticated
+  using (public.is_staff())
+  with check (public.is_staff());
+
+drop trigger if exists portal_docs_touch on public.portal_docs;
+create trigger portal_docs_touch
+  before update on public.portal_docs
+  for each row execute function public.touch_updated_at();
+
+grant select, insert, update, delete on public.portal_docs to authenticated;
+
+-- ---------------------------------------------------------------------
+-- 5. CUSTOMER DOCUMENTS — one dashboard record per customer
+-- ---------------------------------------------------------------------
+create table if not exists public.customer_docs (
+  owner       uuid primary key references auth.users (id) on delete cascade,
+  data        jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
+alter table public.customer_docs enable row level security;
+
+drop policy if exists "own customer document" on public.customer_docs;
+create policy "own customer document" on public.customer_docs
+  for all to authenticated
+  using (owner = auth.uid())
+  with check (owner = auth.uid());
+
+drop policy if exists "staff read customer documents" on public.customer_docs;
+create policy "staff read customer documents" on public.customer_docs
+  for select to authenticated
+  using (public.is_staff());
+
+drop policy if exists "staff write customer documents" on public.customer_docs;
+create policy "staff write customer documents" on public.customer_docs
+  for update to authenticated
+  using (public.is_staff())
+  with check (public.is_staff());
+
+drop trigger if exists customer_docs_touch on public.customer_docs;
+create trigger customer_docs_touch
+  before update on public.customer_docs
+  for each row execute function public.touch_updated_at();
+
+grant select, insert, update, delete on public.customer_docs to authenticated;
+
+create index if not exists customer_docs_updated_idx
+  on public.customer_docs (updated_at desc);
+
+-- ---------------------------------------------------------------------
+-- 6. ENQUIRIES — contact form
 -- ---------------------------------------------------------------------
 create table if not exists public.enquiries (
   id          uuid primary key default gen_random_uuid(),
@@ -72,64 +272,180 @@ create table if not exists public.enquiries (
 
 alter table public.enquiries enable row level security;
 
--- Anonymous visitors may submit an enquiry, but never read them back.
-create policy "anyone can submit an enquiry"
-  on public.enquiries for insert to anon
+drop policy if exists "anyone can submit an enquiry" on public.enquiries;
+create policy "anyone can submit an enquiry" on public.enquiries
+  for insert to anon, authenticated
   with check (consent = true);
 
-create policy "admins read enquiries"
-  on public.enquiries for select to authenticated
-  using ((auth.jwt() ->> 'role') = 'admin');
+drop policy if exists "staff read enquiries" on public.enquiries;
+create policy "staff read enquiries" on public.enquiries
+  for select to authenticated
+  using (public.is_staff());
+
+drop policy if exists "staff update enquiries" on public.enquiries;
+create policy "staff update enquiries" on public.enquiries
+  for update to authenticated
+  using (public.is_staff())
+  with check (public.is_staff());
+
+grant insert on public.enquiries to anon, authenticated;
+grant select, update, delete on public.enquiries to authenticated;
 
 -- ---------------------------------------------------------------------
--- 3. CLIENT PORTAL (starter)
---    Profiles are keyed to Supabase Auth users. Document storage and
---    statement generation should happen server-side (Edge Function) —
---    the current portal is a browser-only demonstration.
+-- 7. AUDIT LOG — append-only trail of staff activity
 -- ---------------------------------------------------------------------
-create table if not exists public.clients (
-  id          uuid primary key default gen_random_uuid(),
-  user_id     uuid references auth.users (id) on delete cascade,
-  reference   text unique not null,          -- e.g. JC-2019-0412
-  full_name   text not null,
-  phone       text,
-  plan        text default 'Household Financial Plan',
+create table if not exists public.audit_log (
+  id          bigserial primary key,
+  actor       uuid references auth.users (id) on delete set null,
+  action      text not null,
+  target      text,
+  detail      jsonb not null default '{}'::jsonb,
   created_at  timestamptz not null default now()
 );
 
-alter table public.clients enable row level security;
+alter table public.audit_log enable row level security;
 
-create policy "clients read their own profile"
-  on public.clients for select to authenticated
-  using (user_id = auth.uid());
+drop policy if exists "staff read audit" on public.audit_log;
+create policy "staff read audit" on public.audit_log
+  for select to authenticated
+  using (public.is_staff());
 
-create policy "admins read all clients"
-  on public.clients for select to authenticated
-  using ((auth.jwt() ->> 'role') = 'admin');
+drop policy if exists "staff write audit" on public.audit_log;
+create policy "staff write audit" on public.audit_log
+  for insert to authenticated
+  with check (public.is_staff());
 
-create table if not exists public.statements (
-  id          uuid primary key default gen_random_uuid(),
-  client_id   uuid not null references public.clients (id) on delete cascade,
-  period      text not null,
-  reference   text not null,
-  currency    text not null default 'MWK',
-  opening     numeric(14,2) not null default 0,
-  closing     numeric(14,2) not null default 0,
-  rows        jsonb not null default '[]'::jsonb,
-  issued_at   timestamptz not null default now()
-);
+grant select, insert on public.audit_log to authenticated;
 
-alter table public.statements enable row level security;
+create index if not exists audit_log_created_idx
+  on public.audit_log (created_at desc);
 
-create policy "clients read their own statements"
-  on public.statements for select to authenticated
-  using (client_id in (select id from public.clients where user_id = auth.uid()));
+-- Record document changes automatically (who touched what, when).
+create or replace function public.log_doc_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  doc_id text;
+begin
+  doc_id := coalesce((to_jsonb(new) ->> 'id'), (to_jsonb(new) ->> 'owner'));
+  insert into public.audit_log (actor, action, target, detail)
+  values (
+    auth.uid(),
+    lower(tg_op) || ' ' || tg_table_name,
+    doc_id,
+    jsonb_build_object('table', tg_table_name, 'at', now())
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists site_docs_audit on public.site_docs;
+create trigger site_docs_audit
+  after insert or update or delete on public.site_docs
+  for each row execute function public.log_doc_change();
+
+drop trigger if exists portal_docs_audit on public.portal_docs;
+create trigger portal_docs_audit
+  after insert or update or delete on public.portal_docs
+  for each row execute function public.log_doc_change();
 
 -- ---------------------------------------------------------------------
--- 4. NOTES
---    • Administrator accounts: create an app_metadata role of 'admin'
---      in Supabase Auth, and the JWT policies above will apply.
---    • After running this, set useSupabase, supabaseUrl and
---      supabaseAnonKey in assets/js/config.js.
---    • Never expose the service-role key in the browser bundle.
+-- 8. STORAGE
+--    site-media     public read (live-feed photos)
+--    kyc-documents  private, owner + staff only
+-- ---------------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('site-media', 'site-media', true)
+on conflict (id) do nothing;
+
+insert into storage.buckets (id, name, public)
+values ('kyc-documents', 'kyc-documents', false)
+on conflict (id) do nothing;
+
+drop policy if exists "site media is public" on storage.objects;
+create policy "site media is public" on storage.objects
+  for select to anon, authenticated
+  using (bucket_id = 'site-media');
+
+drop policy if exists "staff upload site media" on storage.objects;
+create policy "staff upload site media" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'site-media' and public.is_staff());
+
+drop policy if exists "staff update site media" on storage.objects;
+create policy "staff update site media" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'site-media' and public.is_staff());
+
+drop policy if exists "staff delete site media" on storage.objects;
+create policy "staff delete site media" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'site-media' and public.is_staff());
+
+drop policy if exists "own kyc documents" on storage.objects;
+create policy "own kyc documents" on storage.objects
+  for all to authenticated
+  using (bucket_id = 'kyc-documents' and (storage.foldername(name))[1] = auth.uid()::text)
+  with check (bucket_id = 'kyc-documents' and (storage.foldername(name))[1] = auth.uid()::text);
+
+drop policy if exists "staff read kyc documents" on storage.objects;
+create policy "staff read kyc documents" on storage.objects
+  for select to authenticated
+  using (bucket_id = 'kyc-documents' and public.is_staff());
+
+-- ---------------------------------------------------------------------
+-- 9. STAFF HELPERS
+--    After creating the administrator in Authentication → Users, run:
+--      select public.promote_staff('you@jaycobfinancial.mw');
+-- ---------------------------------------------------------------------
+create or replace function public.promote_staff(staff_email text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated int;
+begin
+  update public.profiles
+     set role = 'admin'
+   where lower(email) = lower(staff_email)
+     and role <> 'admin';
+  get diagnostics updated = row_count;
+  if updated = 0 then
+    return 'No profile matched ' || staff_email || '. Create the user in Authentication first.';
+  end if;
+  return staff_email || ' is now an administrator.';
+end;
+$$;
+
+revoke all on function public.promote_staff(text) from anon, authenticated;
+
+-- ---------------------------------------------------------------------
+-- 10. OPTIONAL: realtime for live updates and staff dashboards
+-- ---------------------------------------------------------------------
+do $$
+begin
+  begin
+    alter publication supabase_realtime add table public.site_docs;
+  exception when duplicate_object then null;
+  end;
+  begin
+    alter publication supabase_realtime add table public.customer_docs;
+  exception when duplicate_object then null;
+  end;
+end;
+$$;
+
+-- ---------------------------------------------------------------------
+-- NOTES
+--  • Never expose the service-role key in the browser bundle. The anon
+--    key is safe because every table above is guarded by RLS.
+--  • Supabase → Authentication → Providers → Email: turn "Confirm email"
+--    off while testing, on for production.
+--  • Sign-in attempts, lockouts and OTP delivery are handled by Supabase
+--    Auth settings (Authentication → Rate limits / Email templates).
 -- ---------------------------------------------------------------------

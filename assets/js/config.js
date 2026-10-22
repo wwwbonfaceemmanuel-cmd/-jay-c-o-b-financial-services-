@@ -1,48 +1,53 @@
 /* =====================================================================
    JAY C O B FINANCIAL SERVICES — runtime configuration
    ---------------------------------------------------------------------
-   The site currently runs in demo mode: the live feed, calculator and
-   client portal work entirely in the browser (localStorage), so it can
-   be reviewed without a backend.
+   The site runs in two modes, chosen automatically:
 
-   CONNECTING SUPABASE LATER
-   1. Create a Supabase project and a `live_posts` table:
-        id          uuid primary key default gen_random_uuid()
-        type        text        -- announcement | card | image
-        title       text
-        body        text
-        link        text
-        link_label  text
-        image       text
-        animation   text        -- slide | flap | swipe | rotate | spin
-        pinned      boolean default false
-        published   boolean default true
-        date        timestamptz default now()
+   • DEMO MODE (default, no keys)
+     The live feed, catalogue, admin console and customer dashboard all
+     read and write browser localStorage, so the whole system can be
+     reviewed without a backend.
 
-   2. Paste the project URL and the public anon key below and set
-      useSupabase to true. assets/js/live.js will then read published
-      posts straight from the table over the REST API; the admin console
-      sends the same fields when creating or updating rows.
+   • CLOUD MODE (Supabase)
+     Set a project URL and the public anon key below — or, on Railway,
+     set the SUPABASE_URL and SUPABASE_ANON_KEY environment variables and
+     server.js serves them to the browser at /env.js. Everything then
+     persists in Postgres behind Row Level Security.
 
-   3. Row-level security: allow `select` for anon on live_posts, and
-      require an authenticated admin role for insert/update/delete.
-
-   4. Portal authentication, statements and enquiries can follow the
-      same pattern — the demo implementations are isolated in
-      assets/js/portal.js, assets/js/main.js and assets/js/admin.js.
+   Railway / Supabase steps are in DEPLOY.md. Never put a service-role
+   key in this file: it is public. The anon key is safe because every
+   table is protected by RLS (supabase/schema.sql).
    ===================================================================== */
 window.JCOB_CONFIG = {
   currency: "MWK",
   locale: "en-MW",
 
-  useSupabase: false,
+  /* Cloud (Supabase). Leave blank for demo mode. */
   supabaseUrl: "",          // e.g. "https://xxxxxxxxxxxx.supabase.co"
   supabaseAnonKey: "",      // public anon key (never a service-role key)
 
-  // Table names used once Supabase is connected
+  /* "auto" → cloud as soon as a URL and key are present.
+     Set to false to stay on localStorage even with keys configured. */
+  useSupabase: "auto",
+  demoMode: true,
+
+  /* Table map — matches supabase/schema.sql. */
+  tables: {
+    site: "site_docs",
+    portal: "portal_docs",
+    customer: "customer_docs",
+    profiles: "profiles",
+    enquiries: "enquiries"
+  },
+
+  /* Storage buckets (created by the schema, or by hand in the dashboard). */
+  buckets: {
+    media: "site-media",
+    kyc: "kyc-documents"
+  },
+
+  /* Legacy keys kept so older modules keep working. */
   liveTable: "live_posts",
   enquiriesTable: "enquiries",
-  clientsTable: "clients",
-
-  demoMode: true
+  clientsTable: "clients"
 };

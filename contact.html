@@ -168,7 +168,7 @@
 
               <button class="btn btn--gold btn--lg btn--block mt-3" type="submit">Send enquiry</button>
               <p class="form-status" role="status"></p>
-              <p class="text-tiny text-muted mt-2">This demonstration form does not transmit data to a server. In production it would post to an encrypted enquiry endpoint.</p>
+              <p class="text-tiny text-muted mt-2" data-enquiry-note>This demonstration form records the enquiry in this browser. Once the cloud connection is live, enquiries are stored in the encrypted database and appear in the admin console.</p>
             </form>
           </div>
         </div>
@@ -322,7 +322,9 @@
     </div>
   </footer>
 
+  <script src="env.js" defer></script>
   <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/cloud.js" defer></script>
   <script src="assets/js/main.js" defer></script>
   <script src="assets/js/live.js" defer></script>
 

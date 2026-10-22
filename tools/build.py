@@ -30,7 +30,8 @@ EMAIL = "hello@jaycobfinancial.mw"
 SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
-BASE_SCRIPTS = ["assets/js/config.js", "assets/js/site-store.js", "assets/js/finance.js",
+BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/cloud.js",
+                "assets/js/site-store.js", "assets/js/finance.js",
                 "assets/js/app-data.js", "assets/js/ui.js", "assets/js/main.js",
                 "assets/js/live.js", "assets/js/site-content.js"]
 
@@ -420,7 +421,9 @@ def build_dashboard() -> None:
 </head>
 <body class="app-body" data-page="dashboard">
 %(body)s
+  <script src="env.js" defer></script>
   <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/cloud.js" defer></script>
   <script src="assets/js/finance.js" defer></script>
   <script src="assets/js/app-data.js" defer></script>
   <script src="assets/js/ui.js" defer></script>

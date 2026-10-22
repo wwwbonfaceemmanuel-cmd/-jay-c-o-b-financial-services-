@@ -143,11 +143,17 @@
   var data = read();
   var listeners = [];
 
-  function write() {
+  function notify() {
+    listeners.forEach(function (fn) { try { fn(data); } catch (e) {} });
+  }
+
+  function write(scope) {
     data.updated = new Date().toISOString();
     try {
       window.localStorage.setItem(KEY, JSON.stringify(data));
-      listeners.forEach(function (fn) { try { fn(data); } catch (e) {} });
+      notify();
+      try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
+      push(scope || ["settings", "products"]);
       return true;
     } catch (e) {
       return false;
@@ -156,7 +162,7 @@
 
   function reset() {
     data = clone(DEFAULTS);
-    write();
+    write(["settings", "products", "content", "sections"]);
     return data;
   }
 
@@ -329,21 +335,21 @@
     });
     if (!Object.keys(current).length) delete data.content[page][key];
     else data.content[page][key] = current;
-    write();
+    write(["content"]);
   }
 
   function clearField(page, key) {
     if (data.content[page]) {
       delete data.content[page][key];
       if (!Object.keys(data.content[page]).length) delete data.content[page];
-      write();
+      write(["content"]);
     }
   }
 
   function clearPage(page) {
     delete data.content[page];
     delete data.sections[page];
-    write();
+    write(["content", "sections"]);
   }
 
   function setSection(page, key, isHidden) {
@@ -351,7 +357,7 @@
     if (isHidden) data.sections[page][key] = { hidden: true };
     else delete data.sections[page][key];
     if (!Object.keys(data.sections[page]).length) delete data.sections[page];
-    write();
+    write(["sections"]);
   }
 
   function editCount(page) {
@@ -376,6 +382,124 @@
     });
   }
 
+  /* ------------------------------------------------------------------
+     CLOUD (Supabase) — the same four documents, kept in site_docs.
+     Reads happen once at boot; every local write is pushed in the
+     background so the website and the console share one source of truth.
+     ------------------------------------------------------------------ */
+  var CLOUD = window.JCOB_CLOUD;
+  var remote = {
+    enabled: !!(CLOUD && CLOUD.enabled),
+    state: CLOUD && CLOUD.enabled ? "connecting" : "local",
+    at: null,
+    error: null
+  };
+
+  function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
+
+  function localExists() {
+    try { return !!window.localStorage.getItem(KEY); } catch (e) { return false; }
+  }
+
+  function payloadFor(kind) {
+    if (kind === "settings") return data.settings;
+    if (kind === "products") return data.products;
+    if (kind === "content") return data.content;
+    return data.sections;
+  }
+
+  function push(scope) {
+    if (!cloudOn()) return Promise.resolve(null);
+    /* Public visitors read these documents but never write them. */
+    if (!CLOUD.auth || !CLOUD.auth.isSignedIn()) {
+      remote.state = "synced";
+      return Promise.resolve(null);
+    }
+    var kinds = (scope || []).filter(function (k, i, a) { return a.indexOf(k) === i; });
+    if (!kinds.length) return Promise.resolve(null);
+    remote.state = "saving";
+    return Promise.all(kinds.map(function (kind) {
+      return CLOUD.docs.put("site", kind, payloadFor(kind));
+    })).then(function (rows) {
+      remote.state = "synced";
+      remote.at = new Date().toISOString();
+      remote.error = null;
+      return rows;
+    }).catch(function (err) {
+      remote.state = "error";
+      remote.error = String((err && err.message) || err);
+      return null;
+    });
+  }
+
+  function mergeSettings(saved) {
+    var base = clone(SETTINGS);
+    var out = Object.assign(base, saved || {});
+    out.social = Object.assign(clone(SETTINGS).social, (saved || {}).social || {});
+    out.calc = Object.assign(clone(SETTINGS).calc, (saved || {}).calc || {});
+    out.policy = Object.assign(clone(SETTINGS).policy, (saved || {}).policy || {});
+    return out;
+  }
+
+  /* Pull the published documents and apply them over the local cache. */
+  function hydrate() {
+    if (!cloudOn()) return Promise.resolve(false);
+    var hadLocal = localExists();
+    return Promise.all([
+      CLOUD.docs.get("site", "settings"),
+      CLOUD.docs.get("site", "products"),
+      CLOUD.docs.get("site", "content"),
+      CLOUD.docs.get("site", "sections")
+    ]).then(function (rows) {
+      var remoteSettings = rows[0];
+      var remoteProducts = rows[1];
+      var remoteContent = rows[2];
+      var remoteSections = rows[3];
+      var changed = false;
+      var seed = [];
+
+      if (remoteSettings && remoteSettings.data) {
+        data.settings = mergeSettings(remoteSettings.data);
+        changed = true;
+      } else if (hadLocal) seed.push("settings");
+
+      if (remoteProducts && Array.isArray(remoteProducts.data) && remoteProducts.data.length) {
+        data.products = remoteProducts.data;
+        changed = true;
+      } else if (hadLocal) seed.push("products");
+
+      if (remoteContent && remoteContent.data && typeof remoteContent.data === "object") {
+        data.content = remoteContent.data;
+        changed = true;
+      } else if (hadLocal) seed.push("content");
+
+      if (remoteSections && remoteSections.data && typeof remoteSections.data === "object") {
+        data.sections = remoteSections.data;
+        changed = true;
+      } else if (hadLocal) seed.push("sections");
+
+      if (changed) {
+        data.updated = new Date().toISOString();
+        try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+        notify();
+        try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
+      }
+
+      remote.state = "synced";
+      remote.at = new Date().toISOString();
+      remote.error = null;
+      /* Publish this browser's edits only when an administrator is signed in. */
+      if (seed.length && CLOUD.auth && CLOUD.auth.isStaff()) push(seed);
+      return changed;
+    }).catch(function (err) {
+      remote.state = "offline";
+      remote.error = String((err && err.message) || err);
+      return false;
+    });
+  }
+
+  var ready = hydrate();
+
   window.JCOB_SITE = {
     KEY: KEY,
     VERSION: VERSION,
@@ -395,6 +519,10 @@
     setSection: setSection,
     editCount: editCount,
     product: product,
-    subscribe: subscribe
+    subscribe: subscribe,
+    hydrate: hydrate,
+    ready: ready,
+    remote: remote,
+    push: push
   };
 })();

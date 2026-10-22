@@ -144,26 +144,67 @@ investors, partners, legal, API integrations, fraud, templates and the calculato
 - Everything degrades safely: with an empty store the website renders exactly as authored, and the
   console keeps working on its own local data.
 
-### Next: Railway + Supabase
+### Cloud: Supabase behind Railway
 
-The data layer is deliberately thin. To go live: create the tables in `supabase/schema.sql`
-(plus `site_settings`, `site_content`, `site_products`), paste the project URL and anon key into
-`assets/js/config.js`, and swap the four storage functions (`site-store.js` `read()/write()`,
-`app-data.js` `read()/persist()`) for Supabase queries. Railway then serves the static build and the
-Supabase project holds the data.
+The system runs on two modes, chosen automatically:
+
+| Mode | When | Where data lives |
+| --- | --- | --- |
+| **Demo** | no Supabase keys | browser `localStorage` |
+| **Cloud** | `SUPABASE_URL` + `SUPABASE_ANON_KEY` present | Supabase Postgres, guarded by Row Level Security |
+
+`assets/js/cloud.js` is the only module that speaks to the network — Auth, the document
+endpoints and Storage uploads. Everything else keeps its existing calls (`JCOB_SITE.save()`,
+`JCOB_DATA.persist()`, `JCOB_LIVE.savePosts()`), so the pages and the console did not need rewriting.
+
+| Supabase table | Holds | Who can read / write |
+| --- | --- | --- |
+| `profiles` | one row per account, with `role` (`customer` / `officer` / `credit` / `staff` / `admin`) | owner, staff read all; role changes blocked for non-staff |
+| `site_docs` | `settings`, `products`, `content`, `sections`, `live_posts` | public read, staff write |
+| `portal_docs` | the admin console's own database (`main`) | staff only |
+| `customer_docs` | one dashboard document per customer | owner, staff read/update |
+| `enquiries` | contact-form submissions | anyone may submit, staff read |
+| `audit_log` | every document change (who, what, when) | staff read, written by trigger |
+| Storage | `site-media` (public photos), `kyc-documents` (private) | staff / owning customer |
+
+Operational details:
+
+- **Keys never enter Git.** `server.js` answers `/env.js` from the Railway environment; the same
+  file is a harmless placeholder on a static host, where you paste keys into `assets/js/config.js`
+  instead.
+- **Sessions** refresh automatically; the UI session (`jcob_session_v1`) and the Supabase session
+  (`jcob_cloud_session_v1`) are kept in step, so existing route guards keep working.
+- **The admin gate** signs in with Supabase and refuses any account whose `profiles.role` is not a
+  staff role. `admin2026` remains the demo-mode password only.
+- **The bridge** reads every `customer_docs` row, so website applications and tickets from all
+  customers appear in the console; a decision writes the status, reviewer note and notification back
+  to the right customer's document.
+- **Photos** uploaded in the Live Feed editor go to the public `site-media` bucket after being
+  downscaled to 1200 px JPEG; the post stores the public URL.
+- **Fallback**: if the cloud is unreachable the site uses its local cache; the console shows a
+  `Cloud error` badge in the Website connection panel.
+
+Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md](DEPLOY.md)**.
 
 ## Project structure
 
 ```
 .
 ├── *.html                      # pages (flat, relative links, portable)
+├── server.js                   # zero-dependency static server + /env.js + /healthz (Railway)
+├── env.js                      # placeholder runtime config for static hosts
+├── Dockerfile · railway.json   # Railway build (Node 20)
+├── DEPLOY.md                   # Supabase + Railway setup and first-run checklist
+├── supabase/schema.sql         # tables, RLS policies, triggers, storage buckets
+├── tools/dev/mock-cloud.js     # in-memory Supabase stand-in for local testing
 ├── assets/
 │   ├── css/styles.css          # tokens, v3 theme block, components, responsive, print
 │   ├── img/                    # logo lockups, favicon, photography
 │   └── js/
-│       ├── config.js           # Supabase-ready config stub
+│       ├── config.js           # runtime config (table map, buckets, demo/cloud switch)
+│       ├── cloud.js            # Supabase client: auth, documents, storage
 │       ├── finance.js          # MWK formatting, amortisation, APR, affordability, masking
-│       ├── app-data.js         # single data layer (seeded demo store, localStorage)
+│       ├── app-data.js         # customer document store (cloud + local cache)
 │       ├── ui.js               # toasts, modals, bell, session, tables, pagination, print
 │       ├── main.js             # site chrome, nav, reveal, validation, accordion
 │       ├── auth.js             # registration, login, OTP, recovery, lockout
@@ -258,16 +299,27 @@ root as-is — there is no build step at runtime.
   validation, `aria-live` status messages, semantic headings, and reduced-motion support.
 - System-font fallbacks, defer-loaded scripts, SVG logos and lazy-loaded photography below the fold.
 
-## Data and future Supabase connection
+## Data layer
 
-`assets/js/config.js` holds the project URL/key placeholders and feature flags. All reads and
-writes go through `window.JCOB_DATA` (`assets/js/app-data.js`), so swapping the localStorage
-adapter for Supabase queries is a single-file change. `supabase/schema.sql` sketches customers,
-applications, loans, schedules, transactions, documents, notifications and tickets.
+`assets/js/cloud.js` owns every network call. In cloud mode each feature persists itself:
+
+| Feature | Function that saves | Supabase destination |
+| --- | --- | --- |
+| Website content, catalogue, settings, live feed | `JCOB_SITE.save()` / `setField()` / `setSection()` / `JCOB_LIVE.savePosts()` | `site_docs` |
+| Admin console (all modules) | `save()` in `admin.html` | `portal_docs` |
+| Customer dashboard (all panels) | `JCOB_DATA.save()` | `customer_docs` |
+| Registration, sign-in, recovery | `JCOB_CLOUD.auth.*` | Supabase Auth + `profiles` |
+| Contact form | `JCOB_CLOUD.from("enquiries")` | `enquiries` |
+| Live-feed photos | `JCOB_CLOUD.storage.upload()` | Storage `site-media` |
+| KYC documents (next phase) | — | Storage `kyc-documents` (private) |
+
+With no keys the same calls fall back to `localStorage`, which is why the demo works offline and why
+the cloud can be switched on without touching the pages.
 
 ## Disclaimer
 
-This is a demonstration environment. Company details, licence references, rates, decisions and
-reference numbers are illustrative; no real credit is advanced, no money moves and no personal
-data leaves the browser. Borrowing costs money — read the Responsible Lending Policy, Fee
-Disclosure Statement and Terms and Conditions before entering any real agreement.
+Company details, licence references, rates, decisions and reference numbers remain illustrative
+until they are replaced in the admin console; no real credit is advanced and no money moves. Once
+the Supabase connection is configured, submitted enquiries, applications, tickets and KYC uploads
+are stored in your own Supabase project. Borrowing costs money — read the Responsible Lending
+Policy, Fee Disclosure Statement and Terms and Conditions before entering any real agreement.
