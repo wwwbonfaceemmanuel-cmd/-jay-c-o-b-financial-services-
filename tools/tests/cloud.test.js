@@ -159,7 +159,7 @@ async function signInGate(w, creds) {
     await ready(dom, 1500);
     const w = dom.window;
     const body = w.document.body.textContent.replace(/\s+/g, " ");
-    t.ok("profile rendered", body.includes("Memory Tembo"));
+    t.ok("profile rendered", body.includes("Mock Cloud Customer"));
     t.ok("application listed", body.includes("APP-CLOUD-001"));
     t.ok("document synced", w.JCOB_DATA.remote.state === "synced",
       w.JCOB_DATA.remote.state + " " + (w.JCOB_DATA.remote.error || ""));
