@@ -49,7 +49,17 @@
   var url = String(pick(ENV.supabaseUrl, CFG.supabaseUrl) || "").replace(/\/+$/, "");
   var key = String(pick(ENV.supabaseAnonKey, CFG.supabaseAnonKey) || "");
   var wanted = pick(ENV.useSupabase, CFG.useSupabase);
-  var enabled = !!url && !!key && wanted !== false && wanted !== "false";
+
+  /* Escape hatch: ?local=1 (or localStorage jcob_mode = "local") keeps the
+     site on browser storage even when keys are configured. Useful for
+     previewing the demo data and for automated tests. */
+  var forcedLocal = false;
+  try {
+    forcedLocal = window.localStorage.getItem("jcob_mode") === "local";
+    if (/[?&]local=1\b/.test(window.location.search)) forcedLocal = true;
+  } catch (e) {}
+
+  var enabled = !!url && !!key && !forcedLocal && wanted !== false && wanted !== "false";
 
   var TABLES = Object.assign({
     site: "site_docs",
@@ -501,6 +511,7 @@
 
   window.JCOB_CLOUD = {
     enabled: enabled,
+    forcedLocal: forcedLocal,
     url: url,
     key: key,
     tables: TABLES,

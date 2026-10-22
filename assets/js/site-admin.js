@@ -862,6 +862,7 @@
         '<button class="btn ghost" data-nav="website">Manage pages</button>' +
         '<button class="btn ghost" data-nav="catalogue">Products &amp; rates</button>' +
         '<a class="btn ghost" href="index.html" target="_blank" rel="noopener">View website ↗</a>' +
+        '<a class="btn ghost" href="system-check.html" target="_blank" rel="noopener">Connection check ↗</a>' +
         '</div></div></div>';
       return _vSettings() + panel;
     };

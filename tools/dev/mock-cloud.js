@@ -174,6 +174,13 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/auth/v1/recover") return send(res, 200, {});
 
+  if (pathname === "/auth/v1/settings") {
+    return send(res, 200, {
+      mailer_autoconfirm: true,
+      external: { email: true, phone: false }
+    });
+  }
+
   /* ---------------- storage ---------------- */
   if (pathname.startsWith("/storage/v1/object/")) {
     const parts = pathname.split("/").filter(Boolean); // storage, v1, object, bucket, ...path
@@ -185,6 +192,15 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { Key: bucket + "/" + objectPath, size });
     }
     return send(res, 200, { bucket, path: objectPath, publicUrl: "http://127.0.0.1:" + PORT + "/storage/v1/object/public/" + bucket + "/" + objectPath });
+  }
+
+  /* Public object reads: bucket-missing vs object-missing, like Supabase. */
+  if (pathname.startsWith("/storage/v1/object/public/")) {
+    const bucket = pathname.split("/")[5];
+    if (!["site-media", "kyc-documents"].includes(bucket)) {
+      return send(res, 404, { statusCode: "404", error: "Not Found", message: "Bucket not found" });
+    }
+    return send(res, 404, { statusCode: "404", error: "Not Found", message: "Object not found" });
   }
 
   /* ---------------- rest ---------------- */

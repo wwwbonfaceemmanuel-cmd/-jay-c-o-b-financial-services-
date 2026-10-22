@@ -3,33 +3,35 @@
    ---------------------------------------------------------------------
    The site runs in two modes, chosen automatically:
 
-   • DEMO MODE (default, no keys)
+   • DEMO MODE (no keys)
      The live feed, catalogue, admin console and customer dashboard all
      read and write browser localStorage, so the whole system can be
      reviewed without a backend.
 
-   • CLOUD MODE (Supabase)
-     Set a project URL and the public anon key below — or, on Railway,
-     set the SUPABASE_URL and SUPABASE_ANON_KEY environment variables and
-     server.js serves them to the browser at /env.js. Everything then
-     persists in Postgres behind Row Level Security.
+   • CLOUD MODE (Supabase) — configured below
+     Everything persists in Postgres behind Row Level Security.
 
-   Railway / Supabase steps are in DEPLOY.md. Never put a service-role
-   key in this file: it is public. The anon key is safe because every
-   table is protected by RLS (supabase/schema.sql).
+   The values below are the project's PUBLIC connection details. The anon
+   key is designed to be shipped to browsers: it can only do what the RLS
+   policies in supabase/schema.sql allow. Never put the service-role key
+   here, and never commit one.
+
+   On Railway, server.js overrides these from the SUPABASE_URL and
+   SUPABASE_ANON_KEY environment variables (served at /env.js), so the
+   deployment can be re-pointed without a code change.
    ===================================================================== */
 window.JCOB_CONFIG = {
   currency: "MWK",
   locale: "en-MW",
 
-  /* Cloud (Supabase). Leave blank for demo mode. */
-  supabaseUrl: "",          // e.g. "https://xxxxxxxxxxxx.supabase.co"
-  supabaseAnonKey: "",      // public anon key (never a service-role key)
+  /* Cloud (Supabase) — project: cybaejegytnvtitznofp */
+  supabaseUrl: "https://cybaejegytnvtitznofp.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5YmFlamVneXRudnRpdHpub2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2OTc2MDQsImV4cCI6MjEwODI3MzYwNH0.GFtYtTLnN31Sts4FjbUEuDqiN3ukQtIuT6e52UN5H34",
 
   /* "auto" → cloud as soon as a URL and key are present.
      Set to false to stay on localStorage even with keys configured. */
   useSupabase: "auto",
-  demoMode: true,
+  demoMode: false,
 
   /* Table map — matches supabase/schema.sql. */
   tables: {

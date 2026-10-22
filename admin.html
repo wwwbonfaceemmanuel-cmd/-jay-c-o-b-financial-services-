@@ -290,7 +290,7 @@ body.locked { overflow: hidden; }
     <input id="admin-password" type="password" placeholder="Enter password" autocomplete="current-password" required>
     <button class="btn primary" type="submit" id="gate-submit">Unlock console</button>
     <p id="gate-status" role="status"></p>
-    <div class="gate-foot"><span id="gate-hint">Demo password: admin2026</span><a href="index.html">← Back to website</a></div>
+    <div class="gate-foot"><span id="gate-hint">Demo password: admin2026</span><a href="system-check.html">Connection check</a><a href="index.html">← Back to website</a></div>
   </form>
 </div>
 
@@ -1986,13 +1986,38 @@ toast('info','Welcome back, Administrator','JAY C O B Admin Control Center loade
       });
     }).catch(function (err) {
       var message = String((err && err.message) || "Sign-in failed");
-      if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an administrator account.";
+      var code = (err && err.status) || 0;
+      var needsCheck = false;
+      if (/administrator access/i.test(message)) {
+        /* role refusal — the message is already the right one */
+      } else if (/invalid|credentials|grant/i.test(message)) {
+        message = "That email and password do not match an administrator account.";
+      } else if (/relation .* does not exist|schema cache|not set up/i.test(message)) {
+        message = "The database is not set up yet — run supabase/schema.sql in the Supabase SQL editor.";
+        needsCheck = true;
+      } else if (/fetch|network|load failed|failed to fetch/i.test(message)) {
+        message = "Cannot reach Supabase. Check the project URL and that the project is running.";
+        needsCheck = true;
+      } else if (code >= 500) {
+        message = "Supabase returned an error (" + code + "). Try again in a moment.";
+        needsCheck = true;
+      }
       say(message, true);
+      if (needsCheck) showCheckLink();
       input.select();
     }).then(function () {
       if (submit) { submit.disabled = false; submit.textContent = "Unlock console"; }
     });
   });
+
+  function showCheckLink() {
+    if (document.getElementById("gate-check-link")) return;
+    var link = document.createElement("p");
+    link.id = "gate-check-link";
+    link.className = "gate-note";
+    link.innerHTML = '<a href="system-check.html">Open the connection check →</a>';
+    if (status && status.parentNode) status.parentNode.insertBefore(link, status.nextSibling);
+  }
 
   var out = document.getElementById("signOut");
   if (out) out.addEventListener("click", function () {

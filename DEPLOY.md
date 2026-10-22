@@ -4,6 +4,18 @@ Everything in this repository now runs against Supabase. The browser
 layer is finished; what is left is creating the two accounts, pasting
 three values and running one SQL file.
 
+**Status: the project is already configured.**
+`assets/js/config.js` carries the public URL and anon key for
+`cybaejegytnvtitznofp.supabase.co`, so the site is in cloud mode as soon as
+it is served. Two things remain, and both need your Supabase login:
+
+1. **Run `supabase/schema.sql`** in the SQL editor (creates every table,
+   policy, trigger and bucket).
+2. **Create your administrator** and promote it with `promote_staff`.
+
+After that, open **`system-check.html`** on the deployed site: it tests the
+connection live and tells you exactly what to fix if a line is red.
+
 This page is the checklist. Work top to bottom — each step says who does
 what, and how to tell it worked.
 
@@ -49,11 +61,12 @@ Visitor / customer            Admin console (admin.html)
 
 ## Phase 1 — Supabase (about 10 minutes)
 
-1. Create an account at <https://supabase.com> → **New project**.
-   * Name: `jaycob-financial-services`
-   * Region: the closest to Malawi (Europe / South Africa)
-   * Save the database password somewhere safe — you will not need it for
-     the website, but you will need it for backups.
+1. The project already exists: **`cybaejegytnvtitznofp`**
+   (`https://cybaejegytnvtitznofp.supabase.co`). If you rebuild it from
+   scratch, create a new project and paste the new URL + anon key into
+   `assets/js/config.js` (or into the Railway variables in Phase 2).
+   Keep the **service-role** key to yourself — it must never be in the
+   repository or the browser.
 
 2. Open **SQL Editor → New query**, paste the whole of
    [`supabase/schema.sql`](supabase/schema.sql) and press **Run**.
@@ -108,14 +121,24 @@ Visitor / customer            Admin console (admin.html)
    `https://<your-domain>/healthz`; it should return
    `{"status":"ok","cloud":true,...}`.
 
-**Check:** `https://<your-domain>/env.js` shows your URL and anon key, and
-`https://<your-domain>/admin.html` asks for an email + password.
+**Check:** `https://<your-domain>/env.js` shows your URL and anon key,
+`https://<your-domain>/admin.html` asks for an email + password, and
+`https://<your-domain>/system-check.html` runs the full diagnostic.
+
+> Railway variables **override** `config.js`, so rotating the key later is a
+> variable change plus a redeploy — no code edit.
 
 ---
 
 ## Phase 3 — First run through the system
 
-Do these in order; each one proves a different part of the wiring.
+Start at **`system-check.html`**. It reports, live: the configuration in
+use, whether each table exists and is readable, whether the website
+documents are published, whether the media bucket answers, and it can sign
+in as your administrator to prove the staff policies accept the account
+(it also tells you when an account is a customer rather than staff).
+
+Then do these in order; each one proves a different part of the wiring.
 
 1. **Website reads the cloud.** Open the home page. Footer phone, email
    and address come from `site_docs → settings` (the seeded defaults
@@ -188,25 +211,43 @@ its own.
 
 ---
 
-## Running it locally before the accounts exist
+## Running it locally
 
-Two terminals, no dependencies:
+**Against the real project** (what you have now):
 
 ```bash
-# 1. a stand-in for Supabase (in-memory, development only)
-node tools/dev/mock-cloud.js          # http://127.0.0.1:54321
+node server.js            # http://localhost:8080
+```
 
-# 2. the site, wired to the stand-in
+Keys come from `assets/js/config.js`, so nothing else is needed.
+
+**Against the in-memory stand-in** (no Supabase account touched):
+
+```bash
+node tools/dev/mock-cloud.js          # http://127.0.0.1:54321
 SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=dev-anon PORT=8000 node server.js
 ```
 
-Open <http://127.0.0.1:8000>. Staff sign-in: `admin@jaycob.mw /
-Admin123!`; customer: `customer@jaycob.mw / Customer123!`.
+Staff sign-in: `admin@jaycob.mw / Admin123!`; customer:
+`customer@jaycob.mw / Customer123!`.
 
-Plain demo mode (browser storage, no server at all):
+**Demo mode** — browser storage only, useful for reviewing the design
+without touching any database:
 
 ```bash
 python3 -m http.server 8000
+```
+
+then open any page with `?local=1` (e.g.
+<http://localhost:8000/admin.html?local=1>), or run
+`localStorage.jcob_mode = "local"` in the console. The admin password in
+this mode is `admin2026`.
+
+**Automated checks** (94 browser assertions):
+
+```bash
+npm install
+npm test
 ```
 
 ---

@@ -288,7 +288,9 @@
       var raw = window.localStorage.getItem(cacheKey());
       if (!raw) return null;
       var parsed = JSON.parse(raw);
-      return parsed && parsed.profile ? parsed : null;
+      /* A document written by an earlier version (or a partial cloud record)
+         must not leave the dashboard without settings/security blocks. */
+      return parsed && parsed.profile ? normalise(parsed) : null;
     } catch (e) {
       return null;
     }

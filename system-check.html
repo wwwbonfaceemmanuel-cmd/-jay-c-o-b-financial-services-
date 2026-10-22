@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connection check — JAY C O B FINANCIAL SERVICES</title>
+  <meta name="description" content="Live diagnostic for the Supabase connection behind the JAY C O B Financial Services website, admin console and customer dashboard.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#06262a">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .check-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .check-summary { padding: 1rem 1.15rem; border-radius: 14px; border: 1px solid var(--line); margin: 1.25rem 0; line-height: 1.55; }
+    .check-summary.is-ok { background: rgba(16, 122, 87, .10); border-color: rgba(16, 122, 87, .45); }
+    .check-summary.is-warn { background: rgba(196, 138, 22, .10); border-color: rgba(196, 138, 22, .45); }
+    .check-summary.is-fail { background: rgba(168, 59, 52, .10); border-color: rgba(168, 59, 52, .45); }
+    .check-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+    .check-table td { border-bottom: 1px solid var(--line); padding: .85rem .6rem; vertical-align: top; font-size: .92rem; }
+    .check-table tr:last-child td { border-bottom: 0; }
+    .check-icon { width: 42px; text-align: center; font-weight: 800; font-size: 1.05rem; }
+    .is-ok .check-icon { color: #177764; }
+    .is-warn .check-icon { color: #a97213; }
+    .is-fail .check-icon { color: #a83b34; }
+    .check-note { color: var(--muted); margin-top: .2rem; line-height: 1.55; }
+    .check-fix { margin-top: .35rem; font-size: .84rem; color: #8a5a10; }
+    .check-note code, .check-fix code { font-size: .82em; }
+    .check-form { display: grid; gap: .75rem; grid-template-columns: 1fr 1fr; align-items: end; }
+    @media (max-width: 640px) { .check-form { grid-template-columns: 1fr; } }
+    .check-form .btn { justify-self: start; }
+  </style>
+</head>
+<body data-page="system-check">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="JAY C O B FINANCIAL SERVICES home">
+        <img src="assets/img/logo-lockup.svg" alt="JAY C O B FINANCIAL SERVICES" width="200" height="44">
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html">Website</a>
+        <a href="admin.html">Admin portal</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="check-wrap">
+      <p class="eyebrow">Deployment</p>
+      <h1>Connection check</h1>
+      <p class="lead">This page talks to Supabase with the public key and reports exactly what is working.
+        Open it after running <code>supabase/schema.sql</code> and again after deploying to Railway.</p>
+      <p class="text-small text-muted" id="check-detail">Running checks…</p>
+
+      <div class="check-summary" id="check-summary" role="status" aria-live="polite">Running checks…</div>
+
+      <div class="panel">
+        <table class="check-table" id="check-table">
+          <caption class="sr-only">Connection check results</caption>
+          <tbody id="check-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="panel mt-3">
+        <h2 style="font-size:1.15rem;">Test an administrator account</h2>
+        <p class="text-small text-muted">Signs in through Supabase Auth, reads the account's role from
+          <code>profiles</code>, and — if the role is a staff role — performs one small write to prove the
+          policies accept it. Nothing is changed on the website.</p>
+        <form id="check-form" class="check-form mt-2" novalidate>
+          <div class="field">
+            <label for="check-email">Administrator email</label>
+            <input id="check-email" type="email" autocomplete="username" placeholder="you@jaycobfinancial.mw" required>
+          </div>
+          <div class="field">
+            <label for="check-password">Password</label>
+            <input id="check-password" type="password" autocomplete="current-password" placeholder="Your password" required>
+          </div>
+          <div style="grid-column:1/-1;">
+            <button class="btn btn--gold" type="submit">Run the sign-in test</button>
+            <p class="form-status" id="check-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel mt-3">
+        <h2 style="font-size:1.15rem;">If something is red</h2>
+        <ol class="text-small" style="line-height:1.8;padding-left:1.1rem;">
+          <li><strong>Table missing</strong> → paste the whole of <code>supabase/schema.sql</code> into
+            Supabase → SQL Editor → New query → Run.</li>
+          <li><strong>Sign-in fails</strong> → create the user in Supabase → Authentication → Users, then run
+            <code>select public.promote_staff('your@email');</code></li>
+          <li><strong>Write refused</strong> → the account is not staff yet: run <code>promote_staff</code>
+            and sign in again.</li>
+          <li><strong>Documents empty</strong> → open <a href="admin.html">the admin portal</a>, save Website
+            Settings once, and reload this page.</li>
+          <li><strong>Nothing at all</strong> → the URL and key are missing: set them in Railway or in
+            <code>assets/js/config.js</code>.</li>
+        </ol>
+        <p class="text-tiny text-muted">Full instructions: <code>DEPLOY.md</code> in the repository.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="text-tiny">JAY C O B FINANCIAL SERVICES · Lilongwe, Malawi · diagnostics page, not linked from the public site.
+        <a href="index.html">Return to the website</a></p>
+    </div>
+  </footer>
+
+  <script src="env.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/cloud.js" defer></script>
+  <script src="assets/js/system-check.js" defer></script>
+</body>
+</html>

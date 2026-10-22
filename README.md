@@ -184,7 +184,24 @@ Operational details:
 - **Fallback**: if the cloud is unreachable the site uses its local cache; the console shows a
   `Cloud error` badge in the Website connection panel.
 
+The project is already pointed at Supabase (`cybaejegytnvtitznofp`). Two steps remain:
+run `supabase/schema.sql`, then promote your administrator. Open
+**`system-check.html`** on the deployed site for a live diagnosis — it tests the configuration,
+every table, the website documents, the media bucket and a real administrator sign-in, and prints
+the exact fix for anything red.
+
 Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md](DEPLOY.md)**.
+
+### Running the checks
+
+```bash
+npm install     # once — jsdom, for the browser suites
+npm test        # starts the Supabase stand-in + server, runs 94 assertions
+```
+
+The suites in `tools/tests/` cover demo mode (calculator arithmetic, console, bridge, dashboard,
+single-file bundle), cloud mode (hydration, catalogue, live feed, staff gate, role refusal, console
+persistence, registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page.
 
 ## Project structure
 
@@ -196,7 +213,9 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 ├── Dockerfile · railway.json   # Railway build (Node 20)
 ├── DEPLOY.md                   # Supabase + Railway setup and first-run checklist
 ├── supabase/schema.sql         # tables, RLS policies, triggers, storage buckets
+├── system-check.html           # live connection diagnostic (noindex)
 ├── tools/dev/mock-cloud.js     # in-memory Supabase stand-in for local testing
+├── tools/tests/                # browser suites (npm test)
 ├── assets/
 │   ├── css/styles.css          # tokens, v3 theme block, components, responsive, print
 │   ├── img/                    # logo lockups, favicon, photography
