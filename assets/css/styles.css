@@ -1215,9 +1215,6 @@ input[type="range"]::-moz-range-thumb {
   padding: clamp(1.6rem, 3.5vw, 2.4rem);
   box-shadow: var(--shadow-lg);
 }
-[data-demo-only] { display: none !important; }
-html[data-demo="1"] [data-demo-only] { display: block !important; }
-
 .demo-note {
   margin-top: 1.2rem;
   background: var(--gold-100);

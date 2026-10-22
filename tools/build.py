@@ -30,10 +30,8 @@ EMAIL = "hello@jaycobfinancial.mw"
 SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
-BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/demo-mode.js",
-                "assets/js/cloud.js",
+BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/cloud.js",
                 "assets/js/site-store.js", "assets/js/finance.js",
-                "assets/js/demo-customer.js", "assets/js/demo-portal.js",
                 "assets/js/app-data.js", "assets/js/ui.js", "assets/js/main.js",
                 "assets/js/live.js", "assets/js/site-content.js"]
 
@@ -175,7 +173,7 @@ FOOTER = """  <footer class="site-footer">
         </div>
       </div>
 
-      <p class="disclaimer">JAY C O B FINANCIAL SERVICES is a licensed money lender operating in Malawi. Credit is subject to affordability and credit assessment. Interest rates, fees and charges are disclosed before an agreement is signed. Borrowing costs money — consider whether a loan is right for you, and read the Responsible Lending Policy, Fee Disclosure Statement and Terms and Conditions. This website is a demonstration environment: figures, decisions and reference numbers are illustrative and no real credit is advanced.</p>
+      <p class="disclaimer">JAY C O B FINANCIAL SERVICES is a licensed money lender operating in Malawi. Credit is subject to affordability and credit assessment. Interest rates, fees and charges are disclosed before an agreement is signed. Borrowing costs money — consider whether a loan is right for you, and read the Responsible Lending Policy, Fee Disclosure Statement and Terms and Conditions.</p>
 
       <div class="footer-bottom">
         <p>© <span data-year>2026</span> JAY C O B FINANCIAL SERVICES. All rights reserved.</p>
@@ -425,11 +423,8 @@ def build_dashboard() -> None:
 %(body)s
   <script src="env.js" defer></script>
   <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/demo-mode.js" defer></script>
   <script src="assets/js/cloud.js" defer></script>
   <script src="assets/js/finance.js" defer></script>
-  <script src="assets/js/demo-customer.js" defer></script>
-  <script src="assets/js/demo-portal.js" defer></script>
   <script src="assets/js/app-data.js" defer></script>
   <script src="assets/js/ui.js" defer></script>
   <script src="assets/js/apply.js" defer></script>

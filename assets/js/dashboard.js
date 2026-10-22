@@ -21,10 +21,6 @@
   /* ---------------- Session guard ---------------- */
   var params = new URLSearchParams(location.search);
   var session = UI.getSession();
-  var DEMO = window.JCOB_DEMO;
-  if (!session && DEMO && DEMO.on()) {
-    session = UI.setSession({ authenticated: true, name: "Demonstration account", email: "demo@jaycobfinancial.mw", identifier: "demo@jaycobfinancial.mw", demo: true }, true);
-  }
   if (!session || !session.authenticated) {
     window.location.replace("login.html?next=dashboard.html");
     return;
@@ -1473,7 +1469,7 @@
             { label: "Close", variant: "ghost" },
             { label: "Upload proof", variant: "gold", onClick: function () {
                 d.proof = true; DATA.save(); UI.closeModal(); render(false);
-                UI.toast({ title: "Proof attached", message: "Demo: proof of payment recorded.", type: "success" });
+                UI.toast({ title: "Proof attached", message: "Proof of payment recorded against this deposit.", type: "success" });
                 return true;
               } }
           ]
@@ -1565,21 +1561,40 @@
         if (amount + fee > available) { status.className = "form-status is-visible form-status--error"; status.textContent = "Insufficient balance (" + mwk(available) + ")."; return; }
         if (kind === "other" && !$("tr-to").value.trim()) { status.className = "form-status is-visible form-status--error"; status.textContent = "Enter the recipient account number."; return; }
 
+        /* Send a real one-time code before asking for it. */
+        (function () {
+          var email = (db().profile.email || "").trim();
+          if (email && window.JCOB_CLOUD && window.JCOB_CLOUD.enabled) {
+            window.JCOB_CLOUD.auth.sendOtp(email).catch(function () {});
+          }
+        })();
+
         UI.modal({
           title: "Confirm transfer",
           subtitle: mwk(amount) + (fee ? " + " + mwk(fee) + " fee" : ""),
           body: '<div class="form-grid">' + reviewItem("From", $("tr-from").value) +
             reviewItem("To", kind === "other" ? $("tr-to").value + " (" + $("tr-name").value + ")" : "Savings goal") +
             reviewItem("Amount", mwk(amount)) + reviewItem("Fee", mwk(fee)) + "</div>" +
-            '<div class="field" style="margin-top:.9rem;"><label for="tr-otp">Authorisation code</label><input id="tr-otp" placeholder="Enter 123456 (demo)"><span class="hint">A one-time code was sent to your phone.</span></div>',
+            '<div class="field" style="margin-top:.9rem;"><label for="tr-otp">Authorisation code</label><input id="tr-otp" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code"><span class="hint">We emailed a one-time code to the address on your account.</span></div>',
           actions: [
             { label: "Cancel", variant: "ghost" },
             { label: "Authorise transfer", variant: "gold", onClick: function () {
-                var code = (document.getElementById("tr-otp").value || "").trim();
-                if (code !== "123456") {
-                  UI.toast({ title: "Invalid code", message: "Use 123456 in this demo.", type: "danger" });
+                var code = (document.getElementById("tr-otp").value || "").replace(/\D/g, "");
+                var cloud = window.JCOB_CLOUD;
+                var email = (db().profile.email || "").trim();
+                if (!cloud || !cloud.enabled) {
+                  UI.toast({ title: "Unavailable", message: "Transfers need the account service, which cannot be reached right now.", type: "danger" });
                   return false;
                 }
+                if (!email) {
+                  UI.toast({ title: "Email needed", message: "Add the email address on your account before authorising a transfer.", type: "danger" });
+                  return false;
+                }
+                if (code.length !== 6) {
+                  UI.toast({ title: "Code needed", message: "Enter the six digits from the email we sent you.", type: "danger" });
+                  return false;
+                }
+                cloud.auth.verifyOtp(email, code).then(function () {
                 var ref = DATA.reference("TRF");
                 if ($("tr-from").value === "Savings") db().savings.balance -= (amount + fee);
                 else setWallet(walletBalance() - amount - fee);
@@ -1593,7 +1608,10 @@
                 DATA.notify("Transfer", "Transfer completed", mwk(amount) + " transferred (" + ref + ").", "In-app + SMS");
                 DATA.save(); UI.closeModal(); render();
                 UI.toast({ title: "Transfer complete", message: ref, type: "success" });
-                return true;
+                }).catch(function () {
+                  UI.toast({ title: "Invalid code", message: "That code is incorrect or has expired. Request a new one and try again.", type: "danger" });
+                });
+                return false;
               } }
           ]
         });
@@ -1714,8 +1732,8 @@
           body: '<div class="form-grid">' + reviewItem("Status", UI.statusPill(d.status)) + reviewItem("Expiry", d.expiry ? dt(d.expiry) : "No expiry") +
             reviewItem("Required", d.required ? "Yes" : "Optional") + reviewItem("Reviewer note", d.note || "—") + "</div>" +
             '<div class="notice notice--info" style="margin-top:.8rem;">' + ICON.lock + "<div>Secure preview. Identification numbers are masked. Downloads are logged against your account.</div></div>",
-          actions: [{ label: "Close", variant: "ghost" }, { label: "Download (demo)", variant: "gold", onClick: function () {
-            UI.downloadCSV("JC-document-" + d.id + ".txt", "JAY C O B FINANCIAL SERVICES\nDocument: " + d.name + "\nStatus: " + d.status + "\nDemo copy — not a real certificate.");
+          actions: [{ label: "Close", variant: "ghost" }, { label: "Download", variant: "gold", onClick: function () {
+            UI.downloadCSV("JC-document-" + d.id + ".txt", "JAY C O B FINANCIAL SERVICES\nDocument: " + d.name + "\nStatus: " + d.status + "\nGenerated from the document register. Sign in to verify.");
             return false;
           } }]
         });
@@ -1795,18 +1813,41 @@
         var next = $("sec-new").value;
         var confirm = $("sec-confirm").value;
         var status = $("security-status");
-        var validCurrent = current === "demo1234";
-        if (!validCurrent) { status.className = "form-status is-visible form-status--error"; status.textContent = "Current password is incorrect (demo password: demo1234)."; return; }
+        var CLOUD = window.JCOB_CLOUD;
+        var email = db().profile.email || (window.JCOB_UI && UI.getSession() && (UI.getSession().email || UI.getSession().identifier)) || "";
+
+        if (!CLOUD || !CLOUD.enabled) {
+          status.className = "form-status is-visible form-status--error";
+          status.textContent = "Changing your password needs the account service, which cannot be reached right now. Please call +265 999 123 456.";
+          return;
+        }
+        if (!current) { status.className = "form-status is-visible form-status--error"; status.textContent = "Enter your current password."; return; }
         if (next.length < 8) { status.className = "form-status is-visible form-status--error"; status.textContent = "New password must be at least 8 characters."; return; }
         if (next !== confirm) { status.className = "form-status is-visible form-status--error"; status.textContent = "New passwords do not match."; return; }
-        db().security.passwordChanged = new Date().toISOString();
-        DATA.save();
-        DATA.notify("Security", "Password changed", "Your password was changed. If this was not you, contact support immediately.", "In-app + Email");
+
         status.className = "form-status is-visible";
-        status.textContent = "Password updated successfully.";
-        pfSec.reset();
-        meter.querySelectorAll("i").forEach(function (bar) { bar.style.background = "var(--line)"; });
-        UI.toast({ title: "Password updated", message: "Use your new password next time you sign in.", type: "success" });
+        status.textContent = "Updating your password…";
+
+        /* Re-authenticate first: Supabase will not accept a password change
+           without proof of the current one. */
+        CLOUD.auth.signIn(email, current).then(function () {
+          return CLOUD.auth.updatePassword(next);
+        }).then(function () {
+          db().security.passwordChanged = new Date().toISOString();
+          DATA.save();
+          DATA.notify("Security", "Password changed", "Your password was changed. If this was not you, contact support immediately.", "In-app + Email");
+          status.className = "form-status is-visible";
+          status.textContent = "Password updated successfully.";
+          pfSec.reset();
+          meter.querySelectorAll("i").forEach(function (bar) { bar.style.background = "var(--line)"; });
+          UI.toast({ title: "Password updated", message: "Use your new password next time you sign in.", type: "success" });
+        }).catch(function (err) {
+          var message = String((err && err.message) || "");
+          if (/invalid|credentials|grant/i.test(message)) message = "That current password is not correct.";
+          else if (!message) message = "We could not update the password just now. Please try again.";
+          status.className = "form-status is-visible form-status--error";
+          status.textContent = message;
+        });
       });
     }
     var mfa = $("mfa-toggle");
@@ -2023,7 +2064,7 @@
       reviewItem("Description", t.description) + reviewItem("Client", profile().fullName) + "</div>" +
       '<p style="font-size:.68rem;color:var(--muted);margin-top:.9rem;border-top:1px dashed var(--line-strong);padding-top:.7rem;">' +
       "JAY C O B FINANCIAL SERVICES · Plot 47/3, Area 47, Sector 3, Lilongwe · hello@jaycobfinancial.mw · +265 999 123 456<br>" +
-      "All amounts in Malawian Kwacha (MWK). This is an illustrative demonstration receipt.</p></div>";
+      "All amounts in Malawian Kwacha (MWK). This receipt is system-generated — quote " + esc(t.ref) + " in any query.</p></div>";
     UI.modal({
       title: "Receipt", subtitle: mwk(t.amount),
       body: body,
@@ -2059,7 +2100,7 @@
       reviewItem("Currency", "MWK") + reviewItem("Verification code", "JC-" + s.ref.slice(-4) + "-VERIFIED") + "</div>" +
       '<table class="data" style="margin-top:.8rem;"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
       (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>" +
-      '<p style="font-size:.68rem;color:var(--muted);margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. Illustrative demonstration statement.</p></div>';
+      '<p style="font-size:.68rem;color:var(--muted);margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. System-generated statement — quote ' + esc(s.ref) + ' in any query.</p></div>';
     UI.modal({
       title: "Statement " + s.ref, subtitle: s.period,
       body: body,
@@ -2105,7 +2146,7 @@
     var l = DATA.findLoan(loanId);
     if (!l) return;
     var text = [
-      "JAY C O B FINANCIAL SERVICES — LOAN AGREEMENT (DEMO)",
+      "JAY C O B FINANCIAL SERVICES — LOAN AGREEMENT",
       "Loan ID," + l.id,
       "Borrower," + profile().fullName,
       "Client reference," + profile().accountNumber,
@@ -2119,7 +2160,7 @@
       "Maturity date," + dt(l.maturity),
       "Guarantor," + (l.guarantor ? l.guarantor.name : "Not required"),
       "",
-      "This document is an illustrative demonstration agreement. A signed agreement is required before disbursement.",
+      "This extract is generated from the loan record. The signed agreement held on file is the binding document.",
       "Read with the Terms and Conditions, Fees and Charges Disclosure and Responsible Lending Policy."
     ].join("\n");
     UI.downloadCSV("JC-loan-agreement-" + l.id + ".txt", text);

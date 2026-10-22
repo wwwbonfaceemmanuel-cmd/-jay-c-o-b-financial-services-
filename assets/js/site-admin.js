@@ -91,7 +91,7 @@
   }
 
   /* In cloud mode every customer document in Supabase is a website record;
-     in demo mode there is a single local document. */
+     offline there is a single local document. */
   var siteDocs = null;
   var docsAt = 0;
   var loading = false;

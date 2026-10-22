@@ -1,5 +1,4 @@
-/* Production behaviour: an installation with no demonstration data.
-   The suites in demo.test.js run with ?demo=1; this one does not. */
+/* The shipped build: an installation with no demonstration data at all. */
 "use strict";
 
 const { reporter, makeDom, ready, sleep } = require("./lib");
@@ -14,11 +13,11 @@ const session = () => JSON.stringify({
 
   /* ---- the public site still works ---------------------------------- */
   {
-    const { dom, errors } = makeDom("index.html", { local: true, demo: false });
+    const { dom, errors } = makeDom("index.html", { local: true });
     await ready(dom, 600);
     const w = dom.window;
-    t.eq("demonstration mode off", w.JCOB_DEMO.on(), false);
-    t.eq("no demo customer loaded", typeof w.JCOB_DEMO_CUSTOMER, "function");
+    t.eq("no demonstration switch in the build", typeof w.JCOB_DEMO, "undefined");
+    t.eq("no demonstration dataset in the build", typeof w.JCOB_DEMO_CUSTOMER, "undefined");
     t.eq("catalogue still published", w.JCOB_SITE.products.length, 11);
     t.eq("no page-text overrides invented", Object.keys(w.JCOB_SITE.get().content || {}).length, 0);
     t.ok("hero renders", /JAY C O B/.test(w.document.body.textContent));
@@ -29,7 +28,7 @@ const session = () => JSON.stringify({
   /* ---- a brand-new customer has nothing ----------------------------- */
   {
     const { dom, errors } = makeDom("dashboard.html", {
-      local: true, demo: false, hash: "#applications",
+      local: true, hash: "#applications",
       seed: { jcob_session_v1: session() }
     });
     await ready(dom, 900);
@@ -52,7 +51,7 @@ const session = () => JSON.stringify({
   /* ---- every dashboard area survives an empty account --------------- */
   {
     const { dom, errors } = makeDom("dashboard.html", {
-      local: true, demo: false,
+      local: true,
       seed: { jcob_session_v1: session() }
     });
     await ready(dom, 900);
@@ -74,7 +73,7 @@ const session = () => JSON.stringify({
      Local mode keeps the shared mock project out of this check: what is
      being tested is that the console invents nothing on its own. */
   {
-    const { dom, errors } = makeDom("admin.html", { local: true, demo: false });
+    const { dom, errors } = makeDom("admin.html", { local: true });
     await ready(dom, 1200);
     const w = dom.window;
     const db = w.JCOB_PORTAL.db();
@@ -89,9 +88,9 @@ const session = () => JSON.stringify({
     w.close();
   }
 
-  /* ---- the published demo password is refused ---------------------- */
+  /* ---- offline sign-in fails closed -------------------------------- */
   {
-    const { dom, errors } = makeDom("login.html", { local: true, demo: false });
+    const { dom, errors } = makeDom("login.html", { local: true });
     await ready(dom, 500);
     const w = dom.window;
     w.document.getElementById("login-id").value = "demo@jaycobfinancial.mw";
@@ -99,22 +98,23 @@ const session = () => JSON.stringify({
     w.document.getElementById("login-form").dispatchEvent(new w.Event("submit", { bubbles: true }));
     await sleep(400);
     const status = w.document.getElementById("login-status").textContent;
-    t.ok("demo credentials refused", !w.localStorage.getItem("jcob_session_v1"));
+    t.ok("no session created", !w.localStorage.getItem("jcob_session_v1"));
     t.ok("reason explained", /unavailable|not connected/i.test(status), status);
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }
 
-  /* ---- the same build returns the demo set on request --------------- */
+  /* ---- the console refuses to open without the account service ------ */
   {
-    const { dom } = makeDom("dashboard.html", {
-      local: true, demo: true,
-      seed: { jcob_session_v1: session() }
-    });
-    await ready(dom, 900);
+    const { dom } = makeDom("admin.html", { local: true });
+    await ready(dom, 700);
     const w = dom.window;
-    t.eq("demonstration mode on", w.JCOB_DEMO.on(), true);
-    t.ok("demonstration records available", w.JCOB_DATA.get().applications.length > 0);
+    w.document.getElementById("admin-password").value = "admin2026";
+    w.document.getElementById("admin-gate-form")
+      .dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+    await sleep(300);
+    t.ok("console stays locked", w.document.getElementById("admin-gate").hidden === false);
+    t.ok("no published password", !/admin2026/i.test(w.document.getElementById("gate-hint").textContent));
     w.close();
   }
 

@@ -3,10 +3,9 @@
    ---------------------------------------------------------------------
    The site runs in two modes, chosen automatically:
 
-   • DEMO MODE (no keys)
-     The live feed, catalogue, admin console and customer dashboard all
-     read and write browser localStorage, so the whole system can be
-     reviewed without a backend.
+   • OFFLINE MODE (no keys)
+     The website, catalogue and calculator read browser localStorage. Sign-in,
+     the admin console and the customer dashboard need cloud mode.
 
    • CLOUD MODE (Supabase) — configured below
      Everything persists in Postgres behind Row Level Security.
@@ -31,7 +30,6 @@ window.JCOB_CONFIG = {
   /* "auto" → cloud as soon as a URL and key are present.
      Set to false to stay on localStorage even with keys configured. */
   useSupabase: "auto",
-  demoMode: false,
 
   /* Table map — matches supabase/schema.sql. */
   tables: {

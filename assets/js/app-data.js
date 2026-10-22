@@ -4,25 +4,22 @@
    One document per customer. Every read and write goes through this
    module, so the dashboard never needs to know where it is stored:
 
-     • Cloud mode  — one row per signed-in customer in Supabase
-                     (customer_docs), mirrored to localStorage as an
-                     offline cache.
-     • Demo mode   — one browser-local document, and only when
-                     demonstration mode has been asked for (?demo=1).
-                     assets/js/demo-customer.js supplies that document.
+     • Cloud mode — one row per signed-in customer in Supabase
+                  (customer_docs), mirrored to localStorage as an offline
+                  cache.
+     • Offline    — the same document, kept in localStorage only.
 
    A new account starts empty: no loans, no applications, no balances and
-   no borrowed identity. Demonstration data is never mixed into it.
+   no borrowed identity. There is no sample or demonstration data in this
+   build — every figure on the dashboard was either entered by the customer
+   or written by the console.
    ===================================================================== */
 (function () {
   "use strict";
 
-  var KEY = "jcob_app_v2";        /* v2: production documents (v1 held demo data) */
-  var DEMO_KEY = "jcob_app_v1";   /* demonstration documents stay on the old key */
+  var KEY = "jcob_app_v2";
   var F = window.JCOB_FINANCE;
-  var DEMO = window.JCOB_DEMO;
 
-  function demoOn() { return !!(DEMO && DEMO.on()); }
   function today() { return new Date().toISOString().slice(0, 10); }
 
   /* ---------------- shape of an account that has never borrowed ------- */
@@ -75,16 +72,13 @@
     };
   }
 
-  /* Demonstration document (only reachable through ?demo=1). */
-  function seed() {
-    if (demoOn() && window.JCOB_DEMO_CUSTOMER) return window.JCOB_DEMO_CUSTOMER();
-    return empty();
-  }
+  /* The starting point of every account. */
+  function seed() { return empty(); }
 
 
 
   /* ---------------- Storage ----------------
-     Demo mode keeps one document in localStorage.
+     Offline mode keeps one document in localStorage.
      Cloud mode keeps one document per signed-in customer in Supabase
      (customer_docs) and mirrors it to localStorage as an offline cache.
      Every function in the dashboard goes through persist(), so nothing
@@ -106,9 +100,6 @@
     return user && user.id ? user.id : null;
   }
   function cacheKey() {
-    /* Demonstration documents keep their old key, so a browser that once
-       used demo mode can never show that data in the live system. */
-    if (demoOn()) return DEMO_KEY;
     var id = cloudOn() ? uid() : null;
     return id ? KEY + ":" + id : KEY;
   }
@@ -171,7 +162,7 @@
 
   /* Empty but valid document for a brand-new cloud account. Only the
      details the person gave us at sign-up are copied in — never a
-     demonstration profile. */
+     different account's profile. */
   function blank(meta) {
     var doc = empty();
     var key;
@@ -351,9 +342,8 @@
     cacheKey: cacheKey
   };
 
-  /* Demo mode: seed on first visit so every panel has content to show.
-     Cloud mode: pull this customer's document first — never publish a
-     seed over a real record. */
+  /* Cloud mode: pull this customer's document first — never publish an
+     empty document over a real record. Offline: keep the local copy. */
   if (cloudOn()) {
     hydrate();
     document.addEventListener("jcob:auth", function () { hydrate(); });

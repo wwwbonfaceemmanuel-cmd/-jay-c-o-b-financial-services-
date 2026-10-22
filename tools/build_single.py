@@ -158,10 +158,16 @@ def patch_js(name: str, code: str, images=None) -> str:
         code = code.replace('bindPwMeter("reset-password", "pw-meter", "pw-hint")',
                             'bindPwMeter("reset-password", "reset-pw-meter", "reset-pw-hint")')
     if name == "dashboard.js":
-        old = 'if (!session && DEMO && DEMO.on()) {'
-        new = 'if (!session && ((DEMO && DEMO.on()) || window.JCOB_SINGLE)) {'
+        # The bundle has no auth server: browsing it locally opens a preview
+        # session so every dashboard view can be inspected in one file.
+        old = 'var session = UI.getSession();'
+        add = ('var session = UI.getSession();\n'
+               '  if (!session && window.JCOB_SINGLE) {\n'
+               '    session = UI.setSession({ authenticated: true, name: "Preview visitor",\n'
+               '      email: "", identifier: "", single: true }, true);\n'
+               '  }')
         assert old in code, "dashboard session guard not found"
-        code = code.replace(old, new, 1)
+        code = code.replace(old, add, 1)
     if images:
         code = re.sub(r'assets/img/([A-Za-z0-9._-]+)',
                       lambda m: images.get(m.group(1), m.group(0)), code)
@@ -391,15 +397,15 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 """
 
     bootstrap = """
-/* ==== single-file bootstrap: demo session so the dashboard is usable immediately ==== */
+/* ==== single-file bootstrap: preview session so the dashboard can be walked ==== */
 window.JCOB_SINGLE = true;
 try {
   if (window.JCOB_UI && !window.JCOB_UI.getSession()) {
     window.JCOB_UI.setSession({
       authenticated: true,
-      name: "Memory Tembo",
-      email: "demo@jaycobfinancial.mw",
-      identifier: "demo@jaycobfinancial.mw",
+      name: "Preview visitor",
+      email: "",
+      identifier: "",
       at: new Date().toISOString()
     }, true);
   }
@@ -433,7 +439,7 @@ __CSS__
 </head>
 <body data-page="index" data-single="true">
 <a class="skip-link" href="#main">Skip to content</a>
-<p class="sf-note"><strong>Single-file edition</strong> &mdash; every page, the calculator and the full customer dashboard in one HTML document. Demo login: demo@jaycobfinancial.mw &middot; demo1234 &middot; OTP 123456</p>
+<p class="sf-note"><strong>Single-file edition</strong> &mdash; every page, the calculator and the full customer dashboard in one HTML document. Reviewed with a preview session; no accounts or records are included.</p>
 __HEADER__
 <main id="main">
 __VIEWS__

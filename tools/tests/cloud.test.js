@@ -90,6 +90,20 @@ async function signInGate(w, creds) {
     await sleep(900);
     const saved = await rest("site_docs?id=eq.settings&select=data");
     t.eq("website settings saved", saved[0].data.phone, "+265 111 222 333");
+
+    /* Decision round-trip: console → the customer's own document. */
+    const imported = (w.JCOB_PORTAL.db().applications || []).find((a) => a.siteRef === "APP-CLOUD-001");
+    if (imported) {
+      imported.status = "Approved";
+      imported.rate = 24;
+      imported.term = 12;
+      w.JCOB_ADMIN_SITE.syncBackToSite();
+      await sleep(900);
+      const docs = await rest("customer_docs?select=data");
+      const doc = (docs || []).map((r) => r.data).find((d) => d && (d.applications || []).some((a) => a.ref === "APP-CLOUD-001"));
+      const written = doc && doc.applications.find((a) => a.ref === "APP-CLOUD-001");
+      t.ok("decision written back to the customer document", !!(written && written.status === "approved"));
+    }
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }
@@ -114,8 +128,8 @@ async function signInGate(w, creds) {
     await signInGate(w, STAFF);
     await sleep(1600);
     const db = w.JCOB_PORTAL.db();
-    t.ok("portal loaded", (db.customers || []).length > 0);
-    db.customers[0].name = "Persisted Customer";
+    t.ok("portal loaded", Array.isArray(db.customers));
+    db.customers.push({ id: "CUS-TEST-1", name: "Persisted Customer", status: "Active", kyc: "Pending" });
     w.JCOB_PORTAL.save();
     await sleep(1200);
     w.close();

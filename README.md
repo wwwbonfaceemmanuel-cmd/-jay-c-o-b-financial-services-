@@ -89,52 +89,31 @@ Settings (language, channels, marketing consent, privacy, accessibility, downloa
 
 ---
 
-## Empty by default — demonstration data on request
+## Empty by default — no sample data
 
-The system holds no invented records. A new installation has no customers, no loans, no
-repayments, no staff list and no balances: the public site reads its catalogue and settings from
-`site_docs`, the console reads its book from `portal_docs`, and each customer reads only their own
-document. An account that has never borrowed shows empty states, not somebody else's history.
+The system holds no invented records. A new installation has no customers, no loans, no repayments,
+no staff list, no balances and no demonstration logins:
 
-Demonstration data still exists for reviews and the automated suites, but it is **off unless it is
-asked for**:
+* the public site reads its catalogue, settings and page text from `site_docs`;
+* the admin console reads its book from `portal_docs` (configuration only until real records exist);
+* each customer reads only their own document from `customer_docs`;
+* sign-in, sign-up, one-time codes and password recovery all run through Supabase Auth;
+* a brand-new account shows empty states — never somebody else's history.
 
-| Switch | Effect |
-| --- | --- |
-| `?demo=1` on any page | switches demonstration mode on (remembered in `localStorage.jcob_demo`) |
-| `?demo=0` on any page | switches it off again |
+There is no demonstration switch, no fixed OTP, no browser-side password store and no published
+console password in this build. An installation without Supabase configured works as a website and
+a calculator, and refuses sign-in and the console with a message telling the visitor to call.
 
-Nothing else turns it on — there is no key, no build flag and no code path that reaches it for a
-normal visitor. The dataset lives in `assets/js/demo-customer.js` (customer dashboard) and
-`assets/js/demo-portal.js` (console); both files only define functions and are inert unless the
-switch is set.
-
-With demonstration mode on:
-
-| Field | Value |
-| --- | --- |
-| Email | `demo@jaycobfinancial.mw` |
-| Phone | `+265 999 123 456` |
-| Password | `demo1234` |
-| OTP | `123456` |
-| Admin console | `admin2026` (on `admin.html`, only while no Supabase project is configured) |
-
-Demonstration customer **Memory Tembo** (`JC-ACC-100412`) is kept on the old storage key
-`jcob_app_v1`; live documents use `jcob_app_v2` (and `jcob_admin_system_v2` in the console), so a
-browser that once ran the demo can never show that data in the live system.
-
-If a project was set up with an earlier build, run **`supabase/remove-demo-data.sql`** once: it
-clears the demonstration console book from `portal_docs` and any demonstration customer documents,
-then prints a verification table.
-
----
+If a project was set up with an earlier build, run **`supabase/remove-demo-data.sql`** once: it names
+what it finds, clears the old console book from `portal_docs` and any demonstration customer
+documents, then prints a verification table.
 
 ## Admin management portal
 
 `admin.html` is the full management console for the business and the website. It signs staff in
 against Supabase and requires a staff role (`admin`, `staff`, `officer` or `credit`) on the
-`profiles` row; anyone else is refused. The published `admin2026` password only exists when
-demonstration mode is on and no Supabase project is configured.
+`profiles` row; anyone else is refused. There is no bypass password, and without a reachable
+Supabase project the console stays locked.
 
 The portal ships with the complete back office: dashboard, customers, KYC, loan applications,
 products, credit assessment, active loans, disbursement, guarantors and collateral, repayments,
@@ -175,7 +154,7 @@ The system runs on two modes, chosen automatically:
 
 | Mode | When | Where data lives |
 | --- | --- | --- |
-| **Demo** | no Supabase keys | browser `localStorage` |
+| **Offline** | no Supabase keys | browser `localStorage` (site content only; no sign-in) |
 | **Cloud** | `SUPABASE_URL` + `SUPABASE_ANON_KEY` present | Supabase Postgres, guarded by Row Level Security |
 
 `assets/js/cloud.js` is the only module that speaks to the network — Auth, the document
@@ -200,7 +179,7 @@ Operational details:
 - **Sessions** refresh automatically; the UI session (`jcob_session_v1`) and the Supabase session
   (`jcob_cloud_session_v1`) are kept in step, so existing route guards keep working.
 - **The admin gate** signs in with Supabase and refuses any account whose `profiles.role` is not a
-  staff role. `admin2026` remains the demo-mode password only.
+  staff role. There is no bypass password.
 - **The bridge** reads every `customer_docs` row, so website applications and tickets from all
   customers appear in the console; a decision writes the status, reviewer note and notification back
   to the right customer's document.
@@ -222,12 +201,14 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 94 assertions
+npm test        # starts the Supabase stand-in + server, runs 115 assertions
 ```
 
-The suites in `tools/tests/` cover demo mode (calculator arithmetic, console, bridge, dashboard,
-single-file bundle), cloud mode (hydration, catalogue, live feed, staff gate, role refusal, console
-persistence, registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page.
+The suites in `tools/tests/` cover the shipped build (empty account and console, calculator
+arithmetic, dashboard, live desk, single-file bundle), local mode, cloud mode (hydration, catalogue,
+live feed, staff gate, role refusal, console persistence, decision round-trip, registration,
+sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. Test records live in
+`tools/tests/fixtures.js` and never reach a browser.
 
 ## Project structure
 
@@ -250,7 +231,7 @@ persistence, registration, sign-in, recovery, enquiries, dashboard guard) and th
 │   ├── css/styles.css          # tokens, v3 theme block, components, responsive, print
 │   ├── img/                    # logo lockups, favicon, photography
 │   └── js/
-│       ├── config.js           # runtime config (table map, buckets, demo/cloud switch)
+│       ├── config.js           # runtime config (table map, buckets, cloud switch)
 │       ├── cloud.js            # Supabase client: auth, documents, storage
 │       ├── finance.js          # MWK formatting, amortisation, APR, affordability, masking
 │       ├── app-data.js         # customer document store (cloud + local cache)
@@ -268,9 +249,7 @@ persistence, registration, sign-in, recovery, enquiries, dashboard guard) and th
 │       ├── site-store.js       # shared website store: settings, catalogue, content
 │       ├── site-content.js     # applies published content to every public page
 │       ├── site-admin.js       # admin ↔ website connector (Website group)
-│       ├── admin.js            # legacy feed console (superseded, kept for reference)
-│       └── portal.js           # legacy portal (superseded by dashboard.html)
-├── admin.html                  # admin management portal (password: admin2026)
+├── admin.html                  # admin management portal (Supabase staff sign-in)
 ├── single/index.html           # entire site in one self-contained file
 ├── tools/
 │   ├── build.py                # static site builder (header/footer/scripts + legal + aliases)
@@ -302,7 +281,8 @@ python3 tools/build_single.py          # rebuild single/index.html from the chec
 python3 tools/build_single.py --check  # also fail on external references / duplicate ids
 ```
 
-Demo login inside the bundle: `demo@jaycobfinancial.mw` / `demo1234`, OTP `123456`.
+The bundle opens the dashboard views with a preview session so a reviewer can walk them; it has no
+accounts and no stored records.
 
 ## Building and checking
 
@@ -362,8 +342,8 @@ root as-is — there is no build step at runtime.
 | Live-feed photos | `JCOB_CLOUD.storage.upload()` | Storage `site-media` |
 | KYC documents (next phase) | — | Storage `kyc-documents` (private) |
 
-With no keys the same calls fall back to `localStorage`, which is why the demo works offline and why
-the cloud can be switched on without touching the pages.
+With no keys the same calls fall back to `localStorage`, so the website keeps working offline and
+the cloud can be switched on without touching the pages. Sign-in and the console require the cloud.
 
 ## Disclaimer
 

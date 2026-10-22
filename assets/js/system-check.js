@@ -78,7 +78,7 @@
     var fromEnv = !!(ENV.supabaseUrl && ENV.supabaseUrl === url);
     if (!url || !key) {
       add("Runtime configuration", "fail",
-        "No Supabase URL or anon key was found, so the site is staying in demo mode.",
+        "No Supabase URL or anon key was found, so the site is running offline: content only, no sign-in.",
         "Set SUPABASE_URL and SUPABASE_ANON_KEY in Railway, or paste them into assets/js/config.js.");
       return;
     }
@@ -267,7 +267,7 @@
     if (detail) {
       detail.textContent = CLOUD.enabled
         ? "Live checks against " + CLOUD.url.replace(/^https?:\/\//, "") + " — refreshed each time you open this page."
-        : "No credentials found: the site is in demo mode.";
+        : "No credentials found: the site is offline — content only, no sign-in.";
     }
     checkConfig();
     if (!CLOUD.enabled) {

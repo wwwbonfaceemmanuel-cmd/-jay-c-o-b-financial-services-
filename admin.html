@@ -368,9 +368,6 @@ body.locked { overflow: hidden; }
 
 <script src="env.js"></script>
 <script src="assets/js/config.js"></script>
-<script src="assets/js/demo-mode.js"></script>
-<script src="assets/js/demo-customer.js"></script>
-<script src="assets/js/demo-portal.js"></script>
 <script src="assets/js/cloud.js"></script>
 <script src="assets/js/site-store.js"></script>
 <script src="assets/js/live.js"></script>
@@ -384,9 +381,7 @@ body.locked { overflow: hidden; }
    calls like  supabase.from('customers').select('*')  and the REST of
    the application works unchanged.
 ===================================================================== */
-/* v1 held the demonstration book; the live console keeps its own key so
-   that data can never surface in production. */
-const DB_KEY = (window.JCOB_DEMO && window.JCOB_DEMO.on()) ? 'jcob_admin_system_v1' : 'jcob_admin_system_v2';
+const DB_KEY = 'jcob_admin_system_v2';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=p=>(p||'ID')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
@@ -404,7 +399,7 @@ const paged=1;
    roles, document templates, integration endpoints, the branch list, the
    chart of accounts and the system settings. Customers, staff, loans,
    repayments and every other record arrive from the database — or from
-   the demonstration dataset, which is only loaded with ?demo=1.
+   the database. Nothing is pre-filled with sample records.
    ------------------------------------------------------------------ */
 function configDb(){
   const site = window.JCOB_SITE;
@@ -465,14 +460,8 @@ function configDb(){
 }
 
 function seed(){
-  const base = configDb();
-  if (window.JCOB_DEMO && window.JCOB_DEMO.on() && window.JCOB_DEMO_PORTAL) {
-    return Object.assign(base, window.JCOB_DEMO_PORTAL());
-  }
-  return base;
+  return configDb();
 }
-
-window.JCOB_ADMIN_HELPERS = { dAgo: dAgo, dFwd: dFwd };
 let db;
 try{const raw=localStorage.getItem(DB_KEY);db=raw?JSON.parse(raw):seed()}catch(e){db=seed()}
 
@@ -1406,7 +1395,7 @@ const customActs={
    if(amt<p.min||amt>p.max)return toast('err','Amount out of range',p.name+' allows '+num(p.min)+' — '+num(p.max));
    const id=uid('APP-30');db.applications.unshift({id,cust:val('naC'),product:p.name,amount:amt,term:+val('naT'),date:new Date().toISOString(),status:'Pending',officer:'Unassigned',score:60+Math.floor(Math.random()*25),purpose:val('naPu')});
    audit('Administrator','New application '+id+' — '+val('naC'),'Loan Applications');save();closeModal();render(false);toast('ok','Application received',id)}},
- assessException(){toast('info','Exception path opened','Senior credit committee note field added to case file (demo workflow)')},
+ assessException(){toast('info','Exception path opened','Senior credit committee note field added to case file (placeholder — not wired yet)')},
  // products
  prodNew(){prodModal(null)},prodEdit(e){prodModal(e.dataset.id)},
  prodToggle(e){const p=db.products.find(x=>x.id===e.dataset.id);p.active=!p.active;audit('Administrator',(p.active?'Activated':'Deactivated')+' product '+p.name,'Loan Products');save();render(false);toast('ok','Product updated',p.name)},
@@ -1591,11 +1580,11 @@ const customActs={
  bkpVerify(e){toast('ok','Integrity check passed','All row hashes verified for '+e.dataset.id)},
  // reports / risk
  rptRun(e){runReport(e.dataset.id,e.dataset.pdf)},
- brAdd(){toast('info','Branch wizard','District, manager and float setup captured (demo)')},
+ brAdd(){toast('info','Branch wizard','District, manager and float setup captured (placeholder — not wired yet)')},
  brReport(e){const b=db.branches.find(x=>x.id===e.dataset.id);openModal({title:'Branch performance — '+b.name,size:'lg',
   body:`<div class="calc-res" style="grid-template-columns:repeat(3,1fr)"><div class="cr"><span>Customers</span><b>${num(b.cust)}</b></div><div class="cr"><span>Portfolio</span><b style="font-size:14px">${mwk(b.portfolio)}</b></div><div class="cr"><span>Cash cover</span><b>${pct(100*b.cash/b.portfolio)}</b></div>
   <div class="cr"><span>NPL (30d)</span><b>2.8%</b></div><div class="cr"><span>Growth QoQ</span><b class="up">+11%</b></div><div class="cr"><span>Staff</span><b>6 officers</b></div></div>`})},
- loAdd(){toast('info','Officer onboarding','Profile + branch assignment flow opened (demo)')},
+ loAdd(){toast('info','Officer onboarding','Profile + branch assignment flow opened (placeholder — not wired yet)')},
  loAssign(e){const o=db.officers.find(x=>x.id===e.dataset.id);toast('info','Worklist','Balancing queue for '+o.name+' — 2 reassignments proposed')},
  prlVerify(e){const p=db.payroll.find(x=>x.id===e.dataset.id);p.verified=true;audit('Administrator','Salary verified with '+p.employer,'Payroll');save();render(false);toast('ok','Verified',p.employer+' confirmed employment')},
  prlRun(){db.payroll.forEach(p=>{if(p.status==='Deducted'){const l=db.loans.find(x=>x.cust===p.cust&&x.status==='Active');if(l){l.paidTotal+=p.deduction;l.balance=Math.max(0,l.balance-p.deduction+Math.round(p.deduction*0.1))}}});
@@ -1609,18 +1598,18 @@ const customActs={
    db.ledger.unshift({id:uid('JR'),date:new Date().toISOString(),ref:val('glR'),account:cr.name,debit:0,credit:amt,narr:val('glN')});
    audit('Administrator','Journal posted '+val('glR')+' — '+mwk(amt),'Accounting');save();closeModal();render(false);toast('ok','Journal posted','Books remain balanced')}},
  glEntries(){toast('info','Ledger entries','Filtered journal listing opened (see Transaction Ledger)')},
- invAdd(){toast('info','Investor onboarding','Capital agreement + rate card flow (demo)')},
+ invAdd(){toast('info','Investor onboarding','Capital agreement + rate card flow (placeholder — not wired yet)')},
  invPay(e){const i=db.investors.find(x=>x.id===e.dataset.id);const due=i.returns-i.paid;i.paid=i.returns;audit('Administrator','Paid investor distribution '+mwk(due)+' to '+i.name,'Investors');save();render(false);toast('ok','Distribution paid',mwk(due)+' to '+i.name)},
  invStm(){toast('ok','Statement created','Investor statement queued for delivery')},
- agtAdd(){toast('info','Agent registration','KYC + commission structure flow (demo)')},
+ agtAdd(){toast('info','Agent registration','KYC + commission structure flow (placeholder — not wired yet)')},
  agtPay(e){const a=db.agents.find(x=>x.id===e.dataset.id);a.paid=a.commission;audit('Administrator','Paid commission to '+a.name,'Partners');save();render(false);toast('ok','Commission paid',a.name)},
  agtToggle(e){const a=db.agents.find(x=>x.id===e.dataset.id);a.status=a.status==='Active'?'Deactivated':'Active';save();render(false);toast('ok','Updated',a.name)},
  lglAdvance(e){const l=db.legal.find(x=>x.id===e.dataset.id);const stages=['Demand letter issued','Court filing','Judgment obtained','Enforcement / attachment','Settlement agreement','Closed'];
   const i=stages.indexOf(l.stage)+1;l.stage=stages[Math.min(i,stages.length-2)];l.updated=new Date().toISOString();
   audit('Administrator','Legal case '+l.id+' advanced — '+l.stage,'Legal');save();render(false);toast('ok','Stage updated',l.stage)},
- lglDoc(){toast('info','Documents','Signed filings and notices listed in case folder (demo)')},
- lglAdd(){toast('info','Recovery case','Case intake requires delinquency > 90 days + committee approval (demo)')},
- apiConfig(){toast('info','API configuration','Provider keys stored with vault encryption (demo)')},
+ lglDoc(){toast('info','Documents','Signed filings and notices listed in case folder (placeholder — not wired yet)')},
+ lglAdd(){toast('info','Recovery case','Case intake requires delinquency > 90 days + committee approval (placeholder — not wired yet)')},
+ apiConfig(){toast('info','API configuration','Provider keys stored with vault encryption (placeholder — not wired yet)')},
  apiLogs(e){const a=db.apis.find(x=>x.id===e.dataset.id);openModal({title:'Error log — '+a.name,body:`<div class="lst flush">${a.errors24===0?'<div class="empty">No errors in the last 24 hours.</div>':Array.from({length:a.errors24},(_,i)=>`<div class="li"><span class="ic" style="background:rgba(248,113,113,.12)">✗</span><div><b>HTTP ${504-i}</b><small>${dtFmt(dAgo(i*0.2))} · route retry succeeded after ${2+i*2}s</small></div></div>`).join('')}</div>`})},
  frdInvest(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Under investigation';save();render(false);toast('info','Case opened','Investigation notes enabled for '+f.id)},
  frdResolve(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Resolved';audit('Administrator','Fraud alert '+f.id+' resolved — no loss','Fraud');save();render(false);toast('ok','Resolved','False positive recorded for tuning')},
@@ -1634,7 +1623,7 @@ const customActs={
   <p><b>Principal:</b> MWK {{amount}} · <b>Rate:</b> {{rate}}% per month · <b>Term:</b> {{term}} months · <b>Instalment:</b> MWK {{emi}}</p>
   <p>The Borrower consents to repayment per the amortization schedule and authorizes recovery action on default beyond the grace period…</p>
   <div style="margin-top:30px;color:#999;font-size:11px">Signature: __________________ &nbsp;&nbsp; Date: ____ / ____ / 2026</div></div>`})},
- tplNew(){toast('info','Template editor','WYSIWYG blocks + merge fields (demo)')},
+ tplNew(){toast('info','Template editor','WYSIWYG blocks + merge fields (placeholder — not wired yet)')},
  // calculator actions
  openCalc(){location.hash='#/calculator'},
  calcRun(){renderCalc();toast('ok','Calculated','Schedule generated below')},
@@ -1673,7 +1662,7 @@ $('#clock').textContent=new Date().toLocaleString('en-GB');
 $('#notifBtn').addEventListener('click',e=>{e.stopPropagation();$('#notifDrop').classList.toggle('open');$('#userDrop').classList.remove('open')});
 $('#userBtn').addEventListener('click',e=>{if(e.target.closest('.drop'))return;$('#userDrop').classList.toggle('open');$('#notifDrop').classList.remove('open')});
 document.addEventListener('click',e=>{if(!e.target.closest('#userBtn'))$('#userDrop').classList.remove('open');if(!e.target.closest('#notifBtn')&&!e.target.closest('#notifDrop'))$('#notifDrop').classList.remove('open')});
-$('#signOut').addEventListener('click',()=>confirmAct('Sign out','End this admin session? Your local data remains saved on this device. You can also reset demo data.','Sign out',()=>{toast('info','Session ended','Signed out (demo mode — reload to sign back in)')},'warn'));
+$('#signOut').addEventListener('click',()=>confirmAct('Sign out','End this admin session? You will need your email and password to sign in again.','Sign out',()=>{if(window.JCOB_CLOUD&&window.JCOB_CLOUD.auth)window.JCOB_CLOUD.auth.signOut();try{sessionStorage.removeItem('jcob_admin_ok')}catch(e){}toast('info','Session ended','Signed out — reload to sign back in')},'warn'));
 $('#menuBtn').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));
 // global search
 $('#globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();const box=$('#searchResults');
@@ -1714,8 +1703,7 @@ function showIdentity(){
 function showDataMode(){
   const el = document.getElementById('dataMode');
   if (!el) return;
-  if (window.JCOB_DEMO && window.JCOB_DEMO.on()) el.innerHTML = 'System Operational · Data source: <b style="color:var(--warn)">demonstration data</b>';
-  else if (cloud.on) el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
+  if (cloud.on) el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
   else el.innerHTML = 'Offline · Data source: <b style="color:var(--warn)">this device</b>';
 }
 showIdentity();
@@ -1727,7 +1715,7 @@ if (window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.onChan
 /* ---------------- init ---------------- */
 render(true);
 updateNotifCount();
-toast('info','Welcome to the control center','JAY C O B management portal loaded' + (window.JCOB_DEMO && window.JCOB_DEMO.on() ? ' · demonstration data' : ''));
+toast('info','Welcome to the control center','JAY C O B management portal loaded');
 </script>
 
 <script src="assets/js/site-admin.js"></script>
@@ -1736,7 +1724,8 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
    Administrator gate
    Cloud mode : signs in to Supabase Auth and requires a staff role
                 (admin / staff / officer / credit) on the profile row.
-   Demo mode  : the published password, session-scoped only.
+   Offline    : the console refuses to open — there is nothing that can
+                verify a staff role without the account service.
    ------------------------------------------------------------------ */
 (function () {
   var gate = document.getElementById("admin-gate");
@@ -1778,7 +1767,7 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
     if (window.JCOB_DATA) window.JCOB_DATA.remote.state = window.JCOB_DATA.remote.state;
   }
 
-  /* A stale demo flag must not open the console when cloud sign-in is on. */
+  /* A stale session flag must not outlive a cloud sign-out. */
   if (ok && cloudOn && !(CLOUD.auth.isSignedIn() && CLOUD.auth.isStaff(CLOUD.auth.profile()))) {
     ok = false;
     try { sessionStorage.removeItem("jcob_admin_ok"); } catch (e) {}
@@ -1799,17 +1788,8 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
     say("");
 
     if (!cloudOn) {
-      var demoOpen = !!(window.JCOB_DEMO && window.JCOB_DEMO.on());
-      if (demoOpen && input.value === "admin2026") {
-        try { sessionStorage.setItem("jcob_admin_ok", "1"); } catch (err) {}
-        input.value = "";
-        unlock();
-      } else {
-        say(demoOpen
-          ? "That password is not correct. Try again."
-          : "This console is not connected to the authentication service. Sign-in is unavailable until Supabase is reachable.", true);
-        input.select();
-      }
+      say("This console is not connected to the authentication service. Sign-in is unavailable until Supabase is reachable.", true);
+      input.select();
       return;
     }
 

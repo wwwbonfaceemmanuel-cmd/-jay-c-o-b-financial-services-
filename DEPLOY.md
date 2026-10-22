@@ -262,17 +262,18 @@ SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=dev-anon PORT=8000 node se
 Staff sign-in: `admin@jaycob.mw / Admin123!`; customer:
 `customer@jaycob.mw / Customer123!`.
 
-**Demo mode** — browser storage only, useful for reviewing the design
-without touching any database:
+**Offline mode** — browser storage only, for reviewing the layout without
+touching any database (the website and calculator work; sign-in and the
+console stay locked):
 
 ```bash
 python3 -m http.server 8000
 ```
 
 then open any page with `?local=1` (e.g.
-<http://localhost:8000/admin.html?local=1>), or run
-`localStorage.jcob_mode = "local"` in the console. The admin password in
-this mode is `admin2026`.
+<http://localhost:8000/index.html?local=1>), or run
+`localStorage.jcob_mode = "local"` in the console. Browsing works; sign-in
+and the admin console require the Supabase stand-in that `npm test` starts.
 
 **Automated checks** (94 browser assertions):
 
@@ -301,7 +302,7 @@ npm test
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Site stays in demo mode | `/env.js` empty | Railway variables missing; redeploy |
+| Site never reaches Supabase | `/env.js` empty | Railway variables missing; redeploy |
 | `new row violates row-level security` | account has no staff role | run `promote_staff` |
 | Admin gate says *administrator access* | signed in as a customer | use the promoted account |
 | Console data resets | remote write failing | check `/healthz`, then RLS policies |
