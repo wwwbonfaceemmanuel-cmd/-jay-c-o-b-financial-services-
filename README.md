@@ -1,7 +1,7 @@
 # JAY C O B FINANCIAL SERVICES — lending website (v3)
 
 A complete, responsive lending site and customer dashboard for **JAY C O B FINANCIAL SERVICES**,
-a licensed money lender in Lilongwe, Malawi. Emerald-green and liquid dark-golden-crystal theme,
+a licensed money lender in Lilongwe, Malawi. Emerald-green and blue liquid-crystal theme,
 all money in **Malawian Kwacha (MWK)**.
 
 Plain HTML, CSS and JavaScript. No framework, no bundler, no runtime dependencies — deployable to
@@ -15,11 +15,11 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 
 | Page | Contents |
 | --- | --- |
-| `index.html` | Branding, hero with Apply / Login / Register, five loan cards, eligibility overview, working calculator preview, live feed, how it works, why choose us, customer benefits, rates & repayment table, testimonials, FAQ, security & trust, contact |
+| `index.html` | Branding, hero with Apply / Login / Register, five loan cards, eligibility overview, working calculator preview with basis selector, live feed + ticker + blog stream, how it works, why choose us, customer benefits, rates & repayment table, testimonials, FAQ, security & trust, contact |
 | `about.html` | Overview, mission & vision, values, history timeline, leadership, registration & licensing, CSR, location & contact |
 | `loan-products.html` | All eleven products with limits, terms, rates, fees, repayment frequency, eligibility, documents, plus a full comparison table |
 | `apply.html` | Five-step application: product & amount → personal/employment → business & bank → documents → review, with draft saving, reference number and confirmation |
-| `calculator.html` | Amount, rate, term, flat/reducing, monthly/fortnightly, processing & admin fees, instalment, interest, total repayment, APR, amortisation preview, CSV, print, reset, "Apply for This Loan" |
+| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **flat / reducing segmented selector**, amount, rate, term, monthly/fortnightly, processing & admin fees, instalment, annual outlay, interest, total repayment, APR, amortisation preview, CSV, print, reset, "Apply for This Loan" |
 | `eligibility.html` | Eight-question preliminary check scored out of 100 with per-criterion explanations and an apply link |
 | `how-it-works.html` | Ten steps from account creation to repayment and monitoring, with timings and requirements |
 | `interest-rates-fees.html` | Rate table with indicative APR, flat vs reducing comparison, every charge, three worked examples, total cost of borrowing |
@@ -27,8 +27,26 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | `register.html`, `login.html`, `verify.html`, `forgot-password.html`, `reset-password.html` | Registration, email-or-phone login, OTP verification, recovery, password reset, lockout and session handling |
 | `dashboard.html` | Customer portal (hash-routed single page) |
 | 14 legal pages | Privacy, Terms, Loan Agreement Terms, Cookies, Responsible Lending, Complaints, Data Protection, KYC, AML, Credit Reporting, Fees Disclosure, Customer Rights, Consent & Retention, Licensing |
-| `services.html`, `insights.html`, `insight-*.html`, `contact.html`, `live.html`, `admin.html`, `404.html` | Retained v1/v2 pages, re-skinned with the v3 header, footer and brand |
+| `live.html` | Live desk: animated feed widget, endless headline ticker, and the full live-blog stream |
+| `admin.html` | Administrator console: publish / edit / delete announcements, cards, photo posts and blog posts, upload or link an image, choose one of seven motions, pin, unpublish |
+| `services.html`, `insights.html`, `insight-*.html`, `contact.html`, `404.html` | Retained pages, re-skinned with the current header, footer and brand |
 | `products.html`, `portal.html` | Aliases that forward old links to the loan products page and the dashboard login |
+
+### Live blog, announcements and motion system
+
+Ten seeded posts across four formats — **announcement**, **card**, **photo update** and **live blog** —
+each with its own motion: **slide, flap, swipe, rotate, spin, swap** and **endless float** (a looping
+motion for standing notices). On top of that:
+
+- an endless marquee **ticker** of every published headline, pausing on hover and focus;
+- an auto-advancing feed (6.5 s) with previous / next / pause controls, dots and a live pulse;
+- a corner **notification toast** that inherits the post's motion on every public page;
+- the full **live-blog stream** on `live.html` and the four newest posts on the home page;
+- all of it managed from `admin.html` — password gate, image upload (resized to 1200 px and stored
+  as a data URL) or image URL, text, link + button label, motion, pin, publish/unpublish, edit and delete.
+
+Posts persist in `localStorage` (`jcob_live_posts_v1`) and read from a Supabase `live_posts` table
+without code changes once `assets/js/config.js` is filled in.
 
 ### Customer dashboard (all sections)
 
@@ -147,7 +165,8 @@ root as-is — there is no build step at runtime.
 
 ## Design, accessibility and performance
 
-- Emerald (`#03170f` → `#106648`) with liquid gold (`#8a6a12` → `#f7efd9`) and a cream paper base.
+- Emerald (`#04171a` → `#0d4a4b`) with blue liquid crystal (`#0a3f6b` → `#e6f3fd`) on an ice-paper base
+  (`#eef4fa`), frosted glass surfaces, iridescent facet highlights and a slow ambient drift.
 - Logo lockup in the header, footer, section headers, legal navigation, auth pages, receipts and
   printed documents.
 - Responsive breakpoints at 1180, 1024, 760 and 520 px; the dashboard sidebar collapses to a

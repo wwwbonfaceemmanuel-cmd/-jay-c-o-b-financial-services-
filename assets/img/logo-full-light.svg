@@ -1,13 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" aria-label="JAY C O B Financial Services">
   <defs>
     <linearGradient id="lockGradientLight" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0d5038"/>
-      <stop offset="1" stop-color="#03170f"/>
+      <stop offset="0" stop-color="#0d4a4a"/>
+      <stop offset="0.52" stop-color="#0a3f6b"/>
+      <stop offset="1" stop-color="#04171a"/>
+    </linearGradient>
+    <linearGradient id="crystalSheenLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.46"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#a8d8fb" stop-opacity="0.22"/>
+    </linearGradient>
+    <linearGradient id="wordMarkLight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c4e2fb"/>
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="16" fill="url(#lockGradientLight)"/>
-  <rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#d9b45a" stroke-opacity=".55"/>
-  <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="600" fill="#f0dcae" letter-spacing="-1">JC</text>
-  <text x="80" y="32" font-family="Georgia, 'Times New Roman', serif" font-size="23" font-weight="600" fill="#ffffff" letter-spacing="-0.4">JAY C O B</text>
-  <text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" font-weight="600" fill="#9db1c2" letter-spacing="2.3">FINANCIAL SERVICES</text>
+  <rect width="64" height="64" rx="16" fill="url(#crystalSheenLight)"/>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#a8d8fb" stroke-opacity=".6"/>
+  <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="600" fill="#eaf6ff" letter-spacing="-1">JC</text>
+  <text x="80" y="32" font-family="Georgia, 'Times New Roman', serif" font-size="23" font-weight="600" fill="url(#wordMarkLight)" letter-spacing="-0.4">JAY C O B</text>
+  <text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" font-weight="600" fill="#b8d4e6" letter-spacing="2.3">FINANCIAL SERVICES</text>
 </svg>

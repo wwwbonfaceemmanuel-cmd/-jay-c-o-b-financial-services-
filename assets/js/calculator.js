@@ -23,16 +23,73 @@
     long: { label: "Long-term Loan", rate: 21, min: 1000000, max: 60000000, term: 60, maxTerm: 84, fee: 2.5 }
   };
 
-  var state = { preset: "personal", amount: 5000000, rate: 24, term: 12, method: "reducing", frequency: "monthly", fee: 2, adminFee: 0, showAll: false };
+  var state = {
+    preset: "personal", amount: 5000000, rate: 24,
+    term: 1, termMonths: 1, basis: "monthly",
+    method: "reducing", frequency: "monthly",
+    fee: 2, adminFee: 0, showAll: false
+  };
 
   function $(id) { return document.getElementById(id); }
   function mwk(v) { return F.formatMWK(v); }
 
+  /* Radial/segmented selector for flat vs reducing */
+  function methodValue() {
+    var picked = document.querySelector('input[name="calc-method"]:checked');
+    return picked ? picked.value : state.method;
+  }
+  function setMethod(value) {
+    var input = document.querySelector('input[name="calc-method"][value="' + value + '"]');
+    if (input) input.checked = true;
+    state.method = value;
+  }
+
+  /* Monthly / annual basis changes the unit of the term field */
+  function termMonths() {
+    return state.basis === "annual" ? state.term * 12 : state.term;
+  }
+  function syncTermField(keepValue) {
+    var p = PRESETS[state.preset];
+    var termEl = $("calc-term");
+    var label = $("calc-term-label");
+    var hint = $("calc-term-hint");
+    var basisHint = $("calc-basis-hint");
+    if (!termEl) return;
+    if (state.basis === "annual") {
+      if (label) label.textContent = "Repayment period (years)";
+      termEl.min = "1";
+      termEl.max = String(Math.max(1, Math.ceil(p.maxTerm / 12)));
+      termEl.step = "1";
+      if (!keepValue) termEl.value = "1";
+      if (basisHint) basisHint.textContent = "Annual quotation: 1 year to start (12 instalments)";
+    } else {
+      if (label) label.textContent = "Repayment period (months)";
+      termEl.min = "1";
+      termEl.max = String(p.maxTerm);
+      termEl.step = "1";
+      if (!keepValue) termEl.value = "1";
+      if (basisHint) basisHint.textContent = "Monthly quotation: 1 month to start";
+    }
+    if (keepValue) {
+      var current = Math.max(Math.round(Number(termEl.value) || 1), 1);
+      var max = Number(termEl.max) || 84;
+      termEl.value = String(Math.min(current, max));
+    }
+    state.term = Math.max(Math.round(Number(termEl.value) || 1), 1);
+    if (hint) {
+      hint.textContent = state.basis === "annual"
+        ? "= " + (state.term * 12) + " monthly instalments"
+        : state.term + (state.term === 1 ? " monthly instalment" : " monthly instalments");
+    }
+  }
+
   function readInputs() {
     state.amount = Math.max(Number($("calc-amount").value) || 0, 0);
     state.rate = Math.max(Number($("calc-rate").value) || 0, 0);
+    state.basis = $("calc-basis") ? $("calc-basis").value : "monthly";
     state.term = Math.max(Math.round(Number($("calc-term").value) || 1), 1);
-    state.method = $("calc-method").value;
+    state.termMonths = termMonths();
+    state.method = methodValue();
     state.frequency = $("calc-frequency").value;
     state.fee = Math.max(Number($("calc-fee").value) || 0, 0);
     state.adminFee = Math.max(Number($("calc-admin").value) || 0, 0);
@@ -40,7 +97,7 @@
 
   function compute() {
     return F.amortize({
-      principal: state.amount, rate: state.rate, termMonths: state.term,
+      principal: state.amount, rate: state.rate, termMonths: state.termMonths,
       method: state.method, frequency: state.frequency,
       processingFeePct: state.fee, adminFee: state.adminFee
     });
@@ -59,6 +116,14 @@
     $("res-rate").textContent = c.rate + "% p.a.";
     $("res-apr").textContent = c.apr.toFixed(1) + "%";
     $("res-instalments").textContent = c.periods + " × " + mwk(c.payment);
+    var perYear = state.frequency === "fortnightly" ? 26 : 12;
+    var annual = c.payment * perYear;
+    if ($("res-annual")) $("res-annual").textContent = mwk(annual);
+    if ($("res-basis")) {
+      $("res-basis").textContent = state.basis === "annual"
+        ? "Annually · " + state.term + (state.term === 1 ? " year" : " years") + " (" + c.periods + " instalments)"
+        : "Monthly · " + state.term + (state.term === 1 ? " month" : " months");
+    }
     $("res-method").textContent = state.method === "flat" ? "Flat rate" : "Reducing balance";
     $("res-frequency").textContent = c.frequencyLabel;
     $("res-first").textContent = F.shortDate(c.firstDue);
@@ -69,7 +134,7 @@
     $("bar-interest").style.width = Math.max(100 - pct, 0).toFixed(1) + "%";
 
     var other = F.amortize({
-      principal: state.amount, rate: state.rate, termMonths: state.term,
+      principal: state.amount, rate: state.rate, termMonths: state.termMonths,
       method: state.method === "flat" ? "reducing" : "flat", frequency: state.frequency,
       processingFeePct: state.fee, adminFee: state.adminFee
     });
@@ -81,7 +146,7 @@
         : "Both methods produce the same total at these inputs.";
 
     $("calc-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · " + p.maxTerm + " months maximum";
-    $("apply-link").href = "apply.html?product=" + encodeURIComponent(p.label) + "&amount=" + state.amount + "&term=" + state.term;
+    $("apply-link").href = "apply.html?product=" + encodeURIComponent(p.label) + "&amount=" + state.amount + "&term=" + state.termMonths;
     $("calc-aside-note").textContent = "Indicative only — final terms follow credit and affordability assessment.";
     renderSchedule(c);
   }
@@ -109,15 +174,14 @@
     state.preset = key;
     state.rate = p.rate;
     state.fee = p.fee;
-    state.term = p.term;
     state.amount = Math.min(Math.max(state.amount, p.min), p.max);
     $("calc-amount").value = state.amount;
     $("calc-amount").min = p.min;
     $("calc-amount").max = p.max;
     $("calc-rate").value = p.rate;
-    $("calc-term").value = state.term;
-    $("calc-term").max = p.maxTerm;
     $("calc-fee").value = p.fee;
+    syncTermField(true);
+    state.termMonths = termMonths();
     render();
   }
 
@@ -147,25 +211,49 @@
 
   function reset() {
     state.showAll = false;
+    if ($("calc-basis")) $("calc-basis").value = "monthly";
+    state.basis = "monthly";
     applyPreset("personal");
     $("calc-amount").value = 5000000;
-    $("calc-method").value = "reducing";
+    setMethod("reducing");
     $("calc-frequency").value = "monthly";
     $("calc-admin").value = 0;
     readInputs();
     render();
-    UI.toast({ title: "Calculator reset", message: "Default personal loan figures restored.", type: "info" });
+    UI.toast({ title: "Calculator reset", message: "Monthly basis, 1 month, reducing balance restored.", type: "info" });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
       radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
-    ["calc-amount", "calc-rate", "calc-term", "calc-method", "calc-frequency", "calc-fee", "calc-admin"].forEach(function (id) {
+    ["calc-amount", "calc-rate", "calc-term", "calc-frequency", "calc-fee", "calc-admin"].forEach(function (id) {
       var el = $(id);
       if (!el) return;
       el.addEventListener("input", function () { readInputs(); render(); });
       el.addEventListener("change", function () { readInputs(); render(); });
+    });
+
+    if ($("calc-basis")) {
+      $("calc-basis").addEventListener("change", function () {
+        state.basis = $("calc-basis").value;
+        syncTermField(false);
+        readInputs();
+        render();
+        UI.toast({
+          title: state.basis === "annual" ? "Annual basis" : "Monthly basis",
+          message: state.basis === "annual" ? "Repayment period is now in years — 1 year (12 instalments)." : "Repayment period is now in months — 1 month.",
+          type: "info"
+        });
+      });
+    }
+
+    document.querySelectorAll('input[name="calc-method"]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        state.method = radio.value;
+        readInputs();
+        render();
+      });
     });
     $("calc-reset").addEventListener("click", reset);
     $("calc-export").addEventListener("click", exportCSV);
@@ -184,6 +272,17 @@
     }
     if (params.get("amount")) $("calc-amount").value = Number(params.get("amount"));
     if (params.get("term")) $("calc-term").value = Number(params.get("term"));
+    if (params.get("basis") === "annual" && $("calc-basis")) {
+      $("calc-basis").value = "annual";
+      state.basis = "annual";
+      syncTermField(true);
+    }
+    state.term = Math.max(Math.round(Number($("calc-term").value) || 1), 1);
+    if ($("calc-term-hint")) {
+      $("calc-term-hint").textContent = state.basis === "annual"
+        ? "= " + (state.term * 12) + " monthly instalments"
+        : state.term + (state.term === 1 ? " monthly instalment" : " monthly instalments");
+    }
     readInputs();
     render();
   });

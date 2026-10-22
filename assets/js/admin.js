@@ -34,7 +34,78 @@
   var cancelBtn = document.getElementById("post-cancel");
   var statusEl = document.getElementById("post-status");
   var formHeading = document.getElementById("post-form-heading");
+  var fileEl = document.getElementById("post-image-file");
+  var previewWrap = document.getElementById("post-image-preview");
+  var previewImg = document.getElementById("post-image-preview-img");
+  var clearImageBtn = document.getElementById("post-image-clear");
   var editingId = null;
+  var uploadedImage = "";
+
+  function showPreview(src) {
+    uploadedImage = src || "";
+    if (!previewWrap || !previewImg) return;
+    if (uploadedImage) {
+      previewImg.src = uploadedImage;
+      previewWrap.hidden = false;
+    } else {
+      previewImg.removeAttribute("src");
+      previewWrap.hidden = true;
+    }
+  }
+
+  /* Downscale uploads so a data URL fits comfortably in localStorage */
+  function readImageFile(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = function () { reject(new Error("read failed")); };
+      reader.onload = function () {
+        var img = new Image();
+        img.onerror = function () { resolve(String(reader.result || "")); };
+        img.onload = function () {
+          try {
+            var max = 1200;
+            var scale = Math.min(1, max / Math.max(img.width, img.height));
+            var canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", 0.82));
+          } catch (err) {
+            resolve(String(reader.result || ""));
+          }
+        };
+        img.src = String(reader.result || "");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (fileEl) {
+    fileEl.addEventListener("change", function () {
+      var file = fileEl.files && fileEl.files[0];
+      if (!file) return;
+      if (!/^image\//.test(file.type)) {
+        statusEl.className = "form-status is-visible form-status--error";
+        statusEl.textContent = "That file is not an image. Choose a JPG, PNG or WebP file.";
+        return;
+      }
+      readImageFile(file).then(function (dataUri) {
+        showPreview(dataUri);
+        statusEl.className = "form-status is-visible";
+        statusEl.textContent = "Image ready: " + file.name + ". It will be attached when you publish.";
+      }).catch(function () {
+        statusEl.className = "form-status is-visible form-status--error";
+        statusEl.textContent = "Could not read that image. Try a smaller file or paste a URL instead.";
+      });
+    });
+  }
+
+  if (clearImageBtn) {
+    clearImageBtn.addEventListener("click", function () {
+      showPreview("");
+      if (fileEl) fileEl.value = "";
+    });
+  }
 
   function refresh() {
     if (window.JCOB_LIVE && window.JCOB_LIVE.initFeeds) window.JCOB_LIVE.initFeeds();
@@ -70,6 +141,7 @@
 
   /* ---------------- Form helpers ---------------- */
   function imageValue() {
+    if (uploadedImage) return uploadedImage;
     if (imageEl.value === "custom") {
       return (customImageEl.value || "").trim();
     }
@@ -92,6 +164,8 @@
     publishedEl.checked = true;
     imageEl.value = "";
     customImageWrap.hidden = true;
+    if (fileEl) fileEl.value = "";
+    showPreview("");
     formHeading.textContent = "Publish a live update";
     submitBtn.textContent = "Publish update";
     if (cancelBtn) cancelBtn.hidden = true;
@@ -117,7 +191,7 @@
     }
     if (type === "image" && !imageValue()) {
       statusEl.className = "form-status is-visible form-status--error";
-      statusEl.textContent = "Choose an image for a photo update.";
+      statusEl.textContent = "Choose or upload an image for a photo update.";
       return;
     }
 
@@ -175,12 +249,18 @@
       list.innerHTML = '<p class="text-small text-muted">No updates yet. Publish the first one.</p>';
       return;
     }
+    var labels = (window.JCOB_LIVE && window.JCOB_LIVE.typeLabels) || {};
+    var anims = (window.JCOB_LIVE && window.JCOB_LIVE.animationLabels) || {};
     list.innerHTML = posts.map(function (p) {
-      var type = (p.type || "announcement").slice(0, 3);
+      var type = p.type || "announcement";
+      var thumb = p.image
+        ? '<img class="admin-thumb" src="' + escapeHtml(p.image) + '" alt="" loading="lazy">'
+        : '<span class="admin-type">' + escapeHtml((labels[type] || type).slice(0, 3)) + "</span>";
       return '<div class="admin-item' + (p.published === false ? " is-hidden" : "") + '" data-id="' + escapeHtml(p.id) + '">' +
-        '<span class="admin-type">' + escapeHtml(type) + "</span>" +
+        thumb +
         "<div><strong>" + escapeHtml(p.title) + "</strong>" +
-        '<span class="meta">' + shortDate(p.date) + " · " + escapeHtml(p.animation || "slide") +
+        '<span class="meta">' + (labels[type] || type) + " · " + shortDate(p.date) + " · " +
+        escapeHtml(anims[p.animation] || p.animation || "slide") +
         " · " + (p.published === false ? "draft" : "published") + (p.pinned ? " · pinned" : "") + "</span></div>" +
         '<div class="admin-actions">' +
         '<button class="icon-btn" type="button" data-action="toggle" title="Publish / unpublish">' + (p.published === false ? "◻" : "◼") + "</button>" +
@@ -220,15 +300,23 @@
       publishedEl.checked = post.published !== false;
 
       var preset = post.image || "";
-      var known = Array.prototype.some.call(imageEl.options, function (o) { return o.value === preset; });
-      if (preset && !known) {
-        imageEl.value = "custom";
-        customImageWrap.hidden = false;
-        customImageEl.value = preset;
-      } else {
-        imageEl.value = preset;
+      if (preset.indexOf("data:") === 0) {
+        imageEl.value = "";
         customImageWrap.hidden = true;
         customImageEl.value = "";
+        showPreview(preset);
+      } else {
+        var known = Array.prototype.some.call(imageEl.options, function (o) { return o.value === preset; });
+        showPreview("");
+        if (preset && !known) {
+          imageEl.value = "custom";
+          customImageWrap.hidden = false;
+          customImageEl.value = preset;
+        } else {
+          imageEl.value = preset;
+          customImageWrap.hidden = true;
+          customImageEl.value = "";
+        }
       }
 
       formHeading.textContent = "Edit live update";
@@ -236,7 +324,7 @@
       cancelBtn.hidden = false;
       statusEl.className = "form-status";
       statusEl.textContent = "";
-      form.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (form.scrollIntoView) form.scrollIntoView({ behavior: "smooth", block: "center" });
       titleEl.focus({ preventScroll: true });
     }
   });
@@ -244,7 +332,7 @@
   var resetBtn = document.getElementById("reset-posts");
   if (resetBtn) {
     resetBtn.addEventListener("click", function () {
-      if (!window.confirm("Restore the four demo updates? Your published changes will be removed.")) return;
+      if (!window.confirm("Restore the ten demo updates? Your published changes will be removed.")) return;
       try { window.localStorage.removeItem(window.JCOB_LIVE.KEY); } catch (e) {}
       resetForm();
       refresh();

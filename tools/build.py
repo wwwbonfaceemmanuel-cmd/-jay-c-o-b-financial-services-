@@ -31,7 +31,7 @@ SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
 BASE_SCRIPTS = ["assets/js/config.js", "assets/js/finance.js", "assets/js/app-data.js",
-                "assets/js/ui.js", "assets/js/main.js"]
+                "assets/js/ui.js", "assets/js/main.js", "assets/js/live.js"]
 
 
 def esc(value: str) -> str:
@@ -198,7 +198,7 @@ HEAD = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>%(title)s</title>
   <meta name="description" content="%(desc)s">
-  <meta name="theme-color" content="#03170f">
+  <meta name="theme-color" content="#06262a">
   <meta property="og:title" content="%(title)s">
   <meta property="og:description" content="%(desc)s">
   <meta property="og:type" content="website">
@@ -410,7 +410,7 @@ def build_dashboard() -> None:
   <title>My dashboard — JAY C O B FINANCIAL SERVICES</title>
   <meta name="description" content="Manage loans, repayments, documents and account security from your JAY C O B FINANCIAL SERVICES customer dashboard.">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#03170f">
+  <meta name="theme-color" content="#06262a">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

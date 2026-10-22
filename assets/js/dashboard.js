@@ -38,6 +38,11 @@
   };
 
   /* ---------------- Helpers ---------------- */
+  function pwToggle(id) {
+    return '<button type="button" class="pw-toggle" data-pw-toggle="' + id + '" aria-label="Show password" aria-pressed="false" title="Show password">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>';
+  }
+
   function esc(v) {
     return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -1113,11 +1118,15 @@
           '<form id="password-form">' +
             '<div class="field"><label for="sec-current">Current password</label>' +
               '<div class="pw-wrap"><input id="sec-current" type="password" autocomplete="current-password">' +
-              '<button type="button" class="pw-toggle" data-pw-toggle="sec-current" aria-label="Show password" aria-pressed="false" style="position:absolute;right:.4rem;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;background:transparent;cursor:pointer;">👁</button></div></div>' +
-            '<div class="field" style="margin-top:.8rem;"><label for="sec-new">New password</label><input id="sec-new" type="password" autocomplete="new-password"></div>' +
+              pwToggle("sec-current") + '</div></div>' +
+            '<div class="field" style="margin-top:.8rem;"><label for="sec-new">New password</label>' +
+              '<div class="pw-wrap"><input id="sec-new" type="password" autocomplete="new-password">' +
+              pwToggle("sec-new") + '</div></div>' +
             '<div class="pw-meter" id="sec-meter"><i></i><i></i><i></i><i></i><i></i></div>' +
             '<p class="pw-hint" id="sec-hint">Use at least 8 characters, including a number and a symbol.</p>' +
-            '<div class="field" style="margin-top:.8rem;"><label for="sec-confirm">Confirm new password</label><input id="sec-confirm" type="password" autocomplete="new-password"></div>' +
+            '<div class="field" style="margin-top:.8rem;"><label for="sec-confirm">Confirm new password</label>' +
+              '<div class="pw-wrap"><input id="sec-confirm" type="password" autocomplete="new-password">' +
+              pwToggle("sec-confirm") + '</div></div>' +
             '<button class="btn btn--gold" type="submit" style="margin-top:.9rem;">Update password</button>' +
             '<p class="form-status" id="security-status"></p>' +
           "</form>") +
@@ -1776,7 +1785,7 @@
         var v = $("sec-new").value;
         var score = Math.min(5, (v.length >= 8 ? 2 : 0) + (/\d/.test(v) ? 1 : 0) + (/[A-Z]/.test(v) ? 1 : 0) + (/[^A-Za-z0-9]/.test(v) ? 1 : 0));
         meter.querySelectorAll("i").forEach(function (bar, i) {
-          bar.style.background = i < score ? (score <= 2 ? "var(--danger)" : score <= 3 ? "#b8912a" : "var(--success)") : "var(--line)";
+          bar.style.background = i < score ? (score <= 2 ? "var(--danger)" : score <= 3 ? "#2a76b8" : "var(--success)") : "var(--line)";
         });
       });
       pfSec.addEventListener("submit", function (e) {

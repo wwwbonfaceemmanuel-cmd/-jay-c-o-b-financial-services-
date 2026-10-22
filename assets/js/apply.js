@@ -75,7 +75,7 @@
       '<div class="row"><span>Indicative rate</span><strong>' + p.rate + "% p.a. (reducing)</strong></div>" +
       '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
       '<div class="row"><span>Total repayment</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
-      '<p class="result-note" style="font-size:.7rem;color:#9db3a4;margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
+      '<p class="result-note" style="font-size:.7rem;color:#9bb5b0;margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
   }
 
   function stepOne() {
