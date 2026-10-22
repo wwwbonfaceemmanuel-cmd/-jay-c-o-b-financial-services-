@@ -33,8 +33,8 @@
 -- documents as numbers, so nothing is rounded on the way in or out.
 --
 -- Layout
---   1. helpers            is_staff(), is_admin(), touch()
---   2. profiles           one row per Supabase Auth user (carries role)
+--   1. profiles           one row per Supabase Auth user (carries role)
+--   2. helpers            is_staff(), is_admin(), touch()
 --   3. site_docs          public website content (catalogue, settings,
 --                         page overrides, live feed)
 --   4. portal_docs        the admin console database (staff only)
@@ -46,7 +46,27 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- 1. HELPERS
+-- 1. PROFILES
+-- ---------------------------------------------------------------------
+create table if not exists public.profiles (
+  id          uuid primary key references auth.users (id) on delete cascade,
+  full_name   text not null default '',
+  email       text,
+  phone       text,
+  account_no  text,
+  role        text not null default 'customer'
+              check (role in ('customer', 'officer', 'credit', 'staff', 'admin')),
+  status      text not null default 'active'
+              check (status in ('active', 'suspended', 'closed')),
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+create unique index if not exists profiles_account_no_idx
+  on public.profiles (account_no) where account_no is not null;
+
+-- ---------------------------------------------------------------------
+-- 2. HELPERS
 -- ---------------------------------------------------------------------
 create or replace function public.is_staff()
 returns boolean
@@ -85,26 +105,6 @@ begin
 end;
 $$;
 
--- ---------------------------------------------------------------------
--- 2. PROFILES
--- ---------------------------------------------------------------------
-create table if not exists public.profiles (
-  id          uuid primary key references auth.users (id) on delete cascade,
-  full_name   text not null default '',
-  email       text,
-  phone       text,
-  account_no  text,
-  role        text not null default 'customer'
-              check (role in ('customer', 'officer', 'credit', 'staff', 'admin')),
-  status      text not null default 'active'
-              check (status in ('active', 'suspended', 'closed')),
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now()
-);
-
-create unique index if not exists profiles_account_no_idx
-  on public.profiles (account_no) where account_no is not null;
-
 alter table public.profiles enable row level security;
 
 drop policy if exists "read own profile" on public.profiles;
@@ -138,6 +138,12 @@ security definer
 set search_path = public
 as $$
 begin
+  /* No JWT means a server-side session (SQL editor, migration, service
+     role) — already privileged. API callers always carry a JWT. */
+  if auth.uid() is null then
+    new.updated_at = now();
+    return new;
+  end if;
   if new.role is distinct from old.role and not public.is_staff() then
     raise exception 'Only administrators can change a role';
   end if;
