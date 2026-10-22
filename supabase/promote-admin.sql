@@ -8,14 +8,19 @@
 --     It can open the admin console, change the website, publish the live
 --     feed, approve applications and read every customer document.
 --   * 'staff', 'officer' and 'credit' are ordinary staff roles: they can
---     use the console but the app treats 'admin' as the owner role.
+--     use the console, but the app treats 'admin' as the owner role.
 --
--- The script is safe to re-run, and it repairs the profile row if the
--- signup trigger did not create one (for example when the account was
--- added before the schema was installed).
+-- Behaviour
+--   • Leave target_email as null and, when the project has exactly one
+--     account, that account is promoted — no editing needed.
+--   • With several accounts it stops and lists them, so nothing is
+--     promoted by accident; set target_email and run it again.
+--   • It repairs a missing profile row (an account created before the
+--     schema was installed), then promotes it.
+-- Safe to re-run.
 -- =====================================================================
 
--- 1. Which accounts exist? (copy the exact email into step 2)
+-- 1. Which accounts exist? ---------------------------------------------
 select u.id,
        u.email,
        u.email_confirmed_at is not null as confirmed,
@@ -26,20 +31,36 @@ select u.id,
   left join public.profiles p on p.id = u.id
  order by u.created_at desc;
 
--- 2. Promote -----------------------------------------------------------------
---    Change the address below, then run the whole DO block.
+-- 2. Promote -----------------------------------------------------------
 do $$
 declare
-  target_email text := 'you@jaycobfinancial.mw';   -- <-- EDIT THIS
-  target_id uuid;
+  target_email text := null;      -- e.g. 'owner@jaycobfinancial.mw'; null = auto
+  target_id    uuid;
+  total        int;
+  candidates   text;
+  promoted     text;
 begin
-  select id into target_id
-    from auth.users
-   where lower(email) = lower(trim(target_email))
-   limit 1;
-
-  if target_id is null then
-    raise exception 'No account found for %. Create it in Authentication -> Users first.', target_email;
+  if target_email is not null and trim(target_email) <> '' then
+    select id into target_id
+      from auth.users
+     where lower(email) = lower(trim(target_email))
+     limit 1;
+    if target_id is null then
+      raise exception 'No account found for %. Run step 1 to see the addresses that exist.', target_email;
+    end if;
+  else
+    select count(*) into total from auth.users;
+    if total = 0 then
+      raise exception 'No accounts yet. Create one in Authentication -> Users first.';
+    elsif total > 1 then
+      select string_agg(email, ', ' order by created_at)
+        into candidates
+        from auth.users;
+      raise exception 'This project has % accounts (%). Set target_email at the top of this block to the one you want.',
+        total, candidates;
+    else
+      select id into target_id from auth.users limit 1;
+    end if;
   end if;
 
   -- Create the profile if the signup trigger missed it, otherwise promote.
@@ -59,11 +80,12 @@ begin
          email      = excluded.email,
          updated_at = now();
 
-  raise notice '% is now a Super Admin (role: admin).', target_email;
+  select email into promoted from auth.users where id = target_id;
+  raise notice '% is now a Super Admin (role: admin).', promoted;
 end
 $$;
 
--- 3. Confirm ----------------------------------------------------------------
+-- 3. Confirm ------------------------------------------------------------
 select p.email,
        p.role,
        p.status,
@@ -77,16 +99,16 @@ select p.email,
  order by (p.role = 'admin') desc, p.email;
 
 -- ---------------------------------------------------------------------
--- Shortcut for later: the same promotion in one line (does not repair a
--- missing profile row, so prefer step 2 if this returns "No profile matched").
+-- Shortcut once the profile row exists (does not repair a missing row):
 --
 --   select public.promote_staff('another.admin@jaycobfinancial.mw');
 --
--- To demote someone back to a customer:
+-- Demote back to a customer:
 --
---   update public.profiles set role = 'customer' where lower(email) = lower('someone@example.com');
+--   update public.profiles
+--      set role = 'customer'
+--    where lower(email) = lower('someone@example.com');
 --
--- To check what the website itself sees, open system-check.html and sign in
--- with the account: the "Administrator role" and "Write test" lines must be
--- green.
+-- Then open system-check.html and sign in: "Administrator role" and
+-- "Write test (admin)" must both be green.
 -- ---------------------------------------------------------------------
