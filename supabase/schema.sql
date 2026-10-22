@@ -242,6 +242,11 @@ create policy "staff write customer documents" on public.customer_docs
   using (public.is_staff())
   with check (public.is_staff());
 
+drop policy if exists "staff insert customer documents" on public.customer_docs;
+create policy "staff insert customer documents" on public.customer_docs
+  for insert to authenticated
+  with check (public.is_staff());
+
 drop trigger if exists customer_docs_touch on public.customer_docs;
 create trigger customer_docs_touch
   before update on public.customer_docs
@@ -365,36 +370,45 @@ insert into storage.buckets (id, name, public)
 values ('kyc-documents', 'kyc-documents', false)
 on conflict (id) do nothing;
 
-drop policy if exists "site media is public" on storage.objects;
-create policy "site media is public" on storage.objects
-  for select to anon, authenticated
-  using (bucket_id = 'site-media');
-
-drop policy if exists "staff upload site media" on storage.objects;
-create policy "staff upload site media" on storage.objects
-  for insert to authenticated
-  with check (bucket_id = 'site-media' and public.is_staff());
-
-drop policy if exists "staff update site media" on storage.objects;
-create policy "staff update site media" on storage.objects
-  for update to authenticated
-  using (bucket_id = 'site-media' and public.is_staff());
-
-drop policy if exists "staff delete site media" on storage.objects;
-create policy "staff delete site media" on storage.objects
-  for delete to authenticated
-  using (bucket_id = 'site-media' and public.is_staff());
-
-drop policy if exists "own kyc documents" on storage.objects;
-create policy "own kyc documents" on storage.objects
-  for all to authenticated
-  using (bucket_id = 'kyc-documents' and (storage.foldername(name))[1] = auth.uid()::text)
-  with check (bucket_id = 'kyc-documents' and (storage.foldername(name))[1] = auth.uid()::text);
-
-drop policy if exists "staff read kyc documents" on storage.objects;
-create policy "staff read kyc documents" on storage.objects
-  for select to authenticated
-  using (bucket_id = 'kyc-documents' and public.is_staff());
+-- Storage policies. Created through dynamic SQL so that a project where the
+-- SQL editor cannot modify storage.objects still completes every other step.
+-- If a notice is raised, add the same policies in Dashboard -> Storage ->
+-- Policies (the names are listed in the notice).
+do $storage$
+declare
+  stmt text;
+  policy_rows text[][] := array[
+    array['site media is public', 'select', 'anon, authenticated',
+          'bucket_id = ''site-media''', null],
+    array['staff upload site media', 'insert', 'authenticated',
+          null, 'bucket_id = ''site-media'' and public.is_staff()'],
+    array['staff update site media', 'update', 'authenticated',
+          'bucket_id = ''site-media'' and public.is_staff()', null],
+    array['staff delete site media', 'delete', 'authenticated',
+          'bucket_id = ''site-media'' and public.is_staff()', null],
+    array['own kyc documents', 'all', 'authenticated',
+          'bucket_id = ''kyc-documents'' and (storage.foldername(name))[1] = auth.uid()::text',
+          'bucket_id = ''kyc-documents'' and (storage.foldername(name))[1] = auth.uid()::text'],
+    array['staff read kyc documents', 'select', 'authenticated',
+          'bucket_id = ''kyc-documents'' and public.is_staff()', null]
+  ];
+  item text[];
+  policy_name text;
+begin
+  foreach item slice 1 in array policy_rows loop
+    policy_name := item[1];
+    begin
+      execute format('drop policy if exists %I on storage.objects', policy_name);
+      stmt := format('create policy %I on storage.objects for %s to %s', policy_name, item[2], item[3]);
+      if item[4] is not null then stmt := stmt || format(' using (%s)', item[4]); end if;
+      if item[5] is not null then stmt := stmt || format(' with check (%s)', item[5]); end if;
+      execute stmt;
+    exception when insufficient_privilege or undefined_table or undefined_object then
+      raise notice 'Could not create storage policy %. Add it in Dashboard -> Storage -> Policies.', policy_name;
+    end;
+  end loop;
+end;
+$storage$;
 
 -- ---------------------------------------------------------------------
 -- 9. STAFF HELPERS
@@ -422,7 +436,7 @@ begin
 end;
 $$;
 
-revoke all on function public.promote_staff(text) from anon, authenticated;
+revoke all on function public.promote_staff(text) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------
 -- 10. OPTIONAL: realtime for live updates and staff dashboards
@@ -431,11 +445,11 @@ do $$
 begin
   begin
     alter publication supabase_realtime add table public.site_docs;
-  exception when duplicate_object then null;
+  exception when duplicate_object or undefined_object then null;
   end;
   begin
     alter publication supabase_realtime add table public.customer_docs;
-  exception when duplicate_object then null;
+  exception when duplicate_object or undefined_object then null;
   end;
 end;
 $$;
