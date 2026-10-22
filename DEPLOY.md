@@ -9,8 +9,9 @@ three values and running one SQL file.
 `cybaejegytnvtitznofp.supabase.co`, so the site is in cloud mode as soon as
 it is served. Two things remain, and both need your Supabase login:
 
-1. **Run `supabase/schema.sql`** in the SQL editor (creates every table,
-   policy, trigger and bucket).
+1. **Run `supabase/install.sql`** in the SQL editor — one paste that
+   creates every table, policy, trigger and bucket *and* publishes the
+   website's settings, the eleven products and the live posts.
 2. **Create your administrator** and promote it with `promote_staff`.
 
 After that, open **`system-check.html`** on the deployed site: it tests the
@@ -69,8 +70,23 @@ Visitor / customer            Admin console (admin.html)
    repository or the browser.
 
 2. Open **SQL Editor → New query**, paste the whole of
-   [`supabase/schema.sql`](supabase/schema.sql) and press **Run**.
-   It is idempotent — running it twice is safe.
+   [`supabase/install.sql`](supabase/install.sql) and press **Run**.
+
+   That one file is the schema **plus** the seed: tables, policies,
+   triggers and storage buckets, then the website's settings, the eleven
+   products and the ten live-feed posts. Once it has run, the database —
+   not the browser — is what every visitor reads.
+
+   It is idempotent: running it twice is safe, and re-running never
+   overwrites content an administrator has already edited.
+
+   *Prefer the pieces separately?* `supabase/schema.sql`, then
+   `supabase/seed.sql`. Using the Supabase CLI? The schema is also at
+   `supabase/migrations/20261022000001_init.sql`.
+
+   The seed is generated from the site's own defaults with
+   `node tools/db/generate-seed.js && node tools/db/build-install.js`, so
+   the database can never drift from the code.
 
 3. Open **Project Settings → API** and copy:
    * **Project URL** — `https://xxxxx.supabase.co`
@@ -91,7 +107,14 @@ Visitor / customer            Admin console (admin.html)
      select public.promote_staff('you@jaycobfinancial.mw');
      ```
 
-     The reply should say `… is now an administrator.`
+     The reply should say `… is now an administrator.` (role `admin`, shown
+     in the console as **Super Admin**).
+
+     If that replies *"No profile matched"* — for example because the user
+     was created before the schema was installed — run
+     [`supabase/promote-admin.sql`](supabase/promote-admin.sql) instead: it
+     creates the missing profile row and promotes the account, then prints
+     a verification table.
 
 6. Create the customer you will use for testing (either register through
    the website, or **Add user** the same way).

@@ -185,7 +185,8 @@ Operational details:
   `Cloud error` badge in the Website connection panel.
 
 The project is already pointed at Supabase (`cybaejegytnvtitznofp`). Two steps remain:
-run `supabase/schema.sql`, then promote your administrator. Open
+run `supabase/install.sql` (schema + seeded content in one paste), then promote your
+administrator. Open
 **`system-check.html`** on the deployed site for a live diagnosis — it tests the configuration,
 every table, the website documents, the media bucket and a real administrator sign-in, and prints
 the exact fix for anything red.
@@ -212,10 +213,14 @@ persistence, registration, sign-in, recovery, enquiries, dashboard guard) and th
 ├── env.js                      # placeholder runtime config for static hosts
 ├── Dockerfile · railway.json   # Railway build (Node 20)
 ├── DEPLOY.md                   # Supabase + Railway setup and first-run checklist
+├── supabase/install.sql        # ONE PASTE: schema + seed (generated)
 ├── supabase/schema.sql         # tables, RLS policies, triggers, storage buckets
+├── supabase/seed.sql           # settings, catalogue and live posts (generated)
+├── supabase/migrations/        # same schema for the Supabase CLI
 ├── system-check.html           # live connection diagnostic (noindex)
 ├── tools/dev/mock-cloud.js     # in-memory Supabase stand-in for local testing
 ├── tools/tests/                # browser suites (npm test)
+├── tools/db/                   # seed generator + installer builder
 ├── assets/
 │   ├── css/styles.css          # tokens, v3 theme block, components, responsive, print
 │   ├── img/                    # logo lockups, favicon, photography
@@ -247,7 +252,7 @@ persistence, registration, sign-in, recovery, enquiries, dashboard guard) and th
 │   ├── legal_docs.py           # legal document content
 │   ├── retheme_legacy.py       # re-skins retained pages with the v3 chrome
 │   └── pages/                  # page body fragments consumed by build.py
-├── supabase/schema.sql         # future database schema
+├── supabase/                    # schema, seed, one-step installer, migrations
 ├── sitemap.xml, robots.txt
 └── README.md
 ```

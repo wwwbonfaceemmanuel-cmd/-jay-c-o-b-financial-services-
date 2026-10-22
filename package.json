@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "node server.js",
     "test": "node tools/tests/run.js",
-    "check": "node tools/tests/run.js"
+    "check": "node tools/tests/run.js",
+    "seed": "node tools/db/generate-seed.js && node tools/db/build-install.js",
+    "verify:db": "node tools/db/verify-seed.js"
   },
   "engines": {
     "node": ">=20"
