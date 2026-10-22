@@ -30,8 +30,10 @@ EMAIL = "hello@jaycobfinancial.mw"
 SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
-BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/cloud.js",
+BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/demo-mode.js",
+                "assets/js/cloud.js",
                 "assets/js/site-store.js", "assets/js/finance.js",
+                "assets/js/demo-customer.js", "assets/js/demo-portal.js",
                 "assets/js/app-data.js", "assets/js/ui.js", "assets/js/main.js",
                 "assets/js/live.js", "assets/js/site-content.js"]
 
@@ -423,8 +425,11 @@ def build_dashboard() -> None:
 %(body)s
   <script src="env.js" defer></script>
   <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/demo-mode.js" defer></script>
   <script src="assets/js/cloud.js" defer></script>
   <script src="assets/js/finance.js" defer></script>
+  <script src="assets/js/demo-customer.js" defer></script>
+  <script src="assets/js/demo-portal.js" defer></script>
   <script src="assets/js/app-data.js" defer></script>
   <script src="assets/js/ui.js" defer></script>
   <script src="assets/js/apply.js" defer></script>

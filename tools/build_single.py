@@ -158,8 +158,8 @@ def patch_js(name: str, code: str, images=None) -> str:
         code = code.replace('bindPwMeter("reset-password", "pw-meter", "pw-hint")',
                             'bindPwMeter("reset-password", "reset-pw-meter", "reset-pw-hint")')
     if name == "dashboard.js":
-        old = 'if (!session && params.get("demo") === "1") {'
-        new = 'if (!session && (params.get("demo") === "1" || window.JCOB_SINGLE)) {'
+        old = 'if (!session && DEMO && DEMO.on()) {'
+        new = 'if (!session && ((DEMO && DEMO.on()) || window.JCOB_SINGLE)) {'
         assert old in code, "dashboard session guard not found"
         code = code.replace(old, new, 1)
     if images:

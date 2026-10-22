@@ -89,7 +89,27 @@ Settings (language, channels, marketing consent, privacy, accessibility, downloa
 
 ---
 
-## Demo credentials
+## Empty by default — demonstration data on request
+
+The system holds no invented records. A new installation has no customers, no loans, no
+repayments, no staff list and no balances: the public site reads its catalogue and settings from
+`site_docs`, the console reads its book from `portal_docs`, and each customer reads only their own
+document. An account that has never borrowed shows empty states, not somebody else's history.
+
+Demonstration data still exists for reviews and the automated suites, but it is **off unless it is
+asked for**:
+
+| Switch | Effect |
+| --- | --- |
+| `?demo=1` on any page | switches demonstration mode on (remembered in `localStorage.jcob_demo`) |
+| `?demo=0` on any page | switches it off again |
+
+Nothing else turns it on — there is no key, no build flag and no code path that reaches it for a
+normal visitor. The dataset lives in `assets/js/demo-customer.js` (customer dashboard) and
+`assets/js/demo-portal.js` (console); both files only define functions and are inert unless the
+switch is set.
+
+With demonstration mode on:
 
 | Field | Value |
 | --- | --- |
@@ -97,19 +117,24 @@ Settings (language, channels, marketing consent, privacy, accessibility, downloa
 | Phone | `+265 999 123 456` |
 | Password | `demo1234` |
 | OTP | `123456` |
-| Admin console | `admin2026` (on `admin.html`) |
+| Admin console | `admin2026` (on `admin.html`, only while no Supabase project is configured) |
 
-Seeded customer **Memory Tembo** (`JC-ACC-100412`), wallet **MWK 615,000**, two loans
-(`LN-2026-0412` personal, `LN-2026-0588` in arrears), four applications, two tickets and
-thirteen notification types. All data lives in `localStorage` under `jcob_app_v1`; the session
-key is `jcob_session_v1`. Clear site data to reset the demonstration.
+Demonstration customer **Memory Tembo** (`JC-ACC-100412`) is kept on the old storage key
+`jcob_app_v1`; live documents use `jcob_app_v2` (and `jcob_admin_system_v2` in the console), so a
+browser that once ran the demo can never show that data in the live system.
+
+If a project was set up with an earlier build, run **`supabase/remove-demo-data.sql`** once: it
+clears the demonstration console book from `portal_docs` and any demonstration customer documents,
+then prints a verification table.
 
 ---
 
 ## Admin management portal
 
-`admin.html` is the full management console for the business and the website. It is protected by a
-demo password — **`admin2026`** — held for the browser session only.
+`admin.html` is the full management console for the business and the website. It signs staff in
+against Supabase and requires a staff role (`admin`, `staff`, `officer` or `credit`) on the
+`profiles` row; anyone else is refused. The published `admin2026` password only exists when
+demonstration mode is on and no Supabase project is configured.
 
 The portal ships with the complete back office: dashboard, customers, KYC, loan applications,
 products, credit assessment, active loans, disbursement, guarantors and collateral, repayments,

@@ -469,7 +469,7 @@
       "The animated updates shown on the home page, the live desk and the section strips. Slides, cards, photo posts and announcements.",
       '<a class="btn ghost" href="live.html" target="_blank" rel="noopener">View live desk ↗</a>' +
       '<button class="btn ghost" data-act="liveAbout">+ About Us cards</button>' +
-      '<button class="btn ghost" data-act="liveRestore">Restore demo posts</button>' +
+      '<button class="btn ghost" data-act="liveRestore">Restore default feed</button>' +
       '<button class="btn primary" data-act="liveNew">+ New update</button>'
     );
     html += '<div class="stats">' +
@@ -763,10 +763,10 @@
       }, "danger");
     },
     liveRestore: function () {
-      confirmAct("Restore demo posts", "Replace the current feed with the demo set? Anything you published yourself is removed.", "Restore", function () {
+      confirmAct("Restore default feed", "Replace the current feed with the default set? Anything you published yourself is removed.", "Restore", function () {
         L.savePosts(L.DEFAULTS.slice());
         render(false);
-        toast("ok", "Feed restored", "The demo updates are back.");
+        toast("ok", "Feed restored", "The default updates are back.");
       }, "warn");
     },
     liveAbout: function () {
@@ -847,7 +847,7 @@
       var cloudState = (window.JCOB_PORTAL && window.JCOB_PORTAL.cloud) || { on: false, state: "local" };
       var cloudLabel = cloudState.on
         ? (cloudState.state === "error" ? "Cloud error" : cloudState.state === "saving" ? "Saving to cloud…" : "Supabase connected")
-        : "Local demo data";
+        : "This device only";
       var cloudTone = cloudState.on ? (cloudState.state === "error" ? "r" : "g") : "n";
       var panel = '<div class="panel"><div class="ph"><h3>Website connection</h3><span class="bdg ' + cloudTone + '">' + cloudLabel + '</span></div><div class="pb">' +
         '<p class="tsub" style="margin:0 0 12px;line-height:1.7">Brand, contact details, hours, socials, calculator defaults and lending policy are published to the public website from <b>Website Settings</b>. Page text, cards and section visibility live under <b>Website Pages</b>. ' +

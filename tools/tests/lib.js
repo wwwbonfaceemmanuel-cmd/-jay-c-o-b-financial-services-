@@ -58,6 +58,9 @@ function makeDom(file, options) {
          reaches the same origin the browser would. */
       window.fetch = (input, init) => fetch(new URL(input, window.location.href), init);
       if (options.local) window.localStorage.setItem("jcob_mode", "local");
+      /* The suites exercise the demonstration dataset unless they say
+         otherwise — a production build starts empty. */
+      if (options.demo !== false) window.localStorage.setItem("jcob_demo", "1");
       Object.keys(options.seed || {}).forEach((key) => {
         try { window.localStorage.setItem(key, options.seed[key]); } catch (e) {}
       });

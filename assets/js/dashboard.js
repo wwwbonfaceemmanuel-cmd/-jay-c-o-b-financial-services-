@@ -21,8 +21,9 @@
   /* ---------------- Session guard ---------------- */
   var params = new URLSearchParams(location.search);
   var session = UI.getSession();
-  if (!session && params.get("demo") === "1") {
-    session = UI.setSession({ authenticated: true, name: "Memory Tembo", email: "demo@jaycobfinancial.mw", identifier: "demo@jaycobfinancial.mw" }, true);
+  var DEMO = window.JCOB_DEMO;
+  if (!session && DEMO && DEMO.on()) {
+    session = UI.setSession({ authenticated: true, name: "Demonstration account", email: "demo@jaycobfinancial.mw", identifier: "demo@jaycobfinancial.mw", demo: true }, true);
   }
   if (!session || !session.authenticated) {
     window.location.replace("login.html?next=dashboard.html");
@@ -2231,8 +2232,11 @@
       });
     }
 
-    /* Re-render whenever the cloud document lands. */
+    /* Re-render whenever the cloud document lands. The sidebar carries the
+       signed-in name, email and initials, so it has to be refreshed too —
+       otherwise the header keeps the placeholder it drew before hydration. */
     document.addEventListener("jcob:data-ready", function () {
+      renderSidebar();
       if (render) render();
     });
 

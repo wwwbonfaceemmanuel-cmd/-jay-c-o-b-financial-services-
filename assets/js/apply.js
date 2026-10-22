@@ -163,7 +163,7 @@
       "<h3>Business & payment details</h3><p class=\"step-intro\">Business information applies to business applicants. Bank or mobile money details are used for disbursement and repayments.</p>" +
       '<div class="fieldset-title">Business information</div>' +
       '<div class="form-grid">' +
-        '<div class="field"><label for="ap-biz-name">Registered business name</label><input id="ap-biz-name" placeholder="Tembo Traders"></div>' +
+        '<div class="field"><label for="ap-biz-name">Registered business name</label><input id="ap-biz-name" placeholder="Registered business name"></div>' +
         '<div class="field"><label for="ap-biz-reg">Business registration number</label><input id="ap-biz-reg" placeholder="MW-2019-44821"></div>' +
         '<div class="field"><label for="ap-biz-tin">Tax identification number (TIN)</label><input id="ap-biz-tin" placeholder="12345678"></div>' +
         '<div class="field"><label for="ap-biz-years">Years in operation</label><input id="ap-biz-years" type="number" min="0" value="7"></div>' +
@@ -180,7 +180,7 @@
       "</div>" +
       '<div class="fieldset-title">Guarantor (if required)</div>' +
       '<div class="form-grid">' +
-        '<div class="field"><label for="ap-g-name">Guarantor name</label><input id="ap-g-name" value="Grace Tembo"></div>' +
+        '<div class="field"><label for="ap-g-name">Guarantor name</label><input id="ap-g-name" placeholder="Full name of the guarantor"></div>' +
         '<div class="field"><label for="ap-g-phone">Guarantor phone</label><input id="ap-g-phone" value="+265 888 456 789"></div>' +
         '<div class="field"><label for="ap-g-rel">Relationship</label><input id="ap-g-rel" value="Sister"></div>' +
         '<div class="field"><label for="ap-g-id">Guarantor ID number</label><input id="ap-g-id" class="masked" value="MWI-••••-2210"></div>' +

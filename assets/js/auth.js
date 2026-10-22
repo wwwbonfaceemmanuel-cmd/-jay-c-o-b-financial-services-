@@ -2,7 +2,11 @@
    Customer authentication
    Register · login (email or phone) · OTP verification · password reset
    · lockout protection · session expiry · MFA bridge
-   Demo credentials: demo@jaycobfinancial.mw / +265 999 123 456 / demo1234
+
+   Sign-in is real: Supabase Auth when the project is configured, and
+   nothing else. The published demonstration account (demo@jaycobfinancial.mw
+   / demo1234 / OTP 123456) exists only when demonstration mode has been
+   asked for with ?demo=1 — it is refused on a live deployment.
    ===================================================================== */
 (function () {
   "use strict";
@@ -11,9 +15,12 @@
   var DATA = window.JCOB_DATA;
   var F = window.JCOB_FINANCE;
   var CLOUD = window.JCOB_CLOUD;
+  var DEMO = window.JCOB_DEMO;
   var ACCOUNT_KEY = "jcob_account_v1";
   var PENDING_KEY = "jcob_pending_verify";
   var DEMO_CODE = "123456";
+
+  function demoOn() { return !!(DEMO && DEMO.on()); }
 
   function $(id) { return document.getElementById(id); }
   function page() {
@@ -21,7 +28,9 @@
   }
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
-  function demoBypass(identifier, password) { return demoMatch(identifier) && password === "demo1234"; }
+  function demoBypass(identifier, password) {
+    return demoOn() && demoMatch(identifier) && password === "demo1234";
+  }
 
   function readAccount() {
     try { return JSON.parse(localStorage.getItem(ACCOUNT_KEY) || "null"); } catch (e) { return null; }
@@ -123,6 +132,15 @@
       };
       saveAccount(account);
 
+      if (!cloudOn() && !demoOn()) {
+        var offline = $("register-status");
+        if (offline) {
+          offline.className = "form-status is-visible form-status--error";
+          offline.textContent = "Account creation is unavailable right now — the registration service cannot be reached. Please call +265 999 123 456 or try again later.";
+        }
+        return;
+      }
+
       if (cloudOn()) {
         var status = $("register-status");
         if (status) {
@@ -214,14 +232,26 @@
 
     if (resendBtn) {
       resendBtn.addEventListener("click", function () {
-        UI.toast({ title: "New code sent", message: "A fresh 6-digit code was sent. Demo code: " + DEMO_CODE, type: "info" });
+        UI.toast({
+          title: "New code sent",
+          message: demoOn()
+            ? "A fresh 6-digit code was sent. Demonstration code: " + DEMO_CODE
+            : "A fresh 6-digit code has been sent to your email and phone.",
+          type: "info"
+        });
         seconds = 45;
         resendBtn.disabled = true;
       });
     }
 
     var demoHint = $("demo-code");
-    if (demoHint) demoHint.textContent = DEMO_CODE;
+    if (demoHint) {
+      if (demoOn()) demoHint.textContent = DEMO_CODE;
+      else {
+        var hintBlock = demoHint.closest("[data-demo-only]") || demoHint;
+        hintBlock.hidden = true;
+      }
+    }
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -229,6 +259,11 @@
       if (code.length !== 6) {
         status.className = "form-status is-visible form-status--error";
         status.textContent = "Enter all six digits of your verification code.";
+        return;
+      }
+      if (!demoOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Enter the code from the email we sent you. If it has expired, request a new one.";
         return;
       }
       if (code !== DEMO_CODE) {
@@ -242,9 +277,9 @@
       var account = readAccount();
       var session = UI.setSession({
         authenticated: true,
-        name: pending && pending.name ? pending.name : (account ? account.fullName : "Memory Tembo"),
-        identifier: pending && pending.identifier ? pending.identifier : (account ? account.email : "demo@jaycobfinancial.mw"),
-        email: account ? account.email : "demo@jaycobfinancial.mw",
+        name: pending && pending.name ? pending.name : (account ? account.fullName : ""),
+        identifier: pending && pending.identifier ? pending.identifier : (account ? account.email : ""),
+        email: account ? account.email : (pending && pending.identifier ? pending.identifier : ""),
         mode: pending ? pending.mode : "login"
       }, true);
 
@@ -345,6 +380,14 @@
         return;
       }
 
+      if (!demoOn()) {
+        /* No cloud project and no demonstration data: there is nothing to
+           authenticate against, and guessing must not be possible. */
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Sign-in is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
+        return;
+      }
+
       var account = readAccount();
       var registered = account && (
         account.email.toLowerCase() === identifier.toLowerCase() ||
@@ -375,7 +418,7 @@
       var mfa = DATA.get().security.mfa;
       var pendingSession = {
         authenticated: !mfa,
-        name: registered ? account.fullName : "Memory Tembo",
+        name: registered ? account.fullName : "Demonstration account",
         identifier: identifier,
         email: registered ? account.email : "demo@jaycobfinancial.mw",
         remember: $("login-remember").checked
@@ -418,8 +461,12 @@
           fieldError(idInput, "Enter your email or phone number first.");
           return;
         }
+        if (!demoOn()) {
+          fieldError(idInput, "One-time codes are sent to the email address on your account. Sign in with your password instead.");
+          return;
+        }
         try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier, name: "Memory Tembo", code: DEMO_CODE }));
+          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier, name: "Demonstration account", code: DEMO_CODE }));
         } catch (err) {}
         window.location.href = "verify.html";
       });
@@ -453,11 +500,17 @@
         return;
       }
 
+      if (!demoOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Password recovery is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
+        return;
+      }
+
       setTimeout(function () {
         status.className = "form-status is-visible";
         status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
           '</strong>, a reset link has been sent by email or SMS and expires in 30 minutes. ' +
-          '<a href="reset-password.html">Continue to reset password (demo)</a>';
+          '<a href="reset-password.html">Continue to reset password (demonstration)</a>';
         DATA.notify("Security", "Password reset requested", "A password reset was requested for " + input.value.trim() + ". If this was not you, contact support.", "In-app + Email");
       }, 700);
     });
@@ -478,6 +531,17 @@
       if (passwordScore(pw) < 3) { fieldError($("reset-password"), "Choose a stronger password (8+ characters, letters and numbers)."); ok = false; }
       if (pw !== pw2) { fieldError($("reset-confirm"), "Passwords do not match."); ok = false; }
       if (!ok) return;
+
+      if (cloudOn()) {
+        status.className = "form-status is-visible";
+        status.textContent = "Open the reset link we emailed you to set this password. If the link has expired, request a new one.";
+        return;
+      }
+      if (!demoOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Password reset is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
+        return;
+      }
 
       var account = readAccount();
       if (account) { account.password = pw; saveAccount(account); }

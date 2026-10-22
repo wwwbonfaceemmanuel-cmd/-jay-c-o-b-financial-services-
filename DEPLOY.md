@@ -119,8 +119,16 @@ Visitor / customer            Admin console (admin.html)
 6. Create the customer you will use for testing (either register through
    the website, or **Add user** the same way).
 
+7. If this project was set up with an earlier build, run
+   [`supabase/remove-demo-data.sql`](supabase/remove-demo-data.sql) — the
+   console used to publish its demonstration book the first time an
+   administrator signed in, and that book lives in `portal_docs → main`.
+   The script names what it finds, deletes it and prints a verification
+   table. The current build starts empty, so this is a one-off.
+
 **Check:** in **Table Editor** the tables `profiles`, `site_docs`,
-`portal_docs`, `customer_docs`, `enquiries` and `audit_log` all exist.
+`portal_docs`, `customer_docs`, `enquiries` and `audit_log` all exist, and
+`portal_docs` is empty until the console is opened for the first time.
 
 ---
 
