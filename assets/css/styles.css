@@ -4777,3 +4777,65 @@ summary:focus-visible {
   .sheet-value, .sheet-row--primary .sheet-value { color: #111 !important; -webkit-text-fill-color: #111 !important; }
   .sheet-label, .sheet-note, .sheet-meta span { color: #333 !important; }
 }
+
+/* =====================================================================
+   LIVE STRIPS — section-level live blogs
+   Compact three-up blog cards embedded in page sections and pages.
+   ===================================================================== */
+.live-section { border-top: 1px solid rgba(201, 162, 39, 0.28); padding-top: 1.4rem; }
+
+.live-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  align-items: stretch;
+}
+.live-strip .live-blog {
+  grid-template-columns: 1fr;
+  padding: 0.75rem;
+  gap: 0.7rem;
+}
+.live-strip .live-blog-media { min-height: 118px; }
+.live-strip .live-blog-body h3 { font-size: 0.98rem; margin-top: 0.45rem; }
+.live-strip .live-blog-body p {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-top: 0.35rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.live-strip .live-blog-meta { margin-top: 0.55rem; font-size: 0.66rem; }
+.live-strip .live-chip { font-size: 0.58rem; padding: 0.12rem 0.42rem; }
+.live-strip .live-empty { color: var(--muted); font-size: 0.85rem; }
+
+/* Tone: dark sections */
+.live-strip[data-tone="dark"] .live-blog {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.12), rgba(10, 63, 107, 0.22));
+  border-color: rgba(201, 162, 39, 0.4);
+  box-shadow: inset 0 1px 0 rgba(246, 236, 196, 0.2), 0 20px 44px -32px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.live-strip[data-tone="dark"] .live-blog-body h3 { color: #ffffff; }
+.live-strip[data-tone="dark"] .live-blog-body p { color: #cfe0ea; }
+.live-strip[data-tone="dark"] .live-blog-meta { color: #9fbac8; }
+.live-strip[data-tone="dark"] .live-chip {
+  background: rgba(201, 162, 39, 0.18);
+  border-color: rgba(201, 162, 39, 0.5);
+  color: #f6ecc4;
+}
+.live-strip[data-tone="dark"] .live-blog-media--none {
+  background: linear-gradient(140deg, #06262a, #0a3f6b 62%, #5b4306 140%);
+  color: var(--gold-200);
+}
+.live-strip[data-tone="dark"] .live-blog .link-arrow { color: var(--gold-200); }
+
+@media (max-width: 1024px) {
+  .live-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .live-strip { grid-template-columns: 1fr; }
+  .live-strip .live-blog-media { min-height: 150px; }
+}

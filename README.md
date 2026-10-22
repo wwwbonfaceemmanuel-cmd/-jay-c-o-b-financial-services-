@@ -46,9 +46,16 @@ motion for standing notices). On top of that:
 - seven **About Us cards** (mission, vision, values, history, licensing, CSR, contact) live in the same
   stream and the same admin list, each with a different motion — slide, swap, flap, rotate, spin,
   swipe and endless;
+- **section live blogs**: fifteen further posts are tagged to a section and rendered as a compact
+  three-up strip inside it — Security & trust and Why choose us on the home page, Customer stories
+  under the testimonials, plus a strip on `eligibility.html` and on `loan-products.html`. Each strip
+  is filtered by topic, keeps its own motion actions and hides itself if every post in that topic is
+  unpublished;
 - all of it managed from `admin.html` — password gate, image upload (resized to 1200 px and stored
   as a data URL) or image URL, text, link + button label, motion, pin, publish/unpublish, edit, delete,
   and a one-click **Add About Us cards** action that publishes or restores the seven story cards.
+- the composer's **Show in section** selector targets one of the five strips (or the general feed), so
+  an administrator controls exactly which section a post appears in.
 
 Posts persist in `localStorage` (`jcob_live_posts_v1`) and read from a Supabase `live_posts` table
 without code changes once `assets/js/config.js` is filled in.
