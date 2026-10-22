@@ -376,7 +376,8 @@ body.locked { overflow: hidden; }
 /* =====================================================================
    JAY C O B ADMIN SYSTEM — DATA LAYER
    ---------------------------------------------------------------------
-   Currently uses an in-browser store persisted to localStorage.
+   Supabase is the only store: portal_docs/main, read at sign-in and
+   written on every change.
    The whole layer below is supabase-ready: replace load()/save() with
    calls like  supabase.from('customers').select('*')  and the REST of
    the application works unchanged.
@@ -462,17 +463,17 @@ function configDb(){
 function seed(){
   return configDb();
 }
-let db;
-try{const raw=localStorage.getItem(DB_KEY);db=raw?JSON.parse(raw):seed()}catch(e){db=seed()}
+let db=seed();
 
 /* ---------------- cloud persistence (Supabase) ----------------
-   Every console write already funnels through save(), so the whole
-   portal database is mirrored to portal_docs/main without touching the
-   modules. Until an administrator signs in, the local copy is used. */
-const cloud=(()=>{const c=window.JCOB_CLOUD;return{on:!!(c&&c.enabled),state:(c&&c.enabled)?'connecting':'local',at:null,error:null,api:c}})();
+   Supabase is the only store. portal_docs/main holds the console book;
+   the page keeps it in memory while it is open and writes every change
+   back. Nothing is kept in the browser, so the console can never show a
+   record the database does not hold. */
+const cloud=(()=>{const c=window.JCOB_CLOUD;return{on:!!(c&&c.enabled),state:(c&&c.enabled)?'connecting':'offline',at:null,error:null,api:c}})();
 let cloudTimer=null;
 function cloudPush(){
-  if(!cloud.on)return;
+  if(!cloud.on){cloud.state='offline';return;}
   clearTimeout(cloudTimer);
   cloud.state='saving';
   cloudTimer=setTimeout(async()=>{
@@ -482,7 +483,6 @@ function cloudPush(){
   },500);
 }
 function save(){
-  try{localStorage.setItem(DB_KEY,JSON.stringify(db))}catch(e){}
   cloudPush();
 }
 async function cloudLoad(){
@@ -492,7 +492,6 @@ async function cloudLoad(){
     if(row&&row.data&&row.data.customers){
       /* merge over a fresh seed so modules added later still have a shape */
       db=Object.assign(seed(),row.data);
-      try{localStorage.setItem(DB_KEY,JSON.stringify(db))}catch(e){}
       cloud.state='synced';cloud.at=row.updated_at;
       if(typeof render==='function')render(true);
       return true;
@@ -677,7 +676,7 @@ function buildNav(){const counts=badgeCounts();
   const items=g.items.map(([id,label,ic])=>`<button class="navlink ${route===id?'active':''}" data-nav="${id}">${ICONS[ic]}<span>${label}</span>${counts[id]?`<span class="cnt">${counts[id]}</span>`:''}</button>`).join('');
   const open=(ui.navClosed||[]).includes(g.g)?'closed':'';
   return `<div class="navgrp ${open}"><button class="gh" data-grp="${g.g}">${g.g}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="items">${items}</div></div>`}).join('')+
-  `<div class="syncbox"><b><span class="pulse"></span> WEBSITE CONNECTED</b><br>Website connected · everything is saved in this browser today. Railway + Supabase wiring is next; the data layer is ready for it.</div>`}
+  `<div class="syncbox"><b><span class="pulse"></span> WEBSITE CONNECTED</b><br>Website connected · every record is read from and written to Supabase.</div>`}
 let route=location.hash.replace('#/','')||'dashboard';
 window.addEventListener('hashchange',()=>{route=location.hash.replace('#/','')||'dashboard';render(true)});
 document.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');if(n){location.hash='#/'+n.dataset.nav;$('.sidebar').classList.remove('open')}
@@ -1704,7 +1703,7 @@ function showDataMode(){
   const el = document.getElementById('dataMode');
   if (!el) return;
   if (cloud.on) el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
-  else el.innerHTML = 'Offline · Data source: <b style="color:var(--warn)">this device</b>';
+  else el.innerHTML = 'Not connected · <b style="color:var(--warn)">account service unreachable</b>';
 }
 showIdentity();
 showDataMode();

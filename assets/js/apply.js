@@ -458,6 +458,17 @@
       UI.toast({ title: "Consent required", message: "Accept all three declarations before submitting.", type: "danger" });
       return;
     }
+    /* An application has to reach the database. Without a signed-in account
+       the page says so instead of showing a reference that exists nowhere. */
+    if (!DATA.canWrite || !DATA.canWrite()) {
+      var state5 = document.getElementById("ap-status");
+      if (state5) {
+        state5.className = "form-status is-visible form-status--error";
+        state5.textContent = "Please sign in (or create an account) so your application can be saved to your file. Your answers on this screen are kept while you sign in.";
+      }
+      UI.toast({ title: "Sign in to submit", message: "Applications are stored in your account — sign in and send it again.", type: "danger" });
+      return;
+    }
     var draft = collect();
     var ref = DATA.reference("APP");
     var app = {

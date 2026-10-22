@@ -154,39 +154,66 @@
     renderSync();
   }
 
-  /* Where the last change went: the live database, or only this device.
-     The dashboard is never allowed to imply a record is saved when the
-     write to Supabase failed. */
+  /* Where the data comes from and whether the last change reached the
+     database. The dashboard never implies a record is stored when the
+     write to Supabase has not succeeded. */
+  var lastSyncState = null;
   function renderSync() {
-    var els = document.querySelectorAll("[data-sync]");
-    if (!els.length) return;
     var remote = DATA.remote || {};
+    var state = remote.state || "";
     var cloud = window.JCOB_CLOUD && window.JCOB_CLOUD.enabled;
     var signedIn = !!(cloud && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.isSignedIn &&
       window.JCOB_CLOUD.auth.isSignedIn());
-    var text = "";
+    var chipText = "";
     var tone = "";
-    if (cloud && !signedIn) {
-      text = "";
-    } else if (!cloud) {
-      text = "Offline — saved on this device only";
-      tone = "is-warn";
-    } else if (remote.state === "error" || remote.state === "offline") {
-      text = "Not saved to the server — check your connection";
+    var alertText = "";
+    var alertTone = "";
+
+    if (!cloud) {
+      chipText = "Not connected";
       tone = "is-error";
-    } else if (remote.state === "synced") {
-      text = "Saved to your account";
+      alertText = "This dashboard is not connected to the account service, so there is nothing to show. " +
+        "Call +265 999 123 456 and we will help you with your account.";
+      alertTone = "is-error";
+    } else if (!signedIn) {
+      chipText = "";
+    } else if (state === "error") {
+      chipText = "Not saved to the server";
+      tone = "is-error";
+      alertText = "We could not reach the account service. Nothing you change now is being saved — " +
+        "reload the page when your connection is back.";
+      alertTone = "is-error";
+    } else if (state === "offline") {
+      chipText = "Not connected";
+      tone = "is-error";
+      alertText = "You are not signed in to the account service, so this page cannot save anything.";
+      alertTone = "is-error";
+    } else if (state === "connecting") {
+      chipText = "Loading your account…";
+    } else if (state === "saving") {
+      chipText = "Saving…";
+    } else if (state === "synced") {
+      chipText = "Saved to your account";
       tone = "is-ok";
-    } else if (remote.state === "connecting" || remote.state === "saving") {
-      text = "Saving…";
-      tone = "";
     }
-    els.forEach(function (el) {
-      el.textContent = text;
+
+    document.querySelectorAll("[data-sync]").forEach(function (el) {
+      el.textContent = chipText;
       el.className = "app-sync " + tone;
-      el.hidden = !text;
-      el.title = remote.error || text;
+      el.hidden = !chipText;
+      el.title = remote.error || chipText;
     });
+    var alert = document.querySelector("[data-data-alert]");
+    if (alert) {
+      alert.textContent = alertText;
+      alert.className = "app-alert " + alertTone;
+      alert.hidden = !alertText;
+    }
+
+    if (cloud && state === "error" && lastSyncState !== "error" && UI.toast) {
+      UI.toast({ title: "Not saved", message: "We could not reach the account service. Reload when you are back online.", type: "danger" });
+    }
+    lastSyncState = state;
   }
 
   function highlightNav() {
@@ -2317,6 +2344,10 @@
       renderSidebar();
       if (render) render();
     });
+
+    /* Every write to customer_docs reports back here, so the chip and the
+       banner always describe the state of the database, not the page. */
+    document.addEventListener("jcob:data", function () { renderSync(); });
 
     /* session expiry: 30 minutes of inactivity */
     var last = Date.now();

@@ -262,20 +262,22 @@ SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=dev-anon PORT=8000 node se
 Staff sign-in: `admin@jaycob.mw / Admin123!`; customer:
 `customer@jaycob.mw / Customer123!`.
 
-**Offline mode** — browser storage only, for reviewing the layout without
-touching any database (the website and calculator work; sign-in and the
-console stay locked):
+**Without a backend** — the marketing pages and calculator draw from the
+catalogue compiled into `assets/js/site-store.js`. There is no browser
+database: the dashboard shows an empty account and a banner saying it is
+not connected, and the console stays locked.
 
 ```bash
 python3 -m http.server 8000
 ```
 
-then open any page with `?local=1` (e.g.
-<http://localhost:8000/index.html?local=1>), or run
-`localStorage.jcob_mode = "local"` in the console. Browsing works; sign-in
-and the admin console require the Supabase stand-in that `npm test` starts.
+**Clearing an old installation.** Earlier builds wrote a demonstration
+book into `portal_docs/main`. Run `supabase/remove-demo-data.sql` once in
+the SQL Editor after deploying: it names what it finds, deletes the old
+console document, any demonstration customer documents and the
+demonstration login, then prints a verification table.
 
-**Automated checks** (94 browser assertions):
+**Automated checks** (125 browser assertions):
 
 ```bash
 npm install

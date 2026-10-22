@@ -11,7 +11,7 @@
                  the CMS computes from the live page markup
      sections  — per-page section visibility
 
-   Everything is browser-local (localStorage) today and every read/write
+   Everything is kept in Supabase (site_docs); every read/write
    goes through this module, so Supabase can replace read()/write() with
    table calls later without touching the pages or the admin console.
 
@@ -121,26 +121,10 @@
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
-  function read() {
-    try {
-      var raw = window.localStorage.getItem(KEY);
-      if (!raw) return clone(DEFAULTS);
-      var parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== "object") return clone(DEFAULTS);
-      return {
-        version: VERSION,
-        settings: Object.assign(clone(SETTINGS), parsed.settings || {}),
-        products: Array.isArray(parsed.products) && parsed.products.length ? parsed.products : clone(PRODUCTS),
-        content: parsed.content && typeof parsed.content === "object" ? parsed.content : {},
-        sections: parsed.sections && typeof parsed.sections === "object" ? parsed.sections : {},
-        updated: parsed.updated || null
-      };
-    } catch (e) {
-      return clone(DEFAULTS);
-    }
-  }
-
-  var data = read();
+  /* The published documents live in site_docs. The constants above are the
+     fallback used to draw a page before the database answers (and on a
+     deployment with no database at all) — they are never treated as edits. */
+  var data = clone(DEFAULTS);
   var listeners = [];
 
   function notify() {
@@ -149,15 +133,11 @@
 
   function write(scope) {
     data.updated = new Date().toISOString();
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(data));
-      notify();
-      try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
-      push(scope || ["settings", "products"]);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    notify();
+    try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
+    var pending = push(scope || ["settings", "products"]);
+    pending.catch(function () {});
+    return true;
   }
 
   function reset() {
@@ -375,11 +355,6 @@
 
   function subscribe(fn) {
     listeners.push(fn);
-    window.addEventListener("storage", function (e) {
-      if (e.key !== KEY || !e.newValue) return;
-      data = read();
-      try { fn(data); } catch (err) {}
-    });
   }
 
   /* ------------------------------------------------------------------
@@ -397,8 +372,8 @@
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
 
-  function localExists() {
-    try { return !!window.localStorage.getItem(KEY); } catch (e) { return false; }
+  function isStaff() {
+    return !!(CLOUD && CLOUD.auth && CLOUD.auth.isStaff && CLOUD.auth.isStaff());
   }
 
   function payloadFor(kind) {
@@ -444,7 +419,6 @@
   /* Pull the published documents and apply them over the local cache. */
   function hydrate() {
     if (!cloudOn()) return Promise.resolve(false);
-    var hadLocal = localExists();
     return Promise.all([
       CLOUD.docs.get("site", "settings"),
       CLOUD.docs.get("site", "products"),
@@ -461,26 +435,25 @@
       if (remoteSettings && remoteSettings.data) {
         data.settings = mergeSettings(remoteSettings.data);
         changed = true;
-      } else if (hadLocal) seed.push("settings");
+      } else if (isStaff()) seed.push("settings");
 
       if (remoteProducts && Array.isArray(remoteProducts.data) && remoteProducts.data.length) {
         data.products = remoteProducts.data;
         changed = true;
-      } else if (hadLocal) seed.push("products");
+      } else if (isStaff()) seed.push("products");
 
       if (remoteContent && remoteContent.data && typeof remoteContent.data === "object") {
         data.content = remoteContent.data;
         changed = true;
-      } else if (hadLocal) seed.push("content");
+      } else if (isStaff()) seed.push("content");
 
       if (remoteSections && remoteSections.data && typeof remoteSections.data === "object") {
         data.sections = remoteSections.data;
         changed = true;
-      } else if (hadLocal) seed.push("sections");
+      } else if (isStaff()) seed.push("sections");
 
       if (changed) {
         data.updated = new Date().toISOString();
-        try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
         notify();
         try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
       }

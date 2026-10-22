@@ -104,6 +104,30 @@ There is no demonstration switch, no fixed OTP, no browser-side password store a
 console password in this build. An installation without Supabase configured works as a website and
 a calculator, and refuses sign-in and the console with a message telling the visitor to call.
 
+### Supabase is the only store
+
+Nothing is cached, mirrored or edited in the browser. The page holds the customer's document in
+memory while it is open, reads it from `customer_docs` on load and writes every change straight back:
+
+| What | Table | Who can read it |
+| --- | --- | --- |
+| Customer document (profile, loans, repayments, KYC, tickets) | `customer_docs` | the owner, and staff |
+| Console book (customers, applications, ledger, staff) | `portal_docs` | staff only |
+| Website content (settings, catalogue, page text, live posts) | `site_docs` | everyone |
+| Enquiries | `enquiries` | staff, plus insert for a visitor |
+| Roles and staff flags | `profiles` | the owner and staff |
+| KYC files and site images | buckets `kyc-documents`, `site-media` | per policy |
+| Passwords, one-time codes, recovery links | Supabase Auth | never exposed to the page |
+
+The browser keeps one thing: the session token, so you stay signed in between pages. It is removed on
+sign-out, together with any document an older build once cached. Old `jcob_app_v2` cache entries are
+deleted automatically the first time a page loads.
+
+The dashboard's top bar says exactly where the last change went — **Saved to your account** only
+after the write to Supabase succeeds, **Not saved to the server** when it does not, and **Not
+connected** when there is no account service at all. When the connection drops, the banner says so
+and nothing is silently kept on the device.
+
 If a project was set up with an earlier build, run **`supabase/remove-demo-data.sql`** once: it names
 what it finds, clears the old console book from `portal_docs` and any demonstration customer
 documents, then prints a verification table.
@@ -201,14 +225,18 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 115 assertions
+npm test        # starts the Supabase stand-in + server, runs 125 assertions
 ```
 
-The suites in `tools/tests/` cover the shipped build (empty account and console, calculator
-arithmetic, dashboard, live desk, single-file bundle), local mode, cloud mode (hydration, catalogue,
-live feed, staff gate, role refusal, console persistence, decision round-trip, registration,
-sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. Test records live in
-`tools/tests/fixtures.js` and never reach a browser.
+The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
+single-file bundle, an empty dashboard that ignores a stale browser copy), cloud mode (hydration,
+catalogue, live feed, staff gate, role refusal, console persistence, decision round-trip,
+registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. The cloud
+suite also proves the browser holds no records: a change written in the dashboard lands in
+`customer_docs`, and a stale copy left in localStorage is ignored and deleted.
+
+The mock project in `tools/dev/mock-cloud.js` is test infrastructure only. It is never served by
+the site and never loaded by a page.
 
 ## Project structure
 

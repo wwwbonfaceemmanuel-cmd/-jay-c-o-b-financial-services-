@@ -3,9 +3,10 @@
    ---------------------------------------------------------------------
    The site runs in two modes, chosen automatically:
 
-   • OFFLINE MODE (no keys)
-     The website, catalogue and calculator read browser localStorage. Sign-in,
-     the admin console and the customer dashboard need cloud mode.
+   • NO BACKEND (no keys)
+     The marketing pages still draw from the catalogue compiled into
+     site-store.js. Accounts, the dashboard and the console are unavailable:
+     nothing is stored in the browser.
 
    • CLOUD MODE (Supabase) — configured below
      Everything persists in Postgres behind Row Level Security.
@@ -28,7 +29,7 @@ window.JCOB_CONFIG = {
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5YmFlamVneXRudnRpdHpub2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2OTc2MDQsImV4cCI6MjEwODI3MzYwNH0.GFtYtTLnN31Sts4FjbUEuDqiN3ukQtIuT6e52UN5H34",
 
   /* "auto" → cloud as soon as a URL and key are present.
-     Set to false to stay on localStorage even with keys configured. */
+     Set to false to run without the account service even when keys exist. */
   useSupabase: "auto",
 
   /* Table map — matches supabase/schema.sql. */

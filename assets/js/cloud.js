@@ -3,7 +3,7 @@
    ---------------------------------------------------------------------
    One small client used by every module on the site. Nothing else in the
    project talks to the network directly, so switching between offline
-   (browser localStorage) and the live cloud (Supabase behind Railway)
+   and the live cloud (Supabase behind Railway)
    happens here and nowhere else.
 
    CONFIGURATION
@@ -12,7 +12,8 @@
      window.JCOB_CONFIG       (assets/js/config.js — paste keys for static
                                hosting such as GitHub Pages)
    Cloud mode is on as soon as both values exist and useSupabase is not
-   false. With no keys the whole site keeps working from localStorage.
+   false. With no keys the marketing pages still work; nothing is stored in
+   the browser.
 
    DATA MODEL (see supabase/schema.sql)
      site_docs      id → jsonb    public read, staff write
@@ -50,7 +51,9 @@
   var key = String(pick(ENV.supabaseAnonKey, CFG.supabaseAnonKey) || "");
   var wanted = pick(ENV.useSupabase, CFG.useSupabase);
 
-  /* Escape hatch: ?local=1 (or localStorage jcob_mode = "local") keeps the
+  /* Test escape hatch: ?local=1 (or localStorage jcob_mode = "local") forces
+     the site to behave as if the account service were unreachable, so the
+     fail-closed paths can be exercised. It never stores records.
      site on browser storage even when keys are configured. Useful for
      previewing the layout and for automated tests. */
   var forcedLocal = false;

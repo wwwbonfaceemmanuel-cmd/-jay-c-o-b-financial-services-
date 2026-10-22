@@ -1,20 +1,18 @@
-/* Local behaviour with no backend: the public site, the calculator, the
-   dashboard, the live desk and the single-file bundle must all work from
-   browser storage. Records used here are written by the test itself (see
-   fixtures.js) — the application ships no sample data. */
+/* Behaviour with no backend: the public site, the calculator, the live desk
+   and the single-file bundle still work, and the account areas refuse to
+   invent anything. Nothing is stored in the browser. */
 "use strict";
 
 const { reporter, makeDom, ready, sleep } = require("./lib");
-const { customerDoc } = require("./fixtures");
 
 (async () => {
-  const t = reporter("[local mode — public site]");
+  const t = reporter("[no backend — public site]");
   {
     const { dom, errors } = makeDom("index.html", { local: true });
     await ready(dom, 600);
     const w = dom.window;
-    t.eq("cloud disabled in local mode", w.JCOB_CLOUD.enabled, false);
-    t.eq("store reports local", w.JCOB_SITE.remote.state, "local");
+    t.eq("cloud disabled without keys", w.JCOB_CLOUD.enabled, false);
+    t.eq("store reports no backend", w.JCOB_SITE.remote.state, "local");
     t.eq("catalogue available", w.JCOB_SITE.products.length, 11);
     t.ok("hero renders", /JAY C O B/.test(w.document.body.textContent));
     t.eq("no demo switch in the build", typeof w.JCOB_DEMO, "undefined");
@@ -22,7 +20,7 @@ const { customerDoc } = require("./fixtures");
     w.close();
   }
 
-  console.log("\n[local mode — calculator]");
+  console.log("\n[no backend — calculator]");
   {
     const { dom, errors } = makeDom("calculator.html", { local: true });
     await ready(dom);
@@ -54,27 +52,35 @@ const { customerDoc } = require("./fixtures");
     w.close();
   }
 
-  console.log("\n[local mode — dashboard with a stored record]");
+  console.log("\n[no backend — the dashboard holds no cache]");
   {
-    const doc = customerDoc();
+    /* A stale document left in the browser by an old build must never be
+       shown: there is no browser store any more. */
+    const doc = {
+      profile: { fullName: "Cached Customer", email: "cached@example.com", accountNumber: "JC-ACC-999999" },
+      applications: [{ ref: "APP-CACHE-999", product: "Personal Loan", status: "Approved" }]
+    };
     const { dom, errors } = makeDom("dashboard.html", {
       local: true,
       hash: "#applications",
       seed: {
         jcob_app_v2: JSON.stringify(doc),
-        jcob_session_v1: JSON.stringify({ authenticated: true, name: doc.profile.fullName, email: doc.profile.email })
+        jcob_session_v1: JSON.stringify({ authenticated: true, name: "Cached Customer", email: "cached@example.com" })
       }
     });
     await ready(dom, 700);
     const w = dom.window;
-    t.ok("application listed", /APP-2026-0412/.test(w.document.body.textContent));
-    t.ok("status shown", /Approved/i.test(w.document.body.textContent));
-    t.ok("customer name in the header", /Test Borrower/.test(w.document.body.textContent));
+    const text = w.document.body.textContent.replace(/\s+/g, " ");
+    const db = w.JCOB_DATA.get();
+    t.eq("no records invented without a database", db.applications.length, 0);
+    t.eq("no cached identity shown", db.profile.fullName, "");
+    t.ok("stale cache ignored", !/Cached Customer|APP-CACHE-999/.test(w.document.body.innerHTML));
+    t.ok("dashboard says it is not connected", /not connected to the account service/i.test(text));
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }
 
-  console.log("\n[local mode — live desk and bundle]");
+  console.log("\n[no backend — live desk and bundle]");
   {
     const { dom } = makeDom("live.html", { local: true });
     await ready(dom, 500);

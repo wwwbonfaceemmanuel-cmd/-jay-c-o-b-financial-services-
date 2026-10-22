@@ -3186,6 +3186,14 @@ h1 em, .gold-text {
 .app-sync.is-warn { color: #7a5a12; border-color: #f0dfae; background: #fdf7e6; }
 .app-sync.is-error { color: #9b2c2c; border-color: #f2c2c2; background: #fdf1f1; }
 .app-sync[hidden] { display: none; }
+
+.app-alert {
+  margin: 0 0 0 0; padding: .85rem 1.15rem;
+  border-left: 4px solid #b45309; background: #fdf7e6; color: #6b4a09;
+  font-size: .86rem; line-height: 1.5;
+}
+.app-alert.is-error { border-left-color: #b91c1c; background: #fdf1f1; color: #7f1d1d; }
+.app-alert[hidden] { display: none; }
 @media (max-width: 720px) { .app-sync { display: none; } }
 
 .bell-wrap { position: relative; }

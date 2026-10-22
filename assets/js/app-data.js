@@ -4,10 +4,11 @@
    One document per customer. Every read and write goes through this
    module, so the dashboard never needs to know where it is stored:
 
-     • Cloud mode — one row per signed-in customer in Supabase
-                  (customer_docs), mirrored to localStorage as an offline
-                  cache.
-     • Offline    — the same document, kept in localStorage only.
+     • Supabase — one row per signed-in customer in customer_docs. This is
+                  the only copy: the open page holds it in memory and
+                  writes every change straight back.
+     • No account service — the dashboard is read-only and says so. It
+                  never invents or caches a record on the device.
 
    A new account starts empty: no loans, no applications, no balances and
    no borrowed identity. There is no sample or demonstration data in this
@@ -78,84 +79,85 @@
 
 
   /* ---------------- Storage ----------------
-     Offline mode keeps one document in localStorage.
-     Cloud mode keeps one document per signed-in customer in Supabase
-     (customer_docs) and mirrors it to localStorage as an offline cache.
-     Every function in the dashboard goes through persist(), so nothing
-     else in the project needs to know which mode is active.
+     Supabase is the only store. The open page keeps the customer's
+     document in memory; every change is written to customer_docs. Nothing
+     is kept in the browser, so a device can never show a record the
+     database does not hold. With no account service the dashboard is
+     read-only and says so.
      ------------------------------------------------------------------ */
   var CLOUD = window.JCOB_CLOUD;
   var remote = {
     enabled: !!(CLOUD && CLOUD.enabled),
-    state: CLOUD && CLOUD.enabled ? "connecting" : "local",
+    state: CLOUD && CLOUD.enabled ? "connecting" : "offline",
     at: null,
     error: null
   };
-  var hydrating = !!(CLOUD && CLOUD.enabled);
   var pushTimer = null;
+  var loaded = false;
+  var db = empty();
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
   function uid() {
     var user = CLOUD && CLOUD.auth && CLOUD.auth.user();
     return user && user.id ? user.id : null;
   }
-  function cacheKey() {
-    var id = cloudOn() ? uid() : null;
-    return id ? KEY + ":" + id : KEY;
-  }
+  function canWrite() { return cloudOn() && !!uid() && loaded && remote.state !== "error"; }
 
-  function read() {
+  function announce() {
     try {
-      var raw = window.localStorage.getItem(cacheKey());
-      if (!raw) return null;
-      var parsed = JSON.parse(raw);
-      /* A document written by an earlier version (or a partial cloud record)
-         must not leave the dashboard without settings/security blocks. */
-      return parsed && parsed.profile ? normalise(parsed) : null;
-    } catch (e) {
-      return null;
-    }
+      document.dispatchEvent(new CustomEvent("jcob:data", { detail: { state: remote.state } }));
+    } catch (e) {}
   }
 
-  var db = read() || seed();
-
-  function saveCache() {
+  /* Drop the cache written by earlier builds. */
+  (function clearLegacy() {
     try {
-      window.localStorage.setItem(cacheKey(), JSON.stringify(db));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
+      var ls = window.localStorage, i, key;
+      for (i = ls.length - 1; i >= 0; i -= 1) {
+        key = ls.key(i);
+        if (key && (key === "jcob_app_v2" || key.indexOf("jcob_app_v2:") === 0)) ls.removeItem(key);
+      }
+    } catch (e) {}
+  })();
 
   function pushCloud() {
-    if (!cloudOn() || !uid()) return Promise.resolve(null);
+    if (!cloudOn() || !uid()) { remote.state = "offline"; announce(); return Promise.resolve(null); }
+    if (!loaded) return Promise.resolve(null);
     remote.state = "saving";
+    announce();
     return CLOUD.customer.save(db).then(function (row) {
       remote.state = "synced";
       remote.at = new Date().toISOString();
       remote.error = null;
+      announce();
       return row;
     }).catch(function (err) {
       remote.state = "error";
       remote.error = String((err && err.message) || err);
+      announce();
       return null;
     });
   }
 
+  /* Every change in the dashboard calls save(), which queues one write to
+     the database. The browser is never used as a backup store. */
   function persist() {
-    var ok = saveCache();
-    if (cloudOn() && !hydrating) {
-      if (pushTimer) clearTimeout(pushTimer);
-      pushTimer = setTimeout(function () { pushTimer = null; pushCloud(); }, 400);
+    if (!cloudOn() || !uid()) {
+      remote.state = "offline";
+      remote.error = "Not signed in to the account service.";
+      announce();
+      return false;
     }
-    return ok;
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () { pushTimer = null; pushCloud(); }, 350);
+    return true;
   }
 
   function get() { return db; }
   function save() { return persist(); }
   function reset() {
-    db = seed();
+    db = empty();
+    loaded = false;
     persist();
     return db;
   }
@@ -193,15 +195,23 @@
   }
 
   function hydrate() {
-    if (!cloudOn() || !uid()) return Promise.resolve(false);
-    hydrating = true;
+    if (!cloudOn() || !uid()) {
+      remote.state = "offline";
+      remote.error = "Not signed in to the account service.";
+      loaded = false;
+      db = empty();
+      announce();
+      return Promise.resolve(false);
+    }
+    remote.state = "connecting";
     return CLOUD.customer.load().then(function (row) {
       if (row && row.data && row.data.profile) {
         db = normalise(row.data);
-        saveCache();
+        loaded = true;
         remote.state = "synced";
         remote.at = row.updated_at || new Date().toISOString();
         remote.error = null;
+        announce();
       } else {
         var user = CLOUD.auth.user() || {};
         var meta = user.user_metadata || {};
@@ -215,17 +225,16 @@
           accountNumber: (CLOUD.auth.profile() || {}).account_no || ""
         });
         db.profile.avatar = (db.profile.fullName || "?").split(" ").map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
-        saveCache();
-        hydrating = false;
+        loaded = true;
         return pushCloud().then(function () { return true; });
       }
-      hydrating = false;
       try { document.dispatchEvent(new CustomEvent("jcob:data-ready", { detail: db })); } catch (e) {}
       return true;
     }).catch(function (err) {
-      hydrating = false;
-      remote.state = "offline";
+      loaded = false;
+      remote.state = "error";
       remote.error = String((err && err.message) || err);
+      announce();
       return false;
     });
   }
@@ -339,15 +348,15 @@
     hydrate: hydrate,
     remote: remote,
     cloud: cloudOn,
-    cacheKey: cacheKey
+    canWrite: canWrite
   };
 
-  /* Cloud mode: pull this customer's document first — never publish an
-     empty document over a real record. Offline: keep the local copy. */
+  /* The document is read from customer_docs before anything is shown, and
+     re-read whenever the signed-in customer changes. */
   if (cloudOn()) {
     hydrate();
     document.addEventListener("jcob:auth", function () { hydrate(); });
-  } else if (!read()) {
-    persist();
+  } else {
+    remote.state = "offline";
   }
 })();

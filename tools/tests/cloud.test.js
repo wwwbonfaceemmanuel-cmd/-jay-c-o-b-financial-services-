@@ -167,6 +167,61 @@ async function signInGate(w, creds) {
     w.close();
   }
 
+  console.log("\n[cloud mode — Supabase is the only store]");
+  {
+    /* A stale document left in this browser by an older build must be
+       ignored, and a fresh browser (no local data at all) must still show
+       the account exactly as it is in customer_docs. */
+    const auth = await token(CUSTOMER);
+    const session = {
+      access_token: auth.access_token, refresh_token: auth.refresh_token,
+      expires_at: Date.now() + 3600 * 1000, token_type: "bearer", user: auth.user
+    };
+    const uid = auth.user.id;
+    const stale = {
+      profile: { fullName: "Cached Customer", email: "cached@example.com", accountNumber: "JC-ACC-999999" },
+      applications: [{ ref: "APP-CACHE-999", product: "Personal Loan", status: "Approved" }],
+      loans: [], transactions: [], notifications: [], documents: []
+    };
+
+    const { dom } = makeDom("dashboard.html", {
+      hash: "#applications",
+      seed: {
+        jcob_cloud_session_v1: JSON.stringify(session),
+        ["jcob_app_v2:" + uid]: JSON.stringify(stale),
+        jcob_app_v2: JSON.stringify(stale)
+      }
+    });
+    await ready(dom, 1500);
+    const w = dom.window;
+    const html = w.document.body.innerHTML;
+    t.ok("stale browser copy ignored", !/Cached Customer|APP-CACHE-999/.test(html));
+    t.ok("account shown from the database", /Mock Cloud Customer/.test(w.document.body.textContent));
+    t.eq("record came from customer_docs", w.JCOB_DATA.get().profile.fullName, "Mock Cloud Customer");
+    t.eq("browser copy removed on load", w.localStorage.getItem("jcob_app_v2:" + uid), null);
+    w.close();
+
+    const fresh = makeDom("dashboard.html", {
+      hash: "#applications",
+      seed: { jcob_cloud_session_v1: JSON.stringify(session) }
+    });
+    await ready(fresh.dom, 1500);
+    const w2 = fresh.dom.window;
+    t.ok("a new browser still sees the account", /APP-CLOUD-001/.test(w2.document.body.textContent));
+    t.eq("no document cached after load", w2.localStorage.getItem("jcob_app_v2:" + uid), null);
+    t.eq("sync state reported", w2.JCOB_DATA.remote.state, "synced");
+
+    /* A change must go to the database, not to the browser. */
+    w2.JCOB_DATA.notify("General", "Store check", "Written to customer_docs.", "In-app");
+    await sleep(1200);
+    const leftovers = Object.keys(w2.localStorage).filter((k) => /^jcob_(app|site|live|admin_system)/.test(k));
+    t.eq("browser keeps no records", leftovers.join(","), "");
+    const rows = await rest("customer_docs?owner=eq." + uid + "&select=data");
+    const stored = (rows[0] && rows[0].data && rows[0].data.notifications) || [];
+    t.ok("change reached customer_docs", stored.some((n) => n.title === "Store check"));
+    w2.close();
+  }
+
   console.log("\n[cloud mode — auth flows]");
   {
     const { dom, errors } = makeDom("login.html");

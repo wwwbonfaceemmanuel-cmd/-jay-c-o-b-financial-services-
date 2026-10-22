@@ -86,18 +86,14 @@
   var CLOUD = window.JCOB_CLOUD;
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
 
-  function siteData() {
-    try { return JSON.parse(window.localStorage.getItem(SITE_KEY) || "null"); } catch (e) { return null; }
-  }
-
-  /* In cloud mode every customer document in Supabase is a website record;
-     offline there is a single local document. */
+  /* Every customer document in Supabase is a website record. There is no
+     browser-side copy: the console reads the database and writes back to it. */
   var siteDocs = null;
   var docsAt = 0;
   var loading = false;
 
   function loadSiteDocs(force) {
-    if (!cloudOn()) return Promise.resolve([{ owner: null, data: siteData() }].filter(function (d) { return d.data; }));
+    if (!cloudOn()) return Promise.resolve([]);
     if (loading) return Promise.resolve(siteDocs || []);
     if (!force && siteDocs && Date.now() - docsAt < 8000) return Promise.resolve(siteDocs);
     loading = true;
@@ -251,8 +247,6 @@
         if (!doc.owner) return;
         CLOUD.customer.saveFor(doc.owner, doc.data);
       });
-    } else {
-      try { window.localStorage.setItem(SITE_KEY, JSON.stringify(dirty[0].data)); } catch (e) {}
     }
   }
 

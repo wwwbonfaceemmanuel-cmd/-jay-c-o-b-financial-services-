@@ -117,12 +117,12 @@ LEGAL_DOCS = [
         "The cookies and local storage we use, what each one does, and how to control them.",
         [
             ("1. What we use", [
-                "Strictly necessary cookies and browser storage keep you signed in, remember your security preferences and protect forms against cross-site request forgery. The site does not work without these.",
+                "A strictly necessary session token in browser storage keeps you signed in between pages and protects forms against cross-site request forgery. Nothing else about you is kept on the device, and the site does not work without this token.",
                 "Analytics storage helps us understand which pages are used so we can improve them. Marketing storage is used only where you opt in.",
             ]),
             ("2. Where your account data lives", [
                 "Your account details, applications, loans, repayments, documents and notifications are stored in our secured database and are visible only to you and to authorised staff.",
-                "Your browser keeps a session token and a cache of your own dashboard so that a page reload does not sign you out. Signing out, or clearing site data, removes that local copy \u2014 the record in our database remains and is available when you sign in again.",
+                "Your browser keeps only a session token, so that moving between pages does not sign you out. No account record, balance or document is stored on your device. Signing out removes the token; the record in our database remains and is available when you sign in again.",
             ]),
             ("3. Third parties", [
                 "Fonts are loaded from Google Fonts, which receives your IP address as part of the request. Payment, SMS and analytics providers may set their own cookies when those integrations are enabled.",

@@ -3200,6 +3200,14 @@ h1 em, .gold-text {
 .app-sync.is-warn { color: #7a5a12; border-color: #f0dfae; background: #fdf7e6; }
 .app-sync.is-error { color: #9b2c2c; border-color: #f2c2c2; background: #fdf1f1; }
 .app-sync[hidden] { display: none; }
+
+.app-alert {
+  margin: 0 0 0 0; padding: .85rem 1.15rem;
+  border-left: 4px solid #b45309; background: #fdf7e6; color: #6b4a09;
+  font-size: .86rem; line-height: 1.5;
+}
+.app-alert.is-error { border-left-color: #b91c1c; background: #fdf1f1; color: #7f1d1d; }
+.app-alert[hidden] { display: none; }
 @media (max-width: 720px) { .app-sync { display: none; } }
 
 .bell-wrap { position: relative; }
@@ -7103,7 +7111,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="#/">Home</a><span class="sep">/</span><a href="#/loan-products">Loan products</a><span class="sep">/</span><span>Application</span></nav>
       <span class="eyebrow">Five steps · about 10 minutes</span>
       <h1>Apply for a loan</h1>
-      <p class="lead">Complete the form below and receive a reference number as soon as you submit. Your progress is saved in this browser, so you can finish later from any device using your account.</p>
+      <p class="lead">Complete the form below and receive a reference number as soon as you submit. Your progress is saved to your account as you go, so you can come back and finish later.</p>
       <div class="flex flex-wrap gap-1 mt-2">
         <a class="btn btn--ghost btn--sm" href="#/eligibility">Check eligibility first</a>
         <a class="btn btn--ghost btn--sm" href="#/calculator">Estimate repayment</a>
@@ -7477,13 +7485,13 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
           <p class="legal-meta">Version 3.0 · Last updated 1 October 2026 · Applies to all customers in Malawi</p>
           <section>
             <h2>1. What we use</h2>
-            <p>Strictly necessary cookies and browser storage keep you signed in, remember your security preferences and protect forms against cross-site request forgery. The site does not work without these.</p>
+            <p>A strictly necessary session token in browser storage keeps you signed in between pages and protects forms against cross-site request forgery. Nothing else about you is kept on the device, and the site does not work without this token.</p>
             <p>Analytics storage helps us understand which pages are used so we can improve them. Marketing storage is used only where you opt in.</p>
           </section>
           <section>
             <h2>2. Where your account data lives</h2>
             <p>Your account details, applications, loans, repayments, documents and notifications are stored in our secured database and are visible only to you and to authorised staff.</p>
-            <p>Your browser keeps a session token and a cache of your own dashboard so that a page reload does not sign you out. Signing out, or clearing site data, removes that local copy — the record in our database remains and is available when you sign in again.</p>
+            <p>Your browser keeps only a session token, so that moving between pages does not sign you out. No account record, balance or document is stored on your device. Signing out removes the token; the record in our database remains and is available when you sign in again.</p>
           </section>
           <section>
             <h2>3. Third parties</h2>
@@ -7689,6 +7697,8 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
           </div>
         </div>
       </div>
+
+      <div class="app-alert" data-data-alert hidden role="alert"></div>
 
       <main class="app-content" id="app-content" tabindex="-1">
         <div class="app-page-head"><div><h1>Loading your dashboard…</h1><p>Preparing balances, loans and notifications.</p></div></div>
@@ -9465,9 +9475,10 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
    ---------------------------------------------------------------------
    The site runs in two modes, chosen automatically:
 
-   • OFFLINE MODE (no keys)
-     The website, catalogue and calculator read browser localStorage. Sign-in,
-     the admin console and the customer dashboard need cloud mode.
+   • NO BACKEND (no keys)
+     The marketing pages still draw from the catalogue compiled into
+     site-store.js. Accounts, the dashboard and the console are unavailable:
+     nothing is stored in the browser.
 
    • CLOUD MODE (Supabase) — configured below
      Everything persists in Postgres behind Row Level Security.
@@ -9490,7 +9501,7 @@ window.JCOB_CONFIG = {
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5YmFlamVneXRudnRpdHpub2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2OTc2MDQsImV4cCI6MjEwODI3MzYwNH0.GFtYtTLnN31Sts4FjbUEuDqiN3ukQtIuT6e52UN5H34",
 
   /* "auto" → cloud as soon as a URL and key are present.
-     Set to false to stay on localStorage even with keys configured. */
+     Set to false to run without the account service even when keys exist. */
   useSupabase: "auto",
 
   /* Table map — matches supabase/schema.sql. */
@@ -9521,7 +9532,7 @@ window.JCOB_CONFIG = {
    ---------------------------------------------------------------------
    One small client used by every module on the site. Nothing else in the
    project talks to the network directly, so switching between offline
-   (browser localStorage) and the live cloud (Supabase behind Railway)
+   and the live cloud (Supabase behind Railway)
    happens here and nowhere else.
 
    CONFIGURATION
@@ -9530,7 +9541,8 @@ window.JCOB_CONFIG = {
      window.JCOB_CONFIG       (assets/js/config.js — paste keys for static
                                hosting such as GitHub Pages)
    Cloud mode is on as soon as both values exist and useSupabase is not
-   false. With no keys the whole site keeps working from localStorage.
+   false. With no keys the marketing pages still work; nothing is stored in
+   the browser.
 
    DATA MODEL (see supabase/schema.sql)
      site_docs      id → jsonb    public read, staff write
@@ -9568,7 +9580,9 @@ window.JCOB_CONFIG = {
   var key = String(pick(ENV.supabaseAnonKey, CFG.supabaseAnonKey) || "");
   var wanted = pick(ENV.useSupabase, CFG.useSupabase);
 
-  /* Escape hatch: ?local=1 (or localStorage jcob_mode = "local") keeps the
+  /* Test escape hatch: ?local=1 (or localStorage jcob_mode = "local") forces
+     the site to behave as if the account service were unreachable, so the
+     fail-closed paths can be exercised. It never stores records.
      site on browser storage even when keys are configured. Useful for
      previewing the layout and for automated tests. */
   var forcedLocal = false;
@@ -10179,7 +10193,7 @@ window.JCOB_CONFIG = {
                  the CMS computes from the live page markup
      sections  — per-page section visibility
 
-   Everything is browser-local (localStorage) today and every read/write
+   Everything is kept in Supabase (site_docs); every read/write
    goes through this module, so Supabase can replace read()/write() with
    table calls later without touching the pages or the admin console.
 
@@ -10289,26 +10303,10 @@ window.JCOB_CONFIG = {
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
-  function read() {
-    try {
-      var raw = window.localStorage.getItem(KEY);
-      if (!raw) return clone(DEFAULTS);
-      var parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== "object") return clone(DEFAULTS);
-      return {
-        version: VERSION,
-        settings: Object.assign(clone(SETTINGS), parsed.settings || {}),
-        products: Array.isArray(parsed.products) && parsed.products.length ? parsed.products : clone(PRODUCTS),
-        content: parsed.content && typeof parsed.content === "object" ? parsed.content : {},
-        sections: parsed.sections && typeof parsed.sections === "object" ? parsed.sections : {},
-        updated: parsed.updated || null
-      };
-    } catch (e) {
-      return clone(DEFAULTS);
-    }
-  }
-
-  var data = read();
+  /* The published documents live in site_docs. The constants above are the
+     fallback used to draw a page before the database answers (and on a
+     deployment with no database at all) — they are never treated as edits. */
+  var data = clone(DEFAULTS);
   var listeners = [];
 
   function notify() {
@@ -10317,15 +10315,11 @@ window.JCOB_CONFIG = {
 
   function write(scope) {
     data.updated = new Date().toISOString();
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(data));
-      notify();
-      try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
-      push(scope || ["settings", "products"]);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    notify();
+    try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
+    var pending = push(scope || ["settings", "products"]);
+    pending.catch(function () {});
+    return true;
   }
 
   function reset() {
@@ -10543,11 +10537,6 @@ window.JCOB_CONFIG = {
 
   function subscribe(fn) {
     listeners.push(fn);
-    window.addEventListener("storage", function (e) {
-      if (e.key !== KEY || !e.newValue) return;
-      data = read();
-      try { fn(data); } catch (err) {}
-    });
   }
 
   /* ------------------------------------------------------------------
@@ -10565,8 +10554,8 @@ window.JCOB_CONFIG = {
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
 
-  function localExists() {
-    try { return !!window.localStorage.getItem(KEY); } catch (e) { return false; }
+  function isStaff() {
+    return !!(CLOUD && CLOUD.auth && CLOUD.auth.isStaff && CLOUD.auth.isStaff());
   }
 
   function payloadFor(kind) {
@@ -10612,7 +10601,6 @@ window.JCOB_CONFIG = {
   /* Pull the published documents and apply them over the local cache. */
   function hydrate() {
     if (!cloudOn()) return Promise.resolve(false);
-    var hadLocal = localExists();
     return Promise.all([
       CLOUD.docs.get("site", "settings"),
       CLOUD.docs.get("site", "products"),
@@ -10629,26 +10617,25 @@ window.JCOB_CONFIG = {
       if (remoteSettings && remoteSettings.data) {
         data.settings = mergeSettings(remoteSettings.data);
         changed = true;
-      } else if (hadLocal) seed.push("settings");
+      } else if (isStaff()) seed.push("settings");
 
       if (remoteProducts && Array.isArray(remoteProducts.data) && remoteProducts.data.length) {
         data.products = remoteProducts.data;
         changed = true;
-      } else if (hadLocal) seed.push("products");
+      } else if (isStaff()) seed.push("products");
 
       if (remoteContent && remoteContent.data && typeof remoteContent.data === "object") {
         data.content = remoteContent.data;
         changed = true;
-      } else if (hadLocal) seed.push("content");
+      } else if (isStaff()) seed.push("content");
 
       if (remoteSections && remoteSections.data && typeof remoteSections.data === "object") {
         data.sections = remoteSections.data;
         changed = true;
-      } else if (hadLocal) seed.push("sections");
+      } else if (isStaff()) seed.push("sections");
 
       if (changed) {
         data.updated = new Date().toISOString();
-        try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
         notify();
         try { document.dispatchEvent(new CustomEvent("jcob:site-updated", { detail: data })); } catch (e) {}
       }
@@ -10954,10 +10941,11 @@ window.JCOB_CONFIG = {
    One document per customer. Every read and write goes through this
    module, so the dashboard never needs to know where it is stored:
 
-     • Cloud mode — one row per signed-in customer in Supabase
-                  (customer_docs), mirrored to localStorage as an offline
-                  cache.
-     • Offline    — the same document, kept in localStorage only.
+     • Supabase — one row per signed-in customer in customer_docs. This is
+                  the only copy: the open page holds it in memory and
+                  writes every change straight back.
+     • No account service — the dashboard is read-only and says so. It
+                  never invents or caches a record on the device.
 
    A new account starts empty: no loans, no applications, no balances and
    no borrowed identity. There is no sample or demonstration data in this
@@ -11028,84 +11016,85 @@ window.JCOB_CONFIG = {
 
 
   /* ---------------- Storage ----------------
-     Offline mode keeps one document in localStorage.
-     Cloud mode keeps one document per signed-in customer in Supabase
-     (customer_docs) and mirrors it to localStorage as an offline cache.
-     Every function in the dashboard goes through persist(), so nothing
-     else in the project needs to know which mode is active.
+     Supabase is the only store. The open page keeps the customer's
+     document in memory; every change is written to customer_docs. Nothing
+     is kept in the browser, so a device can never show a record the
+     database does not hold. With no account service the dashboard is
+     read-only and says so.
      ------------------------------------------------------------------ */
   var CLOUD = window.JCOB_CLOUD;
   var remote = {
     enabled: !!(CLOUD && CLOUD.enabled),
-    state: CLOUD && CLOUD.enabled ? "connecting" : "local",
+    state: CLOUD && CLOUD.enabled ? "connecting" : "offline",
     at: null,
     error: null
   };
-  var hydrating = !!(CLOUD && CLOUD.enabled);
   var pushTimer = null;
+  var loaded = false;
+  var db = empty();
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
   function uid() {
     var user = CLOUD && CLOUD.auth && CLOUD.auth.user();
     return user && user.id ? user.id : null;
   }
-  function cacheKey() {
-    var id = cloudOn() ? uid() : null;
-    return id ? KEY + ":" + id : KEY;
-  }
+  function canWrite() { return cloudOn() && !!uid() && loaded && remote.state !== "error"; }
 
-  function read() {
+  function announce() {
     try {
-      var raw = window.localStorage.getItem(cacheKey());
-      if (!raw) return null;
-      var parsed = JSON.parse(raw);
-      /* A document written by an earlier version (or a partial cloud record)
-         must not leave the dashboard without settings/security blocks. */
-      return parsed && parsed.profile ? normalise(parsed) : null;
-    } catch (e) {
-      return null;
-    }
+      document.dispatchEvent(new CustomEvent("jcob:data", { detail: { state: remote.state } }));
+    } catch (e) {}
   }
 
-  var db = read() || seed();
-
-  function saveCache() {
+  /* Drop the cache written by earlier builds. */
+  (function clearLegacy() {
     try {
-      window.localStorage.setItem(cacheKey(), JSON.stringify(db));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
+      var ls = window.localStorage, i, key;
+      for (i = ls.length - 1; i >= 0; i -= 1) {
+        key = ls.key(i);
+        if (key && (key === "jcob_app_v2" || key.indexOf("jcob_app_v2:") === 0)) ls.removeItem(key);
+      }
+    } catch (e) {}
+  })();
 
   function pushCloud() {
-    if (!cloudOn() || !uid()) return Promise.resolve(null);
+    if (!cloudOn() || !uid()) { remote.state = "offline"; announce(); return Promise.resolve(null); }
+    if (!loaded) return Promise.resolve(null);
     remote.state = "saving";
+    announce();
     return CLOUD.customer.save(db).then(function (row) {
       remote.state = "synced";
       remote.at = new Date().toISOString();
       remote.error = null;
+      announce();
       return row;
     }).catch(function (err) {
       remote.state = "error";
       remote.error = String((err && err.message) || err);
+      announce();
       return null;
     });
   }
 
+  /* Every change in the dashboard calls save(), which queues one write to
+     the database. The browser is never used as a backup store. */
   function persist() {
-    var ok = saveCache();
-    if (cloudOn() && !hydrating) {
-      if (pushTimer) clearTimeout(pushTimer);
-      pushTimer = setTimeout(function () { pushTimer = null; pushCloud(); }, 400);
+    if (!cloudOn() || !uid()) {
+      remote.state = "offline";
+      remote.error = "Not signed in to the account service.";
+      announce();
+      return false;
     }
-    return ok;
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () { pushTimer = null; pushCloud(); }, 350);
+    return true;
   }
 
   function get() { return db; }
   function save() { return persist(); }
   function reset() {
-    db = seed();
+    db = empty();
+    loaded = false;
     persist();
     return db;
   }
@@ -11143,15 +11132,23 @@ window.JCOB_CONFIG = {
   }
 
   function hydrate() {
-    if (!cloudOn() || !uid()) return Promise.resolve(false);
-    hydrating = true;
+    if (!cloudOn() || !uid()) {
+      remote.state = "offline";
+      remote.error = "Not signed in to the account service.";
+      loaded = false;
+      db = empty();
+      announce();
+      return Promise.resolve(false);
+    }
+    remote.state = "connecting";
     return CLOUD.customer.load().then(function (row) {
       if (row && row.data && row.data.profile) {
         db = normalise(row.data);
-        saveCache();
+        loaded = true;
         remote.state = "synced";
         remote.at = row.updated_at || new Date().toISOString();
         remote.error = null;
+        announce();
       } else {
         var user = CLOUD.auth.user() || {};
         var meta = user.user_metadata || {};
@@ -11165,17 +11162,16 @@ window.JCOB_CONFIG = {
           accountNumber: (CLOUD.auth.profile() || {}).account_no || ""
         });
         db.profile.avatar = (db.profile.fullName || "?").split(" ").map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
-        saveCache();
-        hydrating = false;
+        loaded = true;
         return pushCloud().then(function () { return true; });
       }
-      hydrating = false;
       try { document.dispatchEvent(new CustomEvent("jcob:data-ready", { detail: db })); } catch (e) {}
       return true;
     }).catch(function (err) {
-      hydrating = false;
-      remote.state = "offline";
+      loaded = false;
+      remote.state = "error";
       remote.error = String((err && err.message) || err);
+      announce();
       return false;
     });
   }
@@ -11289,16 +11285,16 @@ window.JCOB_CONFIG = {
     hydrate: hydrate,
     remote: remote,
     cloud: cloudOn,
-    cacheKey: cacheKey
+    canWrite: canWrite
   };
 
-  /* Cloud mode: pull this customer's document first — never publish an
-     empty document over a real record. Offline: keep the local copy. */
+  /* The document is read from customer_docs before anything is shown, and
+     re-read whenever the signed-in customer changes. */
   if (cloudOn()) {
     hydrate();
     document.addEventListener("jcob:auth", function () { hydrate(); });
-  } else if (!read()) {
-    persist();
+  } else {
+    remote.state = "offline";
   }
 })();
 
@@ -11770,7 +11766,7 @@ window.JCOB_CONFIG = {
    LIVE BLOG & NOTIFICATIONS — administrator-managed announcement feed
    Types      : announcement · card · image · blog
    Motions    : slide · flap · swipe · rotate · spin · swap · endless
-   Storage    : localStorage today, Supabase later (see loadRemote below).
+   Storage    : site_docs/live_posts in Supabase (see hydrateRemote below).
    ===================================================================== */
 (function () {
   "use strict";
@@ -12145,27 +12141,23 @@ window.JCOB_CONFIG = {
     return extra.length ? posts.concat(extra) : posts;
   }
 
-  function read() {
-    try {
-      var raw = window.localStorage.getItem(KEY);
-      if (!raw) return withAboutCards(DEFAULTS.slice());
-      var parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || !parsed.length) return withAboutCards(DEFAULTS.slice());
-      return withAboutCards(parsed);
-    } catch (e) {
-      return withAboutCards(DEFAULTS.slice());
-    }
+  /* The published feed lives in site_docs/live_posts. The posts written in
+     this file are the starting content used to draw a feed before the
+     database answers (and on a deployment with no database at all). */
+  var posts = withAboutCards(DEFAULTS.slice());
+
+  function read() { return posts; }
+
+  function notify() {
+    try { document.dispatchEvent(new CustomEvent("jcob:live", { detail: posts })); } catch (e) {}
+    try { if (typeof initFeeds === "function") initFeeds(); } catch (e) {}
   }
 
-  function write(posts) {
-    var ok = true;
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(posts));
-    } catch (e) {
-      ok = false;
-    }
+  function write(next) {
+    posts = withAboutCards(Array.isArray(next) ? next.slice() : []);
+    notify();
     pushRemote(posts);
-    return ok;
+    return true;
   }
 
   /* ---------------- Cloud (Supabase) ---------------- */
@@ -12488,17 +12480,17 @@ window.JCOB_CONFIG = {
   function hydrateRemote() {
     if (!CLOUD || !CLOUD.enabled) return Promise.resolve(false);
     return CLOUD.docs.get("site", "live_posts").then(function (row) {
-      var posts = row && Array.isArray(row.data) ? row.data : null;
-      if (posts && posts.length) {
-        try { window.localStorage.setItem(KEY, JSON.stringify(posts)); } catch (e) {}
+      if (row && Array.isArray(row.data)) {
+        posts = withAboutCards(row.data.slice());
         remote.state = "synced";
         remote.error = null;
+        notify();
         initFeeds();
         return true;
       }
-      /* first run against an empty cloud: publish whatever this browser has */
-      var local = read();
-      if (local.length) pushRemote(local);
+      /* First run against an empty database: a staff member publishes the
+         site's own default feed so the collection has a starting point. */
+      if (CLOUD.auth && CLOUD.auth.isStaff && CLOUD.auth.isStaff()) pushRemote(posts);
       return false;
     }).catch(function (err) {
       remote.state = "offline";
@@ -12536,7 +12528,7 @@ window.JCOB_CONFIG = {
       if (closed) return;
       closed = true;
       wrap.classList.remove("is-in");
-      try { window.localStorage.setItem(DISMISS_KEY, post.id); } catch (e) {}
+      try { window.sessionStorage.setItem(DISMISS_KEY, post.id); } catch (e) {}
       setTimeout(function () { wrap.remove(); }, 350);
     }
     wrap.querySelector(".live-toast-close").addEventListener("click", close);
@@ -12549,7 +12541,7 @@ window.JCOB_CONFIG = {
   if (document.body && !isDashboard) {
     var latest = published(read())[0];
     var dismissed = null;
-    try { dismissed = window.localStorage.getItem(DISMISS_KEY); } catch (e) {}
+    try { dismissed = window.sessionStorage.getItem(DISMISS_KEY); } catch (e) {}
     if (latest && latest.id !== dismissed) {
       setTimeout(function () { showToast(latest); }, 2200);
     }
@@ -13846,6 +13838,17 @@ window.JCOB_CONFIG = {
   function submitApplication() {
     if (!validateStep(5)) {
       UI.toast({ title: "Consent required", message: "Accept all three declarations before submitting.", type: "danger" });
+      return;
+    }
+    /* An application has to reach the database. Without a signed-in account
+       the page says so instead of showing a reference that exists nowhere. */
+    if (!DATA.canWrite || !DATA.canWrite()) {
+      var state5 = document.getElementById("ap-status");
+      if (state5) {
+        state5.className = "form-status is-visible form-status--error";
+        state5.textContent = "Please sign in (or create an account) so your application can be saved to your file. Your answers on this screen are kept while you sign in.";
+      }
+      UI.toast({ title: "Sign in to submit", message: "Applications are stored in your account — sign in and send it again.", type: "danger" });
       return;
     }
     var draft = collect();
@@ -15175,39 +15178,66 @@ try {
     renderSync();
   }
 
-  /* Where the last change went: the live database, or only this device.
-     The dashboard is never allowed to imply a record is saved when the
-     write to Supabase failed. */
+  /* Where the data comes from and whether the last change reached the
+     database. The dashboard never implies a record is stored when the
+     write to Supabase has not succeeded. */
+  var lastSyncState = null;
   function renderSync() {
-    var els = document.querySelectorAll("[data-sync]");
-    if (!els.length) return;
     var remote = DATA.remote || {};
+    var state = remote.state || "";
     var cloud = window.JCOB_CLOUD && window.JCOB_CLOUD.enabled;
     var signedIn = !!(cloud && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.isSignedIn &&
       window.JCOB_CLOUD.auth.isSignedIn());
-    var text = "";
+    var chipText = "";
     var tone = "";
-    if (cloud && !signedIn) {
-      text = "";
-    } else if (!cloud) {
-      text = "Offline — saved on this device only";
-      tone = "is-warn";
-    } else if (remote.state === "error" || remote.state === "offline") {
-      text = "Not saved to the server — check your connection";
+    var alertText = "";
+    var alertTone = "";
+
+    if (!cloud) {
+      chipText = "Not connected";
       tone = "is-error";
-    } else if (remote.state === "synced") {
-      text = "Saved to your account";
+      alertText = "This dashboard is not connected to the account service, so there is nothing to show. " +
+        "Call +265 999 123 456 and we will help you with your account.";
+      alertTone = "is-error";
+    } else if (!signedIn) {
+      chipText = "";
+    } else if (state === "error") {
+      chipText = "Not saved to the server";
+      tone = "is-error";
+      alertText = "We could not reach the account service. Nothing you change now is being saved — " +
+        "reload the page when your connection is back.";
+      alertTone = "is-error";
+    } else if (state === "offline") {
+      chipText = "Not connected";
+      tone = "is-error";
+      alertText = "You are not signed in to the account service, so this page cannot save anything.";
+      alertTone = "is-error";
+    } else if (state === "connecting") {
+      chipText = "Loading your account…";
+    } else if (state === "saving") {
+      chipText = "Saving…";
+    } else if (state === "synced") {
+      chipText = "Saved to your account";
       tone = "is-ok";
-    } else if (remote.state === "connecting" || remote.state === "saving") {
-      text = "Saving…";
-      tone = "";
     }
-    els.forEach(function (el) {
-      el.textContent = text;
+
+    document.querySelectorAll("[data-sync]").forEach(function (el) {
+      el.textContent = chipText;
       el.className = "app-sync " + tone;
-      el.hidden = !text;
-      el.title = remote.error || text;
+      el.hidden = !chipText;
+      el.title = remote.error || chipText;
     });
+    var alert = document.querySelector("[data-data-alert]");
+    if (alert) {
+      alert.textContent = alertText;
+      alert.className = "app-alert " + alertTone;
+      alert.hidden = !alertText;
+    }
+
+    if (cloud && state === "error" && lastSyncState !== "error" && UI.toast) {
+      UI.toast({ title: "Not saved", message: "We could not reach the account service. Reload when you are back online.", type: "danger" });
+    }
+    lastSyncState = state;
   }
 
   function highlightNav() {
@@ -17338,6 +17368,10 @@ try {
       renderSidebar();
       if (render) render();
     });
+
+    /* Every write to customer_docs reports back here, so the chip and the
+       banner always describe the state of the database, not the page. */
+    document.addEventListener("jcob:data", function () { renderSync(); });
 
     /* session expiry: 30 minutes of inactivity */
     var last = Date.now();

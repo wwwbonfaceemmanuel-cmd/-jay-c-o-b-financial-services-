@@ -2,7 +2,7 @@
    LIVE BLOG & NOTIFICATIONS — administrator-managed announcement feed
    Types      : announcement · card · image · blog
    Motions    : slide · flap · swipe · rotate · spin · swap · endless
-   Storage    : localStorage today, Supabase later (see loadRemote below).
+   Storage    : site_docs/live_posts in Supabase (see hydrateRemote below).
    ===================================================================== */
 (function () {
   "use strict";
@@ -377,27 +377,23 @@
     return extra.length ? posts.concat(extra) : posts;
   }
 
-  function read() {
-    try {
-      var raw = window.localStorage.getItem(KEY);
-      if (!raw) return withAboutCards(DEFAULTS.slice());
-      var parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || !parsed.length) return withAboutCards(DEFAULTS.slice());
-      return withAboutCards(parsed);
-    } catch (e) {
-      return withAboutCards(DEFAULTS.slice());
-    }
+  /* The published feed lives in site_docs/live_posts. The posts written in
+     this file are the starting content used to draw a feed before the
+     database answers (and on a deployment with no database at all). */
+  var posts = withAboutCards(DEFAULTS.slice());
+
+  function read() { return posts; }
+
+  function notify() {
+    try { document.dispatchEvent(new CustomEvent("jcob:live", { detail: posts })); } catch (e) {}
+    try { if (typeof initFeeds === "function") initFeeds(); } catch (e) {}
   }
 
-  function write(posts) {
-    var ok = true;
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(posts));
-    } catch (e) {
-      ok = false;
-    }
+  function write(next) {
+    posts = withAboutCards(Array.isArray(next) ? next.slice() : []);
+    notify();
     pushRemote(posts);
-    return ok;
+    return true;
   }
 
   /* ---------------- Cloud (Supabase) ---------------- */
@@ -720,17 +716,17 @@
   function hydrateRemote() {
     if (!CLOUD || !CLOUD.enabled) return Promise.resolve(false);
     return CLOUD.docs.get("site", "live_posts").then(function (row) {
-      var posts = row && Array.isArray(row.data) ? row.data : null;
-      if (posts && posts.length) {
-        try { window.localStorage.setItem(KEY, JSON.stringify(posts)); } catch (e) {}
+      if (row && Array.isArray(row.data)) {
+        posts = withAboutCards(row.data.slice());
         remote.state = "synced";
         remote.error = null;
+        notify();
         initFeeds();
         return true;
       }
-      /* first run against an empty cloud: publish whatever this browser has */
-      var local = read();
-      if (local.length) pushRemote(local);
+      /* First run against an empty database: a staff member publishes the
+         site's own default feed so the collection has a starting point. */
+      if (CLOUD.auth && CLOUD.auth.isStaff && CLOUD.auth.isStaff()) pushRemote(posts);
       return false;
     }).catch(function (err) {
       remote.state = "offline";
@@ -768,7 +764,7 @@
       if (closed) return;
       closed = true;
       wrap.classList.remove("is-in");
-      try { window.localStorage.setItem(DISMISS_KEY, post.id); } catch (e) {}
+      try { window.sessionStorage.setItem(DISMISS_KEY, post.id); } catch (e) {}
       setTimeout(function () { wrap.remove(); }, 350);
     }
     wrap.querySelector(".live-toast-close").addEventListener("click", close);
@@ -781,7 +777,7 @@
   if (document.body && !isDashboard) {
     var latest = published(read())[0];
     var dismissed = null;
-    try { dismissed = window.localStorage.getItem(DISMISS_KEY); } catch (e) {}
+    try { dismissed = window.sessionStorage.getItem(DISMISS_KEY); } catch (e) {}
     if (latest && latest.id !== dismissed) {
       setTimeout(function () { showToast(latest); }, 2200);
     }
