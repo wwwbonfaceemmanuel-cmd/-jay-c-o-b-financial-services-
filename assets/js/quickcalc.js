@@ -15,6 +15,7 @@
   var termEl = $("qc-term");
   var methodEl = $("qc-method");
   var freqEl = $("qc-frequency");
+  var basisEl = $("qc-basis");
   var rateEl = $("qc-rate");
 
   function clampAmount(v) {
@@ -38,12 +39,15 @@
     });
 
     $("qc-payment").textContent = F.formatMWK(c.payment);
+    var basis = basisEl ? basisEl.value : "monthly";
     $("qc-per").textContent = (frequency === "monthly" ? "per month" : "per fortnight") +
-      " · " + c.periods + " instalments";
+      " · " + c.periods + " instalments · " + (basis === "annual" ? "annual basis" : "monthly basis");
     $("qc-principal").textContent = F.formatMWK(c.principal);
     $("qc-interest").textContent = F.formatMWK(c.totalInterest + c.fees);
     $("qc-total").textContent = F.formatMWK(c.totalCost);
     $("qc-method-out").textContent = method === "flat" ? "Flat rate" : "Reducing balance";
+    var perYear = frequency === "fortnightly" ? 26 : 12;
+    if ($("qc-annual")) $("qc-annual").textContent = F.formatMWK(c.payment * perYear);
 
     var principalShare = c.totalCost > 0 ? (c.principal / c.totalCost) * 100 : 100;
     $("qc-bar-p").style.width = principalShare.toFixed(1) + "%";
@@ -53,6 +57,13 @@
     if (apply) {
       apply.href = "apply.html?amount=" + Math.round(amount) + "&term=" + term;
     }
+  }
+
+  if (basisEl) {
+    basisEl.addEventListener("change", function () {
+      termEl.value = basisEl.value === "annual" ? "12" : "1";
+      update();
+    });
   }
 
   [amountEl, termEl, methodEl, freqEl, rateEl].forEach(function (el) {

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Live update console — JAY C O B FINANCIAL SERVICES</title>
   <meta name="description" content="Administrator console for publishing and managing live announcements, cards and photo updates.">
-  <meta name="theme-color" content="#03170f">
+  <meta name="theme-color" content="#031613">
   <meta property="og:title" content="Live update console — JAY C O B FINANCIAL SERVICES">
   <meta property="og:description" content="Administrator console for publishing and managing live announcements, cards and photo updates.">
   <meta property="og:type" content="website">
@@ -151,6 +151,7 @@
                     <option value="announcement">Announcement — short notice</option>
                     <option value="card">Card — headline + call to action</option>
                     <option value="image">Image — photo update</option>
+                    <option value="blog">Live blog — image + long text</option>
                   </select>
                 </div>
 
@@ -191,16 +192,28 @@
                   <label for="post-image-custom">Custom image URL</label>
                   <input id="post-image-custom" type="text" placeholder="assets/img/your-photo.jpg">
                 </div>
+                <div class="field mt-2">
+                  <label for="post-image-file">Or upload an image</label>
+                  <input id="post-image-file" type="file" accept="image/*">
+                  <span class="hint">JPG, PNG or WebP. Resized to 1200 px and stored in this browser.</span>
+                  <div class="post-image-preview" id="post-image-preview" hidden>
+                    <img id="post-image-preview-img" alt="Selected image preview" loading="lazy">
+                    <button class="btn btn--ghost btn--xs" type="button" id="post-image-clear">Remove image</button>
+                  </div>
+                </div>
 
                 <div class="field mt-2">
-                  <label for="post-animation">Entrance action</label>
+                  <label for="post-animation">Motion action</label>
                   <select id="post-animation">
                     <option value="slide">Slide in</option>
                     <option value="flap">Flap (flip board)</option>
                     <option value="swipe">Swipe across</option>
                     <option value="rotate">Rotate in</option>
                     <option value="spin">Spin in</option>
+                    <option value="swap">Swap (3D card turn)</option>
+                    <option value="endless">Endless float (loops forever)</option>
                   </select>
+                  <span class="hint">Endless keeps moving — used for standing notices and security warnings.</span>
                 </div>
 
                 <div class="stack mt-2" style="display:grid; gap:.5rem;">

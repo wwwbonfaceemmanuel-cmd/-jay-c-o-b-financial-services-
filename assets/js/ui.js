@@ -307,10 +307,10 @@
     var doc = frame.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head><title>JAY C O B Financial Services</title>' +
-      '<style>body{font-family:Inter,Arial,sans-serif;color:#0a2118;padding:24px;font-size:12px;}' +
+      '<style>body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:24px;font-size:12px;}' +
       'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;} table{width:100%;border-collapse:collapse;margin-top:12px;}' +
-      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;} th{font-size:10px;text-transform:uppercase;color:#6b8375;}' +
-      '.muted{color:#6b8375;font-size:11px;} .brand{display:flex;gap:12px;align-items:center;margin-bottom:14px;}' +
+      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;} th{font-size:10px;text-transform:uppercase;color:#658982;}' +
+      '.muted{color:#658982;font-size:11px;} .brand{display:flex;gap:12px;align-items:center;margin-bottom:14px;}' +
       '.brand img{height:40px;} .totals{margin-top:12px;font-weight:700;}</style></head><body>' +
       '<div class="brand"><img src="' + location.origin + location.pathname.replace(/[^/]*$/, "") + 'assets/img/logo-full.svg" alt="JAY C O B Financial Services">' +
       "<div><strong>JAY C O B FINANCIAL SERVICES</strong><div class=\"muted\">Plot 47/3, Area 47, Sector 3, Lilongwe · MWK</div></div></div>" +
@@ -386,11 +386,46 @@
     });
   }
 
+
+  /* ---------------- Password reveal (single delegated handler) ---------------- */
+  var EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg>';
+
+  function passwordInputFor(btn) {
+    var id = btn.getAttribute("data-pw-toggle");
+    var input = id ? document.getElementById(id) : null;
+    if (input) return input;
+    var wrap = btn.closest(".pw-wrap") || btn.parentNode;
+    return wrap ? wrap.querySelector('input[type="password"], input[type="text"]') : null;
+  }
+
+  function initPasswordToggles() {
+    if (document.documentElement.getAttribute("data-pw-bound") === "1") return;
+    document.documentElement.setAttribute("data-pw-bound", "1");
+    document.addEventListener("click", function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest("[data-pw-toggle]") : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      var input = passwordInputFor(btn);
+      if (!input) return;
+      var showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+      btn.setAttribute("aria-pressed", String(!showing));
+      btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+      btn.setAttribute("title", showing ? "Show password" : "Hide password");
+      btn.innerHTML = showing ? EYE_ON : EYE_OFF;
+      try { input.focus({ preventScroll: true }); } catch (err) {}
+    }, true);
+  }
+  initPasswordToggles();
+
   /* ---------------- Boot ---------------- */
   document.addEventListener("DOMContentLoaded", function () {
     initBell();
     initProfileMenu();
     initSidebar();
+    initPasswordToggles();
     updateBell();
   });
 
@@ -417,6 +452,7 @@
     statusPill: statusPill,
     emptyState: emptyState,
     initFilter: initFilter,
+    initPasswordToggles: initPasswordToggles,
     formatMWK: F ? F.formatMWK : function (v) { return "MWK " + v; }
   };
 })();

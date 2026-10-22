@@ -225,7 +225,7 @@
       }
       if (note) {
         note.textContent = "You're on the list. Look out for the next briefing.";
-        note.style.color = "#ecd7a6";
+        note.style.color = "#a6c4ec";
       }
       form.reset();
     });
@@ -242,18 +242,7 @@
     });
   });
 
-  /* ---------- Password reveal toggles ---------- */
-  document.querySelectorAll("[data-pw-toggle]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var input = document.getElementById(btn.getAttribute("data-pw-toggle"));
-      if (!input) return;
-      var showing = input.type === "text";
-      input.type = showing ? "password" : "text";
-      btn.setAttribute("aria-pressed", String(!showing));
-      btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-      input.focus({ preventScroll: true });
-    });
-  });
+  /* Password reveal is handled once, by JCOB_UI.initPasswordToggles(). */
 
   /* ---------- Copy-to-clipboard (portal helpers) ---------- */
   document.querySelectorAll("[data-copy]").forEach(function (btn) {

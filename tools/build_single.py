@@ -10,12 +10,14 @@ images are inlined so the file works offline with no assets folder.
 import base64
 import mimetypes
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "single" / "index.html"
-IMG_OPT = Path("/tmp/img_opt")
+IMG_OPT = ROOT / ".cache" / "single-img"
 
 # Views in navigation order. Aliases (portal/products) are redirects and are skipped.
 SKIP = {"portal", "products", "404"}
@@ -60,14 +62,29 @@ def data_uri(path: Path) -> str:
     return "data:%s;base64,%s" % (mime, base64.b64encode(path.read_bytes()).decode("ascii"))
 
 
+def optimize_jpeg(src: Path) -> Path:
+    """Resize + recompress photos once, so the bundle stays small."""
+    if not shutil.which("convert"):
+        return src
+    dest = IMG_OPT / src.name
+    if dest.exists() and dest.stat().st_mtime >= src.stat().st_mtime:
+        return dest
+    IMG_OPT.mkdir(parents=True, exist_ok=True)
+    try:
+        subprocess.run(["convert", str(src), "-resize", "900x900>", "-strip",
+                        "-quality", "72", str(dest)], check=True, capture_output=True)
+        return dest if dest.exists() else src
+    except Exception:
+        return src
+
+
 def image_map():
-    """Original images plus the optimised JPEGs (smaller, same look)."""
+    """Every image inlined as a data URI, photos downscaled first."""
     out = {}
-    for f in (ROOT / "assets" / "img").iterdir():
-        if f.suffix.lower() == ".jpg" and (IMG_OPT / f.name).exists():
-            out[f.name] = data_uri(IMG_OPT / f.name)
-        else:
-            out[f.name] = data_uri(f)
+    for f in sorted((ROOT / "assets" / "img").iterdir()):
+        if not f.is_file():
+            continue
+        out[f.name] = data_uri(optimize_jpeg(f) if f.suffix.lower() in (".jpg", ".jpeg") else f)
     return out
 
 

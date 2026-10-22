@@ -46,17 +46,25 @@
               <span class="hint">Indicative rate for the selected product</span>
             </div>
             <div class="field">
-              <label for="calc-term">Repayment period (months)</label>
-              <input id="calc-term" type="number" min="1" max="84" step="1" value="12">
-              <span class="hint">Monthly or fortnightly instalments</span>
+              <label for="calc-basis">Calculation basis</label>
+              <select id="calc-basis">
+                <option value="monthly" selected>Monthly — defaults to 1 month</option>
+                <option value="annual">Annually — defaults to 1 year</option>
+              </select>
+              <span class="hint" id="calc-basis-hint">Monthly quotation: 1 month to start</span>
             </div>
             <div class="field">
-              <label for="calc-method">Interest method</label>
-              <select id="calc-method">
-                <option value="reducing" selected>Reducing balance</option>
-                <option value="flat">Flat rate</option>
-              </select>
-              <span class="hint">Reducing balance costs less overall</span>
+              <label for="calc-term" id="calc-term-label">Repayment period (months)</label>
+              <input id="calc-term" type="number" min="1" max="84" step="1" value="1">
+              <span class="hint" id="calc-term-hint">1 monthly instalment</span>
+            </div>
+            <div class="field field--full">
+              <span class="field-label" id="calc-method-label">Interest method</span>
+              <div class="segmented" role="radiogroup" aria-labelledby="calc-method-label">
+                <label><input type="radio" name="calc-method" value="reducing" checked><span>Reducing balance</span></label>
+                <label><input type="radio" name="calc-method" value="flat"><span>Flat rate</span></label>
+              </div>
+              <span class="hint">Reducing balance costs less overall · switch to compare instantly</span>
             </div>
             <div class="field">
               <label for="calc-frequency">Repayment frequency</label>
@@ -90,13 +98,13 @@
           <div class="calc-result reveal" aria-live="polite">
             <p class="hero-label">Estimated repayment</p>
             <p class="hero-figure" id="res-payment">MWK 472,798</p>
-            <p class="text-tiny" id="res-payment-period" style="color:#9db3a4;">per month</p>
+            <p class="text-tiny" id="res-payment-period" style="color:#a3c2d6;">per month</p>
 
             <div class="calc-bar" style="margin-top:1rem;">
               <i class="p" id="bar-principal" style="width:86.6%"></i>
               <i class="i" id="bar-interest" style="width:13.4%"></i>
             </div>
-            <p class="text-tiny" style="color:#9db3a4;margin-top:.35rem;"><span style="color:#f0dcae;">Principal</span> · <span>Interest &amp; fees</span></p>
+            <p class="text-tiny" style="color:#a3c2d6;margin-top:.35rem;"><span style="color:#c4e2fb;">Principal</span> · <span>Interest &amp; fees</span></p>
 
             <div class="row"><span>Principal</span><strong id="res-principal">MWK 5,000,000</strong></div>
             <div class="row"><span>Total interest</span><strong id="res-interest">MWK 673,576</strong></div>
@@ -105,12 +113,14 @@
             <div class="row"><span>Nominal rate</span><strong id="res-rate">24% p.a.</strong></div>
             <div class="row"><span>Indicative APR</span><strong id="res-apr">—</strong></div>
             <div class="row"><span>Instalments</span><strong id="res-instalments">12 × MWK 472,798</strong></div>
+            <div class="row"><span>Annual outlay</span><strong id="res-annual">MWK 5,673,576</strong></div>
+            <div class="row"><span>Basis</span><strong id="res-basis">Monthly</strong></div>
             <div class="row"><span>Method</span><strong id="res-method">Reducing balance</strong></div>
             <div class="row"><span>Frequency</span><strong id="res-frequency">Monthly</strong></div>
             <div class="row"><span>First instalment</span><strong id="res-first">—</strong></div>
             <div class="row"><span>Final instalment</span><strong id="res-last">—</strong></div>
-            <p class="text-tiny" id="res-compare" style="color:#9db3a4;margin-top:.7rem;"></p>
-            <p class="text-tiny" id="calc-aside-note" style="color:#7f9a86;margin-top:.4rem;"></p>
+            <p class="text-tiny" id="res-compare" style="color:#a3c2d6;margin-top:.7rem;"></p>
+            <p class="text-tiny" id="calc-aside-note" style="color:#8fadbf;margin-top:.4rem;"></p>
           </div>
 
           <div class="card" style="margin-top:1rem;">

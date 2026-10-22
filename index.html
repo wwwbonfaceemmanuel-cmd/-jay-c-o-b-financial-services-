@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>JAY C O B FINANCIAL SERVICES — Loans in Malawi</title>
   <meta name="description" content="Licensed money lender offering personal, business, emergency, salary-based and agricultural loans in Malawi. Apply online in MWK, check your eligibility and repay from your customer dashboard.">
-  <meta name="theme-color" content="#03170f">
+  <meta name="theme-color" content="#06262a">
   <meta property="og:title" content="JAY C O B FINANCIAL SERVICES — Loans in Malawi">
   <meta property="og:description" content="Licensed money lender offering personal, business, emergency, salary-based and agricultural loans in Malawi. Apply online in MWK, check your eligibility and repay from your customer dashboard.">
   <meta property="og:type" content="website">
@@ -278,16 +278,24 @@
               <span class="hint">Minimum MWK 50,000 · maximum MWK 80,000,000</span>
             </div>
             <div class="field">
+              <label for="qc-basis">Calculation basis</label>
+              <select id="qc-basis">
+                <option value="monthly" selected>Monthly — defaults to 1 month</option>
+                <option value="annual">Annually — defaults to 1 year</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="qc-term">Repayment period</label>
               <select id="qc-term">
-                <option value="1">1 month</option>
+                <option value="1" selected>1 month</option>
                 <option value="3">3 months</option>
                 <option value="6">6 months</option>
-                <option value="12">12 months</option>
-                <option value="12" selected>12 months</option>
-                <option value="36">36 months</option>
-                <option value="48">48 months</option>
-                <option value="60">60 months</option>
+                <option value="12">12 months (1 year)</option>
+                <option value="18">18 months</option>
+                <option value="24">24 months (2 years)</option>
+                <option value="36">36 months (3 years)</option>
+                <option value="48">48 months (4 years)</option>
+                <option value="60">60 months (5 years)</option>
               </select>
             </div>
             <div class="field">
@@ -319,9 +327,9 @@
         <div class="calc-result reveal" aria-live="polite">
           <p class="hero-label">Estimated monthly instalment</p>
           <p class="hero-figure" id="qc-payment">MWK 472,798</p>
-          <p class="text-tiny" id="qc-per" style="color:#9db3a4;">per month · 12 instalments</p>
+          <p class="text-tiny" id="qc-per" style="color:#a3c2d6;">per month · 12 instalments</p>
           <div class="calc-bar" style="margin-top:1rem;"><i class="p" id="qc-bar-p" style="width:86.6%"></i><i class="i" id="qc-bar-i" style="width:13.4%"></i></div>
-          <p class="text-tiny" style="color:#9db3a4;margin-top:.35rem;"><span style="color:#f0dcae;">Principal</span> · <span>Interest &amp; fees</span></p>
+          <p class="text-tiny" style="color:#a3c2d6;margin-top:.35rem;"><span style="color:#c4e2fb;">Principal</span> · <span>Interest &amp; fees</span></p>
           <div class="row"><span>Amount borrowed</span><strong id="qc-principal">MWK 5,000,000</strong></div>
           <div class="row"><span>Interest &amp; fees</span><strong id="qc-interest">MWK 773,576</strong></div>
           <div class="row"><span>Total repayment</span><strong id="qc-total">MWK 5,773,576</strong></div>
@@ -344,6 +352,18 @@
       </div>
       <div class="mt-3 reveal" data-live-feed data-limit="4" aria-label="Live updates">
         <p class="live-empty">Loading live updates…</p>
+      </div>
+      <div class="mt-4">
+        <div class="flex flex-wrap items-end justify-between gap-2 reveal">
+          <div class="section-head">
+            <span class="eyebrow">From the live blog</span>
+            <h3 class="mt-2" style="font-size:clamp(1.25rem,2.2vw,1.6rem);">Announcements, guides and photo updates.</h3>
+          </div>
+          <a class="link-arrow" href="live.html">Read the live blog</a>
+        </div>
+        <div class="mt-2" data-live-stream data-limit="4" aria-label="Live blog posts">
+          <p class="text-small text-muted">Loading posts…</p>
+        </div>
       </div>
     </div>
   </section>
@@ -606,7 +626,7 @@
     <div class="container">
       <div class="cta-band reveal">
         <div>
-          <p class="brand-chip" style="color:#f0dcae;"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Speak to a lender</p>
+          <p class="brand-chip" style="color:#c4e2fb;"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> Speak to a lender</p>
           <h2 id="contact-heading">Ready when you are.</h2>
           <p>Apply online in about ten minutes, or talk to our team first. We will explain the numbers without pressure.</p>
         </div>
@@ -729,6 +749,7 @@
   <script src="assets/js/app-data.js" defer></script>
   <script src="assets/js/ui.js" defer></script>
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/live.js" defer></script>
   <script src="assets/js/quickcalc.js" defer></script>
 </body>
 </html>

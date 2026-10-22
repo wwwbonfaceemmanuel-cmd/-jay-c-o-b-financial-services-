@@ -53,7 +53,7 @@
     if (!input || !meter) return;
     input.addEventListener("input", function () {
       var s = passwordScore(input.value);
-      var colors = ["#d9d3c2", "#a83b34", "#c98a2a", "#b8912a", "#2f8f63", "#147a52"];
+      var colors = ["#c3ccd8", "#a83b34", "#2a7fc9", "#2a76b8", "#318d7a", "#177764"];
       meter.querySelectorAll("i").forEach(function (bar, i) {
         bar.style.background = i < s ? colors[s] : "var(--line)";
       });
@@ -408,17 +408,7 @@
     if (p === "forgot") initForgot();
     if (p === "reset") initReset();
 
-    /* Password toggles */
-    document.querySelectorAll("[data-pw-toggle]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var input = document.getElementById(btn.getAttribute("data-pw-toggle"));
-        if (!input) return;
-        var showing = input.type === "text";
-        input.type = showing ? "password" : "text";
-        btn.setAttribute("aria-pressed", String(!showing));
-        btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-      });
-    });
+    /* Password reveal is handled once, by JCOB_UI.initPasswordToggles(). */
 
     if (p === "login" && new URLSearchParams(location.search).get("reset") === "1") {
       UI.toast({ title: "Password updated", message: "Sign in with your new password.", type: "success" });
