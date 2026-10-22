@@ -4839,3 +4839,20 @@ summary:focus-visible {
   .live-strip { grid-template-columns: 1fr; }
   .live-strip .live-blog-media { min-height: 150px; }
 }
+
+/* ---------- Calculator: worked formula shown under the results sheet ---------- */
+.calc-formula {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.75rem;
+  border-left: 2px solid #c9a227;
+  border-radius: 0 8px 8px 0;
+  background: rgba(201, 162, 39, 0.09);
+  font-size: 0.7rem;
+  line-height: 1.55;
+  color: #d5e4ee;
+  font-variant-numeric: tabular-nums;
+}
+.calc-formula strong { color: #f6ecc4; }
+@media print {
+  .calc-formula { color: #222 !important; background: transparent; border-left-color: #a67c1a; }
+}
