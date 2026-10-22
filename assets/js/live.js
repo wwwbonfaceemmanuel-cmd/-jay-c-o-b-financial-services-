@@ -143,16 +143,120 @@
     }
   ];
 
+
+  /* About Us cards — published straight into the live blog by the administrators.
+     Each card carries a different motion action. */
+  var ABOUT_CARDS = [
+    {
+      id: "lv-ab-01",
+      type: "about",
+      title: "Our mission",
+      body: "To provide transparent, affordable credit and practical financial support to Malawian households and businesses, so that borrowing builds opportunity rather than trapping people in debt.",
+      link: "about.html",
+      linkLabel: "Read our story",
+      image: "assets/img/about-team.jpg",
+      animation: "slide",
+      pinned: false,
+      published: true,
+      date: "2026-10-19T09:00:00"
+    },
+    {
+      id: "lv-ab-02",
+      type: "about",
+      title: "Our vision",
+      body: "To be the most trusted non-bank lender in Malawi — known for fair pricing, human assessment and technology that makes credit easier to understand and manage.",
+      link: "about.html#team",
+      linkLabel: "Meet the team",
+      image: "",
+      animation: "swap",
+      pinned: false,
+      published: true,
+      date: "2026-10-16T11:30:00"
+    },
+    {
+      id: "lv-ab-03",
+      type: "about",
+      title: "What we stand for",
+      body: "Transparency: published rates, itemised fees and a total cost figure before you sign. Responsibility: we decline loans we believe are unaffordable. Respect: no pressure and no humiliation in recovery. Local roots: Malawian staff and Malawian decision-makers.",
+      link: "about.html",
+      linkLabel: "Our values",
+      image: "",
+      animation: "flap",
+      pinned: false,
+      published: true,
+      date: "2026-10-10T14:15:00"
+    },
+    {
+      id: "lv-ab-04",
+      type: "about",
+      title: "Ten years of steady growth",
+      body: "Founded in Lilongwe in 2016 with a single office and salary-based lending. Business lending followed in 2018, the customer portal in 2020, agricultural finance in 2022, secured lending and regional reach in 2024, and a digital-first rebuild in 2026.",
+      link: "about.html",
+      linkLabel: "See our history",
+      image: "assets/img/hero-consultation.jpg",
+      animation: "rotate",
+      pinned: false,
+      published: true,
+      date: "2026-10-02T08:45:00"
+    },
+    {
+      id: "lv-ab-05",
+      type: "about",
+      title: "Registered, licensed and regulated",
+      body: "JAY C O B FINANCIAL SERVICES is a licensed money lender in Malawi, registered with the Registrar of Financial Institutions and operating under the Money Lenders Act. Our registration, licence and complaint route are published in full.",
+      link: "licensing.html",
+      linkLabel: "Licensing & regulation",
+      image: "",
+      animation: "spin",
+      pinned: false,
+      published: true,
+      date: "2026-09-26T10:20:00"
+    },
+    {
+      id: "lv-ab-06",
+      type: "about",
+      title: "Corporate social responsibility",
+      body: "We reinvest a share of our margin into financial literacy and enterprise support in the communities we lend to — including school fee workshops, market-vendor bookkeeping clinics and cooperative governance training.",
+      link: "about.html",
+      linkLabel: "Community work",
+      image: "assets/img/insight-agri.jpg",
+      animation: "swipe",
+      pinned: false,
+      published: true,
+      date: "2026-09-18T13:10:00"
+    },
+    {
+      id: "lv-ab-07",
+      type: "about",
+      title: "Talk to a person, not a chatbot",
+      body: "Head office: Plot 47/3, Area 47, Sector 3, Lilongwe. Call +265 999 123 456, Monday to Friday 08:00–17:00 and Saturday 09:00–12:00, or email hello@jaycobfinancial.mw.",
+      link: "contact.html",
+      linkLabel: "Contact us",
+      image: "",
+      animation: "endless",
+      pinned: false,
+      published: true,
+      date: "2026-09-11T16:00:00"
+    }
+  ];
+
   /* ---------------- Data layer ---------------- */
+  function withAboutCards(posts) {
+    var have = {};
+    posts.forEach(function (p) { have[p.id] = true; });
+    var missing = ABOUT_CARDS.filter(function (p) { return !have[p.id]; });
+    return missing.length ? posts.concat(missing) : posts;
+  }
+
   function read() {
     try {
       var raw = window.localStorage.getItem(KEY);
-      if (!raw) return DEFAULTS.slice();
+      if (!raw) return withAboutCards(DEFAULTS.slice());
       var parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || !parsed.length) return DEFAULTS.slice();
-      return parsed;
+      if (!Array.isArray(parsed) || !parsed.length) return withAboutCards(DEFAULTS.slice());
+      return withAboutCards(parsed);
     } catch (e) {
-      return DEFAULTS.slice();
+      return withAboutCards(DEFAULTS.slice());
     }
   }
 
@@ -207,7 +311,13 @@
     swap: "Swap (3D card turn)",
     endless: "Endless float (loops forever)"
   };
-  var TYPE_LABELS = { announcement: "Announcement", card: "Card", image: "Photo update", blog: "Live blog" };
+  var TYPE_LABELS = {
+    announcement: "Announcement",
+    card: "Card",
+    image: "Photo update",
+    blog: "Live blog",
+    about: "About us"
+  };
 
   window.JCOB_LIVE = {
     KEY: KEY,
@@ -217,6 +327,7 @@
     published: published,
     escapeHtml: escapeHtml,
     animations: ANIMATIONS,
+    aboutCards: ABOUT_CARDS,
     animationLabels: ANIMATION_LABELS,
     typeLabels: TYPE_LABELS
   };
@@ -247,6 +358,14 @@
         "<p>" + escapeHtml(post.body) + "</p>" +
         link +
         "</div></div>";
+    } else if (type === "about") {
+      inner =
+        '<div class="live-card live-card--about">' +
+        '<span class="live-tag live-tag--about">About JAY C O B</span>' +
+        "<h3>" + escapeHtml(post.title) + "</h3>" +
+        "<p>" + escapeHtml(post.body) + "</p>" +
+        link +
+        "</div>";
     } else if (type === "blog") {
       inner =
         '<div class="live-card live-blog-slide">' +
@@ -403,7 +522,9 @@
         ? '<div class="live-blog-media" style="background-image:url(&quot;' + escapeHtml(post.image) + '&quot;)" role="img" aria-label="' + escapeHtml(post.title) + '"></div>'
         : '<div class="live-blog-media live-blog-media--none">' + escapeHtml(TYPE_LABELS[type] || "Update") + "</div>";
       var href = safeHref(post.link);
-      return '<article class="live-blog anim-' + anim + '" data-anim="' + anim + '" data-post="' + escapeHtml(post.id) + '">' +
+      return '<article class="live-blog' + (type === "about" ? " live-blog--about" : "") +
+        ' anim-' + anim + '" data-anim="' + anim + '" data-type="' + escapeHtml(type) +
+        '" data-post="' + escapeHtml(post.id) + '">' +
         media +
         '<div class="live-blog-body">' +
         '<span class="live-chip' + (i === 0 ? " live-chip--live" : "") + '">' + escapeHtml(TYPE_LABELS[type] || "Update") + "</span> " +

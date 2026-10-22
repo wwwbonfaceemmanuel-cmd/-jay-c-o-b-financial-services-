@@ -57,7 +57,8 @@
   /* ------------------------------------------------------------------
      amortize()
      principal   number  — loan amount in MWK
-     rate        number  — annual interest rate, percent (e.g. 24)
+     rate        number  — interest rate, percent, in the unit given by rateBasis
+     rateBasis   string  — 'annual' (default) | 'monthly'  ← quoted per year or per month
      termMonths  number  — term in months
      method      string  — 'reducing' | 'flat'
      frequency   string  — 'monthly' | 'fortnightly'
@@ -66,7 +67,10 @@
      ------------------------------------------------------------------ */
   function amortize(opts) {
     var principal = Math.max(Number(opts.principal) || 0, 0);
-    var rate = Math.max(Math.min(Number(opts.rate) || 0, 100), 0);
+    var rateBasis = opts.rateBasis === "monthly" ? "monthly" : "annual";
+    var rateInput = Math.max(Number(opts.rate) || 0, 0);
+    /* resolve the quoted rate to an annual rate, capped at 100% p.a. */
+    var rate = rateBasis === "monthly" ? Math.min(rateInput * 12, 100) : Math.min(rateInput, 100);
     var termMonths = Math.max(Math.round(Number(opts.termMonths) || 1), 1);
     var method = opts.method === "flat" ? "flat" : "reducing";
     var freqKey = FREQUENCIES[opts.frequency] ? opts.frequency : "monthly";
@@ -134,7 +138,10 @@
 
     return {
       principal: principal,
-      rate: rate,
+      rate: rate,                 /* annual rate actually used */
+      rateInput: rateInput,       /* figure the customer typed */
+      rateBasis: rateBasis,       /* 'annual' | 'monthly' */
+      monthlyRate: rate / 12,
       apr: apr,
       termMonths: termMonths,
       periods: periods,

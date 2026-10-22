@@ -238,8 +238,15 @@
               </select>
             </div>
             <div class="field">
-              <label for="qc-rate">Annual interest rate (%)</label>
-              <input id="qc-rate" type="number" min="1" max="60" step="0.5" value="24">
+              <label for="qc-rate-basis">Interest rate basis</label>
+              <select id="qc-rate-basis">
+                <option value="annual" selected>Annual (% p.a.)</option>
+                <option value="monthly">Monthly (% per month)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="qc-rate" id="qc-rate-label">Annual interest rate (%)</label>
+              <input id="qc-rate" type="number" min="0.1" max="60" step="0.1" value="24">
             </div>
           </div>
           <div class="flex flex-wrap gap-1" style="margin-top:1rem;">
@@ -259,6 +266,8 @@
           <div class="row"><span>Interest &amp; fees</span><strong id="qc-interest">MWK 773,576</strong></div>
           <div class="row"><span>Total repayment</span><strong id="qc-total">MWK 5,773,576</strong></div>
           <div class="row"><span>Interest method</span><strong id="qc-method-out">Reducing balance</strong></div>
+          <div class="row"><span>Interest rate</span><strong id="qc-rate-out">24.0% p.a.</strong></div>
+          <div class="row"><span>Annual outlay</span><strong id="qc-annual">MWK 5,673,576</strong></div>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@
   var methodEl = $("qc-method");
   var freqEl = $("qc-frequency");
   var basisEl = $("qc-basis");
+  var rateBasisEl = $("qc-rate-basis");
   var rateEl = $("qc-rate");
 
   function clampAmount(v) {
@@ -28,12 +29,13 @@
   function update() {
     var amount = clampAmount(amountEl.value);
     var term = Number(termEl.value) || 12;
-    var rate = Math.max(1, Math.min(60, Number(rateEl.value) || 24));
+    var rateBasis = rateBasisEl ? rateBasisEl.value : "annual";
+    var rate = Math.max(0.1, Math.min(60, Number(rateEl.value) || 24));
     var method = methodEl.value;
     var frequency = freqEl.value;
 
     var c = F.amortize({
-      principal: amount, rate: rate, termMonths: term,
+      principal: amount, rate: rate, rateBasis: rateBasis, termMonths: term,
       method: method, frequency: frequency,
       processingFeePct: 2
     });
@@ -46,6 +48,13 @@
     $("qc-interest").textContent = F.formatMWK(c.totalInterest + c.fees);
     $("qc-total").textContent = F.formatMWK(c.totalCost);
     $("qc-method-out").textContent = method === "flat" ? "Flat rate" : "Reducing balance";
+    var rateLabel = $("qc-rate-label");
+    if (rateLabel) rateLabel.textContent = rateBasis === "monthly" ? "Monthly interest rate (%)" : "Annual interest rate (%)";
+    if ($("qc-rate-out")) {
+      $("qc-rate-out").textContent = rateBasis === "monthly"
+        ? c.monthlyRate.toFixed(2) + "% per month"
+        : c.rate.toFixed(1) + "% p.a.";
+    }
     var perYear = frequency === "fortnightly" ? 26 : 12;
     if ($("qc-annual")) $("qc-annual").textContent = F.formatMWK(c.payment * perYear);
 
@@ -65,6 +74,8 @@
       update();
     });
   }
+
+  if (rateBasisEl) rateBasisEl.addEventListener("change", update);
 
   [amountEl, termEl, methodEl, freqEl, rateEl].forEach(function (el) {
     if (!el) return;
