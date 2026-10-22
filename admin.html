@@ -320,7 +320,7 @@ body.locked { overflow: hidden; }
     <button class="icon-btn" id="notifBtn" title="Notifications">🔔<span class="dot" id="notifCount">0</span></button>
     <div class="userbox" id="userBtn">
       <div class="avatar">JC</div>
-      <div><div class="nm">Administrator</div><div class="rl">Super Admin</div></div>
+      <div><div class="nm" id="sessionUser">Staff account</div><div class="rl" id="sessionRole">Signing in…</div></div>
       <div class="drop" id="userDrop">
         <h4>Session</h4>
         <div class="it"><span class="ic" style="background:rgba(96,165,250,.15)">👤</span><div><b id="sessionName">Signed in</b><small id="sessionDetail">—</small></div></div>
@@ -1126,7 +1126,7 @@ function vSettings(){const s=db.settings;
   ${fld('Business name',inp('stBiz',s.biz))}
   <div class="frow">${fld('Registration number',inp('stReg',s.reg))}${fld('Hotline',inp('stHot',s.hotline))}</div>
   <div class="frow">${fld('Currency',sel('stCur',['MWK','USD','ZAR'],s.currency))}${fld('Timezone',sel('stTz',['Africa/Blantyre','Africa/Johannesburg','UTC'],s.tz))}</div>
-  ${fld('Data backend',`<input value="Local browser store (Supabase-ready)" disabled>`,'When the Supabase project keys are added the system syncs automatically without any UI change.')}
+  ${fld('Data backend',`<input value="${window.JCOB_CLOUD && window.JCOB_CLOUD.enabled ? 'Supabase Postgres — live' : 'This browser only — offline'}" disabled>`,'The console reads and writes the live database whenever Supabase is reachable; otherwise it keeps working on this device.')}
   </div></div>
  <div><div class="panel"><div class="ph"><h3>Loan rules & policies</h3></div><div class="pb">
   <div class="frow3">${fld('Grace days',inp('stGrace',s.graceDays,'type="number"'))}${fld('Penalty % /mo arrears',inp('stPen',s.penaltyRate,'type="number" step="0.1"'))}${fld('Max DTI %',inp('stDti',s.maxDTI,'type="number"'))}</div>

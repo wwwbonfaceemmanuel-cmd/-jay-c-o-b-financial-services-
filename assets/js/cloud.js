@@ -366,7 +366,19 @@
     }).catch(function () { return false; });
   }
 
+  /* The cached customer document is a convenience copy of the real row in
+     customer_docs. It is removed on sign-out so a shared phone does not
+     keep the last customer's loans and identity details readable. */
+  function clearCustomerCache() {
+    try {
+      var id = session && session.user && session.user.id;
+      if (id) window.localStorage.removeItem("jcob_app_v2:" + id);
+      window.localStorage.removeItem("jcob_app_v2");
+    } catch (e) {}
+  }
+
   function signOutLocal() {
+    clearCustomerCache();
     session = null;
     profile = null;
     writeSession(null);

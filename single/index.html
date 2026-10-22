@@ -3188,6 +3188,20 @@ h1 em, .gold-text {
 .app-search svg { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); }
 .app-top-actions { margin-left: auto; display: flex; align-items: center; gap: .45rem; }
 
+/* Honest save status: the dashboard never claims a record is stored when
+   the write to Supabase has not succeeded. */
+.app-sync {
+  font-size: .72rem; font-weight: 600; letter-spacing: .01em;
+  padding: .3rem .6rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted); background: #fff;
+  white-space: nowrap;
+}
+.app-sync.is-ok { color: #1c6b45; border-color: #b7e0cb; background: #f0faf5; }
+.app-sync.is-warn { color: #7a5a12; border-color: #f0dfae; background: #fdf7e6; }
+.app-sync.is-error { color: #9b2c2c; border-color: #f2c2c2; background: #fdf1f1; }
+.app-sync[hidden] { display: none; }
+@media (max-width: 720px) { .app-sync { display: none; } }
+
 .bell-wrap { position: relative; }
 .icon-btn-lg {
   position: relative;
@@ -7639,6 +7653,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
         </div>
 
         <div class="app-top-actions">
+          <span class="app-sync" data-sync hidden></span>
           <div class="bell-wrap">
             <button class="icon-btn-lg" type="button" data-bell aria-label="Notifications" aria-expanded="false" aria-controls="bell-panel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -7659,7 +7674,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
           <div class="profile-menu">
             <button class="profile-btn" type="button" data-profile-btn aria-label="Account menu" aria-expanded="false" aria-controls="profile-panel">
-              <span class="avatar" data-profile-avatar>MT</span>
+              <span class="avatar" data-profile-avatar aria-hidden="true"></span>
               <span class="profile-name"><span data-profile-name>Your account</span><small data-profile-email></small></span>
             </button>
             <div class="profile-panel" id="profile-panel">
@@ -9869,7 +9884,19 @@ window.JCOB_CONFIG = {
     }).catch(function () { return false; });
   }
 
+  /* The cached customer document is a convenience copy of the real row in
+     customer_docs. It is removed on sign-out so a shared phone does not
+     keep the last customer's loans and identity details readable. */
+  function clearCustomerCache() {
+    try {
+      var id = session && session.user && session.user.id;
+      if (id) window.localStorage.removeItem("jcob_app_v2:" + id);
+      window.localStorage.removeItem("jcob_app_v2");
+    } catch (e) {}
+  }
+
   function signOutLocal() {
+    clearCustomerCache();
     session = null;
     profile = null;
     writeSession(null);
@@ -15145,6 +15172,42 @@ try {
     document.querySelectorAll("[data-profile-name]").forEach(function (el) { el.textContent = name; });
     document.querySelectorAll("[data-profile-email]").forEach(function (el) { el.textContent = db().profile.email; });
     document.querySelectorAll("[data-profile-avatar]").forEach(function (el) { el.textContent = db().profile.avatar; });
+    renderSync();
+  }
+
+  /* Where the last change went: the live database, or only this device.
+     The dashboard is never allowed to imply a record is saved when the
+     write to Supabase failed. */
+  function renderSync() {
+    var els = document.querySelectorAll("[data-sync]");
+    if (!els.length) return;
+    var remote = DATA.remote || {};
+    var cloud = window.JCOB_CLOUD && window.JCOB_CLOUD.enabled;
+    var signedIn = !!(cloud && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.isSignedIn &&
+      window.JCOB_CLOUD.auth.isSignedIn());
+    var text = "";
+    var tone = "";
+    if (cloud && !signedIn) {
+      text = "";
+    } else if (!cloud) {
+      text = "Offline — saved on this device only";
+      tone = "is-warn";
+    } else if (remote.state === "error" || remote.state === "offline") {
+      text = "Not saved to the server — check your connection";
+      tone = "is-error";
+    } else if (remote.state === "synced") {
+      text = "Saved to your account";
+      tone = "is-ok";
+    } else if (remote.state === "connecting" || remote.state === "saving") {
+      text = "Saving…";
+      tone = "";
+    }
+    els.forEach(function (el) {
+      el.textContent = text;
+      el.className = "app-sync " + tone;
+      el.hidden = !text;
+      el.title = remote.error || text;
+    });
   }
 
   function highlightNav() {
@@ -16243,6 +16306,7 @@ try {
       }
     }
     bind(route);
+    renderSync();
     if (window.scrollTo) { try { window.scrollTo({ top: 0, behavior: "auto" }); } catch (e) {} }
 
     if (route === "apply" && window.JCOB_APPLY) window.JCOB_APPLY.mount();

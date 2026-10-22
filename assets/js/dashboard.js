@@ -151,6 +151,42 @@
     document.querySelectorAll("[data-profile-name]").forEach(function (el) { el.textContent = name; });
     document.querySelectorAll("[data-profile-email]").forEach(function (el) { el.textContent = db().profile.email; });
     document.querySelectorAll("[data-profile-avatar]").forEach(function (el) { el.textContent = db().profile.avatar; });
+    renderSync();
+  }
+
+  /* Where the last change went: the live database, or only this device.
+     The dashboard is never allowed to imply a record is saved when the
+     write to Supabase failed. */
+  function renderSync() {
+    var els = document.querySelectorAll("[data-sync]");
+    if (!els.length) return;
+    var remote = DATA.remote || {};
+    var cloud = window.JCOB_CLOUD && window.JCOB_CLOUD.enabled;
+    var signedIn = !!(cloud && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.isSignedIn &&
+      window.JCOB_CLOUD.auth.isSignedIn());
+    var text = "";
+    var tone = "";
+    if (cloud && !signedIn) {
+      text = "";
+    } else if (!cloud) {
+      text = "Offline — saved on this device only";
+      tone = "is-warn";
+    } else if (remote.state === "error" || remote.state === "offline") {
+      text = "Not saved to the server — check your connection";
+      tone = "is-error";
+    } else if (remote.state === "synced") {
+      text = "Saved to your account";
+      tone = "is-ok";
+    } else if (remote.state === "connecting" || remote.state === "saving") {
+      text = "Saving…";
+      tone = "";
+    }
+    els.forEach(function (el) {
+      el.textContent = text;
+      el.className = "app-sync " + tone;
+      el.hidden = !text;
+      el.title = remote.error || text;
+    });
   }
 
   function highlightNav() {
@@ -1249,6 +1285,7 @@
       }
     }
     bind(route);
+    renderSync();
     if (window.scrollTo) { try { window.scrollTo({ top: 0, behavior: "auto" }); } catch (e) {} }
 
     if (route === "apply" && window.JCOB_APPLY) window.JCOB_APPLY.mount();
