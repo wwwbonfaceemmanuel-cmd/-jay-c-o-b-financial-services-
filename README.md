@@ -106,6 +106,52 @@ key is `jcob_session_v1`. Clear site data to reset the demonstration.
 
 ---
 
+## Admin management portal
+
+`admin.html` is the full management console for the business and the website. It is protected by a
+demo password — **`admin2026`** — held for the browser session only.
+
+The portal ships with the complete back office: dashboard, customers, KYC, loan applications,
+products, credit assessment, active loans, disbursement, guarantors and collateral, repayments,
+schedules, collections, deposits, withdrawals, transfers, savings, fees, interest, ledger,
+reconciliation, statements, support, messaging, admin users, roles, workflows, audit logs, security,
+compliance, system settings, backups, reports, risk, branches, officers, payroll, accounting,
+investors, partners, legal, API integrations, fraud, templates and the calculator.
+
+### The WEBSITE group (site ↔ console connection)
+
+| Module | What it manages | Where it appears on the site |
+| --- | --- | --- |
+| **Website Pages** | Scans each page and lists every section, heading, paragraph, card line and button. Edit text, change link targets, hide a whole section, or reset a page. | The page itself, on next load |
+| **Live Feed** | Publish, edit, pin, unpublish or delete animated updates; choose type (announcement / card / photo / blog), section placement and one of seven motions; upload or link an image. | Home strips, live desk, ticker |
+| **Site Catalogue** | The eleven lending products: annual rate, processing fee, amount limits, term range, summary, active state. | Calculator presets, application limits, product pages, rates tables |
+| **Website Settings** | Brand, tagline, registration, licence, phones, emergency line, emails, address, hours, social links, calculator defaults, published lending policy. | Header, footer, contact blocks, support and legal pages, calculator defaults |
+
+### How the connection works
+
+- `assets/js/site-store.js` is the single shared store (`jcob_site_v1` in localStorage). The website
+  reads it, the console writes it. Replacing `read()`/`write()` with Supabase calls connects both.
+- `assets/js/site-content.js` runs on every public page and applies published text, link and
+  section-visibility overrides, brand/contact replacements and catalogue values.
+- `assets/js/site-admin.js` extends the console (it does not modify the console's own logic) with the
+  WEBSITE group and the two-way bridge:
+  - applications submitted on `apply.html` (`jcob_app_v1`) appear in **Loan Applications**;
+  - support tickets from `support.html` appear in **Customer Support**;
+  - approving, rejecting or requesting information in the console writes the status, reviewer note
+    and a notification back to the customer's dashboard.
+- The page scanner builds stable CSS paths from the same static HTML, so the console and the site
+  always agree on what each block is.
+- Everything degrades safely: with an empty store the website renders exactly as authored, and the
+  console keeps working on its own local data.
+
+### Next: Railway + Supabase
+
+The data layer is deliberately thin. To go live: create the tables in `supabase/schema.sql`
+(plus `site_settings`, `site_content`, `site_products`), paste the project URL and anon key into
+`assets/js/config.js`, and swap the four storage functions (`site-store.js` `read()/write()`,
+`app-data.js` `read()/persist()`) for Supabase queries. Railway then serves the static build and the
+Supabase project holds the data.
+
 ## Project structure
 
 ```
@@ -128,8 +174,13 @@ key is `jcob_session_v1`. Clear site data to reset the demonstration.
 │       ├── rates.js            # worked examples on the rates page
 │       ├── support.js          # contact form and ticket tracking
 │       ├── dashboard.js        # customer dashboard SPA
-│       ├── live.js / admin.js  # animated live feed and its admin console
+│       ├── live.js             # animated live feed (shared by site + admin)
+│       ├── site-store.js       # shared website store: settings, catalogue, content
+│       ├── site-content.js     # applies published content to every public page
+│       ├── site-admin.js       # admin ↔ website connector (Website group)
+│       ├── admin.js            # legacy feed console (superseded, kept for reference)
 │       └── portal.js           # legacy portal (superseded by dashboard.html)
+├── admin.html                  # admin management portal (password: admin2026)
 ├── single/index.html           # entire site in one self-contained file
 ├── tools/
 │   ├── build.py                # static site builder (header/footer/scripts + legal + aliases)
