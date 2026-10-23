@@ -306,8 +306,17 @@
 
   function dashboardShell() {
     if (state.submitted) return confirmation(state.submitted);
-    return '<div class="app-page-head"><div><h1>Apply for a loan</h1><p>Complete the five steps below. Your progress is saved in this browser.</p></div>' +
+    var back = '<button class="page-back" type="button" data-back>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+      '<path d="M15 18l-6-6 6-6"/></svg>Back</button>';
+    var signed = !!(profile().signature && profile().signature.strokes && profile().signature.strokes.length);
+    var needSignature = signed ? "" :
+      '<div class="notice notice--warn" style="margin-bottom:1rem;">' + UI.ICONS.info +
+      "<div><strong>Your signature is not on file</strong>Add it before you submit so the loan agreement can be completed without a branch visit. " +
+      '<a href="apply.html">Sign now</a> — your application will stay here.</div></div>';
+    return back + '<div class="app-page-head"><div><h1>Apply for a loan</h1><p>Complete the five steps below. Your progress is saved to your account.</p></div>' +
       '<div class="head-actions"><a class="btn btn--ghost btn--sm" href="#applications">My applications</a></div></div>' +
+      needSignature +
       '<div class="dash-grid" style="grid-template-columns:1.55fr 1fr;align-items:start;">' +
         '<div class="calc-panel" style="background:#fff;">' + stepper() +
           '<form id="apply-form" novalidate>' + stepOne() + stepTwo() + stepThree() + stepFour() + stepFive() +
@@ -648,6 +657,17 @@
     mount: function () {
       state.scope = "dashboard";
       state.submitted = null;
+      /* A product chosen on the website follows the customer in. */
+      var q = new URLSearchParams((location.hash.split("?")[1]) || "");
+      var wanted = (q.get("product") || "").toLowerCase();
+      Object.keys(PRODUCTS).forEach(function (k) {
+        if (k.toLowerCase() === wanted) { state.product = k; state.term = PRODUCTS[k].term[0]; }
+      });
+      if (q.get("amount")) state.amount = Math.max(Number(q.get("amount")) || 0, 0);
+      if (q.get("term")) state.term = Number(q.get("term")) || state.term;
+      var p = PRODUCTS[state.product];
+      state.amount = Math.min(Math.max(state.amount, p.min), p.max);
+      state.term = Math.min(Math.max(state.term, p.term[0]), p.term[1]);
       bind();
     },
     initPublic: function () {
@@ -672,6 +692,10 @@
   };
 
   document.addEventListener("DOMContentLoaded", function () {
-    if (document.body.getAttribute("data-page") === "apply") window.JCOB_APPLY.initPublic();
+    if (document.body.getAttribute("data-page") !== "apply") return;
+    /* The terms, the account and the signature come first. The form only
+       opens once JCOB_ONBOARD has finished with them. */
+    if (window.JCOB_ONBOARD && window.JCOB_ONBOARD.intercept) return;
+    window.JCOB_APPLY.initPublic();
   });
 })();

@@ -93,8 +93,18 @@
       "</div>";
   }
 
+  /* Every section except the dashboard itself carries a way back. It
+     returns to the section you came from, and to the dashboard when
+     there is nothing behind you (a fresh link, for example). */
+  function backButton() {
+    if (!state.route || state.route === "dashboard") return "";
+    return '<button class="page-back" type="button" data-back>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+      '<path d="M15 18l-6-6 6-6"/></svg>Back</button>';
+  }
+
   function pageHead(title, sub, actions) {
-    return '<div class="app-page-head"><div><h1>' + title + "</h1>" + (sub ? "<p>" + sub + "</p>" : "") + "</div>" +
+    return backButton() + '<div class="app-page-head"><div><h1>' + title + "</h1>" + (sub ? "<p>" + sub + "</p>" : "") + "</div>" +
       (actions ? '<div class="head-actions">' + actions + "</div>" : "") + "</div>";
   }
 
@@ -1287,9 +1297,15 @@
     return { route: parts[0] || "dashboard", query: new URLSearchParams(parts[1] || "") };
   }
 
+  var routeStack = [];
+
   function render(withLoading) {
     var parsed = parseHash();
     var route = ROUTES.hasOwnProperty(parsed.route) ? parsed.route : "dashboard";
+    if (state.route && state.route !== route) {
+      routeStack.push(state.route);
+      if (routeStack.length > 25) routeStack.shift();
+    }
     state.route = route;
     highlightNav();
 
@@ -1321,6 +1337,17 @@
   /* ==================================================================
      EVENT BINDING
      ================================================================== */
+  function wireBack() {
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-back]");
+      if (!btn) return;
+      e.preventDefault();
+      var previous = routeStack.pop();
+      if (previous && ROUTES.hasOwnProperty(previous)) location.hash = "#" + previous;
+      else location.hash = "#dashboard";
+    });
+  }
+
   function bind(route) {
     /* generic: loan modals */
     content.querySelectorAll("[data-payoff]").forEach(function (btn) {
@@ -2309,6 +2336,7 @@
     renderSidebar();
     initSearch();
     applyAccessibility();
+    wireBack();
     render();
 
     window.addEventListener("hashchange", function () { render(); });
@@ -2341,6 +2369,9 @@
        signed-in name, email and initials, so it has to be refreshed too —
        otherwise the header keeps the placeholder it drew before hydration. */
     document.addEventListener("jcob:data-ready", function () {
+      /* Reminders and status changes are raised from the records that
+         just arrived, never invented. Duplicates are keyed and skipped. */
+      if (window.JCOB_DATA && window.JCOB_DATA.runEngine) window.JCOB_DATA.runEngine();
       renderSidebar();
       if (render) render();
     });

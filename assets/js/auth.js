@@ -95,7 +95,8 @@
       }
       if (!nid || nid.length < 6) { fieldError($("reg-nid"), "Enter a valid national ID number."); ok = false; }
       if (!isPhone(phone)) { fieldError($("reg-phone"), "Enter a valid Malawian phone number."); ok = false; }
-      if (!isEmail(email)) { fieldError($("reg-email"), "Enter a valid email address."); ok = false; }
+      /* No email? The phone number is the account and the code arrives by SMS. */
+      if (email && !isEmail(email)) { fieldError($("reg-email"), "Enter a valid email address, or leave it blank."); ok = false; }
       if (passwordScore(pw) < 3) { fieldError($("reg-password"), "Choose a stronger password (8+ characters, letters and numbers)."); ok = false; }
       if (pw !== pw2) { fieldError($("reg-confirm"), "Passwords do not match."); ok = false; }
       if (!consent) { fieldError($("reg-consent"), "You must accept the terms and privacy policy."); ok = false; }
@@ -123,15 +124,15 @@
           status.textContent = "Creating your secure account…";
         }
         CLOUD.auth.signUp({
-          email: email, password: pw, fullName: account.fullName,
-          phone: phone, nid: nid, dob: dob, gender: gender
+          email: email || undefined, phone: phone, password: pw, fullName: account.fullName,
+          nid: nid, dob: dob, gender: gender
         }).then(function (res) {
           if (res && res.needsConfirmation) {
             if (status) {
               status.className = "form-status is-visible";
-              status.textContent = "Check " + email + " for the confirmation link, then sign in. Your account is created but not yet active.";
+              status.textContent = "Check " + (email || phone) + " for the confirmation " + (email ? "link" : "code") + ", then sign in. Your account is created but not yet active.";
             }
-            UI.toast({ title: "Confirm your email", message: "We sent a confirmation link to " + email + ".", type: "info" });
+            UI.toast({ title: "Confirm your account", message: "We sent a confirmation to " + (email || phone) + ".", type: "info" });
             return;
           }
           UI.toast({ title: "Account created", message: "Welcome to JAY C O B Financial Services.", type: "success" });
@@ -197,8 +198,14 @@
       }
     }, 1000);
 
+    /* Codes go to the email address or to the phone number, whichever
+       the customer used. The channel is remembered from the previous page. */
     function codeTarget() {
-      return pending && pending.identifier && isEmail(pending.identifier) ? pending.identifier : "";
+      return pending && pending.identifier ? pending.identifier : "";
+    }
+    function codeChannel() {
+      if (pending && pending.channel) return pending.channel;
+      return pending && isEmail(pending.identifier || "") ? "email" : "sms";
     }
 
     function requestCode(silent) {
@@ -208,11 +215,13 @@
         return;
       }
       if (!target) {
-        UI.toast({ title: "Email needed", message: "Sign in with your email address first, then request a code.", type: "danger" });
+        UI.toast({ title: "Sign in first", message: "Enter your email or phone number on the sign-in page, then request a code.", type: "danger" });
         return;
       }
-      CLOUD.auth.sendOtp(target).then(function () {
-        UI.toast({ title: "Code sent", message: "A fresh 6-digit code is on its way to " + target + ".", type: "info" });
+      var sms = codeChannel() === "sms";
+      var send = sms ? CLOUD.auth.sendPhoneOtp(target) : CLOUD.auth.sendOtp(target);
+      send.then(function () {
+        UI.toast({ title: "Code sent", message: "A fresh 6-digit code is on its way " + (sms ? "by SMS to " : "to ") + target + ".", type: "info" });
       }).catch(function (err) {
         UI.toast({ title: "Could not send a code", message: String((err && err.message) || "Please try again."), type: "danger" });
       });
@@ -251,10 +260,13 @@
       status.className = "form-status is-visible";
       status.textContent = "Checking your code…";
 
-      CLOUD.auth.verifyOtp(codeTarget(), code).then(function (res) {
+      var check = codeChannel() === "sms"
+        ? CLOUD.auth.verifyPhoneOtp(codeTarget(), code)
+        : CLOUD.auth.verifyOtp(codeTarget(), code);
+      check.then(function (res) {
         var profile = (res && res.profile) || (CLOUD.auth.profile && CLOUD.auth.profile()) || {};
         var name = profile.full_name || (pending && pending.name) || "";
-        var email = profile.email || codeTarget();
+        var email = profile.email || (isEmail(codeTarget()) ? codeTarget() : "");
         UI.setSession({
           authenticated: true,
           name: name,
@@ -264,12 +276,19 @@
           cloud: true
         }, true);
 
+        var recovery = pending && pending.mode === "recover";
         try { sessionStorage.removeItem(PENDING_KEY); } catch (err) {}
         DATA.notify("Account verification", "Account verified",
-          "Your email address is verified. Welcome to JAY C O B Financial Services.", "In-app + Email");
+          (codeChannel() === "sms" ? "Your phone number" : "Your email address") +
+          " is verified. Welcome to JAY C O B Financial Services.", "In-app");
         status.className = "form-status is-visible";
-        status.textContent = "Verified. Redirecting to your dashboard…";
-        setTimeout(function () { window.location.href = "dashboard.html"; }, 700);
+        if (recovery) {
+          status.textContent = "Code accepted. Opening your account so you can set a new password…";
+          setTimeout(function () { window.location.href = "dashboard.html#security"; }, 700);
+        } else {
+          status.textContent = "Verified. Redirecting to your dashboard…";
+          setTimeout(function () { window.location.href = "dashboard.html"; }, 700);
+        }
       }).catch(function (err) {
         var message = String((err && err.message) || "");
         if (/expired|invalid|incorrect/i.test(message)) message = "That code is incorrect or has expired. Request a new one.";
@@ -335,11 +354,6 @@
         return;
       }
 
-      if (!isEmail(identifier)) {
-        fieldError(idInput, "Use the email address on your account. Phone sign-in is enabled once SMS is configured.");
-        return;
-      }
-
       status.className = "form-status is-visible";
       status.textContent = "Signing you in…";
 
@@ -352,7 +366,7 @@
           authenticated: true,
           name: name,
           identifier: identifier,
-          email: identifier,
+          email: profile.email || (isEmail(identifier) ? identifier : ""),
           account: profile.account_no || "",
           cloud: true
         }, remember);
@@ -364,8 +378,8 @@
         }, 350);
       }).catch(function (err) {
         var message = String((err && err.message) || "");
-        if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an account.";
-        else if (/confirm/i.test(message)) message = "Please confirm your email address before signing in.";
+        if (/invalid|credentials|grant/i.test(message)) message = "That " + (isEmail(identifier) ? "email address" : "phone number") + " and password do not match an account.";
+        else if (/confirm/i.test(message)) message = "Please confirm your " + (isEmail(identifier) ? "email address" : "phone number") + " before signing in.";
         var tries = UI.tryCount();
         tries.count = (tries.count || 0) + 1;
         if (tries.count >= 5) {
@@ -398,17 +412,15 @@
           fieldError(idInput, "One-time codes need the account service. Please call +265 999 123 456.");
           return;
         }
-        if (!isEmail(identifier)) {
-          fieldError(idInput, "Use the email address on your account to receive a code.");
-          return;
-        }
+        var channel = isEmail(identifier) ? "email" : "sms";
         try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier }));
+          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
         } catch (err) {}
-        CLOUD.auth.sendOtp(identifier).then(function () {
+        var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
+        send.then(function () {
           window.location.href = "verify.html";
         }).catch(function (err) {
-          fieldError(idInput, String((err && err.message) || "We could not send a code to that address."));
+          fieldError(idInput, String((err && err.message) || "We could not send a code to that number."));
         });
       });
     }
@@ -427,12 +439,22 @@
         fieldError(input, "Enter a valid email address or phone number.");
         return;
       }
-      status.className = "form-status is-visible";
-      status.textContent = "Sending a single-use reset link…";
+      var id = input.value.trim();
 
-      if (cloudOn() && isEmail(input.value.trim())) {
-        CLOUD.auth.recover(input.value.trim()).then(function () {
-          status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
+      if (!cloudOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Recovery is unavailable — this deployment is not connected to the account service. Please call +265 999 123 456.";
+        return;
+      }
+
+      status.className = "form-status is-visible";
+
+      /* Email accounts get a single-use link. Phone accounts get a code by
+         SMS, because a phone number cannot receive an email. */
+      if (isEmail(id)) {
+        status.textContent = "Sending a single-use reset link…";
+        CLOUD.auth.recover(id).then(function () {
+          status.innerHTML = 'If an account matches <strong>' + id +
             '</strong>, a reset link has been sent by email and expires in 30 minutes.';
         }).catch(function () {
           status.className = "form-status is-visible form-status--error";
@@ -441,8 +463,17 @@
         return;
       }
 
-      status.className = "form-status is-visible form-status--error";
-      status.textContent = "Password recovery is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
+      status.textContent = "Sending a recovery code by SMS…";
+      try {
+        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: id }));
+      } catch (err) {}
+      CLOUD.auth.sendPhoneOtp(id).then(function () {
+        status.innerHTML = 'If an account matches <strong>' + id + '</strong>, a six-digit recovery code has been sent by SMS. ' +
+          '<a href="verify.html">Enter the code</a> to sign in and set a new password.';
+      }).catch(function () {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "We could not send a recovery code just now. Please try again.";
+      });
     });
   }
 

@@ -4893,6 +4893,206 @@ summary:focus-visible {
   .calc-formula { color: #222 !important; background: transparent; border-left-color: #a67c1a; }
 }
 
+/* =====================================================================
+   Application gate — terms, acceptance, account, signature
+   ===================================================================== */
+.onb-grid { grid-template-columns: 1.65fr .85fr; align-items: start; }
+@media (max-width: 900px) { .onb-grid { grid-template-columns: 1fr; } }
+.onb-title { font-size: clamp(1.3rem, 2.4vw, 1.7rem); margin-top: 1rem; }
+.onb-sub { font-size: .9rem; color: var(--muted); margin-top: .35rem; }
+.onb-steps { margin-bottom: 1.1rem; }
+.onb-aside .onb-card { padding: 1.1rem 1.15rem; }
+.onb-aside .onb-card h3 { font-size: .95rem; margin-bottom: .5rem; }
+
+.onb-terms {
+  margin-top: 1rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.1rem 1.2rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-size: .85rem;
+  line-height: 1.6;
+  color: var(--body);
+  scrollbar-width: thin;
+}
+.onb-terms:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+.onb-terms h3 {
+  font-size: .84rem;
+  letter-spacing: .01em;
+  color: var(--navy-800);
+  margin: 1rem 0 .25rem;
+}
+.onb-terms h3:first-child { margin-top: 0; }
+.onb-terms p { margin: 0 0 .6rem; }
+.onb-terms a { color: var(--teal); text-decoration: underline; }
+.onb-terms .onb-end {
+  margin-top: 1rem;
+  padding-top: .8rem;
+  border-top: 1px dashed var(--line-strong);
+  color: var(--navy-800);
+}
+
+.onb-progress {
+  height: 6px;
+  margin-top: .9rem;
+  border-radius: 999px;
+  background: var(--cream-dark);
+  overflow: hidden;
+}
+.onb-progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--gold-edge);
+  transition: width .18s ease;
+}
+.onb-readnote { font-size: .78rem; color: var(--muted); margin-top: .45rem; }
+
+.onb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: center;
+  margin-top: 1.2rem;
+}
+.onb-hint { font-size: .75rem; color: var(--muted); margin-left: auto; }
+.onb-error {
+  margin-top: .8rem;
+  padding: .6rem .8rem;
+  border-radius: 10px;
+  background: #fbebeb;
+  border: 1px solid rgba(178, 59, 59, .22);
+  color: var(--danger);
+  font-size: .8rem;
+}
+
+.onb-check {
+  display: flex;
+  gap: .65rem;
+  align-items: flex-start;
+  margin-top: .9rem;
+  padding: .8rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font-size: .84rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.onb-check:hover { border-color: var(--line-strong); }
+.onb-check input { width: 18px; height: 18px; margin-top: .1rem; accent-color: var(--navy-700); flex-shrink: 0; }
+.onb-check a { color: var(--teal); text-decoration: underline; }
+
+.onb-methods { border: 0; padding: 0; margin: 1rem 0 0; }
+.onb-methods legend { font-size: .8rem; font-weight: 600; color: var(--ink); margin-bottom: .5rem; }
+.onb-method {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  padding: .75rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-bottom: .5rem;
+  cursor: pointer;
+  background: #fff;
+}
+.onb-method:has(input:checked) { border-color: var(--navy-600); box-shadow: 0 0 0 1px var(--navy-600) inset; }
+.onb-method input { margin-top: .2rem; accent-color: var(--navy-700); width: 17px; height: 17px; }
+.onb-method b { display: block; font-size: .85rem; color: var(--ink); }
+.onb-method small { display: block; font-size: .75rem; color: var(--muted); margin-top: .1rem; }
+.onb-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .8rem; }
+.onb-fields[hidden] { display: none; }
+
+/* ---------- Signature pad ---------- */
+.sigpad {
+  position: relative;
+  margin-top: .45rem;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(13, 107, 90, .06) 27px 28px),
+    #fff;
+  overflow: hidden;
+  touch-action: none;
+}
+.sigpad:focus-within { border-color: var(--navy-600); }
+.sigpad canvas {
+  display: block;
+  width: 100%;
+  height: 190px;
+  cursor: crosshair;
+  outline: none;
+  touch-action: none;
+}
+.sigpad.is-signing { border-style: solid; border-color: var(--navy-600); }
+.sigpad-baseline {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 34px;
+  border-bottom: 1.5px solid rgba(6, 38, 42, .28);
+  pointer-events: none;
+}
+.sigpad-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #9db0bd;
+  pointer-events: none;
+}
+.sigpad-empty.is-error { font-family: inherit; font-style: normal; font-size: .78rem; color: var(--danger); padding: 1rem; text-align: center; }
+.sigpad-foot { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-top: .45rem; }
+
+@media (max-width: 780px) {
+  .onb-fields { grid-template-columns: 1fr; }
+  .onb-hint { margin-left: 0; }
+  .sigpad canvas { height: 160px; }
+}
+
+/* =====================================================================
+   Back navigation — every module and section
+   ===================================================================== */
+.page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: .1rem 0;
+  margin-bottom: .45rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.page-back:hover { color: var(--navy-800); }
+.page-back svg { width: 15px; height: 15px; }
+.page-back:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; border-radius: 4px; }
+
+/* Sign-in helpers: recovery routes next to the form */
+.auth-recover { display: grid; gap: .45rem; margin-top: .9rem; }
+.auth-recover a {
+  display: block;
+  padding: .6rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.auth-recover a:hover { border-color: var(--line-strong); background: var(--cream); }
+.auth-recover strong { display: block; font-size: .8rem; color: var(--navy-800); }
+.auth-recover span { display: block; font-size: .74rem; color: var(--muted); margin-top: .12rem; }
+
 /* ---- single-file bundle ---- */
 .sf-view[hidden] { display: none !important; }
 body.sf-dashboard .site-header, body.sf-dashboard .site-footer { display: none; }
@@ -7105,13 +7305,13 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </div>
     </section>
 </section>
-<section class="sf-view" data-view="apply" data-title="Apply for a loan — JAY C O B FINANCIAL SERVICES" data-desc="Apply for a loan online in five steps: product, personal details, business and bank details, documents, review. Save a draft and get a reference number." data-page="apply" hidden>
+<section class="sf-view" data-view="apply" data-title="Apply for a loan — JAY C O B FINANCIAL SERVICES" data-desc="Apply for a loan online: read and accept the terms, create your account with an email address or a phone number, sign, then complete the five-step form in your dashboard." data-page="apply" hidden>
 <section class="page-hero">
     <div class="container page-hero-inner">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="#/">Home</a><span class="sep">/</span><a href="#/loan-products">Loan products</a><span class="sep">/</span><span>Application</span></nav>
-      <span class="eyebrow">Five steps · about 10 minutes</span>
+      <span class="eyebrow">Read the terms · create your account · sign · apply</span>
       <h1>Apply for a loan</h1>
-      <p class="lead">Complete the form below and receive a reference number as soon as you submit. Your progress is saved to your account as you go, so you can come back and finish later.</p>
+      <p class="lead">Four short steps before the form: read the terms to the end, accept them, create your account with an email address or a phone number, then sign your name. Your application is then saved to your account, so you can finish it in the dashboard today or come back later.</p>
       <div class="flex flex-wrap gap-1 mt-2">
         <a class="btn btn--ghost btn--sm" href="#/eligibility">Check eligibility first</a>
         <a class="btn btn--ghost btn--sm" href="#/calculator">Estimate repayment</a>
@@ -8707,6 +8907,11 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
               <a href="#/forgot-password">Forgot password?</a>
             </div>
 
+            <div class="auth-recover">
+              <a href="#/forgot-password"><strong>Account recovery</strong><span>No email? Get a code by SMS, or reset a forgotten password.</span></a>
+              <a href="#/support"><strong>Cannot sign in at all?</strong><span>Call +265 999 123 456 or open a recovery request.</span></a>
+            </div>
+
             <button class="btn btn--gold" type="submit" style="width:100%;margin-top:1rem;">Sign in</button>
             <button class="btn btn--ghost" type="button" id="login-otp" style="width:100%;margin-top:.55rem;">Sign in with a one-time code instead</button>
 
@@ -8831,8 +9036,8 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
                 <select id="reg-gender"><option>Female</option><option>Male</option><option>Prefer not to say</option></select>
               </div>
               <div class="field field--full"><label for="reg-nid">National ID number *</label><input id="reg-nid" autocomplete="off" required><span class="hint">Masked after submission</span><span class="error-msg">Enter a valid national ID</span></div>
-              <div class="field"><label for="reg-phone">Phone number *</label><input id="reg-phone" type="tel" autocomplete="tel" placeholder="+265 …" required><span class="error-msg">Enter a valid phone number</span></div>
-              <div class="field"><label for="reg-email">Email address *</label><input id="reg-email" type="email" autocomplete="email" required><span class="error-msg">Enter a valid email</span></div>
+              <div class="field"><label for="reg-phone">Phone number *</label><input id="reg-phone" type="tel" autocomplete="tel" placeholder="+265 …" required><span class="hint">Used for your sign-in code and repayment reminders.</span><span class="error-msg">Enter a valid phone number</span></div>
+              <div class="field"><label for="reg-email">Email address</label><input id="reg-email" type="email" autocomplete="email" placeholder="Optional if you have no email"><span class="hint">Leave blank if you have no email — the phone number becomes your sign-in.</span><span class="error-msg">Enter a valid email</span></div>
               <div class="field"><label for="reg-password">Password *</label>
                 <div class="pw-wrap">
                   <input id="reg-password" type="password" autocomplete="new-password" required>
@@ -9978,9 +10183,13 @@ window.JCOB_CONFIG = {
     }, true);
   }
 
-  function signIn(email, password) {
+  /* Sign in with an email address or with a phone number and password. */
+  function signIn(identifier, password) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
-    return authCall("token?grant_type=password", { email: email, password: password })
+    var body = { password: password };
+    if (String(identifier || "").indexOf("@") >= 0) body.email = String(identifier).trim();
+    else body.phone = normalisePhone(identifier);
+    return authCall("token?grant_type=password", body)
       .then(function (payload) {
         var next = normaliseAuth(payload);
         if (!next) throw new Error("No session returned");
@@ -9994,14 +10203,22 @@ window.JCOB_CONFIG = {
       });
   }
 
+  /* Create an account. Supabase accepts an email address or a phone
+     number as the identity; when there is no email the phone is the
+     account and the one-time code goes by SMS. */
   function signUp(input) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
     var meta = {
       full_name: input.fullName || "",
       phone: input.phone || "",
+      email: input.email || "",
       account_no: input.accountNo || ""
     };
-    return authCall("signup", { email: input.email, password: input.password, data: meta })
+    var identity = input.email ? { email: input.email } : { phone: input.phone };
+    if (!identity.email && !identity.phone) {
+      return Promise.reject(new Error("An email address or a phone number is required."));
+    }
+    return authCall("signup", Object.assign(identity, { password: input.password, data: meta }))
       .then(function (payload) {
         var next = normaliseAuth(payload);
         if (!next) return { needsConfirmation: true, user: (payload && payload.user) || (payload && payload.id ? payload : null) };
@@ -10047,6 +10264,16 @@ window.JCOB_CONFIG = {
     return Promise.resolve(true);
   }
 
+  /* Local numbers arrive as 0999…, 265999… or +265999…. Supabase stores
+     E.164, so every path sends the same digits. */
+  function normalisePhone(v) {
+    var d = String(v || "").replace(/[^\d]/g, "");
+    if (!d) return "";
+    if (d.charAt(0) === "0") d = "265" + d.slice(1);
+    else if (d.indexOf("265") !== 0 && d.length <= 9) d = "265" + d;
+    return "+" + d;
+  }
+
   function recover(email) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
     return authCall("recover", { email: email });
@@ -10069,6 +10296,42 @@ window.JCOB_CONFIG = {
     });
   }
 
+  /* ---------------- Phone sign-in and sign-up (SMS one-time codes) -------
+     Used when the customer has no email, or prefers the phone. Supabase
+     generates the code, sends it by SMS and checks it; the browser never
+     decides whether a code is right. */
+  function sendPhoneOtp(phone) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("otp", { phone: String(phone || "").trim(), channel: "sms", should_create_user: true });
+  }
+
+  function verifyPhoneOtp(phone, token) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("verify", { type: "sms", phone: String(phone || "").trim(), token: String(token || "").trim() })
+      .then(adoptSession);
+  }
+
+  /* Turn a successful auth response into the signed-in state every page
+     expects: session stored, profile loaded, listeners told. */
+  function adoptSession(payload) {
+    var next = normaliseAuth(payload);
+    if (!next) throw new Error("That code is incorrect or has expired.");
+    session = next;
+    writeSession(session);
+    return loadProfile().then(function (p) {
+      if (p) return p;
+      return ensureProfile({
+        fullName: (session.user && (session.user.user_metadata || {}).full_name) || "",
+        phone: (session.user && session.user.phone) || "",
+        email: (session.user && session.user.email) || ""
+      });
+    }).then(function (p) {
+      bridgeUiSession();
+      emit();
+      return { session: session, profile: p };
+    });
+  }
+
   /* A one-time code sent to the address on the account. Supabase issues,
      stores and expires it; nothing is validated in the browser. */
   function sendOtp(email) {
@@ -10079,18 +10342,7 @@ window.JCOB_CONFIG = {
   /* Exchange the emailed code for a session. */
   function verifyOtp(email, token) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
-    return authCall("verify", { type: "email", email: email, token: token })
-      .then(function (payload) {
-        var next = normaliseAuth(payload);
-        if (!next) throw new Error("That code is incorrect or has expired.");
-        session = next;
-        writeSession(session);
-        return loadProfile().then(function (p) {
-          bridgeUiSession();
-          emit();
-          return { session: session, profile: p };
-        });
-      });
+    return authCall("verify", { type: "email", email: email, token: token }).then(adoptSession);
   }
 
   function isStaff(p) {
@@ -10176,11 +10428,14 @@ window.JCOB_CONFIG = {
     refresh: refresh,
     auth: {
       signIn: signIn,
+      normalisePhone: normalisePhone,
       signUp: signUp,
       recover: recover,
       updatePassword: updatePassword,
       adoptedLink: adoptedLink,
       sendOtp: sendOtp,
+      sendPhoneOtp: sendPhoneOtp,
+      verifyPhoneOtp: verifyPhoneOtp,
       verifyOtp: verifyOtp,
       signOut: signOut,
       ensureProfile: ensureProfile,
@@ -11112,6 +11367,14 @@ window.JCOB_CONFIG = {
 
   function get() { return db; }
   function save() { return persist(); }
+
+  /* Write now instead of on the debounce, and report whether the database
+     accepted it. Used where the page must not move on until the record is
+     really stored — a signature, for example. */
+  function saveNow() {
+    if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
+    return pushCloud();
+  }
   function reset() {
     db = empty();
     loaded = false;
@@ -11228,6 +11491,91 @@ window.JCOB_CONFIG = {
     return db.notifications.filter(function (n) { return !n.read; }).length;
   }
 
+  /* ---------------- Notification engine ----------------
+     Notifications are generated from real records, never invented. Each
+     one carries a key so the same reminder is never raised twice: the
+     engine can run on every page load and will add only what is new. */
+  function pushOnce(key, type, title, body, channel) {
+    if (!db.notifications) db.notifications = [];
+    if (db.notifications.some(function (n) { return n.key === key; })) return null;
+    var item = {
+      id: "N-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 900 + 100),
+      key: key,
+      type: type,
+      title: title,
+      body: body,
+      date: new Date().toISOString(),
+      read: false,
+      channel: channel || "In-app"
+    };
+    db.notifications.unshift(item);
+    return item;
+  }
+
+  function dayKey(d) {
+    return new Date(d).toISOString().slice(0, 10);
+  }
+
+  /* Repayment reminders, overdue notices and KYC nudges, derived from the
+     loans and profile this customer actually has. */
+  function runEngine() {
+    if (!loaded) return 0;
+    var made = 0;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    activeLoans().forEach(function (loan) {
+      if (!loan.nextDue) return;
+      var due = new Date(loan.nextDue);
+      if (isNaN(due.getTime())) return;
+      var days = Math.round((due - today) / 86400000);
+      if (days < 0) {
+        if (pushOnce("overdue:" + loan.id + ":" + dayKey(due), "Repayment overdue",
+          "Loan " + loan.id + " is overdue",
+          "Your instalment of " + fmt(loan.nextAmount) + " was due on " + fmtDate(due) + ". " +
+          "Pay now to avoid late charges, or contact us to arrange a new date.", "In-app + SMS")) made += 1;
+        return;
+      }
+      if (days <= 3) {
+        var when = days === 0 ? "today" : days === 1 ? "tomorrow" : "in " + days + " days";
+        if (pushOnce("due:" + loan.id + ":" + dayKey(due), "Repayment reminder",
+          "Instalment due " + when,
+          "Loan " + loan.id + ": " + fmt(loan.nextAmount) + " is due on " + fmtDate(due) + ". " +
+          "Pay by Airtel Money, TNM Mpamba or bank transfer from the Repayments page.", "In-app + SMS")) made += 1;
+      }
+    });
+
+    db.applications.forEach(function (a) {
+      if (a.status === "approved" && !a.seenApproved) {
+        if (pushOnce("approved:" + a.ref, "Application update", "Application " + a.ref + " approved",
+          "Your " + a.product + " application for " + fmt(a.amount) + " was approved. " +
+          "Review the offer and sign the agreement to continue.", "In-app + SMS + Email")) made += 1;
+        a.seenApproved = true;
+      }
+      if (a.status === "info_required" && !a.seenInfo) {
+        if (pushOnce("info:" + a.ref, "Application update", "More information needed",
+          "Application " + a.ref + " needs more information before it can be assessed.", "In-app + Email")) made += 1;
+        a.seenInfo = true;
+      }
+    });
+
+    if (!db.profile.signature && loaded) {
+      if (pushOnce("signature:missing", "Account", "Signature needed",
+        "Add your signature to your profile so loan agreements can be completed without a branch visit.", "In-app")) made += 1;
+    }
+
+    if (made) persist();
+    return made;
+  }
+
+  function fmt(v) {
+    var n = Number(v || 0);
+    return "MWK " + n.toLocaleString("en-MW", { maximumFractionDigits: 0 });
+  }
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
   function activeLoans() {
     return db.loans.filter(function (l) {
       return l.status === "Active" || l.status === "In arrears";
@@ -11290,11 +11638,13 @@ window.JCOB_CONFIG = {
     KEY: KEY,
     get: get,
     save: save,
+    saveNow: saveNow,
     reset: reset,
     seed: seed,
     uid: uid,
     reference: reference,
     notify: notify,
+    runEngine: runEngine,
     unreadCount: unreadCount,
     activeLoans: activeLoans,
     totals: totals,
@@ -12983,7 +13333,8 @@ window.JCOB_CONFIG = {
       }
       if (!nid || nid.length < 6) { fieldError($("reg-nid"), "Enter a valid national ID number."); ok = false; }
       if (!isPhone(phone)) { fieldError($("reg-phone"), "Enter a valid Malawian phone number."); ok = false; }
-      if (!isEmail(email)) { fieldError($("reg-email"), "Enter a valid email address."); ok = false; }
+      /* No email? The phone number is the account and the code arrives by SMS. */
+      if (email && !isEmail(email)) { fieldError($("reg-email"), "Enter a valid email address, or leave it blank."); ok = false; }
       if (passwordScore(pw) < 3) { fieldError($("reg-password"), "Choose a stronger password (8+ characters, letters and numbers)."); ok = false; }
       if (pw !== pw2) { fieldError($("reg-confirm"), "Passwords do not match."); ok = false; }
       if (!consent) { fieldError($("reg-consent"), "You must accept the terms and privacy policy."); ok = false; }
@@ -13011,15 +13362,15 @@ window.JCOB_CONFIG = {
           status.textContent = "Creating your secure account…";
         }
         CLOUD.auth.signUp({
-          email: email, password: pw, fullName: account.fullName,
-          phone: phone, nid: nid, dob: dob, gender: gender
+          email: email || undefined, phone: phone, password: pw, fullName: account.fullName,
+          nid: nid, dob: dob, gender: gender
         }).then(function (res) {
           if (res && res.needsConfirmation) {
             if (status) {
               status.className = "form-status is-visible";
-              status.textContent = "Check " + email + " for the confirmation link, then sign in. Your account is created but not yet active.";
+              status.textContent = "Check " + (email || phone) + " for the confirmation " + (email ? "link" : "code") + ", then sign in. Your account is created but not yet active.";
             }
-            UI.toast({ title: "Confirm your email", message: "We sent a confirmation link to " + email + ".", type: "info" });
+            UI.toast({ title: "Confirm your account", message: "We sent a confirmation to " + (email || phone) + ".", type: "info" });
             return;
           }
           UI.toast({ title: "Account created", message: "Welcome to JAY C O B Financial Services.", type: "success" });
@@ -13085,8 +13436,14 @@ window.JCOB_CONFIG = {
       }
     }, 1000);
 
+    /* Codes go to the email address or to the phone number, whichever
+       the customer used. The channel is remembered from the previous page. */
     function codeTarget() {
-      return pending && pending.identifier && isEmail(pending.identifier) ? pending.identifier : "";
+      return pending && pending.identifier ? pending.identifier : "";
+    }
+    function codeChannel() {
+      if (pending && pending.channel) return pending.channel;
+      return pending && isEmail(pending.identifier || "") ? "email" : "sms";
     }
 
     function requestCode(silent) {
@@ -13096,11 +13453,13 @@ window.JCOB_CONFIG = {
         return;
       }
       if (!target) {
-        UI.toast({ title: "Email needed", message: "Sign in with your email address first, then request a code.", type: "danger" });
+        UI.toast({ title: "Sign in first", message: "Enter your email or phone number on the sign-in page, then request a code.", type: "danger" });
         return;
       }
-      CLOUD.auth.sendOtp(target).then(function () {
-        UI.toast({ title: "Code sent", message: "A fresh 6-digit code is on its way to " + target + ".", type: "info" });
+      var sms = codeChannel() === "sms";
+      var send = sms ? CLOUD.auth.sendPhoneOtp(target) : CLOUD.auth.sendOtp(target);
+      send.then(function () {
+        UI.toast({ title: "Code sent", message: "A fresh 6-digit code is on its way " + (sms ? "by SMS to " : "to ") + target + ".", type: "info" });
       }).catch(function (err) {
         UI.toast({ title: "Could not send a code", message: String((err && err.message) || "Please try again."), type: "danger" });
       });
@@ -13139,10 +13498,13 @@ window.JCOB_CONFIG = {
       status.className = "form-status is-visible";
       status.textContent = "Checking your code…";
 
-      CLOUD.auth.verifyOtp(codeTarget(), code).then(function (res) {
+      var check = codeChannel() === "sms"
+        ? CLOUD.auth.verifyPhoneOtp(codeTarget(), code)
+        : CLOUD.auth.verifyOtp(codeTarget(), code);
+      check.then(function (res) {
         var profile = (res && res.profile) || (CLOUD.auth.profile && CLOUD.auth.profile()) || {};
         var name = profile.full_name || (pending && pending.name) || "";
-        var email = profile.email || codeTarget();
+        var email = profile.email || (isEmail(codeTarget()) ? codeTarget() : "");
         UI.setSession({
           authenticated: true,
           name: name,
@@ -13152,12 +13514,19 @@ window.JCOB_CONFIG = {
           cloud: true
         }, true);
 
+        var recovery = pending && pending.mode === "recover";
         try { sessionStorage.removeItem(PENDING_KEY); } catch (err) {}
         DATA.notify("Account verification", "Account verified",
-          "Your email address is verified. Welcome to JAY C O B Financial Services.", "In-app + Email");
+          (codeChannel() === "sms" ? "Your phone number" : "Your email address") +
+          " is verified. Welcome to JAY C O B Financial Services.", "In-app");
         status.className = "form-status is-visible";
-        status.textContent = "Verified. Redirecting to your dashboard…";
-        setTimeout(function () { window.location.href = "#/dashboard"; }, 700);
+        if (recovery) {
+          status.textContent = "Code accepted. Opening your account so you can set a new password…";
+          setTimeout(function () { window.location.href = "dashboard.html#security"; }, 700);
+        } else {
+          status.textContent = "Verified. Redirecting to your dashboard…";
+          setTimeout(function () { window.location.href = "#/dashboard"; }, 700);
+        }
       }).catch(function (err) {
         var message = String((err && err.message) || "");
         if (/expired|invalid|incorrect/i.test(message)) message = "That code is incorrect or has expired. Request a new one.";
@@ -13223,11 +13592,6 @@ window.JCOB_CONFIG = {
         return;
       }
 
-      if (!isEmail(identifier)) {
-        fieldError(idInput, "Use the email address on your account. Phone sign-in is enabled once SMS is configured.");
-        return;
-      }
-
       status.className = "form-status is-visible";
       status.textContent = "Signing you in…";
 
@@ -13240,7 +13604,7 @@ window.JCOB_CONFIG = {
           authenticated: true,
           name: name,
           identifier: identifier,
-          email: identifier,
+          email: profile.email || (isEmail(identifier) ? identifier : ""),
           account: profile.account_no || "",
           cloud: true
         }, remember);
@@ -13252,8 +13616,8 @@ window.JCOB_CONFIG = {
         }, 350);
       }).catch(function (err) {
         var message = String((err && err.message) || "");
-        if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an account.";
-        else if (/confirm/i.test(message)) message = "Please confirm your email address before signing in.";
+        if (/invalid|credentials|grant/i.test(message)) message = "That " + (isEmail(identifier) ? "email address" : "phone number") + " and password do not match an account.";
+        else if (/confirm/i.test(message)) message = "Please confirm your " + (isEmail(identifier) ? "email address" : "phone number") + " before signing in.";
         var tries = UI.tryCount();
         tries.count = (tries.count || 0) + 1;
         if (tries.count >= 5) {
@@ -13286,17 +13650,15 @@ window.JCOB_CONFIG = {
           fieldError(idInput, "One-time codes need the account service. Please call +265 999 123 456.");
           return;
         }
-        if (!isEmail(identifier)) {
-          fieldError(idInput, "Use the email address on your account to receive a code.");
-          return;
-        }
+        var channel = isEmail(identifier) ? "email" : "sms";
         try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier }));
+          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
         } catch (err) {}
-        CLOUD.auth.sendOtp(identifier).then(function () {
+        var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
+        send.then(function () {
           window.location.href = "#/verify";
         }).catch(function (err) {
-          fieldError(idInput, String((err && err.message) || "We could not send a code to that address."));
+          fieldError(idInput, String((err && err.message) || "We could not send a code to that number."));
         });
       });
     }
@@ -13315,12 +13677,22 @@ window.JCOB_CONFIG = {
         fieldError(input, "Enter a valid email address or phone number.");
         return;
       }
-      status.className = "form-status is-visible";
-      status.textContent = "Sending a single-use reset link…";
+      var id = input.value.trim();
 
-      if (cloudOn() && isEmail(input.value.trim())) {
-        CLOUD.auth.recover(input.value.trim()).then(function () {
-          status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
+      if (!cloudOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Recovery is unavailable — this deployment is not connected to the account service. Please call +265 999 123 456.";
+        return;
+      }
+
+      status.className = "form-status is-visible";
+
+      /* Email accounts get a single-use link. Phone accounts get a code by
+         SMS, because a phone number cannot receive an email. */
+      if (isEmail(id)) {
+        status.textContent = "Sending a single-use reset link…";
+        CLOUD.auth.recover(id).then(function () {
+          status.innerHTML = 'If an account matches <strong>' + id +
             '</strong>, a reset link has been sent by email and expires in 30 minutes.';
         }).catch(function () {
           status.className = "form-status is-visible form-status--error";
@@ -13329,8 +13701,17 @@ window.JCOB_CONFIG = {
         return;
       }
 
-      status.className = "form-status is-visible form-status--error";
-      status.textContent = "Password recovery is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
+      status.textContent = "Sending a recovery code by SMS…";
+      try {
+        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: id }));
+      } catch (err) {}
+      CLOUD.auth.sendPhoneOtp(id).then(function () {
+        status.innerHTML = 'If an account matches <strong>' + id + '</strong>, a six-digit recovery code has been sent by SMS. ' +
+          '<a href="#/verify">Enter the code</a> to sign in and set a new password.';
+      }).catch(function () {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "We could not send a recovery code just now. Please try again.";
+      });
     });
   }
 
@@ -13708,8 +14089,17 @@ window.JCOB_CONFIG = {
 
   function dashboardShell() {
     if (state.submitted) return confirmation(state.submitted);
-    return '<div class="app-page-head"><div><h1>Apply for a loan</h1><p>Complete the five steps below. Your progress is saved in this browser.</p></div>' +
+    var back = '<button class="page-back" type="button" data-back>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+      '<path d="M15 18l-6-6 6-6"/></svg>Back</button>';
+    var signed = !!(profile().signature && profile().signature.strokes && profile().signature.strokes.length);
+    var needSignature = signed ? "" :
+      '<div class="notice notice--warn" style="margin-bottom:1rem;">' + UI.ICONS.info +
+      "<div><strong>Your signature is not on file</strong>Add it before you submit so the loan agreement can be completed without a branch visit. " +
+      '<a href="#/apply">Sign now</a> — your application will stay here.</div></div>';
+    return back + '<div class="app-page-head"><div><h1>Apply for a loan</h1><p>Complete the five steps below. Your progress is saved to your account.</p></div>' +
       '<div class="head-actions"><a class="btn btn--ghost btn--sm" href="#applications">My applications</a></div></div>' +
+      needSignature +
       '<div class="dash-grid" style="grid-template-columns:1.55fr 1fr;align-items:start;">' +
         '<div class="calc-panel" style="background:#fff;">' + stepper() +
           '<form id="apply-form" novalidate>' + stepOne() + stepTwo() + stepThree() + stepFour() + stepFive() +
@@ -14050,6 +14440,17 @@ window.JCOB_CONFIG = {
     mount: function () {
       state.scope = "dashboard";
       state.submitted = null;
+      /* A product chosen on the website follows the customer in. */
+      var q = new URLSearchParams((location.hash.split("?")[1]) || "");
+      var wanted = (q.get("product") || "").toLowerCase();
+      Object.keys(PRODUCTS).forEach(function (k) {
+        if (k.toLowerCase() === wanted) { state.product = k; state.term = PRODUCTS[k].term[0]; }
+      });
+      if (q.get("amount")) state.amount = Math.max(Number(q.get("amount")) || 0, 0);
+      if (q.get("term")) state.term = Number(q.get("term")) || state.term;
+      var p = PRODUCTS[state.product];
+      state.amount = Math.min(Math.max(state.amount, p.min), p.max);
+      state.term = Math.min(Math.max(state.term, p.term[0]), p.term[1]);
       bind();
     },
     initPublic: function () {
@@ -14074,7 +14475,11 @@ window.JCOB_CONFIG = {
   };
 
   document.addEventListener("DOMContentLoaded", function () {
-    if (document.body.getAttribute("data-page") === "apply") window.JCOB_APPLY.initPublic();
+    if (document.body.getAttribute("data-page") !== "apply") return;
+    /* The terms, the account and the signature come first. The form only
+       opens once JCOB_ONBOARD has finished with them. */
+    if (window.JCOB_ONBOARD && window.JCOB_ONBOARD.intercept) return;
+    window.JCOB_APPLY.initPublic();
   });
 })();
 
@@ -15137,8 +15542,18 @@ try {
       "</div>";
   }
 
+  /* Every section except the dashboard itself carries a way back. It
+     returns to the section you came from, and to the dashboard when
+     there is nothing behind you (a fresh link, for example). */
+  function backButton() {
+    if (!state.route || state.route === "dashboard") return "";
+    return '<button class="page-back" type="button" data-back>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+      '<path d="M15 18l-6-6 6-6"/></svg>Back</button>';
+  }
+
   function pageHead(title, sub, actions) {
-    return '<div class="app-page-head"><div><h1>' + title + "</h1>" + (sub ? "<p>" + sub + "</p>" : "") + "</div>" +
+    return backButton() + '<div class="app-page-head"><div><h1>' + title + "</h1>" + (sub ? "<p>" + sub + "</p>" : "") + "</div>" +
       (actions ? '<div class="head-actions">' + actions + "</div>" : "") + "</div>";
   }
 
@@ -16331,9 +16746,15 @@ try {
     return { route: parts[0] || "dashboard", query: new URLSearchParams(parts[1] || "") };
   }
 
+  var routeStack = [];
+
   function render(withLoading) {
     var parsed = parseHash();
     var route = ROUTES.hasOwnProperty(parsed.route) ? parsed.route : "dashboard";
+    if (state.route && state.route !== route) {
+      routeStack.push(state.route);
+      if (routeStack.length > 25) routeStack.shift();
+    }
     state.route = route;
     highlightNav();
 
@@ -16365,6 +16786,17 @@ try {
   /* ==================================================================
      EVENT BINDING
      ================================================================== */
+  function wireBack() {
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-back]");
+      if (!btn) return;
+      e.preventDefault();
+      var previous = routeStack.pop();
+      if (previous && ROUTES.hasOwnProperty(previous)) location.hash = "#" + previous;
+      else location.hash = "#dashboard";
+    });
+  }
+
   function bind(route) {
     /* generic: loan modals */
     content.querySelectorAll("[data-payoff]").forEach(function (btn) {
@@ -17353,6 +17785,7 @@ try {
     renderSidebar();
     initSearch();
     applyAccessibility();
+    wireBack();
     render();
 
     window.addEventListener("hashchange", function () { render(); });
@@ -17385,6 +17818,9 @@ try {
        signed-in name, email and initials, so it has to be refreshed too —
        otherwise the header keeps the placeholder it drew before hydration. */
     document.addEventListener("jcob:data-ready", function () {
+      /* Reminders and status changes are raised from the records that
+         just arrived, never invented. Duplicates are keyed and skipped. */
+      if (window.JCOB_DATA && window.JCOB_DATA.runEngine) window.JCOB_DATA.runEngine();
       renderSidebar();
       if (render) render();
     });
