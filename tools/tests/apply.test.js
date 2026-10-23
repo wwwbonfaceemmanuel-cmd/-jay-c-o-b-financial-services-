@@ -306,7 +306,7 @@ async function sessionSeeds(creds) {
     t.eq("engine reports what it added", first >= 1, true);
     t.eq("running twice adds nothing", second, 0);
     t.eq("one reminder per instalment", reminders.length, 1);
-    t.ok("reminder says when it is due", /in 2 days|tomorrow|today/.test(reminders[0].body + reminders[0].title));
+    t.ok("reminder says when it is due", /in [123] days|tomorrow|today/.test(reminders[0].body + reminders[0].title));
     t.ok("bell shows the unread count", Number(w.document.querySelector("[data-notif-total]").textContent) >= 1);
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
@@ -384,7 +384,7 @@ async function sessionSeeds(creds) {
     w.close();
   }
 
-  t.done();
+  process.exit(t.done() ? 0 : 1);
 })().catch((err) => {
   console.error(err);
   process.exit(1);

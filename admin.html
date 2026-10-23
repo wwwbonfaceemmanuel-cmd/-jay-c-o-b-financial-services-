@@ -4,111 +4,144 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JAY C O B FINANCIAL SERVICES · Admin System</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1e3d'/%3E%3Ctext x='32' y='42' font-family='Arial Black' font-size='24' font-weight='900' fill='%2338bdf8' text-anchor='middle'%3EJCB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#06262a">
 <style>
+/* =====================================================================
+   JAY C O B FINANCIAL SERVICES — Admin console
+   The website's own palette: emerald green, liquid crystal blue, and
+   fine gold edges, with Fraunces for headings. Same tokens, same look.
+   ===================================================================== */
 :root{
-  --bg0:#040816; --bg1:#081026; --bg2:#0b1a3a; --bg3:#10224a;
-  --panel:rgba(13,28,60,.62); --panel2:rgba(16,34,74,.55); --panel-solid:#0c1b3d;
-  --line:rgba(96,165,250,.16); --line2:rgba(56,189,248,.28);
-  --txt:#dbe7ff; --muted:#8fa8d6; --dim:#5f77a8;
-  --acc:#38bdf8; --acc2:#60a5fa; --acc3:#0ea5e9;
-  --ok:#34d399; --warn:#fbbf24; --bad:#f87171; --purp:#a78bfa; --teal:#2dd4bf;
-  --shadow:0 18px 50px rgba(2,6,23,.55);
+  /* palette lifted from assets/css/styles.css */
+  --emerald-900:#04171a; --emerald-800:#06262a; --emerald-700:#0a373a; --emerald-600:#0d4a4b; --emerald-500:#10605c;
+  --crystal-700:#0d5c96; --crystal-500:#1f83c9; --crystal-300:#7bb8e8; --crystal-200:#a8d8fb; --crystal-100:#dff1ff;
+  --gold-700:#8a6a12; --gold-500:#c9a227; --gold-400:#dcbb5a; --gold-200:#f2e3b6;
+  --cream:#eef4fa; --cream-dark:#dee9f4; --paper:#fff;
+  --ink:#062430; --body-txt:#3b5666; --muted:#4f6c7d; --dim:#567080;
+  --line:rgba(10,55,58,.13); --line2:rgba(20,88,143,.30);
+  --ok:#0f7a5c; --warn:#8a6a12; --bad:#a83b34; --purp:#6b4fa8; --teal:#0d6b5a;
+  --gold-edge:linear-gradient(135deg,#8a6a12 0%,#d8b554 26%,#f6ecc4 48%,#c9a227 70%,#8a6a12 100%);
+  --gold-liquid:linear-gradient(115deg,#a8d8fb 0%,#dff1ff 22%,#8ec7f0 46%,#c8e8ff 62%,#7bb8e8 82%,#e8f6ff 100%);
+  /* the site's own app-sidebar gradient */
+  --chrome:linear-gradient(185deg,#092f27 0%,#031613 68%);
+
+  /* console aliases */
+  --bg0:var(--cream); --bg1:var(--cream-dark); --bg2:#ffffff; --bg3:#f7fafd;
+  --panel:rgba(255,255,255,.9); --panel2:rgba(255,255,255,.72); --panel-solid:#ffffff;
+  --txt:var(--ink); --acc:var(--crystal-700); --acc2:var(--teal); --acc3:var(--crystal-500);
+  --shadow:0 20px 44px -30px rgba(4,23,26,.5);
   --rad:16px;
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --chrome-txt:#e4f1ec; --chrome-muted:#a3c3ba; --chrome-line:rgba(168,216,251,.16);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scrollbar-color:#24406f var(--bg0)}
-body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:
-  radial-gradient(1200px 700px at 85% -10%,rgba(14,165,233,.16),transparent 60%),
-  radial-gradient(1000px 600px at -10% 110%,rgba(99,102,241,.12),transparent 60%),
-  linear-gradient(160deg,#050a1c 0%,#081026 45%,#040716 100%);
-  color:var(--txt);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+html{scrollbar-color:var(--crystal-300) var(--cream)}
+body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;color:var(--txt);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;
+  background:
+    radial-gradient(1100px 520px at 88% -8%,rgba(39,125,201,.13),transparent 62%),
+    radial-gradient(900px 500px at 4% 2%,rgba(15,78,66,.10),transparent 58%),
+    linear-gradient(180deg,#f4f8fc 0%,var(--cream) 40%,#e9f1f8 100%);
+  background-attachment:fixed}
 a{color:var(--acc);text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit}
-::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#21406f;border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--crystal-300);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em}
 
 /* ---------- TOP BAR ---------- */
 .topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:18px;padding:12px 22px;
-  background:rgba(6,12,30,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:12px;min-width:250px}
-.brand .mark{width:46px;height:46px;flex:0 0 46px;filter:drop-shadow(0 6px 16px rgba(56,189,248,.35))}
-.brand h1{font-size:15px;letter-spacing:.12em;font-weight:800;background:linear-gradient(90deg,#7dd3fc,#38bdf8,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.15}
-.brand small{display:block;font-size:10px;letter-spacing:.28em;color:var(--muted);font-weight:600}
-.crumbs{flex:1;color:var(--dim);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crumbs b{color:var(--txt)}
-.topsearch{display:flex;align-items:center;gap:8px;background:rgba(4,10,28,.7);border:1px solid var(--line);border-radius:12px;padding:8px 12px;width:280px}
-.topsearch input{background:none;border:none;outline:none;color:var(--txt);width:100%;font-size:13px}
+  background:rgba(235,239,245,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 14px 30px -30px rgba(4,23,26,.7)}
+.topbar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold-edge);opacity:.7}
+.brand{display:flex;align-items:center;gap:12px;min-width:250px;color:var(--ink)}
+.brand-logo{height:44px;width:auto;display:block}
+.brand-chip{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.2em;font-weight:800;color:var(--emerald-700);
+  border:1px solid rgba(13,107,90,.35);border-radius:999px;padding:4px 9px;white-space:nowrap;background:rgba(13,107,90,.07)}
+@media(max-width:1240px){.brand-chip{display:none}}
+.foot-logo{height:44px;width:auto;display:block}
+.crumbs{flex:1;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumbs b{color:var(--ink);font-weight:600}
+.topsearch{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;width:280px}
+.topsearch input{background:none;border:none;outline:none;color:var(--ink);width:100%;font-size:13px}
 .topsearch input::placeholder{color:var(--dim)}
 .top-actions{display:flex;align-items:center;gap:10px}
-.chip-clock{font-size:12px;color:var(--muted);background:rgba(4,10,28,.7);border:1px solid var(--line);padding:8px 12px;border-radius:12px;white-space:nowrap}
-.icon-btn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,28,.7);color:var(--txt);display:grid;place-items:center;transition:.2s}
-.icon-btn:hover{border-color:var(--line2);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
-.icon-btn .dot{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
-.userbox{display:flex;align-items:center;gap:10px;background:rgba(4,10,28,.7);border:1px solid var(--line);border-radius:12px;padding:5px 12px 5px 5px;cursor:pointer;position:relative}
-.avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#0ea5e9,#6366f1);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
-.userbox .nm{font-size:12px;font-weight:700}.userbox .rl{font-size:10px;color:var(--muted)}
+.chip-clock{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:12px;white-space:nowrap}
+.icon-btn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{border-color:rgba(13,107,90,.4);box-shadow:0 0 0 3px rgba(13,107,90,.10)}
+.icon-btn .dot{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:linear-gradient(135deg,#a83b34,#c05a4e);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.userbox{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px 12px 5px 5px;cursor:pointer;position:relative;color:var(--ink)}
+.avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,var(--emerald-500),var(--emerald-800));display:grid;place-items:center;font-weight:800;font-size:13px;color:#eaf6f1}
+.userbox .nm{font-size:12px;font-weight:700;color:var(--ink)}.userbox .rl{font-size:10px;color:var(--muted)}
 
-/* dropdowns */
-.drop{position:absolute;top:110%;right:0;width:330px;background:linear-gradient(180deg,#0d1e42,#0a1734);border:1px solid var(--line2);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:none;z-index:80}
+/* dropdowns float over the cream content as white cards */
+.drop{position:absolute;top:110%;right:0;width:330px;background:var(--paper);border:1px solid var(--line2);border-radius:14px;box-shadow:0 26px 60px -30px rgba(4,23,26,.55);padding:10px;display:none;z-index:80}
 .drop.open{display:block;animation:pop .18s ease}
 @keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.drop h4{font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;padding:6px 8px}
-.drop .it{display:flex;gap:10px;padding:9px 8px;border-radius:10px;font-size:12.5px;align-items:flex-start}
-.drop .it:hover{background:rgba(56,189,248,.08)}
+.drop h4{font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;padding:6px 8px;font-weight:800}
+.drop .it{display:flex;gap:10px;padding:9px 8px;border-radius:10px;font-size:12.5px;align-items:flex-start;color:var(--ink)}
+.drop .it:hover{background:rgba(13,107,90,.07)}
 .drop .it .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:0 0 28px;font-size:13px}
-.drop .it small{color:var(--dim)}
-.drop .it.unread{background:rgba(56,189,248,.07)}
-#searchResults{position:absolute;top:100%;left:0;right:0;margin-top:6px;background:#0b1a3a;border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);max-height:280px;overflow:auto;display:none;z-index:90}
-#searchResults .r{padding:9px 12px;font-size:12.5px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
-#searchResults .r:hover{background:rgba(56,189,248,.1)}
+.drop .it small{color:var(--muted)}
+.drop .it.unread{background:rgba(31,131,201,.07)}
+#searchResults{position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--paper);border:1px solid var(--line2);border-radius:12px;box-shadow:0 26px 60px -30px rgba(4,23,26,.5);max-height:280px;overflow:auto;display:none;z-index:90}
+#searchResults .r{padding:9px 12px;font-size:12.5px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;color:var(--ink)}
+#searchResults .r:hover{background:rgba(13,107,90,.08)}
 #searchResults .r span{color:var(--dim)}
 
 /* ---------- LAYOUT ---------- */
 .layout{flex:1;display:flex;min-height:0}
-.sidebar{width:262px;flex:0 0 262px;background:rgba(6,12,30,.6);border-right:1px solid var(--line);padding:14px 12px;overflow-y:auto;position:sticky;top:71px;height:calc(100vh - 71px)}
+.sidebar{width:262px;flex:0 0 262px;background:var(--chrome);border-right:1px solid rgba(201,162,39,.22);padding:14px 12px;overflow-y:auto;position:sticky;top:71px;height:calc(100vh - 71px);color:var(--chrome-txt)}
 .navgrp{margin-bottom:4px}
-.navgrp .gh{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:var(--dim);font-size:10.5px;letter-spacing:.18em;font-weight:800;padding:12px 10px 6px;text-transform:uppercase}
+.navgrp .gh{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:var(--chrome-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.18em;font-weight:800;padding:12px 10px 6px;text-transform:uppercase}
 .navgrp .gh svg{transition:.2s}
 .navgrp.closed .gh svg{transform:rotate(-90deg)}
 .navgrp.closed .items{display:none}
-.navlink{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--muted);font-size:13px;padding:8.5px 12px;border-radius:10px;text-align:left;transition:.15s;margin:1px 0}
-.navlink svg{flex:0 0 16px;opacity:.8}
-.navlink:hover{background:rgba(56,189,248,.09);color:var(--txt)}
-.navlink.active{background:linear-gradient(90deg,rgba(14,165,233,.28),rgba(99,102,241,.18));color:#fff;border-left:3px solid var(--acc);padding-left:9px;box-shadow:inset 0 0 24px rgba(56,189,248,.08)}
-.navlink .cnt{margin-left:auto;font-size:10px;background:rgba(244,63,94,.2);color:#fda4af;padding:1px 7px;border-radius:8px;font-weight:700}
-.syncbox{margin:18px 6px 4px;padding:12px;border-radius:12px;background:rgba(4,10,28,.6);border:1px dashed var(--line2);font-size:11px;color:var(--muted)}
-.syncbox b{color:var(--teal);display:flex;align-items:center;gap:6px}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pl 1.6s infinite}
-@keyframes pl{50%{opacity:.4}}
+.navlink{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:#c3d8d1;font-size:13px;padding:8.5px 12px;border-radius:10px;text-align:left;transition:.15s;margin:1px 0;border-left:3px solid transparent}
+.navlink svg{flex:0 0 16px;opacity:.75}
+.navlink:hover{background:rgba(168,216,251,.10);color:#fff}
+.navlink.active{background:linear-gradient(90deg,rgba(168,216,251,.20),rgba(13,107,90,.16));color:#fff;border-left-color:var(--gold-400);padding-left:9px;box-shadow:inset 0 0 24px rgba(201,162,39,.10)}
+.navlink .cnt{margin-left:auto;font-family:'Inter',sans-serif;font-size:10px;background:rgba(168,59,52,.42);color:#ffd9d5;padding:1px 7px;border-radius:8px;font-weight:700}
+.syncbox{margin:18px 6px 4px;padding:12px;border-radius:12px;background:rgba(4,23,26,.45);border:1px dashed rgba(201,162,39,.35);font-size:11px;color:var(--chrome-muted);line-height:1.55}
+.syncbox b{color:#8fe0c4;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;letter-spacing:.06em;font-size:10.5px;margin-bottom:4px}
+.pulse{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.35}}
 
 /* ---------- CONTENT ---------- */
-.content{flex:1;min-width:0;padding:22px 26px 40px;overflow-x:hidden}
+.content{flex:1;min-width:0;padding:24px 26px 40px;overflow-x:hidden}
 .page-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:18px}
-.aback{display:inline-flex;align-items:center;gap:6px;background:rgba(96,165,250,.09);border:1px solid rgba(96,165,250,.22);color:#9fc4f2;font:600 11.5px/1 Inter,system-ui,sans-serif;padding:6px 11px;border-radius:8px;cursor:pointer;margin-bottom:11px;letter-spacing:.02em;transition:background .15s,color .15s}
-.aback:hover{background:rgba(96,165,250,.18);color:#cfe3ff}
-.aback:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
-.page-h h2{font-size:22px;font-weight:800;letter-spacing:.01em}
-.page-h p{color:var(--muted);font-size:13px;margin-top:4px;max-width:720px}
-.btn{display:inline-flex;align-items:center;gap:7px;border-radius:11px;border:1px solid var(--line2);padding:9px 15px;font-size:12.5px;font-weight:700;color:var(--txt);background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(99,102,241,.2));transition:.18s}
-.btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(14,165,233,.25)}
-.btn.primary{background:linear-gradient(135deg,#0284c7,#4f46e5);border-color:transparent;box-shadow:0 8px 22px rgba(14,124,233,.35)}
-.btn.ghost{background:rgba(4,10,28,.6)}
-.btn.danger{background:linear-gradient(135deg,rgba(244,63,94,.25),rgba(190,18,60,.25));border-color:rgba(244,63,94,.4)}
-.btn.ok{background:linear-gradient(135deg,rgba(52,211,153,.25),rgba(5,150,105,.25));border-color:rgba(52,211,153,.4)}
-.btn.warn{background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(217,119,6,.22));border-color:rgba(251,191,36,.4)}
+.aback{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.9);border:1px solid var(--line);color:var(--muted);font:600 11.5px/1 Inter,system-ui,sans-serif;padding:6px 11px;border-radius:8px;cursor:pointer;margin-bottom:11px;letter-spacing:.02em;transition:background .15s,color .15s,border-color .15s}
+.aback:hover{background:#fff;color:var(--teal);border-color:rgba(13,107,90,.35)}
+.aback:focus-visible{outline:2px solid var(--crystal-500);outline-offset:2px}
+.page-h h2{font-size:24px;font-weight:600;letter-spacing:-.015em;color:var(--emerald-800)}
+.page-h p{color:var(--muted);font-size:13px;margin-top:5px;max-width:720px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:11px;border:1px solid var(--line2);padding:9px 15px;font-size:12.5px;font-weight:700;color:var(--emerald-700);background:#fff;transition:.18s;box-shadow:0 1px 0 rgba(255,255,255,.9) inset}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px -18px rgba(4,23,26,.7);border-color:rgba(13,107,90,.45)}
+.btn.primary{background:linear-gradient(135deg,var(--emerald-600),var(--emerald-800));border-color:transparent;color:#eaf6f1;box-shadow:0 10px 24px -18px rgba(4,23,26,.95)}
+.btn.primary:hover{background:linear-gradient(135deg,var(--emerald-500),var(--emerald-700))}
+.btn.ghost{background:rgba(255,255,255,.72);color:var(--muted)}
+.btn.danger{background:#fbeeec;border-color:rgba(168,59,52,.35);color:var(--bad)}
+.btn.ok{background:#eaf6f1;border-color:rgba(15,122,92,.35);color:var(--ok)}
+.btn.warn{background:#fdf6e3;border-color:rgba(138,106,18,.35);color:var(--warn)}
 .btn.sm{padding:6px 10px;font-size:11px;border-radius:8px}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.gold{background:var(--gold-liquid);border-color:rgba(20,88,143,.25);color:#0a1722;font-weight:800}
+.btn.gold:hover{box-shadow:0 14px 28px -18px rgba(20,88,143,.85)}
 
 /* stat cards */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;margin-bottom:20px}
-.stat{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:16px;backdrop-filter:blur(14px);transition:.2s;cursor:default}
+.stat{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:16px;transition:.2s;cursor:default;box-shadow:var(--shadow)}
+.stat::after{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:var(--gold-edge);opacity:.65}
 .stat:hover{border-color:var(--line2);transform:translateY(-2px)}
-.stat::before{content:'';position:absolute;inset:0;background:radial-gradient(220px 120px at 90% -20%,var(--glow,rgba(56,189,248,.18)),transparent 70%)}
-.stat .lb{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.stat .vl{font-size:23px;font-weight:800;margin:8px 0 4px;text-shadow:0 2px 14px rgba(56,189,248,.15)}
+.stat::before{content:'';position:absolute;inset:0;background:radial-gradient(220px 120px at 90% -20%,var(--glow,rgba(31,131,201,.14)),transparent 70%)}
+.stat .lb{font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.stat .vl{font-family:var(--font-display);font-size:24px;font-weight:600;margin:8px 0 4px;color:var(--emerald-800)}
 .stat .sb{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:6px}
-.stat .ico{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:16px;background:var(--ibg,rgba(56,189,248,.14))}
+.stat .ico{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:16px;background:var(--ibg,rgba(31,131,201,.12))}
 .up{color:var(--ok)}.dn{color:var(--bad)}.fl{color:var(--warn)}
 
 /* grids & panels */
@@ -116,175 +149,180 @@ input,select,textarea{font-family:inherit}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .grid22{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:1280px){.grid2,.grid3,.grid22{grid-template-columns:1fr}}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);backdrop-filter:blur(14px);margin-bottom:16px;overflow:hidden}
-.panel .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
-.panel .ph h3{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
-.panel .ph h3::before{content:'';width:8px;height:8px;border-radius:3px;background:linear-gradient(135deg,#38bdf8,#6366f1);box-shadow:0 0 10px rgba(56,189,248,.6)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow)}
+.panel .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(238,244,250,.5))}
+.panel .ph h3{font-family:var(--font-display);font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--emerald-800)}
+.panel .ph h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--gold-edge);box-shadow:0 0 10px rgba(201,162,39,.5)}
 .panel .pb{padding:16px 18px}
 .panel.flush .pb{padding:0}
 
 /* table */
 .ttools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--line)}
-.ttools .srch{display:flex;align-items:center;gap:7px;background:rgba(4,10,28,.65);border:1px solid var(--line);border-radius:10px;padding:7px 11px;min-width:220px;flex:1;max-width:320px}
+.ttools .srch{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 11px;min-width:220px;flex:1;max-width:320px}
 .ttools .srch input{background:none;border:none;outline:none;color:var(--txt);font-size:12.5px;width:100%}
-.fsel{background:rgba(4,10,28,.65);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:7.5px 10px;font-size:12px;outline:none}
-.fsel option{background:#0b1a3a}
+.fsel{background:#fff;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:7.5px 10px;font-size:12px;outline:none}
+.fsel option{background:#fff;color:var(--ink)}
 .tspace{flex:1}
 .tcount{font-size:11.5px;color:var(--dim)}
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
-thead th{position:sticky;top:0;text-align:left;padding:11px 14px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:rgba(6,14,34,.95);border-bottom:1px solid var(--line);white-space:nowrap}
-tbody td{padding:11px 14px;border-bottom:1px solid rgba(96,165,250,.08);vertical-align:middle}
+thead th{position:sticky;top:0;text-align:left;padding:11px 14px;font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:#f2f7fb;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:800}
+tbody td{padding:11px 14px;border-bottom:1px solid rgba(10,55,58,.07);vertical-align:middle;color:var(--body-txt)}
+tbody td b{color:var(--ink);font-weight:600}
 tbody tr{transition:.14s}
-tbody tr:hover{background:rgba(56,189,248,.06)}
-tbody tr.hl{background:rgba(251,191,36,.06)}
-.tid{font-family:'JetBrains Mono','Consolas',monospace;font-size:11px;color:var(--acc)}
+tbody tr:hover{background:rgba(31,131,201,.05)}
+tbody tr.hl{background:rgba(201,162,39,.08)}
+.tid{font-family:'JetBrains Mono','Consolas',monospace;font-size:11px;color:var(--crystal-700)}
 .tsub{font-size:11px;color:var(--dim)}
-.tamt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tamt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .tamt.neg{color:var(--bad)}.tamt.pos{color:var(--ok)}
 .pgr{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:11px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
-.pgr button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:rgba(4,10,28,.6);color:var(--txt)}
-.pgr button.cur{background:var(--acc3);border-color:var(--acc3);color:#fff;font-weight:700}
+.pgr button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--txt)}
+.pgr button.cur{background:var(--emerald-700);border-color:var(--emerald-700);color:#fff;font-weight:700}
 .pgr button:disabled{opacity:.35}
 
 /* badge */
-.bdg{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.bdg{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
 .bdg::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
-.bdg.g{background:rgba(52,211,153,.13);color:#6ee7b7;border-color:rgba(52,211,153,.3)}
-.bdg.r{background:rgba(248,113,113,.13);color:#fca5a5;border-color:rgba(248,113,113,.3)}
-.bdg.y{background:rgba(251,191,36,.13);color:#fde68a;border-color:rgba(251,191,36,.3)}
-.bdg.b{background:rgba(96,165,250,.13);color:#93c5fd;border-color:rgba(96,165,250,.3)}
-.bdg.p{background:rgba(167,139,250,.13);color:#c4b5fd;border-color:rgba(167,139,250,.3)}
-.bdg.t{background:rgba(45,212,191,.13);color:#5eead4;border-color:rgba(45,212,191,.3)}
-.bdg.n{background:rgba(148,163,184,.13);color:#b6c2d9;border-color:rgba(148,163,184,.3)}
+.bdg.g{background:#e9f6f1;color:#0b6b50;border-color:rgba(15,122,92,.28)}
+.bdg.r{background:#fbeeec;color:#94332d;border-color:rgba(168,59,52,.28)}
+.bdg.y{background:#fdf6e3;color:#7d5f0f;border-color:rgba(138,106,18,.28)}
+.bdg.b{background:#eaf4fc;color:#14588f;border-color:rgba(20,88,143,.28)}
+.bdg.p{background:#f1edfa;color:#5b3f96;border-color:rgba(107,79,168,.28)}
+.bdg.t{background:#e7f5f2;color:#0d6b5a;border-color:rgba(13,107,90,.28)}
+.bdg.n{background:#eef2f6;color:#4f6c7d;border-color:rgba(79,108,125,.25)}
 
 /* tabs */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:12px 18px 0}
-.tabs button{border:1px solid var(--line);background:rgba(4,10,28,.5);color:var(--muted);font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px 10px 0 0;border-bottom:none}
-.tabs button.on{background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(99,102,241,.2));color:#fff}
+.tabs button{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px 10px 0 0;border-bottom:none}
+.tabs button.on{background:linear-gradient(180deg,rgba(13,107,90,.12),rgba(255,255,255,.4));color:var(--emerald-700);box-shadow:inset 0 2px 0 var(--gold-400)}
 
 /* progress */
-.pbar{height:7px;border-radius:5px;background:rgba(148,163,184,.15);overflow:hidden;min-width:90px}
-.pbar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#0ea5e9,#38bdf8)}
-.pbar.ok i{background:linear-gradient(90deg,#059669,#34d399)}
-.pbar.warn i{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.pbar.bad i{background:linear-gradient(90deg,#dc2626,#f87171)}
+.pbar{height:7px;border-radius:5px;background:rgba(10,55,58,.10);overflow:hidden;min-width:90px}
+.pbar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--crystal-700),var(--crystal-300))}
+.pbar.ok i{background:linear-gradient(90deg,#0b6b50,#3fbf9a)}
+.pbar.warn i{background:linear-gradient(90deg,#8a6a12,#dcbb5a)}
+.pbar.bad i{background:linear-gradient(90deg,#94332d,#d98a80)}
 
 /* forms */
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .frow3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:640px){.frow,.frow3{grid-template-columns:1fr}}
 .fld{margin-bottom:13px}
-.fld label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
-.fld input,.fld select,.fld textarea{width:100%;background:rgba(4,10,28,.7);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:13px;padding:10px 12px;outline:none;transition:.15s}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(56,189,248,.14)}
-.fld select option{background:#0b1a3a}
+.fld label{display:block;font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:13px;padding:10px 12px;outline:none;transition:.15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--crystal-500);box-shadow:0 0 0 3px rgba(31,131,201,.16)}
+.fld select option{background:#fff;color:var(--ink)}
 .fld textarea{resize:vertical;min-height:76px}
 .fld .hint{font-size:11px;color:var(--dim);margin-top:4px}
 
 /* modal */
-.overlay{position:fixed;inset:0;background:rgba(2,5,14,.72);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:34px 16px;overflow-y:auto}
+.overlay{position:fixed;inset:0;background:rgba(4,23,26,.55);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:34px 16px;overflow-y:auto}
 .overlay.open{display:flex;animation:fade .18s ease}
 @keyframes fade{from{opacity:0}}
-.modal{width:100%;max-width:680px;background:linear-gradient(180deg,#0e2049,#0a1734);border:1px solid var(--line2);border-radius:18px;box-shadow:var(--shadow);animation:pop .2s ease}
+.modal{width:100%;max-width:680px;background:var(--paper);border:1px solid var(--line2);border-radius:18px;box-shadow:0 40px 90px -40px rgba(4,23,26,.8);animation:pop .2s ease;overflow:hidden}
 .modal.lg{max-width:920px}.modal.xl{max-width:1080px}
-.modal .mh{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line)}
-.modal .mh h3{font-size:16px;font-weight:800}
-.modal .mh .x{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(4,10,28,.6);color:var(--txt);font-size:15px}
+.modal .mh{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#f7fafd,#eef4fa)}
+.modal .mh h3{font-size:17px;font-weight:600;color:var(--emerald-800)}
+.modal .mh .x{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:15px}
 .modal .mb{padding:20px 22px;max-height:62vh;overflow-y:auto}
-.modal .mf{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--line)}
+.modal .mf{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--line);background:#f7fafd}
 .mini-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.mini-tabs button{border:1px solid var(--line);background:rgba(4,10,28,.5);color:var(--muted);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:9px}
-.mini-tabs button.on{background:linear-gradient(135deg,rgba(14,165,233,.3),rgba(99,102,241,.25));color:#fff;border-color:var(--line2)}
-.kv{display:grid;grid-template-columns:150px 1fr;gap:7px 12px;font-size:12.5px;margin-bottom:4px}
-.kv b{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+.mini-tabs button{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:9px}
+.mini-tabs button.on{background:linear-gradient(135deg,var(--emerald-600),var(--emerald-800));color:#eaf6f1;border-color:transparent}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:7px 12px;font-size:12.5px;margin-bottom:4px;color:var(--body-txt)}
+.kv b{color:var(--muted);font-family:'Inter',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
 
 /* toast */
 #toasts{position:fixed;right:20px;bottom:76px;z-index:400;display:flex;flex-direction:column;gap:10px}
-.toast{display:flex;gap:11px;align-items:flex-start;width:330px;background:linear-gradient(180deg,#0f2250,#0b1a3c);border:1px solid var(--line2);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);animation:tin .25s ease}
+.toast{display:flex;gap:11px;align-items:flex-start;width:330px;background:#fff;border:1px solid var(--line2);border-left:3px solid var(--crystal-500);border-radius:14px;padding:13px 15px;box-shadow:0 26px 60px -34px rgba(4,23,26,.6);animation:tin .25s ease}
 @keyframes tin{from{opacity:0;transform:translateX(30px)}}
 .toast .ti{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 30px;font-size:14px}
-.toast.ok .ti{background:rgba(52,211,153,.18);color:var(--ok)}
-.toast.err .ti{background:rgba(248,113,113,.18);color:var(--bad)}
-.toast.info .ti{background:rgba(96,165,250,.18);color:var(--acc2)}
-.toast b{font-size:13px;display:block}.toast span{font-size:12px;color:var(--muted)}
+.toast.ok{border-left-color:var(--ok)}
+.toast.ok .ti{background:#e9f6f1;color:var(--ok)}
+.toast.err{border-left-color:var(--bad)}
+.toast.err .ti{background:#fbeeec;color:var(--bad)}
+.toast.info .ti{background:#eaf4fc;color:var(--crystal-700)}
+.toast b{font-size:13px;display:block;color:var(--ink)}.toast span{font-size:12px;color:var(--muted)}
 
 /* lists */
 .lst{display:flex;flex-direction:column}
-.lst .li{display:flex;gap:12px;padding:11px 18px;border-bottom:1px solid rgba(96,165,250,.08);font-size:12.5px;align-items:flex-start;cursor:pointer}
-.lst .li:hover{background:rgba(56,189,248,.05)}
+.lst .li{display:flex;gap:12px;padding:11px 18px;border-bottom:1px solid rgba(10,55,58,.07);font-size:12.5px;align-items:flex-start;cursor:pointer;color:var(--body-txt)}
+.lst .li b{color:var(--ink);font-weight:600}
+.lst .li:hover{background:rgba(31,131,201,.05)}
 .lst .li:last-child{border-bottom:none}
 .lst .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 30px;font-size:13px}
 .lst small{color:var(--dim);display:block;margin-top:2px}
 .empty{padding:34px;text-align:center;color:var(--dim);font-size:13px}
 
 /* footer */
-.foot{margin-top:auto;border-top:1px solid var(--line);background:rgba(5,10,26,.85);backdrop-filter:blur(10px);padding:26px 30px 18px}
+.foot{margin-top:auto;border-top:1px solid rgba(201,162,39,.28);background:var(--chrome);padding:26px 30px 18px;color:var(--chrome-txt)}
 .foot-in{max-width:1500px;margin:0 auto;display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between}
-.foot .fbrand{display:flex;align-items:center;gap:12px}
-.foot h5{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2);margin-bottom:10px}
-.foot a.fl{display:block;color:var(--muted);font-size:12.5px;margin-bottom:7px;cursor:pointer;background:none;border:none;text-align:left;padding:0}
-.foot a.fl:hover{color:var(--acc)}
-.foot .copy{max-width:1500px;margin:22px auto 0;padding-top:14px;border-top:1px solid rgba(96,165,250,.1);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:11.5px;color:var(--dim)}
+.foot .fbrand{display:flex;align-items:center;gap:12px;color:var(--chrome-txt)}
+.foot h5{font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-200);margin-bottom:10px;font-weight:800}
+.foot a.fl{display:block;color:var(--chrome-muted);font-size:12.5px;margin-bottom:7px;cursor:pointer;background:none;border:none;text-align:left;padding:0}
+.foot a.fl:hover{color:#fff}
+.foot .copy{max-width:1500px;margin:22px auto 0;padding-top:14px;border-top:1px solid rgba(168,216,251,.14);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:11.5px;color:var(--chrome-muted)}
 .statdot{display:inline-flex;align-items:center;gap:7px}
 
 /* calc */
 .calc-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:14px 0}
-.calc-res .cr{background:rgba(4,10,28,.6);border:1px solid var(--line);border-radius:12px;padding:13px}
-.calc-res .cr b{display:block;font-size:19px;margin-top:5px}
-.calc-res .cr span{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+.calc-res .cr{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px}
+.calc-res .cr b{display:block;font-family:var(--font-display);font-size:19px;margin-top:5px;color:var(--emerald-800)}
+.calc-res .cr span{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
 .rpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
-.rpt-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:16px;transition:.2s}
+.rpt-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:16px;transition:.2s;box-shadow:var(--shadow)}
 .rpt-card:hover{border-color:var(--line2);transform:translateY(-2px)}
-.rpt-card .ri{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:17px;margin-bottom:11px}
-.rpt-card h4{font-size:13.5px;margin-bottom:5px}
-.rpt-card p{font-size:11.5px;color:var(--muted);min-height:32px;margin-bottom:11px}
+.rpt-card .ri{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:17px;margin-bottom:11px;background:rgba(13,107,90,.08)}
+.rpt-card h4{font-family:var(--font-display);font-size:14.5px;margin-bottom:5px;color:var(--emerald-800)}
+.rpt-card p{font-size:11.5px;color:var(--muted);min-height:32px;margin-bottom:11px;line-height:1.55}
 canvas.chart{width:100%;display:block}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--muted);padding:10px 18px 14px}
 .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px}
 .perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.perm{background:rgba(4,10,28,.55);border:1px solid var(--line);border-radius:11px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px}
-.sw{position:relative;width:40px;height:21px;background:#1e3a5f;border-radius:12px;border:none;transition:.2s;flex:0 0 40px}
-.sw::after{content:'';position:absolute;top:2.5px;left:3px;width:16px;height:16px;border-radius:50%;background:#8fa8d6;transition:.2s}
-.sw.on{background:var(--acc3)}
+.perm{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--body-txt)}
+.sw{position:relative;width:40px;height:21px;background:#cfdee8;border-radius:12px;border:none;transition:.2s;flex:0 0 40px}
+.sw::after{content:'';position:absolute;top:2.5px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(4,23,26,.3)}
+.sw.on{background:var(--emerald-500)}
 .sw.on::after{left:21px;background:#fff}
-@media(max-width:1060px){.sidebar{position:fixed;z-index:70;left:0;top:0;height:100vh;transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.crumbs{display:none}}
+@media(max-width:1060px){.sidebar{position:fixed;z-index:70;left:0;top:0;height:100vh;transform:translateX(-100%);transition:.25s;box-shadow:0 30px 60px -30px rgba(4,23,26,.8)}.sidebar.open{transform:none}.crumbs{display:none}}
 #menuBtn{display:none}
 @media(max-width:1060px){#menuBtn{display:grid}}
-@media print{.topbar,.sidebar,.foot,#toasts,.ttools,.pgr{display:none!important}.content{padding:0}}
+@media print{.topbar,.sidebar,.foot,#toasts,.ttools,.pgr{display:none!important}.panel,.stat,.rpt-card{box-shadow:none}.content{padding:0}}
 
 /* ---------- administrator gate ---------- */
 body.locked { overflow: hidden; }
 #admin-gate { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center;
-  background: radial-gradient(900px 520px at 50% -10%, rgba(14,165,233,.20), transparent 62%), #040816; padding: 20px; }
+  background:
+    radial-gradient(900px 520px at 50% -10%, rgba(31,131,201,.18), transparent 62%),
+    radial-gradient(700px 480px at 10% 110%, rgba(13,107,90,.22), transparent 60%),
+    linear-gradient(160deg,#f4f8fc,#e6eef7); padding: 20px; }
 #admin-gate[hidden] { display: none; }
-#admin-gate .gate-card { width: min(94vw, 430px); background: linear-gradient(180deg, #0d1e42, #0a1734);
-  border: 1px solid rgba(56,189,248,.30); border-radius: 18px; padding: 28px; box-shadow: 0 26px 70px rgba(2,6,23,.7); }
-#admin-gate .gate-mark { width: 54px; height: 54px; margin-bottom: 14px; }
-#admin-gate h2 { font-size: 19px; margin-bottom: 4px; }
+#admin-gate .gate-card { width: min(94vw, 430px); background: #fff;
+  border: 1px solid var(--line2); border-radius: 18px; padding: 28px; box-shadow: 0 40px 90px -46px rgba(4,23,26,.8); position: relative; overflow: hidden; }
+#admin-gate .gate-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--gold-edge); }
+#admin-gate .gate-mark { width: auto; height: 52px; margin-bottom: 16px; display: block; }
+#admin-gate h2 { font-family: var(--font-display); font-size: 21px; margin-bottom: 4px; color: var(--emerald-800); }
 #admin-gate p { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
-#admin-gate label { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--muted); font-weight: 700; margin-bottom: 6px; }
-#admin-gate input { width: 100%; background: rgba(4,10,28,.8); border: 1px solid var(--line2); color: var(--txt);
+#admin-gate label { display: block; font-family: 'Inter', sans-serif; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); font-weight: 800; margin-bottom: 6px; }
+#admin-gate input { width: 100%; background: #fff; border: 1px solid var(--line2); color: var(--txt);
   border-radius: 11px; padding: 11px 13px; font-size: 13px; outline: none; }
-#admin-gate input:focus { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(56,189,248,.14); }
+#admin-gate input:focus { border-color: var(--crystal-500); box-shadow: 0 0 0 3px rgba(31,131,201,.16); }
 #admin-gate .btn { width: 100%; justify-content: center; margin-top: 12px; }
-#admin-gate .gate-foot { margin-top: 14px; font-size: 11px; color: var(--dim); display: flex; justify-content: space-between; gap: 8px; }
-#admin-gate .gate-foot a { color: var(--muted); }
+#admin-gate .gate-foot { margin-top: 14px; font-size: 11px; color: var(--dim); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+#admin-gate .gate-foot a { color: var(--crystal-700); }
 #gate-status { font-size: 12px; margin-top: 10px; min-height: 16px; }
 #admin-gate [hidden] { display: none !important; }
 #admin-gate .gate-note { margin-top: 2px; margin-bottom: 12px; }
-#gate-status.err { color: #fda4af; }
+#gate-status.err { color: var(--bad); }
 </style>
 </head>
 <body class="no-live-toast">
 
 <div id="admin-gate">
   <form class="gate-card" id="admin-gate-form" novalidate>
-    <svg class="gate-mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <path d="M32 3 58 17v30L32 61 6 47V17L32 3z" fill="rgba(14,165,233,.25)" stroke="#38bdf8" stroke-width="2.4"/>
-      <text x="32" y="40.5" font-family="Arial, sans-serif" font-size="15" font-weight="900" fill="#7dd3fc" text-anchor="middle">JCB</text>
-    </svg>
+    <img class="gate-mark" src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
     <h2>Administrator sign in</h2>
     <p id="gate-intro">JAY C O B management portal. Sign in to manage the website, applications, customers and lending operations.</p>
     <label for="admin-email" id="gate-email-label" hidden>Administrator email</label>
@@ -301,19 +339,13 @@ body.locked { overflow: hidden; }
 <!-- ===================== TOP BAR ===================== -->
 <header class="topbar">
   <button class="icon-btn" id="menuBtn" aria-label="menu">☰</button>
-  <div class="brand">
-    <svg class="mark" viewBox="0 0 64 64" fill="none">
-      <defs><linearGradient id="lg1" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#0ea5e9"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
-      <linearGradient id="lg2" x1="0" y1="64" x2="64" y2="0"><stop stop-color="#7dd3fc"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs>
-      <path d="M32 3 58 17v30L32 61 6 47V17L32 3z" fill="url(#lg1)" opacity=".24"/>
-      <path d="M32 3 58 17v30L32 61 6 47V17L32 3z" stroke="url(#lg2)" stroke-width="2.4"/>
-      <text x="32" y="40.5" font-family="Arial, sans-serif" font-size="17.5" font-weight="900" fill="#7dd3fc" text-anchor="middle" letter-spacing="1">JCB</text>
-    </svg>
-    <h1>JAY C O B FINANCIAL SERVICES<small>ADMIN MANAGEMENT PORTAL</small></h1>
-  </div>
+  <a class="brand" href="index.html" target="_blank" rel="noopener" aria-label="JAY C O B FINANCIAL SERVICES — open the website">
+    <img class="brand-logo" src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+    <span class="brand-chip">ADMIN PORTAL</span>
+  </a>
   <div class="crumbs" id="crumbs">Home / <b>Main Dashboard</b></div>
   <div class="topsearch" style="position:relative">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f77a8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a3c3ba" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="globalSearch" placeholder="Search customers, loans, refs…" autocomplete="off">
     <div id="searchResults"></div>
   </div>
@@ -326,10 +358,10 @@ body.locked { overflow: hidden; }
       <div><div class="nm" id="sessionUser">Staff account</div><div class="rl" id="sessionRole">Signing in…</div></div>
       <div class="drop" id="userDrop">
         <h4>Session</h4>
-        <div class="it"><span class="ic" style="background:rgba(96,165,250,.15)">👤</span><div><b id="sessionName">Signed in</b><small id="sessionDetail">—</small></div></div>
-        <div class="it" data-nav="settings"><span class="ic" style="background:rgba(167,139,250,.15)">⚙️</span><div><b>System Settings</b><small>Business profile, currency & policies</small></div></div>
-        <div class="it" data-nav="security"><span class="ic" style="background:rgba(251,191,36,.15)">🔐</span><div><b>Security & Sessions</b><small>Manage your active sessions</small></div></div>
-        <div class="it" id="signOut"><span class="ic" style="background:rgba(248,113,113,.15)">↩</span><div><b>Sign out</b><small>End this admin session</small></div></div>
+        <div class="it"><span class="ic" style="background:rgba(31,131,201,.15)">👤</span><div><b id="sessionName">Signed in</b><small id="sessionDetail">—</small></div></div>
+        <div class="it" data-nav="settings"><span class="ic" style="background:rgba(107,79,168,.15)">⚙️</span><div><b>System Settings</b><small>Business profile, currency & policies</small></div></div>
+        <div class="it" data-nav="security"><span class="ic" style="background:rgba(138,106,18,.15)">🔐</span><div><b>Security & Sessions</b><small>Manage your active sessions</small></div></div>
+        <div class="it" id="signOut"><span class="ic" style="background:rgba(168,59,52,.15)">↩</span><div><b>Sign out</b><small>End this admin session</small></div></div>
       </div>
     </div>
     <div class="drop" id="notifDrop" style="right:86px"></div>
@@ -349,9 +381,9 @@ body.locked { overflow: hidden; }
   <div class="foot-in">
     <div style="max-width:300px">
       <div class="fbrand">
-        <svg width="40" height="40" viewBox="0 0 64 64" fill="none"><path d="M32 3 58 17v30L32 61 6 47V17L32 3z" fill="rgba(14,165,233,.25)" stroke="#38bdf8" stroke-width="2.4"/><text x="32" y="40.5" font-family="Arial" font-size="17.5" font-weight="900" fill="#7dd3fc" text-anchor="middle">JCB</text></svg>
-        <div><b style="font-size:14px;letter-spacing:.08em">JAY C O B FINANCIAL SERVICES</b><br><small style="color:var(--dim);font-size:11px">Lending · Savings · Financial Inclusion</small></div>
+        <img class="foot-logo" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
       </div>
+      <p style="font-size:11.5px;color:var(--chrome-muted);margin-top:2px;letter-spacing:.14em">LENDING · SAVINGS · FINANCIAL INCLUSION</p>
       <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6">Empowering Malawi with accessible credit, secure savings and trusted financial services across all districts.</p>
     </div>
     <div><h5>Operations</h5><a class="fl" data-nav="loanApps">Loan Applications</a><a class="fl" data-nav="activeLoans">Active Loans</a><a class="fl" data-nav="repayments">Repayments</a><a class="fl" data-nav="collections">Collections</a><a class="fl" data-nav="calculator">Loan Calculator</a></div>
@@ -562,7 +594,7 @@ function T(id,cfg){ui[id]=ui[id]||{};const t=ui[id];t.page=t.page||1;
   pager+=`<button data-pt="${id}" data-p="${t.page+1}" ${t.page>=pages?'disabled':''}>›</button></div>`}
  const filters=(cfg.filters||[]).map(f=>`<select class="fsel" data-fid="${id}" data-fk="${f.k}"><option value="">${f.label}</option>${[...new Set(cfg.rows().map(r=>r[f.k]))].map(v=>`<option ${t.f&&t.f.v===v?'selected':''} value="${esc(v)}">${esc(v)}</option>`).join('')}</select>`).join('');
  return `<div class="ttools">
-   <div class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5f77a8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input data-qid="${id}" value="${esc(t.q||'')}" placeholder="Search…"></div>
+   <div class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#567080" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input data-qid="${id}" value="${esc(t.q||'')}" placeholder="Search…"></div>
    ${filters}
    <div class="tspace"></div>
    ${cfg.head||''}
@@ -624,7 +656,7 @@ function setupCanvas(cv,h){const dpr=window.devicePixelRatio||1;const w=cv.clien
  const ctx=cv.getContext&&cv.getContext('2d');if(!ctx)return[null,w,h];ctx.scale(dpr,dpr);return[ctx,w,h]}
 function chartLine(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||240);if(!ctx)return;const pad={l:56,r:16,t:14,b:30};
  const max=Math.max(...series.flatMap(s=>s.data),1)*1.15;const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
- ctx.strokeStyle='rgba(96,165,250,.12)';ctx.fillStyle='#5f77a8';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
+ ctx.strokeStyle='rgba(31,131,201,.12)';ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
  for(let i=0;i<=4;i++){const y=pad.t+ih-ih*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
   const v=max*i/4;ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v.toFixed(0),pad.l-8,y+3)}
  ctx.textAlign='center';labels.forEach((l,i)=>ctx.fillText(l,pad.l+iw*(i/(labels.length-1||1)),h-10));
@@ -632,10 +664,10 @@ function chartLine(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.
   ctx.strokeStyle=s.color;ctx.lineWidth=2.6;ctx.lineJoin='round';ctx.stroke();
   const g=ctx.createLinearGradient(0,pad.t,0,h-pad.b);g.addColorStop(0,s.color+'44');g.addColorStop(1,s.color+'00');
   ctx.lineTo(pad.l+iw,h-pad.b);ctx.lineTo(pad.l,h-pad.b);ctx.closePath();ctx.fillStyle=g;ctx.fill();
-  s.data.forEach((v,i)=>{const x=pad.l+iw*(i/(labels.length-1||1)),y=pad.t+ih-(v/max)*ih;ctx.beginPath();ctx.arc(x,y,3.4,0,7);ctx.fillStyle='#0b1a3a';ctx.fill();ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke()})})}
+  s.data.forEach((v,i)=>{const x=pad.l+iw*(i/(labels.length-1||1)),y=pad.t+ih-(v/max)*ih;ctx.beginPath();ctx.arc(x,y,3.4,0,7);ctx.fillStyle='#ffffff';ctx.fill();ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke()})})}
 function chartBar(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||240);if(!ctx)return;const pad={l:56,r:16,t:14,b:30};
  const max=Math.max(...series.flatMap(s=>s.data),1)*1.15;const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
- ctx.strokeStyle='rgba(96,165,250,.12)';ctx.fillStyle='#5f77a8';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
+ ctx.strokeStyle='rgba(31,131,201,.12)';ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
  for(let i=0;i<=4;i++){const y=pad.t+ih-ih*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
   const v=max*i/4;ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v.toFixed(0),pad.l-8,y+3)}
  const grp=iw/labels.length,bw=Math.min(34,grp/(series.length+0.6));
@@ -648,8 +680,8 @@ function chartDonut(cv,parts,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||230)
  let tot=parts.reduce((a,p)=>a+p.v,0),ang=-Math.PI/2;
  parts.forEach(p=>{const a2=ang+p.v/tot*Math.PI*2;ctx.beginPath();ctx.arc(cx,cy,r,ang+.02,a2-.02);ctx.arc(cx,cy,ir,a2-.02,ang+.02,true);ctx.closePath();
   const g=ctx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);g.addColorStop(0,p.color);g.addColorStop(1,p.color+'99');ctx.fillStyle=g;ctx.fill();ang=a2});
- ctx.fillStyle='#dbe7ff';ctx.font='700 20px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(opts.center||num(tot),cx,cy-2);
- ctx.fillStyle='#5f77a8';ctx.font='10.5px Inter,sans-serif';ctx.fillText(opts.sub||'Total',cx,cy+15)}
+ ctx.fillStyle='#062430';ctx.font='700 20px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(opts.center||num(tot),cx,cy-2);
+ ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.fillText(opts.sub||'Total',cx,cy+15)}
 
 /* ---------------- derived computations ---------------- */
 const overdueLoans=()=>db.loans.filter(l=>l.status==='Overdue');
@@ -749,41 +781,41 @@ function vDashboard(){const c=db.customers,ap=db.applications,ln=db.loans;
  <div class="page-h"><div><h2>Dashboard Overview</h2><p>Live operational picture of JAY C O B FINANCIAL SERVICES — lending, repayments, deposits and risk at a glance.</p></div>
   <div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn" data-act="openCalc">🧮 Loan Calculator</button><button class="btn primary" data-act="addCustomer">+ Register Customer</button></div></div>
  <div class="stats">
-  ${stat('Total Customers',num(c.length),actBorrowers+' active borrowers','👥','rgba(96,165,250,.2)','rgba(96,165,250,.14)')}
-  ${stat('Loan Applications',num(ap.length),ap.filter(a=>a.status==='Pending').length+' pending · '+ap.filter(a=>a.status==='Under Review').length+' in review','📄','rgba(167,139,250,.2)','rgba(167,139,250,.14)')}
-  ${stat('Approved & Disbursed',num(ln.filter(l=>l.status!=='Closed').length),num(ln.filter(l=>l.status==='Closed').length)+' fully settled','🏦','rgba(56,189,248,.2)','rgba(56,189,248,.14)')}
-  ${stat('Outstanding Loan Balance',mwk(portfolioBalance()),dpd(loans_worst())>0?dpd(loans_worst())+' days worst DPD · PAR30 '+pct(par()):'PAR30 '+pct(par()),'📊','rgba(45,212,191,.2)','rgba(45,212,191,.14)')}
-  ${stat('Repayments Collected',mwk(repTotal),'+'+mwk(db.repayments.filter(r=>new Date(r.date)>dAgo15()).reduce((a,r)=>a+r.amount,0))+' last 15 days','💰','rgba(52,211,153,.2)','rgba(52,211,153,.14)','up')}
-  ${stat('Overdue Loans',num(od.length),pct(defaultRate())+' default rate','⚠️','rgba(248,113,113,.2)','rgba(248,113,113,.14)','dn')}
-  ${stat('Deposits · Withdrawals',mwk(depTotal),mwk(wdTotal)+' withdrawn · '+num(trTotal)+' transfers','🔄','rgba(56,189,248,.2)','rgba(56,189,248,.14)')}
-  ${stat('Pending Tasks',num(db.tasks.length),'Across KYC, loans, recon & approvals','✅','rgba(251,191,36,.2)','rgba(251,191,36,.14)','fl')}
+  ${stat('Total Customers',num(c.length),actBorrowers+' active borrowers','👥','rgba(31,131,201,.2)','rgba(31,131,201,.14)')}
+  ${stat('Loan Applications',num(ap.length),ap.filter(a=>a.status==='Pending').length+' pending · '+ap.filter(a=>a.status==='Under Review').length+' in review','📄','rgba(107,79,168,.2)','rgba(107,79,168,.14)')}
+  ${stat('Approved & Disbursed',num(ln.filter(l=>l.status!=='Closed').length),num(ln.filter(l=>l.status==='Closed').length)+' fully settled','🏦','rgba(20,88,143,.2)','rgba(20,88,143,.14)')}
+  ${stat('Outstanding Loan Balance',mwk(portfolioBalance()),dpd(loans_worst())>0?dpd(loans_worst())+' days worst DPD · PAR30 '+pct(par()):'PAR30 '+pct(par()),'📊','rgba(13,107,90,.2)','rgba(13,107,90,.14)')}
+  ${stat('Repayments Collected',mwk(repTotal),'+'+mwk(db.repayments.filter(r=>new Date(r.date)>dAgo15()).reduce((a,r)=>a+r.amount,0))+' last 15 days','💰','rgba(15,122,92,.2)','rgba(15,122,92,.14)','up')}
+  ${stat('Overdue Loans',num(od.length),pct(defaultRate())+' default rate','⚠️','rgba(168,59,52,.2)','rgba(168,59,52,.14)','dn')}
+  ${stat('Deposits · Withdrawals',mwk(depTotal),mwk(wdTotal)+' withdrawn · '+num(trTotal)+' transfers','🔄','rgba(20,88,143,.2)','rgba(20,88,143,.14)')}
+  ${stat('Pending Tasks',num(db.tasks.length),'Across KYC, loans, recon & approvals','✅','rgba(138,106,18,.2)','rgba(138,106,18,.14)','fl')}
  </div>
  <div class="grid2">
   <div>
    <div class="panel"><div class="ph"><h3>Disbursements vs Collections — Last 6 Months</h3><span class="tcount">MWK</span></div>
      <div class="pb"><canvas class="chart" id="chFlow"></canvas></div>
-     <div class="legend"><span><i style="background:#38bdf8"></i>Disbursed</span><span><i style="background:#34d399"></i>Collected</span></div></div>
+     <div class="legend"><span><i style="background:#1f83c9"></i>Disbursed</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
    <div class="panel"><div class="ph"><h3>Weekly Collections Performance</h3></div>
      <div class="pb"><canvas class="chart" id="chWeek"></canvas></div>
-     <div class="legend"><span><i style="background:#60a5fa"></i>Expected</span><span><i style="background:#34d399"></i>Collected</span></div></div>
+     <div class="legend"><span><i style="background:#7bb8e8"></i>Expected</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
   </div>
   <div>
    <div class="panel"><div class="ph"><h3>Portfolio by Product</h3></div>
      <div class="pb"><canvas class="chart" id="chPortfolio"></canvas></div>
      <div class="legend" id="lgdPortfolio"></div></div>
    <div class="panel"><div class="ph"><h3>Pending Tasks</h3><span class="tcount">${db.tasks.length} open</span></div>
-     <div class="lst flush">${db.tasks.map(t=>`<div class="li" data-nav="${t.to}"><span class="ic" style="background:rgba(251,191,36,.14)">📌</span><div><b>${esc(t.label)}</b><small>Click to open module — SLA: today</small></div><span style="margin-left:auto" class="bdg y">${t.n}</span></div>`).join('')}</div></div>
+     <div class="lst flush">${db.tasks.map(t=>`<div class="li" data-nav="${t.to}"><span class="ic" style="background:rgba(138,106,18,.14)">📌</span><div><b>${esc(t.label)}</b><small>Click to open module — SLA: today</small></div><span style="margin-left:auto" class="bdg y">${t.n}</span></div>`).join('')}</div></div>
    <div class="panel"><div class="ph"><h3>Recent Activity</h3></div>
-     <div class="lst flush">${db.activities.map(a=>`<div class="li"><span class="ic" style="background:rgba(56,189,248,.1)">${a.ic}</span><div><b>${esc(a.t)}</b><small>${esc(a.d)} · ${dtFmt(a.at)}</small></div></div>`).join('')}</div></div>
+     <div class="lst flush">${db.activities.map(a=>`<div class="li"><span class="ic" style="background:rgba(20,88,143,.1)">${a.ic}</span><div><b>${esc(a.t)}</b><small>${esc(a.d)} · ${dtFmt(a.at)}</small></div></div>`).join('')}</div></div>
   </div>
  </div>`}
 function dAgo15(){const d=new Date();d.setDate(d.getDate()-15);return d}
 function loans_worst(){if(!db.loans.length)return null;return db.loans.reduce((w,l)=>dpd(l)>dpd(w)?l:w,db.loans[0])}
 const CHARTS=[];
 function dashboardCharts(){CHARTS.length=0;
- const f1=$('#chFlow');if(f1){const draw=()=>chartLine(f1,['May','Jun','Jul','Aug','Sep','Oct'],[{color:'#38bdf8',data:[5200000,3100000,7800000,2600000,4600000,7200000]},{color:'#34d399',data:[2900000,3400000,3100000,3800000,3600000,4100000]}]);draw();CHARTS.push(draw)}
- const f2=$('#chWeek');if(f2){const draw=()=>chartBar(f2,['Mon','Tue','Wed','Thu','Fri'],[{color:'#60a5fa',data:[880000,760000,940000,810000,1150000]},{color:'#34d399',data:[820000,610000,900000,880000,1090000]}]);draw();CHARTS.push(draw)}
- const f3=$('#chPortfolio');if(f3){const cols=['#38bdf8','#6366f1','#34d399','#fbbf24','#f87171','#a78bfa'];
+ const f1=$('#chFlow');if(f1){const draw=()=>chartLine(f1,['May','Jun','Jul','Aug','Sep','Oct'],[{color:'#1f83c9',data:[5200000,3100000,7800000,2600000,4600000,7200000]},{color:'#0f7a5c',data:[2900000,3400000,3100000,3800000,3600000,4100000]}]);draw();CHARTS.push(draw)}
+ const f2=$('#chWeek');if(f2){const draw=()=>chartBar(f2,['Mon','Tue','Wed','Thu','Fri'],[{color:'#7bb8e8',data:[880000,760000,940000,810000,1150000]},{color:'#0f7a5c',data:[820000,610000,900000,880000,1090000]}]);draw();CHARTS.push(draw)}
+ const f3=$('#chPortfolio');if(f3){const cols=['#1f83c9','#0a373a','#0f7a5c','#c9a227','#a83b34','#6b4fa8'];
   const by=db.products.map((p,i)=>({label:p.name.replace(' Loan',''),color:cols[i%6],v:db.loans.filter(l=>l.product===p.name).reduce((a,l)=>a+l.balance,0)})).filter(x=>x.v>0);
   const draw=()=>chartDonut(f3,by,{center:mwk(portfolioBalance()).replace('MWK ',''),sub:'Outstanding MWK'});draw();CHARTS.push(draw);
   const lg=$('#lgdPortfolio');if(lg)lg.innerHTML=by.map(b=>`<span><i style="background:${b.color}"></i>${b.label} — ${pct(100*b.v/portfolioBalance())}</span>`).join('')}}
@@ -806,10 +838,10 @@ function vCustomers(){window._tblCfg.customers={rows:()=>db.customers,per:9,
   ${r.status!=='Active'?`<button class="btn sm ok" data-act="custStatus" data-v="Active" data-id="${r.id}">Reactivate</button>`:''}`};
  return pageHead('Customer Management','Register, inspect and control every customer profile — balances, employment, next of kin, documents, transaction and loan history.',
   `<button class="btn primary" data-act="addCustomer">+ Register Customer</button>`)
-  +`<div class="stats">${miniStat('Active customers',db.customers.filter(c=>c.status==='Active').length,'▼ '+(db.customers.length-db.customers.filter(c=>c.status==='Active').length)+' restricted','rgba(52,211,153,.14)')}
-   ${miniStat('KYC verified',db.customers.filter(c=>c.kyc==='Verified').length,db.customers.filter(c=>c.kyc==='Pending').length+' awaiting review','rgba(96,165,250,.14)')}
-   ${miniStat('Combined balances',mwk(db.customers.reduce((a,c)=>a+Math.max(c.balance,0),0)),'Positive wallet balances','rgba(56,189,248,.14)')}
-   ${miniStat('Combined savings',mwk(db.customers.reduce((a,c)=>a+c.savings,0)),'Across '+db.savings.length+' savings accounts','rgba(167,139,250,.14)')}</div>
+  +`<div class="stats">${miniStat('Active customers',db.customers.filter(c=>c.status==='Active').length,'▼ '+(db.customers.length-db.customers.filter(c=>c.status==='Active').length)+' restricted','rgba(15,122,92,.14)')}
+   ${miniStat('KYC verified',db.customers.filter(c=>c.kyc==='Verified').length,db.customers.filter(c=>c.kyc==='Pending').length+' awaiting review','rgba(31,131,201,.14)')}
+   ${miniStat('Combined balances',mwk(db.customers.reduce((a,c)=>a+Math.max(c.balance,0),0)),'Positive wallet balances','rgba(20,88,143,.14)')}
+   ${miniStat('Combined savings',mwk(db.customers.reduce((a,c)=>a+c.savings,0)),'Across '+db.savings.length+' savings accounts','rgba(107,79,168,.14)')}</div>
  <div class="panel flush">${T('customers',window._tblCfg.customers)}</div>`}
 /* Every module except the main dashboard carries a way back. */
 function pageHead(t,d,btns){return `${route==='dashboard'?'':'<button class="aback" type="button" data-back>← Back</button>'}
@@ -858,7 +890,7 @@ function vKyc(){const tab=ui.tab.kyc||'queue';
  window._tblCfg.kycH={rows:()=>db.kycDocs.filter(k=>k.status!=='Pending_review'),
   cols:[{t:'Ref',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Document type',k:'type'},{t:'Submitted',f:r=>dFmt(r.submitted)},{t:'Decision',f:r=>badge(r.status)},{t:'Reviewer',k:'by',f:r=>esc(r.by||'—')},{t:'Note',k:'note',f:r=>esc(r.note||'—')}]};
  return pageHead('KYC & Document Verification','Review national IDs, photographs, proof of address, employment and business documents. Every decision enters the audit trail.',`<button class="btn" data-act="kycStats">Verification summary</button>`)
- +`<div class="stats">${miniStat('Pending review',db.kycDocs.filter(k=>k.status==='Pending_review').length,'SLA: 1 business day','rgba(251,191,36,.14)')}${miniStat('Approved (all time)',db.kycDocs.filter(k=>k.status==='Approved').length,'Checks passed','rgba(52,211,153,.14)')}${miniStat('Rejected',db.kycDocs.filter(k=>k.status==='Rejected').length,'Customers asked to resubmit','rgba(248,113,113,.14)')}${miniStat('Fraud matches blocked',1,'Duplicate NID detection — live','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Pending review',db.kycDocs.filter(k=>k.status==='Pending_review').length,'SLA: 1 business day','rgba(138,106,18,.14)')}${miniStat('Approved (all time)',db.kycDocs.filter(k=>k.status==='Approved').length,'Checks passed','rgba(15,122,92,.14)')}${miniStat('Rejected',db.kycDocs.filter(k=>k.status==='Rejected').length,'Customers asked to resubmit','rgba(168,59,52,.14)')}${miniStat('Fraud matches blocked',1,'Duplicate NID detection — live','rgba(107,79,168,.14)')}</div>
  <div class="tabs"><button class="${tab==='queue'?'on':''}" data-tab="kyc" data-v="queue">Pending queue (${db.kycDocs.filter(k=>k.status==='Pending_review').length})</button><button class="${tab==='history'?'on':''}" data-tab="kyc" data-v="history">Decision history & audit trail</button></div>
  <div class="panel flush">${T(tab==='queue'?'kycQ':'kycH',window._tblCfg[tab==='queue'?'kycQ':'kycH'])}</div>`}
 
@@ -878,7 +910,7 @@ function vLoanApps(){const f=ui.tab.loanApps||'all';
  const cnt=s=>db.applications.filter(s==='all'?()=>true:a=>a.status===s).length;
  return pageHead('Loan Applications','Track every application from submission to decision. Assign loan officers, review documents, approve or reject with a reasoned audit trail.',
   `<button class="btn" data-act="openCalc">Open calculator</button><button class="btn primary" data-act="appNew">+ New application</button>`)
- +`<div class="stats">${miniStat('Pending decision',cnt('Pending'),'Needs assignment & review','rgba(251,191,36,.14)')}${miniStat('Under review',cnt('Under Review'),'With loan officers','rgba(96,165,250,.14)')}${miniStat('Approved',cnt('Approved'),'Awaiting disbursement','rgba(52,211,153,.14)')}${miniStat('Conversion rate',pct(100*cnt('Approved')/(db.applications.length-cnt('Pending')-cnt('Under Review')||1)),'Decided applications','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Pending decision',cnt('Pending'),'Needs assignment & review','rgba(138,106,18,.14)')}${miniStat('Under review',cnt('Under Review'),'With loan officers','rgba(31,131,201,.14)')}${miniStat('Approved',cnt('Approved'),'Awaiting disbursement','rgba(15,122,92,.14)')}${miniStat('Conversion rate',pct(100*cnt('Approved')/(db.applications.length-cnt('Pending')-cnt('Under Review')||1)),'Decided applications','rgba(107,79,168,.14)')}</div>
  <div class="tabs">${[['all','All ('+cnt('all')+')'],['pending','Pending'],['review','Under review'],['approved','Approved'],['rejected','Rejected']].map(([k,l])=>`<button class="${f===k?'on':''}" data-tab="loanApps" data-v="${k}">${l}</button>`).join('')}</div>
  <div class="panel flush">${T('loanApps',window._tblCfg.loanApps)}</div>`}
 function riskBadge(s){const cls=s>=75?'g':s>=60?'y':'r';return `<span class="bdg ${cls}">${s}/100</span>`}
@@ -954,7 +986,7 @@ function vActiveLoans(){const tab=ui.tab.activeLoans||'all';
   actions:r=>`<button class="btn sm ghost" data-act="loanView" data-id="${r.id}">Schedule</button>
    ${r.status!=='Cancelled'&&r.status!=='Closed'?`<button class="btn sm warn" data-act="loanCancel" data-id="${r.id}">Cancel</button>`:''}`};
  return pageHead('Active Loans','Live loan book: balances, principal/interest breakdown, repayment progress, start and maturity dates, closures and cancellations.')
- +`<div class="stats">${miniStat('Active loans',db.loans.filter(l=>l.status==='Active').length,'Performing book','rgba(52,211,153,.14)')}${miniStat('Overdue',db.loans.filter(l=>l.status==='Overdue').length,'Requires collections','rgba(248,113,113,.14)')}${miniStat('Fully settled',db.loans.filter(l=>l.status==='Closed').length,'Lifetime closures','rgba(96,165,250,.14)')}${miniStat('Total disbursed (book)',mwk(db.loans.reduce((a,l)=>a+l.principal,0)),mwk(portfolioBalance())+' still outstanding','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Active loans',db.loans.filter(l=>l.status==='Active').length,'Performing book','rgba(15,122,92,.14)')}${miniStat('Overdue',db.loans.filter(l=>l.status==='Overdue').length,'Requires collections','rgba(168,59,52,.14)')}${miniStat('Fully settled',db.loans.filter(l=>l.status==='Closed').length,'Lifetime closures','rgba(31,131,201,.14)')}${miniStat('Total disbursed (book)',mwk(db.loans.reduce((a,l)=>a+l.principal,0)),mwk(portfolioBalance())+' still outstanding','rgba(107,79,168,.14)')}</div>
  <div class="tabs">${[['all','All loans'],['active','Active'],['overdue','Overdue'],['closed','Closed'],['cancelled','Cancelled']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-tab="activeLoans" data-v="${k}">${l}</button>`).join('')}</div>
  <div class="panel flush">${T('activeLoans',window._tblCfg.activeLoans)}</div>`}
 function vDisbursement(){const pend=db.applications.filter(a=>a.status==='Approved');
@@ -965,7 +997,7 @@ function vDisbursement(){const pend=db.applications.filter(a=>a.status==='Approv
  window._tblCfg.disbH={rows:()=>db.loans.map(l=>({...l})),per:9,
   cols:[{t:'Loan',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Amount',f:r=>`<span class="tamt">${mwk(r.principal)}</span>`,raw:r=>r.principal},{t:'Channel',k:'method',f:r=>esc(r.method)},{t:'Disbursed',f:r=>dFmt(r.start)},{t:'Maturity',f:r=>dFmt(r.maturity)},{t:'Status',f:r=>badge(r.status)}]};
  return pageHead('Loan Disbursement','Confirm payouts to bank and mobile money channels. References are captured against every disbursement.')
- +`<div class="stats">${miniStat('Awaiting disbursement',awaiting.length,mwk(awaiting.reduce((a,x)=>a+x.amount,0))+' queued','rgba(251,191,36,.14)')}${miniStat('Disbursed (lifetime)',num(db.loans.length),mwk(db.loans.reduce((a,l)=>a+l.principal,0)),'rgba(52,211,153,.14)')}${miniStat('Airtel Money book',mwk(db.loans.filter(l=>l.method.includes('Airtel')).reduce((a,l)=>a+l.balance,0)),'Mobile channel exposure','rgba(96,165,250,.14)')}${miniStat('Bank book',mwk(db.loans.filter(l=>l.method.includes('Bank')||l.method.includes('Payroll')).reduce((a,l)=>a+l.balance,0)),'Bank & payroll exposure','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Awaiting disbursement',awaiting.length,mwk(awaiting.reduce((a,x)=>a+x.amount,0))+' queued','rgba(138,106,18,.14)')}${miniStat('Disbursed (lifetime)',num(db.loans.length),mwk(db.loans.reduce((a,l)=>a+l.principal,0)),'rgba(15,122,92,.14)')}${miniStat('Airtel Money book',mwk(db.loans.filter(l=>l.method.includes('Airtel')).reduce((a,l)=>a+l.balance,0)),'Mobile channel exposure','rgba(31,131,201,.14)')}${miniStat('Bank book',mwk(db.loans.filter(l=>l.method.includes('Bank')||l.method.includes('Payroll')).reduce((a,l)=>a+l.balance,0)),'Bank & payroll exposure','rgba(107,79,168,.14)')}</div>
  <div class="panel"><div class="ph"><h3>Approved — awaiting disbursement</h3></div>${T('disb',window._tblCfg.disb)}</div>
  <div class="panel"><div class="ph"><h3>Disbursement history & payment references</h3></div>${T('disbH',window._tblCfg.disbH)}</div>`}
 
@@ -979,7 +1011,7 @@ function vGuarantors(){
   actions:r=>r.status==='Held'?`<button class="btn sm warn" data-act="collRelease" data-id="${r.id}">Release</button>`:`<span class="tsub">${dFmt(r.updated||'')}</span>`};
  return pageHead('Guarantors & Collateral','Register and verify guarantors, hold security agreements and release collateral once a loan settles.',
   `<button class="btn" data-act="guarAdd">+ Add guarantor</button><button class="btn primary" data-act="collAdd">+ Register collateral</button>`)
- +`<div class="stats">${miniStat('Guarantors on file',db.guarantors.length,db.guarantors.filter(g=>g.status==='Verified').length+' verified','rgba(96,165,250,.14)')}${miniStat('Collateral held',mwk(db.collateral.filter(c=>c.status==='Held').reduce((a,c)=>a+c.value,0)),db.collateral.filter(c=>c.status==='Held').length+' active securities','rgba(167,139,250,.14)')}${miniStat('Released',db.collateral.filter(c=>c.status==='Released').length,'Securities returned after settlement','rgba(52,211,153,.14)')}${miniStat('Coverage ratio',pct(100*db.collateral.filter(c=>c.status==='Held').reduce((a,c)=>a+c.value,0)/db.loans.filter(l=>db.collateral.some(c=>c.loan===l.id&&c.status==='Held')).reduce((a,l)=>a+l.balance,0)||1),'Held value vs secured balances','rgba(251,191,36,.14)')}</div>
+ +`<div class="stats">${miniStat('Guarantors on file',db.guarantors.length,db.guarantors.filter(g=>g.status==='Verified').length+' verified','rgba(31,131,201,.14)')}${miniStat('Collateral held',mwk(db.collateral.filter(c=>c.status==='Held').reduce((a,c)=>a+c.value,0)),db.collateral.filter(c=>c.status==='Held').length+' active securities','rgba(107,79,168,.14)')}${miniStat('Released',db.collateral.filter(c=>c.status==='Released').length,'Securities returned after settlement','rgba(15,122,92,.14)')}${miniStat('Coverage ratio',pct(100*db.collateral.filter(c=>c.status==='Held').reduce((a,c)=>a+c.value,0)/db.loans.filter(l=>db.collateral.some(c=>c.loan===l.id&&c.status==='Held')).reduce((a,l)=>a+l.balance,0)||1),'Held value vs secured balances','rgba(138,106,18,.14)')}</div>
  <div class="grid22">
  <div class="panel"><div class="ph"><h3>Guarantor register</h3></div>${T('guar',window._tblCfg.guar)}</div>
  <div class="panel"><div class="ph"><h3>Collateral & security agreements</h3></div>${T('coll',window._tblCfg.coll)}</div></div>`}
@@ -996,7 +1028,7 @@ function vRepayments(){
   actions:r=>r.status==='Completed'?`<button class="btn sm danger" data-act="repReverse" data-id="${r.id}">Reverse</button>`:`<span class="tsub">—</span>`};
  return pageHead('Loan Repayments','Record, reconcile and reverse payments. Manual postings require authorization codes; allocation splits principal and interest automatically.',
   `<button class="btn ok" data-act="repReconcile">Reconcile payment batch</button><button class="btn primary" data-act="repRecord">+ Record manual payment</button>`)
- +`<div class="stats">${miniStat('Collected today',mwk(db.repayments.filter(r=>r.status==='Completed'&&new Date(r.date).toDateString()===new Date().toDateString()).reduce((a,r)=>a+r.amount,0)),'Auto-updates on recording','rgba(52,211,153,.14)')}${miniStat('Collected (30 days)',mwk(db.repayments.filter(r=>r.status==='Completed'&&new Date(r.date)>dAgo(30)).reduce((a,r)=>a+r.amount,0)),db.repayments.filter(r=>new Date(r.date)>dAgo(30)).length+' receipts','rgba(56,189,248,.14)')}${miniStat('Reversed / failed',db.repayments.filter(r=>r.status!=='Completed').length,'See audit trail','rgba(248,113,113,.14)')}${miniStat('Outstanding balances',mwk(portfolioBalance()),'Across '+db.loans.filter(l=>l.status!=='Closed').length+' loans','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Collected today',mwk(db.repayments.filter(r=>r.status==='Completed'&&new Date(r.date).toDateString()===new Date().toDateString()).reduce((a,r)=>a+r.amount,0)),'Auto-updates on recording','rgba(15,122,92,.14)')}${miniStat('Collected (30 days)',mwk(db.repayments.filter(r=>r.status==='Completed'&&new Date(r.date)>dAgo(30)).reduce((a,r)=>a+r.amount,0)),db.repayments.filter(r=>new Date(r.date)>dAgo(30)).length+' receipts','rgba(20,88,143,.14)')}${miniStat('Reversed / failed',db.repayments.filter(r=>r.status!=='Completed').length,'See audit trail','rgba(168,59,52,.14)')}${miniStat('Outstanding balances',mwk(portfolioBalance()),'Across '+db.loans.filter(l=>l.status!=='Closed').length+' loans','rgba(107,79,168,.14)')}</div>
  <div class="panel flush">${T('rep',window._tblCfg.rep)}</div>`}
 function vSchedules(){const tab=ui.tab.schedules||'upcoming';
  const rows=()=>{const out=[];db.loans.filter(l=>l.status!=='Closed'&&l.status!=='Cancelled').forEach(l=>(l.schedule||[]).forEach(s=>{
@@ -1014,7 +1046,7 @@ function vSchedules(){const tab=ui.tab.schedules||'upcoming';
   actions:r=>`<button class="btn sm ok" data-act="schedPay" data-loan="${r.loanId}" data-n="${r.n}">Mark paid</button><button class="btn sm warn" data-act="schedMove" data-loan="${r.loanId}" data-n="${r.n}">Reschedule</button>`};
  const dueToday=rows().filter(r=>r.isToday);
  return pageHead('Repayment Schedules','Instalment calendars — weekly and monthly views, upcoming dues and rescheduling with amortization timelines.')
- +`<div class="stats">${miniStat('Due today',dueToday.length,mwk(dueToday.reduce((a,r)=>a+r.amt,0))+' expected','rgba(251,191,36,.14)')}${miniStat('Upcoming instalments (open)',rows().filter(r=>r.status!=='Overdue').length,'Scheduled in system','rgba(96,165,250,.14)')}${miniStat('Overdue instalments',rows().filter(r=>r.status==='Overdue').length,mwk(rows().filter(r=>r.status==='Overdue').reduce((a,r)=>a+r.amt,0))+' in arrears','rgba(248,113,113,.14)')}${miniStat('Collection rate (MTD)',pct(93.6),'Expected vs actual — see reports','rgba(52,211,153,.14)')}</div>
+ +`<div class="stats">${miniStat('Due today',dueToday.length,mwk(dueToday.reduce((a,r)=>a+r.amt,0))+' expected','rgba(138,106,18,.14)')}${miniStat('Upcoming instalments (open)',rows().filter(r=>r.status!=='Overdue').length,'Scheduled in system','rgba(31,131,201,.14)')}${miniStat('Overdue instalments',rows().filter(r=>r.status==='Overdue').length,mwk(rows().filter(r=>r.status==='Overdue').reduce((a,r)=>a+r.amt,0))+' in arrears','rgba(168,59,52,.14)')}${miniStat('Collection rate (MTD)',pct(93.6),'Expected vs actual — see reports','rgba(15,122,92,.14)')}</div>
  <div class="tabs">${[['upcoming','Upcoming'],['today','Due today'],['overdue','Overdue instalments']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-tab="schedules" data-v="${k}">${l}</button>`).join('')}</div>
  <div class="panel flush">${T('sched',window._tblCfg.sched)}</div>
  <div class="panel"><div class="ph"><h3>Amortization viewer</h3></div><div class="pb"><div class="fld" style="max-width:360px;margin:0"><label>Select loan</label>${sel('amortSel',db.loans.map(l=>({v:l.id,t:l.id+' — '+l.cust+' ('+mwk(l.principal)+')'})),db.loans.length?db.loans[0].id:'')}</div><div id="amortOut" style="margin-top:14px"></div></div></div>`}
@@ -1032,12 +1064,12 @@ function vCollections(){const od=overdueLoans();const totalArrears=od.reduce((a,
   actions:r=>`<button class="btn sm" data-act="ptpAdd" data-id="${r.id}">Promise to pay</button><button class="btn sm warn" data-act="restructure" data-id="${r.id}">Restructure</button><button class="btn sm danger" data-act="writeOff" data-id="${r.id}">Write-off</button>`};
  const buckets=[[1,30],[31,60],[61,90],[91,9999]];
  return pageHead('Collections & Delinquency','Prioritize recovery with DPD aging, promise-to-pay tracking, officer assignments, restructuring and write-off workflows.')
- +`<div class="stats">${miniStat('Overdue accounts',od.length,mwk(totalArrears)+' total arrears','rgba(248,113,113,.14)')}${buckets.map(([a,b])=>{const v=od.filter(l=>{const d=dpd(l);return d>=a&&d<=b}).reduce((x,l)=>x+l.balance,0);return miniStat(a+'–'+(b>99?'∞':b)+' days',mwk(v),od.filter(l=>{const d=dpd(l);return d>=a&&d<=b}).length+' loans in bucket','rgba('+(a>60?'248,113,113':a>30?'251,191,36':'96,165,250')+',.14)')}).join('')}</div>
+ +`<div class="stats">${miniStat('Overdue accounts',od.length,mwk(totalArrears)+' total arrears','rgba(168,59,52,.14)')}${buckets.map(([a,b])=>{const v=od.filter(l=>{const d=dpd(l);return d>=a&&d<=b}).reduce((x,l)=>x+l.balance,0);return miniStat(a+'–'+(b>99?'∞':b)+' days',mwk(v),od.filter(l=>{const d=dpd(l);return d>=a&&d<=b}).length+' loans in bucket','rgba('+(a>60?'168,59,52':a>30?'138,106,18':'31,131,201')+',.14)')}).join('')}</div>
  <div class="panel flush">${T('coll2',window._tblCfg.coll2)}</div>
  <div class="grid22"><div class="panel"><div class="ph"><h3>Promise-to-pay records</h3></div><div class="lst flush">
-   ${db.ptps.map(p=>`<div class="li"><span class="ic" style="background:rgba(251,191,36,.12)">🤝</span><div><b>${esc(p.cust)} — ${p.loan}</b><small>${mwk(p.amount)} promised by ${dFmt(p.date)} · ${p.calls} follow-up calls</small></div><span style="margin-left:auto">${badge(p.status)}</span></div>`).join('')||'<div class="empty">No promises on record.</div>'}</div></div>
+   ${db.ptps.map(p=>`<div class="li"><span class="ic" style="background:rgba(138,106,18,.12)">🤝</span><div><b>${esc(p.cust)} — ${p.loan}</b><small>${mwk(p.amount)} promised by ${dFmt(p.date)} · ${p.calls} follow-up calls</small></div><span style="margin-left:auto">${badge(p.status)}</span></div>`).join('')||'<div class="empty">No promises on record.</div>'}</div></div>
  <div class="panel"><div class="ph"><h3>Collection officer assignments</h3></div><div class="lst flush">
-   ${db.officers.map(o=>`<div class="li" data-nav="loanOfficers"><span class="ic" style="background:rgba(96,165,250,.12)">👤</span><div><b>${esc(o.name)} — ${esc(o.branch)}</b><small>${od.filter(l=>l.officer===o.name).length} overdue accounts assigned</small></div><span class="bdg b" style="margin-left:auto">${od.filter(l=>l.officer===o.name).length} cases</span></div>`).join('')}</div></div></div>`}
+   ${db.officers.map(o=>`<div class="li" data-nav="loanOfficers"><span class="ic" style="background:rgba(31,131,201,.12)">👤</span><div><b>${esc(o.name)} — ${esc(o.branch)}</b><small>${od.filter(l=>l.officer===o.name).length} overdue accounts assigned</small></div><span class="bdg b" style="margin-left:auto">${od.filter(l=>l.officer===o.name).length} cases</span></div>`).join('')}</div></div></div>`}
 
 /* =====================================================================
    VIEWS: FINANCE (deposits / withdrawals / transfers / savings / fees / interest / ledger / recon / statements)
@@ -1048,32 +1080,32 @@ function vDeposits(){window._tblCfg.dep={rows:()=>db.deposits.slice().sort((a,b)
   actions:r=>r.status==='Pending'?`<button class="btn sm ok" data-act="depApprove" data-id="${r.id}">Approve</button><button class="btn sm danger" data-act="depDecline" data-id="${r.id}">Decline</button>`:r.status==='Approved'?`<button class="btn sm warn" data-act="depReverse" data-id="${r.id}">Reverse</button>`:'<span class="tsub">—</span>'};
  const pend=db.deposits.filter(d=>d.status==='Pending');
  return pageHead('Deposits','Approve incoming customer deposits, manage reversals and keep a complete deposit history.',`<button class="btn primary" data-act="depNew">+ Post deposit</button>`)
- +`<div class="stats">${miniStat('Pending approval',pend.length,mwk(pend.reduce((a,d)=>a+d.amount,0))+' queued','rgba(251,191,36,.14)')}${miniStat('Approved total',mwk(db.deposits.filter(d=>d.status==='Approved').reduce((a,d)=>a+d.amount,0)),'Cleared into wallets','rgba(52,211,153,.14)')}${miniStat('Reversed',db.deposits.filter(d=>d.status==='Reversed').length,'Escalations to finance','rgba(248,113,113,.14)')}${miniStat('Deposit requests (7d)',db.deposits.filter(d=>new Date(d.date)>dAgo(7)).length,'Inflow velocity','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Pending approval',pend.length,mwk(pend.reduce((a,d)=>a+d.amount,0))+' queued','rgba(138,106,18,.14)')}${miniStat('Approved total',mwk(db.deposits.filter(d=>d.status==='Approved').reduce((a,d)=>a+d.amount,0)),'Cleared into wallets','rgba(15,122,92,.14)')}${miniStat('Reversed',db.deposits.filter(d=>d.status==='Reversed').length,'Escalations to finance','rgba(168,59,52,.14)')}${miniStat('Deposit requests (7d)',db.deposits.filter(d=>new Date(d.date)>dAgo(7)).length,'Inflow velocity','rgba(31,131,201,.14)')}</div>
  <div class="panel flush">${T('dep',window._tblCfg.dep)}</div>`}
 function vWithdrawals(){window._tblCfg.wdr={rows:()=>db.withdrawals.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)),
   cols:[{t:'Request',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Amount',f:r=>`<span class="tamt">${mwk(r.amount)}</span>`,raw:r=>r.amount},{t:'Channel',k:'method'},{t:'Date',f:r=>dFmt(r.date)},{t:'Status',f:r=>badge(r.status)},{t:'Note',k:'note',f:r=>`<span class="tsub">${esc(r.note||'—')}</span>`}],
   filters:[{k:'status',label:'All statuses'}],
   actions:r=>r.status==='Pending'?`<button class="btn sm ok" data-act="wdApprove" data-id="${r.id}">Approve</button><button class="btn sm danger" data-act="wdDecline" data-id="${r.id}">Decline</button>`:r.status==='Approved'?`<button class="btn sm primary" data-act="wdProcess" data-id="${r.id}">Process payout</button>`:r.status==='Failed'?`<button class="btn sm warn" data-act="wdRetry" data-id="${r.id}">Retry</button>`:'<span class="tsub">—</span>'};
  return pageHead('Withdrawals','Two-step approval workflow, payout processing and failed transaction recovery with clear references.')
- +`<div class="stats">${miniStat('Awaiting approval',db.withdrawals.filter(w=>w.status==='Pending').length,mwk(db.withdrawals.filter(w=>w.status==='Pending').reduce((a,w)=>a+w.amount,0)),'rgba(251,191,36,.14)')}${miniStat('Awaiting payout',db.withdrawals.filter(w=>w.status==='Approved').length,'Approved, not yet processed','rgba(96,165,250,.14)')}${miniStat('Failed transactions',db.withdrawals.filter(w=>w.status==='Failed').length,'Retry or refund','rgba(248,113,113,.14)')}${miniStat('Processed total',mwk(db.withdrawals.filter(w=>w.status==='Processed').reduce((a,w)=>a+w.amount,0)),'Lifetime paid out','rgba(52,211,153,.14)')}</div>
+ +`<div class="stats">${miniStat('Awaiting approval',db.withdrawals.filter(w=>w.status==='Pending').length,mwk(db.withdrawals.filter(w=>w.status==='Pending').reduce((a,w)=>a+w.amount,0)),'rgba(138,106,18,.14)')}${miniStat('Awaiting payout',db.withdrawals.filter(w=>w.status==='Approved').length,'Approved, not yet processed','rgba(31,131,201,.14)')}${miniStat('Failed transactions',db.withdrawals.filter(w=>w.status==='Failed').length,'Retry or refund','rgba(168,59,52,.14)')}${miniStat('Processed total',mwk(db.withdrawals.filter(w=>w.status==='Processed').reduce((a,w)=>a+w.amount,0)),'Lifetime paid out','rgba(15,122,92,.14)')}</div>
  <div class="panel flush">${T('wdr',window._tblCfg.wdr)}</div>`}
 function vTransfers(){window._tblCfg.trf={rows:()=>db.transfers.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)),
   cols:[{t:'Reference',k:'ref',f:r=>`<span class="tid">${r.ref}</span>`},{t:'From',k:'from'},{t:'To',k:'to'},{t:'Amount',f:r=>`<span class="tamt">${mwk(r.amount)}</span>`,raw:r=>r.amount},{t:'Fee',f:r=>mwk(r.fee)},{t:'Date',f:r=>dFmt(r.date)},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>r.status==='Completed'?`<button class="btn sm warn" data-act="trfReverse" data-id="${r.id}">Reverse</button>`:r.status==='Pending Verification'?`<button class="btn sm ok" data-act="trfVerify" data-id="${r.id}">Verify</button>`:'<span class="tsub">—</span>'};
  return pageHead('Internal Transfers','Wallet-to-wallet transfers with verification step, automatic fees and reversal controls.',`<button class="btn primary" data-act="trfNew">+ Initiate transfer</button>`)
- +`<div class="stats">${miniStat('Completed transfers',db.transfers.filter(t=>t.status==='Completed').length,mwk(db.transfers.filter(t=>t.status==='Completed').reduce((a,t)=>a+t.amount,0)),'rgba(52,211,153,.14)')}${miniStat('Pending verification',db.transfers.filter(t=>t.status==='Pending Verification').length,'Above verification threshold','rgba(251,191,36,.14)')}${miniStat('Fees earned',mwk(db.transfers.reduce((a,t)=>a+t.fee,0)),'0.5% transfer fee','rgba(167,139,250,.14)')}${miniStat('Reversed',db.transfers.filter(t=>t.status==='Reversed').length,'Audit-logged','rgba(248,113,113,.14)')}</div>
+ +`<div class="stats">${miniStat('Completed transfers',db.transfers.filter(t=>t.status==='Completed').length,mwk(db.transfers.filter(t=>t.status==='Completed').reduce((a,t)=>a+t.amount,0)),'rgba(15,122,92,.14)')}${miniStat('Pending verification',db.transfers.filter(t=>t.status==='Pending Verification').length,'Above verification threshold','rgba(138,106,18,.14)')}${miniStat('Fees earned',mwk(db.transfers.reduce((a,t)=>a+t.fee,0)),'0.5% transfer fee','rgba(107,79,168,.14)')}${miniStat('Reversed',db.transfers.filter(t=>t.status==='Reversed').length,'Audit-logged','rgba(168,59,52,.14)')}</div>
  <div class="panel flush">${T('trf',window._tblCfg.trf)}</div>`}
 function vSavings(){window._tblCfg.sav={rows:()=>db.savings,
   cols:[{t:'Account',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Balance',f:r=>`<span class="tamt">${mwk(r.balance)}</span>`,raw:r=>r.balance},{t:'Rate p.a.',f:r=>r.rate+'%'},{t:'Accrued interest',f:r=>`<span class="tamt" style="color:var(--teal)">${mwk(r.accrued)}</span>`},{t:'Maturity',f:r=>dFmt(r.maturity)},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>`<button class="btn sm warn" data-act="savWithdraw" data-id="${r.id}">Withdraw</button>${r.status==='Matured'?`<button class="btn sm ok" data-act="savRenew" data-id="${r.id}">Renew</button>`:''}`};
  return pageHead('Savings Management','Savings balances, interest accrual, withdrawals and maturity records.')
- +`<div class="stats">${miniStat('Total savings',mwk(db.savings.reduce((a,s)=>a+s.balance,0)),db.savings.length+' accounts','rgba(52,211,153,.14)')}${miniStat('Accrued interest',mwk(db.savings.reduce((a,s)=>a+s.accrued,0)),'Payable on maturity','rgba(56,189,248,.14)')}${miniStat('Matured accounts',db.savings.filter(s=>s.status==='Matured').length,'Ready for renewal/payout','rgba(251,191,36,.14)')}${miniStat('Avg. rate',pct(db.savings.reduce((a,s)=>a+s.rate,0)/db.savings.length),'Weighted by term','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Total savings',mwk(db.savings.reduce((a,s)=>a+s.balance,0)),db.savings.length+' accounts','rgba(15,122,92,.14)')}${miniStat('Accrued interest',mwk(db.savings.reduce((a,s)=>a+s.accrued,0)),'Payable on maturity','rgba(20,88,143,.14)')}${miniStat('Matured accounts',db.savings.filter(s=>s.status==='Matured').length,'Ready for renewal/payout','rgba(138,106,18,.14)')}${miniStat('Avg. rate',pct(db.savings.reduce((a,s)=>a+s.rate,0)/db.savings.length),'Weighted by term','rgba(107,79,168,.14)')}</div>
  <div class="panel flush">${T('sav',window._tblCfg.sav)}</div>`}
 function vFees(){window._tblCfg.fees2={rows:()=>db.fees,
   cols:[{t:'Ref',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Context',k:'cust'},{t:'Type',k:'type'},{t:'Amount',f:r=>`<span class="tamt">${mwk(r.amount)}</span>`,raw:r=>r.amount},{t:'Date',f:r=>dFmt(r.date)},{t:'Status',f:r=>badge(r.status)},{t:'Note',k:'note',f:r=>`<span class="tsub">${esc(r.note||'—')}</span>`}],
   actions:r=>r.status==='Charged'?`<button class="btn sm warn" data-act="feeWaive" data-id="${r.id}">Waive</button><button class="btn sm danger" data-act="feeRefund" data-id="${r.id}">Refund</button>`:'<span class="tsub">—</span>'};
  return pageHead('Fees & Charges','Application, processing, late-payment and service fees with waiver and refund controls.',`<button class="btn primary" data-act="feeAdd">+ Charge fee</button>`)
- +`<div class="stats">${miniStat('Fees charged',mwk(db.fees.filter(f=>f.status==='Charged').reduce((a,f)=>a+f.amount,0)),'Outstanding income','rgba(96,165,250,.14)')}${miniStat('Waived',mwk(db.fees.filter(f=>f.status==='Waived').reduce((a,f)=>a+f.amount,0)),'Goodwill adjustments','rgba(251,191,36,.14)')}${miniStat('Late charges',db.fees.filter(f=>f.type.includes('Late')).length,'Collections-linked','rgba(248,113,113,.14)')}${miniStat('Refunded',mwk(db.fees.filter(f=>f.status==='Refunded').reduce((a,f)=>a+f.amount,0)),'Failed txn refunds','rgba(52,211,153,.14)')}</div>
+ +`<div class="stats">${miniStat('Fees charged',mwk(db.fees.filter(f=>f.status==='Charged').reduce((a,f)=>a+f.amount,0)),'Outstanding income','rgba(31,131,201,.14)')}${miniStat('Waived',mwk(db.fees.filter(f=>f.status==='Waived').reduce((a,f)=>a+f.amount,0)),'Goodwill adjustments','rgba(138,106,18,.14)')}${miniStat('Late charges',db.fees.filter(f=>f.type.includes('Late')).length,'Collections-linked','rgba(168,59,52,.14)')}${miniStat('Refunded',mwk(db.fees.filter(f=>f.status==='Refunded').reduce((a,f)=>a+f.amount,0)),'Failed txn refunds','rgba(15,122,92,.14)')}</div>
  <div class="panel flush">${T('fees2',window._tblCfg.fees2)}</div>`}
 function vInterest(){const collected=db.repayments.filter(r=>r.status==='Completed').reduce((a,r)=>a+r.interest,0);
  const accrued=db.loans.filter(l=>l.status!=='Closed').reduce((a,l)=>a+Math.round(l.balance*l.rate/100),0);
@@ -1081,21 +1113,21 @@ function vInterest(){const collected=db.repayments.filter(r=>r.status==='Complet
   cols:[{t:'Loan',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Rate /mo',f:r=>r.rate+'%'},{t:'Balance',f:r=>mwk(r.balance)},{t:'Accrued this cycle',f:r=>`<span class="tamt" style="color:var(--teal)">${mwk(Math.round(r.balance*r.rate/100))}</span>`,raw:r=>r.rate},{t:'Interest collected',f:r=>mwk(db.repayments.filter(x=>x.loan===r.id&&x.status==='Completed').reduce((a,x)=>a+x.interest,0))}],
   actions:r=>`<button class="btn sm ghost" data-act="intAdjust" data-id="${r.id}">Adjust</button>`};
  return pageHead('Interest Management','Live accrual computations, collections and per-product rate configuration with adjustment authority.')
- +`<div class="stats">${miniStat('Accrued (current cycle)',mwk(accrued),'Across performing book','rgba(56,189,248,.14)')}${miniStat('Interest collected',mwk(collected),'Lifetime receipts','rgba(52,211,153,.14)')}${miniStat('Adjustments this month',2,'MWK 4,900 credited back — auditlogged','rgba(251,191,36,.14)')}${miniStat('Penalty rate (arrears)',pct(db.settings.penaltyRate),'Applied on overdue balance','rgba(248,113,113,.14)')}</div>
+ +`<div class="stats">${miniStat('Accrued (current cycle)',mwk(accrued),'Across performing book','rgba(20,88,143,.14)')}${miniStat('Interest collected',mwk(collected),'Lifetime receipts','rgba(15,122,92,.14)')}${miniStat('Adjustments this month',2,'MWK 4,900 credited back — auditlogged','rgba(138,106,18,.14)')}${miniStat('Penalty rate (arrears)',pct(db.settings.penaltyRate),'Applied on overdue balance','rgba(168,59,52,.14)')}</div>
  <div class="grid2"><div class="panel"><div class="ph"><h3>Accrued interest by loan</h3></div>${T('intL',window._tblCfg.intL)}</div>
  <div class="panel"><div class="ph"><h3>Rate configuration by product</h3></div><div class="pb">${db.products.map(p=>`<div class="perm"><span>${p.name}<div class="tsub">current ${p.rate}% · penalty ${db.settings.penaltyRate}%</div></span><button class="btn sm ghost" data-act="rateEdit" data-id="${p.id}">Configure</button></div>`).join('')}</div></div></div>`}
 function vLedger(){window._tblCfg.led={rows:()=>db.ledger.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)),per:10,
   cols:[{t:'Entry',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Date',f:r=>dFmt(r.date)},{t:'Reference',k:'ref',f:r=>`<span class="tid">${r.ref}</span>`},{t:'Account',k:'account'},{t:'Narration',k:'narr'},{t:'Debit',f:r=>r.debit?`<span class="tamt neg">${mwk(r.debit)}</span>`:'—',raw:r=>r.debit},{t:'Credit',f:r=>r.credit?`<span class="tamt pos">${mwk(r.credit)}</span>`:'—',raw:r=>r.credit}]};
  const dr=db.ledger.reduce((a,l)=>a+l.debit,0),cr=db.ledger.reduce((a,l)=>a+l.credit,0);
  return pageHead('Transaction Ledger','Central double-entry record of every financial movement, reconciled references and full history.')
- +`<div class="stats">${miniStat('Entries',db.ledger.length,'This ledger view','rgba(96,165,250,.14)')}${miniStat('Total debits',mwk(dr),'DR','rgba(248,113,113,.14)')}${miniStat('Total credits',mwk(cr),'CR','rgba(52,211,153,.14)')}<div class="stat" style="--glow:rgba(251,191,36,.15)"><div class="lb">Balance check</div><div class="vl ${dr!==cr?'dn':''}" style="font-size:20px">${dr===cr?'✓ Balanced':'⚠ ' + mwk(Math.abs(dr-cr))}</div><div class="sb">Tie-out against journals</div></div></div>
+ +`<div class="stats">${miniStat('Entries',db.ledger.length,'This ledger view','rgba(31,131,201,.14)')}${miniStat('Total debits',mwk(dr),'DR','rgba(168,59,52,.14)')}${miniStat('Total credits',mwk(cr),'CR','rgba(15,122,92,.14)')}<div class="stat" style="--glow:rgba(138,106,18,.15)"><div class="lb">Balance check</div><div class="vl ${dr!==cr?'dn':''}" style="font-size:20px">${dr===cr?'✓ Balanced':'⚠ ' + mwk(Math.abs(dr-cr))}</div><div class="sb">Tie-out against journals</div></div></div>
  <div class="panel flush">${T('led',window._tblCfg.led)}</div>`}
 function vRecon(){const prov=ui.tab.recon||'All';const rows=()=>db.recon.filter(r=>prov==='All'||r.provider.includes(prov));
  window._tblCfg.rec={rows,cols:[{t:'ID',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Provider',k:'provider'},{t:'Provider ref',k:'ref',f:r=>`<span class="tid">${r.ref}</span>`},{t:'Date',f:r=>dFmt(r.date)},{t:'System (MWK)',f:r=>`<span class="tamt">${num(r.system)}</span>`,raw:r=>r.system},{t:'Provider (MWK)',f:r=>`<span class="tamt">${num(r.provider)}</span>`,raw:r=>r.provider},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>r.status==='Unmatched'?`<button class="btn sm ok" data-act="recMatch" data-id="${r.id}">Match manually</button>`:r.status==='Pending review'?`<button class="btn sm primary" data-act="recReview" data-id="${r.id}">Review & match</button>`:'<span class="tsub">OK</span>'};
  const un=db.recon.filter(r=>r.status==='Unmatched');
  return pageHead('Bank & Mobile Money Reconciliation','Match NBM/NBS bank records, Airtel Money and TNM Mpamba statements against system records; surface unmatched movements.',`<button class="btn" data-act="recRun">Run matching engine</button><button class="btn primary" data-act="recReport">Reconciliation report</button>`)
- +`<div class="stats">${miniStat('Matched',db.recon.filter(r=>r.status==='Matched').length,pct(100*db.recon.filter(r=>r.status==='Matched').length/db.recon.length)+' match rate','rgba(52,211,153,.14)')}${miniStat('Unmatched',un.length,mwk(un.reduce((a,r)=>a+Math.max(r.system,r.provider),0))+' variance','rgba(248,113,113,.14)')}${miniStat('Pending review',db.recon.filter(r=>r.status==='Pending review').length,'Awaiting finance officer','rgba(251,191,36,.14)')}${miniStat('Last provider sync','14 min ago','Next in 30 min','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Matched',db.recon.filter(r=>r.status==='Matched').length,pct(100*db.recon.filter(r=>r.status==='Matched').length/db.recon.length)+' match rate','rgba(15,122,92,.14)')}${miniStat('Unmatched',un.length,mwk(un.reduce((a,r)=>a+Math.max(r.system,r.provider),0))+' variance','rgba(168,59,52,.14)')}${miniStat('Pending review',db.recon.filter(r=>r.status==='Pending review').length,'Awaiting finance officer','rgba(138,106,18,.14)')}${miniStat('Last provider sync','14 min ago','Next in 30 min','rgba(31,131,201,.14)')}</div>
  <div class="tabs">${['All','Bank','Airtel','Mpamba'].map(p=>`<button class="${prov===p?'on':''}" data-tab="recon" data-v="${p}">${p==='Mpamba'?'TNM Mpamba':p==='Bank'?'Banks':p==='All'?'All providers':p+' Money'}</button>`).join('')}</div>
  <div class="panel flush">${T('rec',window._tblCfg.rec)}</div>`}
 function vStatements(){window._tblCfg.stm={rows:()=>db.statements,cols:[{t:'Ref',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Type',k:'type'},{t:'Range / scope',k:'range'},{t:'Generated by',k:'by'},{t:'Date',f:r=>dFmt(r.date)}],
@@ -1117,17 +1149,17 @@ function vSupport(){const tab=ui.tab.support||'open';
   filters:[{k:'cat',label:'All categories'}],
   actions:r=>r.status!=='Resolved'?`${r.agent==='Unassigned'?`<button class="btn sm" data-act="tktAssign" data-id="${r.id}">Assign</button>`:''}<button class="btn sm ok" data-act="tktResolve" data-id="${r.id}">Resolve</button>`:'<span class="tsub">Closed</span>'};
  return pageHead('Customer Support','Tickets, complaints & disputes, account access problems, loan enquiries and repayment disputes with assignment and resolution tracking.',`<button class="btn primary" data-act="tktNew">+ Log ticket</button>`)
- +`<div class="stats">${miniStat('Open tickets',db.tickets.filter(t=>t.status!=='Resolved').length,db.tickets.filter(t=>t.pri==='High'&&t.status!=='Resolved').length+' high priority','rgba(251,191,36,.14)')}${miniStat('Repayment disputes',db.tickets.filter(t=>t.cat.includes('dispute')).length,'Under review','rgba(248,113,113,.14)')}${miniStat('Resolved (7d)',db.tickets.filter(t=>t.status==='Resolved'&&new Date(t.date)>dAgo(7)).length+3,'Avg. 6.2 hours','rgba(52,211,153,.14)')}${miniStat('CSAT (feedback)',4.6+' ★','342 responses this quarter','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Open tickets',db.tickets.filter(t=>t.status!=='Resolved').length,db.tickets.filter(t=>t.pri==='High'&&t.status!=='Resolved').length+' high priority','rgba(138,106,18,.14)')}${miniStat('Repayment disputes',db.tickets.filter(t=>t.cat.includes('dispute')).length,'Under review','rgba(168,59,52,.14)')}${miniStat('Resolved (7d)',db.tickets.filter(t=>t.status==='Resolved'&&new Date(t.date)>dAgo(7)).length+3,'Avg. 6.2 hours','rgba(15,122,92,.14)')}${miniStat('CSAT (feedback)',4.6+' ★','342 responses this quarter','rgba(107,79,168,.14)')}</div>
  <div class="tabs"><button class="${tab==='open'?'on':''}" data-tab="support" data-v="open">Open & in progress</button><button class="${tab==='all'?'on':''}" data-tab="support" data-v="all">All tickets</button></div>
  <div class="panel flush">${T('tkt',window._tblCfg.tkt)}</div>
  <div class="panel"><div class="ph"><h3>Recent customer feedback</h3></div><div class="lst flush">
-  ${[['Faith Msiska','Branch service was fast — loan approved in 2 days. ★★★★★'],['Naomi Chawinga','Deposit took long to reflect. ★★★'],['Mwayi Gondwe','Agro loan terms are fair. Recommend JAY C O B. ★★★★★']].map(([a,b])=>`<div class="li"><span class="ic" style="background:rgba(167,139,250,.12)">💬</span><div><b>${a}</b><small>${b}</small></div></div>`).join('')}</div></div>`}
+  ${[['Faith Msiska','Branch service was fast — loan approved in 2 days. ★★★★★'],['Naomi Chawinga','Deposit took long to reflect. ★★★'],['Mwayi Gondwe','Agro loan terms are fair. Recommend JAY C O B. ★★★★★']].map(([a,b])=>`<div class="li"><span class="ic" style="background:rgba(107,79,168,.12)">💬</span><div><b>${a}</b><small>${b}</small></div></div>`).join('')}</div></div>`}
 function vMessaging(){window._tblCfg.msg={rows:()=>db.notifications.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)),per:10,
   cols:[{t:'ID',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Type',k:'type'},{t:'Channel',k:'channel'},{t:'Message',f:r=>`<span class="tsub" style="max-width:340px;display:inline-block;white-space:normal">${esc(r.body)}</span>`},{t:'Date',f:r=>dFmt(r.date)},{t:'Status',f:r=>badge(r.status)}],
   filters:[{k:'channel',label:'All channels'},{k:'type',label:'All types'}],
   actions:r=>r.status==='Failed'?`<button class="btn sm warn" data-act="msgRetry" data-id="${r.id}">Resend</button>`:'<span class="tsub">Delivered</span>'};
  return pageHead('Notifications & Messaging','Application, approval, rejection, disbursement and repayment alerts across SMS, email and in-app — with failed message recovery.',`<button class="btn primary" data-act="msgCompose">+ Compose broadcast</button>`)
- +`<div class="stats">${miniStat('Sent (30d)',db.notifications.filter(n=>n.status==='Sent').length*29+412,'All channels','rgba(52,211,153,.14)')}${miniStat('Failed deliveries',db.notifications.filter(n=>n.status==='Failed').length,'Resend from queue','rgba(248,113,113,.14)')}${miniStat('SMS health','98.1%','Provider degraded on 1 route','rgba(96,165,250,.14)')}${miniStat('Templates in use',9,'Loan & wallet notifications','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Sent (30d)',db.notifications.filter(n=>n.status==='Sent').length*29+412,'All channels','rgba(15,122,92,.14)')}${miniStat('Failed deliveries',db.notifications.filter(n=>n.status==='Failed').length,'Resend from queue','rgba(168,59,52,.14)')}${miniStat('SMS health','98.1%','Provider degraded on 1 route','rgba(31,131,201,.14)')}${miniStat('Templates in use',9,'Loan & wallet notifications','rgba(107,79,168,.14)')}</div>
  <div class="panel flush">${T('msg',window._tblCfg.msg)}</div>`}
 
 /* =====================================================================
@@ -1137,7 +1169,7 @@ function vAdminUsers(){window._tblCfg.adm={rows:()=>db.admins,
   cols:[{t:'Staff',k:'name',f:r=>`${avatar(r.name)}<b>${esc(r.name)}</b><div class="tsub">${esc(r.email)}</div>`},{t:'Role',k:'role',f:r=>badge(r.role==='Super Admin'?'p'.length?'Active':'' : 'Active'),raw:r=>r.role},{t:'Role name',k:'role',f:r=>esc(r.role)},{t:'Last login',f:r=>dtFmt(r.lastLogin)},{t:'Status',f:r=>badge(r.status)}].filter((c,i)=>i!==1),
   actions:r=>r.role!=='Super Admin'?`<button class="btn sm ghost" data-act="admEdit" data-id="${r.id}">Edit</button><button class="btn sm ${r.status==='Active'?'danger':'ok'}" data-act="admToggle" data-id="${r.id}">${r.status==='Active'?'Deactivate':'Activate'}</button>`:'<span class="tsub">Protected</span>'};
  return pageHead('Admin Users & Staff','Create admin accounts, assign staff roles, manage profiles and deactivate access instantly.',`<button class="btn primary" data-act="admAdd">+ Create admin account</button>`)
- +`<div class="stats">${miniStat('Staff accounts',db.admins.length,db.admins.filter(a=>a.status==='Active').length+' active','rgba(96,165,250,.14)')}${miniStat('Loan officers',db.admins.filter(a=>a.role==='Loan Officer').length,'Portfolio assignments','rgba(52,211,153,.14)')}${miniStat('Finance officers',db.admins.filter(a=>a.role==='Finance Officer').length,'Approvals queue','rgba(167,139,250,.14)')}${miniStat('Deactivated',db.admins.filter(a=>a.status==='Inactive').length,'Access revoked','rgba(248,113,113,.14)')}</div>
+ +`<div class="stats">${miniStat('Staff accounts',db.admins.length,db.admins.filter(a=>a.status==='Active').length+' active','rgba(31,131,201,.14)')}${miniStat('Loan officers',db.admins.filter(a=>a.role==='Loan Officer').length,'Portfolio assignments','rgba(15,122,92,.14)')}${miniStat('Finance officers',db.admins.filter(a=>a.role==='Finance Officer').length,'Approvals queue','rgba(107,79,168,.14)')}${miniStat('Deactivated',db.admins.filter(a=>a.status==='Inactive').length,'Access revoked','rgba(168,59,52,.14)')}</div>
  <div class="panel flush">${T('adm',window._tblCfg.adm)}</div>`}
 const PERM_LABELS={customers:'View customers',kyc:'KYC verification',loanApprove:'Loan approval',disburse:'Disbursement',repayments:'Record repayments',reverse:'Transaction editing / reversal',fees:'Fees & waivers',reports:'Report access',admins:'Manage admin users',roles:'Manage roles',settings:'System settings',writeoff:'Write-off approvals'};
 function vRoles(){return pageHead('Roles & Permissions','Role-based access control (RBAC). Toggling a permission takes effect immediately and is audit-logged.')
@@ -1147,7 +1179,7 @@ function vWorkflows(){const rows=()=>db.workflows.filter(w=>!(ui.tab.wf==='compl
  window._tblCfg.wf={rows,cols:[{t:'Workflow',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Type',k:'type'},{t:'Subject',k:'ref'},{t:'Requested by',k:'by'},{t:'Stage',k:'stage'},{t:'Raised',f:r=>dFmt(r.date)}],
   actions:r=>r.stage.startsWith('Completed')?'<span class="tsub">Closed</span>':`<button class="btn sm ok" data-act="wfApprove" data-id="${r.id}">Approve</button><button class="btn sm danger" data-act="wfReject" data-id="${r.id}">Reject</button>`};
  return pageHead('Approval Workflows','Multi-stage authorization for loan approvals, disbursements, refunds, reversals, write-offs and high-value transactions.')
- +`<div class="stats">${miniStat('Awaiting your action',db.workflows.filter(w=>!w.stage.startsWith('Completed')).length,'Across 5 workflow types','rgba(251,191,36,.14)')}${miniStat('High-value auth',mwk(800000),'Largest pending amount','rgba(96,165,250,.14)')}${miniStat('Write-offs in queue',1,'MWK 255,000 — Risk Committee','rgba(248,113,113,.14)')}${miniStat('Avg. turnaround','5.4 hrs','Last 30 workflows','rgba(52,211,153,.14)')}</div>
+ +`<div class="stats">${miniStat('Awaiting your action',db.workflows.filter(w=>!w.stage.startsWith('Completed')).length,'Across 5 workflow types','rgba(138,106,18,.14)')}${miniStat('High-value auth',mwk(800000),'Largest pending amount','rgba(31,131,201,.14)')}${miniStat('Write-offs in queue',1,'MWK 255,000 — Risk Committee','rgba(168,59,52,.14)')}${miniStat('Avg. turnaround','5.4 hrs','Last 30 workflows','rgba(15,122,92,.14)')}</div>
  <div class="tabs"><button class="${ui.tab.wf!=='completed'?'on':''}" data-tab="wf" data-v="pending">Pending</button><button class="${ui.tab.wf==='completed'?'on':''}" data-tab="wf" data-v="completed">Completed</button></div>
  <div class="panel flush">${T('wf',window._tblCfg.wf)}</div>`}
 function vAudit(){window._tblCfg.aud={rows:()=>db.auditL,per:12,
@@ -1158,10 +1190,10 @@ function vAudit(){window._tblCfg.aud={rows:()=>db.auditL,per:12,
 function vSecurity(){window._tblCfg.ses={rows:()=>db.sessions,cols:[{t:'Session',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'User',k:'user'},{t:'IP address',k:'ip',f:r=>`<span class="tid">${r.ip}</span>`},{t:'Device / location',k:'device'},{t:'Started',f:r=>dtFmt(r.started)},{t:'Status',f:r=>badge(r.status.includes('Failed')?'Failed':r.status.startsWith('Active')?'Active':r.status)}],
   actions:r=>r.status.startsWith('Active')?`<button class="btn sm danger" data-act="sesKill" data-id="${r.id}">Force logout</button>`:'<span class="tsub">—</span>'};
  return pageHead('Security & Sessions','Login history, active sessions with force-logout, failed-attempt lockouts and session expiry controls.')
- +`<div class="stats">${miniStat('Active sessions',db.sessions.filter(s=>s.status.startsWith('Active')).length,'Expiry after 30 min idle','rgba(52,211,153,.14)')}${miniStat('Failed attempts (24h)',4,'One IP blocked automatically','rgba(248,113,113,.14)')}${miniStat('Security alerts',1,'Unusual device location — resolved','rgba(251,191,36,.14)')}${miniStat('2FA coverage','100%','All staff enforced','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Active sessions',db.sessions.filter(s=>s.status.startsWith('Active')).length,'Expiry after 30 min idle','rgba(15,122,92,.14)')}${miniStat('Failed attempts (24h)',4,'One IP blocked automatically','rgba(168,59,52,.14)')}${miniStat('Security alerts',1,'Unusual device location — resolved','rgba(138,106,18,.14)')}${miniStat('2FA coverage','100%','All staff enforced','rgba(31,131,201,.14)')}</div>
  <div class="panel flush">${T('ses',window._tblCfg.ses)}</div>
  <div class="panel"><div class="ph"><h3>Security alerts</h3></div><div class="lst flush">
-  <div class="li"><span class="ic" style="background:rgba(248,113,113,.12)">🚨</span><div><b>4 failed logins from 196.216.8.44</b><small>Blocked after threshold · 14 Oct 2026, 02:41</small></div><span class="bdg g" style="margin-left:auto">Contained</span></div>
+  <div class="li"><span class="ic" style="background:rgba(168,59,52,.12)">🚨</span><div><b>4 failed logins from 196.216.8.44</b><small>Blocked after threshold · 14 Oct 2026, 02:41</small></div><span class="bdg g" style="margin-left:auto">Contained</span></div>
   </div></div>`}
 function vCompliance(){const items=[['Customer due diligence (CDD) complete',96],['ID verification coverage (KYC)',89],['Exposure to single borrower',11],['Liquidity cover ratio',134],['Suspicious activity escalations actioned',100]];
  return pageHead('Compliance & Risk','Customer due diligence, lending requirement adherence, suspicious activity escalation and regulatory record keeping.',`<button class="btn primary" data-act="compReport">Log compliance review</button>`)
@@ -1171,7 +1203,7 @@ function vCompliance(){const items=[['Customer due diligence (CDD) complete',96]
   <div class="kv"><b>Max single-borrower share</b><span>11.4% of portfolio (limit 15%)</span><b>Sector cap — retail trade</b><span>38% of book (limit 45%)</span><b>Regulator returns due</b><span>31 Oct 2026 — RBM quarterly</span><b>AML training status</b><span>All staff current · refresh due Jan 2027</span><b>Escalations this quarter</b><span>2 SARs filed — see fraud monitoring</span></div>
   <button class="btn" style="margin-top:12px" data-act="compEscalate">Escalate suspicious activity</button></div></div></div>
  <div class="panel"><div class="ph"><h3>Compliance reviews log</h3></div><div class="lst flush">
-  ${[['Q3 portfolio compliance review','Completed 02 Oct 2026','No adverse findings'],['Interest disclosure audit','Completed 14 Sep 2026','3 contracts re-papered'],['KYC file sampling (40 files)','Completed 28 Aug 2026','2 files re-requested']].map(([a,b,c])=>`<div class="li"><span class="ic" style="background:rgba(52,211,153,.12)">✔</span><div><b>${a}</b><small>${b} · ${c}</small></div></div>`).join('')}</div></div>`}
+  ${[['Q3 portfolio compliance review','Completed 02 Oct 2026','No adverse findings'],['Interest disclosure audit','Completed 14 Sep 2026','3 contracts re-papered'],['KYC file sampling (40 files)','Completed 28 Aug 2026','2 files re-requested']].map(([a,b,c])=>`<div class="li"><span class="ic" style="background:rgba(15,122,92,.12)">✔</span><div><b>${a}</b><small>${b} · ${c}</small></div></div>`).join('')}</div></div>`}
 function vSettings(){const s=db.settings;
  return pageHead('System Settings','Business profile, currency, timezone, loan rules and document configuration. Changes persist and are audit-logged.')
  +`<div class="grid2"><div class="panel"><div class="ph"><h3>Business details</h3></div><div class="pb">
@@ -1184,12 +1216,12 @@ function vSettings(){const s=db.settings;
   <div class="frow3">${fld('Grace days',inp('stGrace',s.graceDays,'type="number"'))}${fld('Penalty % /mo arrears',inp('stPen',s.penaltyRate,'type="number" step="0.1"'))}${fld('Max DTI %',inp('stDti',s.maxDTI,'type="number"'))}</div>
   <p class="hint">Rules apply to new assessments immediately. Existing schedules are never rewritten silently.</p></div></div>
  <div class="panel"><div class="ph"><h3>Document settings</h3></div><div class="lst flush">
-  ${['National ID mandatory at onboarding','Proof of address required for loans > MWK 500,000','Business license required for business loans','Customer selfie required for digital onboarding'].map(x=>`<div class="li"><span class="ic" style="background:rgba(96,165,250,.1)">📄</span><div>${x}</div><span class="bdg g" style="margin-left:auto">Enforced</span></div>`).join('')}</div></div></div></div>
+  ${['National ID mandatory at onboarding','Proof of address required for loans > MWK 500,000','Business license required for business loans','Customer selfie required for digital onboarding'].map(x=>`<div class="li"><span class="ic" style="background:rgba(31,131,201,.1)">📄</span><div>${x}</div><span class="bdg g" style="margin-left:auto">Enforced</span></div>`).join('')}</div></div></div></div>
  <button class="btn primary" data-act="settingsSave">Save settings</button>`}
 function vBackups(){window._tblCfg.bkp={rows:()=>db.backups,cols:[{t:'Backup',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Date',f:r=>dtFmt(r.date)},{t:'Type',k:'type'},{t:'Size',k:'size'},{t:'Status',f:r=>badge(r.status.startsWith('Verified')?'Verified':'Failed')},{t:'Note',k:'note',f:r=>`<span class="tsub">${esc(r.note||'—')}</span>`}],
   actions:r=>`<button class="btn sm ghost" data-act="bkpVerify" data-id="${r.id}">Verify</button>`};
  return pageHead('Backup & Data Management','Backup monitoring, recovery procedures, data retention and controlled exports.',`<button class="btn warn" data-act="bkpExport">Download full data export (JSON)</button><button class="btn primary" data-act="bkpRun">Run backup now</button>`)
- +`<div class="stats">${miniStat('Last backup',db.backups.length?dFmt(db.backups[0].date):'None yet',db.backups.length?db.backups[0].type+' — '+db.backups[0].size:'No backup run on this deployment','rgba(52,211,153,.14)')}${miniStat('Retention policy','13 months','Financial records — Malawi requirements','rgba(96,165,250,.14)')}${miniStat('Recovery test','Passed','Last drill: 01 Oct 2026 · 22 min RTO','rgba(167,139,250,.14)')}${miniStat('Verification failures',db.backups.filter(b=>String(b.status||'').toLowerCase().includes('failed')).length,'Auto-fallback applied','rgba(248,113,113,.14)')}</div>
+ +`<div class="stats">${miniStat('Last backup',db.backups.length?dFmt(db.backups[0].date):'None yet',db.backups.length?db.backups[0].type+' — '+db.backups[0].size:'No backup run on this deployment','rgba(15,122,92,.14)')}${miniStat('Retention policy','13 months','Financial records — Malawi requirements','rgba(31,131,201,.14)')}${miniStat('Recovery test','Passed','Last drill: 01 Oct 2026 · 22 min RTO','rgba(107,79,168,.14)')}${miniStat('Verification failures',db.backups.filter(b=>String(b.status||'').toLowerCase().includes('failed')).length,'Auto-fallback applied','rgba(168,59,52,.14)')}</div>
  <div class="panel flush">${T('bkp',window._tblCfg.bkp)}</div>
  <div class="panel"><div class="ph"><h3>Data recovery procedures</h3></div><div class="pb"><ol style="padding-left:20px;font-size:13px;line-height:2;color:var(--muted)">
   <li>Freeze write operations via System Settings → maintenance mode.</li><li>Select the last verified backup point (nightly full + WAL increments).</li>
@@ -1211,10 +1243,10 @@ const REPORTS=[
  {id:'growth',t:'Customer growth & retention',d:'Acquisition, dormancy and repeat borrowing.',i:'👥'},
  {id:'staff',t:'Staff performance',d:'Officer productivity, approvals and collection rates.',i:'🏅'}];
 function vReports(){return pageHead('Reports & Analytics','Generate reports and export them to CSV, Excel-compatible formats or PDF (print).')
- +`<div class="rpt-grid">${REPORTS.map(r=>`<div class="rpt-card"><div class="ri" style="background:rgba(56,189,248,.12)">${r.i}</div><h4>${r.t}</h4><p>${r.d}</p>
+ +`<div class="rpt-grid">${REPORTS.map(r=>`<div class="rpt-card"><div class="ri" style="background:rgba(20,88,143,.12)">${r.i}</div><h4>${r.t}</h4><p>${r.d}</p>
   <div style="display:flex;gap:8px"><button class="btn sm primary" data-act="rptRun" data-id="${r.id}">Generate</button><button class="btn sm ghost" data-act="rptRun" data-id="${r.id}" data-pdf="1">PDF</button></div></div>`).join('')}</div>
  <div class="panel" style="margin-top:16px"><div class="ph"><h3>Interest income vs operating expenses — trend</h3></div><div class="pb"><canvas class="chart" id="chRpt"></canvas></div>
- <div class="legend"><span><i style="background:#34d399"></i>Interest + fee income</span><span><i style="background:#fbbf24"></i>Operating expenses</span></div></div>`}
+ <div class="legend"><span><i style="background:#0f7a5c"></i>Interest + fee income</span><span><i style="background:#c9a227"></i>Operating expenses</span></div></div>`}
 function runReport(id,asPdf){const r=REPORTS.find(x=>x.id===id);
  const rows=reportRows(id);const head='Date/Item,'+rows.head.join(',');
  const body=rows.rows.map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
@@ -1242,18 +1274,18 @@ function reportRows(id){const L=db.loans,R=db.repayments.filter(r=>r.status==='C
 function vRisk(){const buc=[[0,30],[31,60],[61,90],[91,9999]];
  const byProduct=db.products.map(p=>{const v=db.loans.filter(l=>l.product===p.name).reduce((a,l)=>a+l.balance,0);return{name:p.name,v}}).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
  return pageHead('Risk & Portfolio Monitoring','Portfolio at Risk (PAR), concentration, repeat borrowing, expected vs actual collections, provisioning and write-offs.')
- +`<div class="stats">${miniStat('PAR 30',pct(par()),'Balance 30+ DPD / total book','rgba(248,113,113,.14)')}${miniStat('PAR 1',pct(7.2),'Balance 1+ DPD / total book','rgba(251,191,36,.14)')}${miniStat('Recovery rate',pct(64.5),'Recovered / written-off amounts','rgba(52,211,153,.14)')}${miniStat('Loss provision held',mwk(Math.round(portfolioBalance()*0.03)),'3% of book — policy floor','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('PAR 30',pct(par()),'Balance 30+ DPD / total book','rgba(168,59,52,.14)')}${miniStat('PAR 1',pct(7.2),'Balance 1+ DPD / total book','rgba(138,106,18,.14)')}${miniStat('Recovery rate',pct(64.5),'Recovered / written-off amounts','rgba(15,122,92,.14)')}${miniStat('Loss provision held',mwk(Math.round(portfolioBalance()*0.03)),'3% of book — policy floor','rgba(31,131,201,.14)')}</div>
  <div class="grid3">
   <div class="panel"><div class="ph"><h3>Concentration by product</h3></div><div class="pb">${byProduct.map(p=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${p.name}</span><b>${pct(100*p.v/portfolioBalance())}</b></div><div class="pbar ${100*p.v/portfolioBalance()>40?'bad':''}"><i style="width:${Math.min(100,100*p.v/Math.max(portfolioBalance(),1))}%"></i></div></div>`).join('')}</div></div>
   <div class="panel"><div class="ph"><h3>Concentration by customer (top 5)</h3></div><div class="pb">${[...db.loans].filter(l=>l.status!=='Closed').sort((a,b)=>b.balance-a.balance).slice(0,5).map(l=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${l.cust}</span><b>${mwk(l.balance)} · ${pct(100*l.balance/portfolioBalance())}</b></div><div class="pbar ${100*l.balance/portfolioBalance()>15?'bad':''}"><i style="width:${100*l.balance/portfolioBalance()*2.5}%"></i></div></div>`).join('')}</div></div>
   <div class="panel"><div class="ph"><h3>Concentration by sector</h3></div><div class="pb">${[['Retail & trade',38],['Agriculture',24],['Salaried consumers',19],['Services',12],['Other',7]].map(([s,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${s}</span><b>${v}%</b></div><div class="pbar ${v>45?'bad':v>35?'warn':''}"><i style="width:${v}%"></i></div></div>`).join('')}</div></div>
  </div>
  <div class="grid22">
-  <div class="panel"><div class="ph"><h3>Expected vs actual collections (past 6 weeks)</h3></div><div class="pb"><canvas class="chart" id="chRisk"></canvas></div><div class="legend"><span><i style="background:#60a5fa"></i>Expected</span><span><i style="background:#34d399"></i>Collected</span></div></div>
+  <div class="panel"><div class="ph"><h3>Expected vs actual collections (past 6 weeks)</h3></div><div class="pb"><canvas class="chart" id="chRisk"></canvas></div><div class="legend"><span><i style="background:#7bb8e8"></i>Expected</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
   <div class="panel"><div class="ph"><h3>High-risk accounts & repeat borrowers</h3></div><div class="lst flush">
-   ${overdueLoans().map(l=>`<div class="li" data-nav="collections"><span class="ic" style="background:rgba(248,113,113,.12)">🚨</span><div><b>${esc(l.cust)} — ${l.id}</b><small>${dpd(l)} DPD · arrears ${mwk(l.balance)}</small></div><span class="bdg r" style="margin-left:auto">HIGH</span></div>`).join('')}
-   <div class="li"><span class="ic" style="background:rgba(52,211,153,.12)">🔁</span><div><b>Repeat borrowers</b><small>${new Set(db.loans.map(l=>l.cust)).size<db.loans.length?db.loans.length-new Set(db.loans.map(l=>l.cust)).size+1:0} customers hold 2+ historical loans — strong retention signal</small></div></div>
-   <div class="li"><span class="ic" style="background:rgba(167,139,250,.12)">🧾</span><div><b>Loan write-offs (YTD)</b><small>MWK 510,000 written off · provisions cover 3.1× losses</small></div></div></div></div></div>`}
+   ${overdueLoans().map(l=>`<div class="li" data-nav="collections"><span class="ic" style="background:rgba(168,59,52,.12)">🚨</span><div><b>${esc(l.cust)} — ${l.id}</b><small>${dpd(l)} DPD · arrears ${mwk(l.balance)}</small></div><span class="bdg r" style="margin-left:auto">HIGH</span></div>`).join('')}
+   <div class="li"><span class="ic" style="background:rgba(15,122,92,.12)">🔁</span><div><b>Repeat borrowers</b><small>${new Set(db.loans.map(l=>l.cust)).size<db.loans.length?db.loans.length-new Set(db.loans.map(l=>l.cust)).size+1:0} customers hold 2+ historical loans — strong retention signal</small></div></div>
+   <div class="li"><span class="ic" style="background:rgba(107,79,168,.12)">🧾</span><div><b>Loan write-offs (YTD)</b><small>MWK 510,000 written off · provisions cover 3.1× losses</small></div></div></div></div></div>`}
 
 /* =====================================================================
    VIEWS: ADVANCED MODULES
@@ -1270,14 +1302,14 @@ function vOfficers(){window._tblCfg.lo={rows:()=>db.officers,cols:[{t:'Officer',
 function vPayroll(){window._tblCfg.prl={rows:()=>db.payroll,cols:[{t:'Ref',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Employer',k:'employer'},{t:'Salary verified',f:r=>badge(r.verified?'Verified':'Pending')},{t:'Deduction /mo',f:r=>`<span class="tamt">${mwk(r.deduction)}</span>`},{t:'Last run',f:r=>dFmt(r.lastRun)},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>`<button class="btn sm ghost" data-act="prlVerify" data-id="${r.id}">Verify with employer</button>`};
  return pageHead('Payroll Integration','Verify salaries with employers and process salary-linked loan deductions.')
- +`<div class="stats">${miniStat('Active salary links',db.payroll.filter(p=>p.status==='Deducted').length,'Auto-deductions live','rgba(52,211,153,.14)')}${miniStat('Monthly deductions',mwk(db.payroll.reduce((a,p)=>a+p.deduction,0)),'Next payroll run: 25 Oct','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Active salary links',db.payroll.filter(p=>p.status==='Deducted').length,'Auto-deductions live','rgba(15,122,92,.14)')}${miniStat('Monthly deductions',mwk(db.payroll.reduce((a,p)=>a+p.deduction,0)),'Next payroll run: 25 Oct','rgba(31,131,201,.14)')}</div>
  <div class="panel flush">${T('prl',window._tblCfg.prl)}
  <div class="pb" style="padding:13px 18px;border-top:1px solid var(--line)"><button class="btn primary" data-act="prlRun">Run payroll deduction cycle</button> <span class="tsub">Posts deductions to ledger and updates loan schedules.</span></div></div>`}
 function vAccounting(){window._tblCfg.gl={rows:()=>db.glAccounts,cols:[{t:'Code',k:'code',f:r=>`<span class="tid">${r.code}</span>`},{t:'Account',k:'name'},{t:'Type',f:r=>badge({Asset:'b',Liability:'y',Income:'g',Expense:'r'}[r.type])},{t:'Balance',f:r=>`<span class="tamt">${mwk(r.bal)}</span>`,raw:r=>r.bal}],actions:r=>`<button class="btn sm ghost" data-act="glEntries" data-id="${r.code}">Entries</button>`};
  const A=db.glAccounts.filter(a=>a.type==='Asset').reduce((a,x)=>a+x.bal,0),Lb=db.glAccounts.filter(a=>a.type==='Liability').reduce((a,x)=>a+x.bal,0);
  const I=db.glAccounts.filter(a=>a.type==='Income').reduce((a,x)=>a+x.bal,0),E=db.glAccounts.filter(a=>a.type==='Expense').reduce((a,x)=>a+x.bal,0);
  return pageHead('Accounting & General Ledger','Chart of accounts, journal entries, trial balance, profit & loss and balance sheet.',`<button class="btn primary" data-act="glJournal">+ Post journal entry</button>`)
- +`<div class="stats">${miniStat('Total assets',mwk(A),'Loan book + cash','rgba(52,211,153,.14)')}${miniStat('Total liabilities',mwk(Lb),'Deposits + investor capital','rgba(251,191,36,.14)')}${miniStat('Net income (YTD)',mwk(I-E),'P&L — see below','rgba(56,189,248,.14)')}${miniStat('Equity (derived)',mwk(A-Lb+I-E),'Assets − liabilities + retained','rgba(167,139,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Total assets',mwk(A),'Loan book + cash','rgba(15,122,92,.14)')}${miniStat('Total liabilities',mwk(Lb),'Deposits + investor capital','rgba(138,106,18,.14)')}${miniStat('Net income (YTD)',mwk(I-E),'P&L — see below','rgba(20,88,143,.14)')}${miniStat('Equity (derived)',mwk(A-Lb+I-E),'Assets − liabilities + retained','rgba(107,79,168,.14)')}</div>
  <div class="panel flush">${T('gl',window._tblCfg.gl)}</div>
  <div class="grid22">
   <div class="panel"><div class="ph"><h3>Trial balance</h3></div><div class="pb"><table style="font-size:12px"><thead><tr><th>Account</th><th style="text-align:right">Debit</th><th style="text-align:right">Credit</th></tr></thead><tbody>
@@ -1286,28 +1318,28 @@ function vAccounting(){window._tblCfg.gl={rows:()=>db.glAccounts,cols:[{t:'Code'
 function vInvestors(){window._tblCfg.inv={rows:()=>db.investors,cols:[{t:'Investor',k:'name'},{t:'Capital',f:r=>`<span class="tamt">${mwk(r.capital)}</span>`,raw:r=>r.capital},{t:'Rate p.a.',f:r=>r.rate+'%'},{t:'Accrued returns',f:r=>mwk(r.returns)},{t:'Distributed',f:r=>mwk(r.paid)},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>r.returns-r.paid>0?`<button class="btn sm ok" data-act="invPay" data-id="${r.id}">Pay distribution</button><button class="btn sm ghost" data-act="invStm" data-id="${r.id}">Statement</button>`:`<button class="btn sm ghost" data-act="invStm" data-id="${r.id}">Statement</button>`};
  return pageHead('Investor Management','Investor registration, capital records, returns and distributions with statements.',`<button class="btn primary" data-act="invAdd">+ Register investor</button>`)
- +`<div class="stats">${miniStat('Investor capital',mwk(db.investors.reduce((a,i)=>a+i.capital,0)),db.investors.length+' registered investors','rgba(96,165,250,.14)')}${miniStat('Returns accrued',mwk(db.investors.reduce((a,i)=>a+i.returns,0)),mwk(db.investors.reduce((a,i)=>a+i.paid,0))+' distributed','rgba(52,211,153,.14)')}</div>
+ +`<div class="stats">${miniStat('Investor capital',mwk(db.investors.reduce((a,i)=>a+i.capital,0)),db.investors.length+' registered investors','rgba(31,131,201,.14)')}${miniStat('Returns accrued',mwk(db.investors.reduce((a,i)=>a+i.returns,0)),mwk(db.investors.reduce((a,i)=>a+i.paid,0))+' distributed','rgba(15,122,92,.14)')}</div>
  <div class="panel flush">${T('inv',window._tblCfg.inv)}</div>`}
 function vPartners(){window._tblCfg.agt={rows:()=>db.agents,cols:[{t:'Agent / partner',k:'name'},{t:'Referrals',k:'refs',raw:r=>r.refs},{t:'Commission earned',f:r=>`<span class="tamt">${mwk(r.commission)}</span>`},{t:'Paid out',f:r=>mwk(r.paid)},{t:'Owed',f:r=>`<span class="tamt" style="color:var(--warn)">${mwk(r.commission-r.paid)}</span>`},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>r.status==='Active'?`${r.commission-r.paid>0?`<button class="btn sm ok" data-act="agtPay" data-id="${r.id}">Pay commission</button>`:''}<button class="btn sm danger" data-act="agtToggle" data-id="${r.id}">Deactivate</button>`:`<button class="btn sm ok" data-act="agtToggle" data-id="${r.id}">Activate</button>`};
  return pageHead('Partner & Agent Management','Register agents, track referrals, manage commissions and partner performance.',`<button class="btn primary" data-act="agtAdd">+ Register agent</button>`)
- +`<div class="stats">${miniStat('Active partners',db.agents.filter(a=>a.status==='Active').length,'Across 4 districts','rgba(96,165,250,.14)')}${miniStat('Referrals YTD',db.agents.reduce((a,x)=>a+x.refs,0),'3% commission base','rgba(167,139,250,.14)')}${miniStat('Commissions owed',mwk(db.agents.reduce((a,x)=>a+x.commission-x.paid,0)),'Next payout run: Friday','rgba(251,191,36,.14)')}</div>
+ +`<div class="stats">${miniStat('Active partners',db.agents.filter(a=>a.status==='Active').length,'Across 4 districts','rgba(31,131,201,.14)')}${miniStat('Referrals YTD',db.agents.reduce((a,x)=>a+x.refs,0),'3% commission base','rgba(107,79,168,.14)')}${miniStat('Commissions owed',mwk(db.agents.reduce((a,x)=>a+x.commission-x.paid,0)),'Next payout run: Friday','rgba(138,106,18,.14)')}</div>
  <div class="panel flush">${T('agt',window._tblCfg.agt)}</div>`}
 function vLegal(){window._tblCfg.lgl={rows:()=>db.legal,cols:[{t:'Case',k:'case',f:r=>`<b>${r.case}</b>`},{t:'Stage',k:'stage'},{t:'Amount at stake',f:r=>`<span class="tamt neg">${mwk(r.amount)}</span>`},{t:'Recovery partner',k:'officer'},{t:'Last update',f:r=>dFmt(r.updated)}],
   actions:r=>`<button class="btn sm" data-act="lglAdvance" data-id="${r.id}">Advance stage</button><button class="btn sm ghost" data-act="lglDoc" data-id="${r.id}">Documents</button>`};
  return pageHead('Legal & Recovery','Formal recovery cases, legal documents, authorized recovery actions and settlement agreements.',`<button class="btn primary" data-act="lglAdd">+ Open recovery case</button>`)
- +`<div class="stats">${miniStat('Active legal cases',db.legal.length,mwk(db.legal.reduce((a,l)=>a+l.amount,0))+' at stake','rgba(248,113,113,.14)')}${miniStat('Under settlement',1,'Structured payment plans','rgba(251,191,36,.14)')}</div>
+ +`<div class="stats">${miniStat('Active legal cases',db.legal.length,mwk(db.legal.reduce((a,l)=>a+l.amount,0))+' at stake','rgba(168,59,52,.14)')}${miniStat('Under settlement',1,'Structured payment plans','rgba(138,106,18,.14)')}</div>
  <div class="panel flush">${T('lgl',window._tblCfg.lgl)}</div>`}
 function vApi(){window._tblCfg.api={rows:()=>db.apis,cols:[{t:'Integration',k:'name'},{t:'Purpose',k:'type'},{t:'Errors (24h)',f:r=>r.errors24===0?'<span class="up">0</span>':`<span class="dn">${r.errors24}</span>`,raw:r=>r.errors24},{t:'Latency',k:'latency'},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>`<button class="btn sm ghost" data-act="apiLogs" data-id="${r.id}">Error log</button>`};
  return pageHead('API & Integrations','Payment providers, banking and mobile money integrations with status monitoring and error logs.',`<button class="btn primary" data-act="apiConfig">Configure credentials</button>`)
- +`<div class="stats">${miniStat('Integrations live',db.apis.filter(a=>a.status==='Operational').length,'of '+db.apis.length+' configured','rgba(52,211,153,.14)')}${miniStat('Errors (24h)',db.apis.reduce((a,x)=>a+x.errors24,0),'SMS gateway degraded','rgba(248,113,113,.14)')}${miniStat('Uptime (30d)','99.6%','Across all providers','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Integrations live',db.apis.filter(a=>a.status==='Operational').length,'of '+db.apis.length+' configured','rgba(15,122,92,.14)')}${miniStat('Errors (24h)',db.apis.reduce((a,x)=>a+x.errors24,0),'SMS gateway degraded','rgba(168,59,52,.14)')}${miniStat('Uptime (30d)','99.6%','Across all providers','rgba(31,131,201,.14)')}</div>
  <div class="panel flush">${T('api',window._tblCfg.api)}</div>
  <div class="panel"><div class="ph"><h3>Supabase connection (planned)</h3></div><div class="pb"><div class="kv"><b>Project URL</b><span class="tid">https://yourproject.supabase.co — to be provided</span><b>Schema</b><span>17 tables mapped 1:1 to the modules in this console</span><b>Auth</b><span>Row-level security keyed to staff roles</span><b>Status</b><span>${badge('Pending_review')} Awaiting project keys — system runs in local mode</span></div></div></div>`}
 function vFraud(){window._tblCfg.frd={rows:()=>db.fraud,cols:[{t:'Alert',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Detection',k:'title'},{t:'Severity',f:r=>badge(r.sev)},{t:'Raised',f:r=>dFmt(r.date)},{t:'Status',f:r=>badge(r.status==='Open'?'Open':r.status==='Resolved'?'Resolved':'In Progress')}],
   actions:r=>r.status!=='Resolved'?`<button class="btn sm" data-act="frdInvest" data-id="${r.id}">Investigate</button><button class="btn sm ok" data-act="frdResolve" data-id="${r.id}">Resolve</button>`:'<span class="tsub">Closed</span>'};
  return pageHead('Fraud Monitoring','Unusual transactions, duplicate applications and suspicious activity detection with investigation records.')
- +`<div class="stats">${miniStat('Open alerts',db.fraud.filter(f=>f.status==='Open').length,'Requires triage','rgba(248,113,113,.14)')}${miniStat('Under investigation',db.fraud.filter(f=>f.status==='Under investigation').length,'Case notes maintained','rgba(251,191,36,.14)')}${miniStat('Resolved (30d)',db.fraud.filter(f=>f.status==='Resolved').length+4,'No confirmed losses','rgba(52,211,153,.14)')}${miniStat('Rules active',12,'Velocity, duplicate, geo rules','rgba(96,165,250,.14)')}</div>
+ +`<div class="stats">${miniStat('Open alerts',db.fraud.filter(f=>f.status==='Open').length,'Requires triage','rgba(168,59,52,.14)')}${miniStat('Under investigation',db.fraud.filter(f=>f.status==='Under investigation').length,'Case notes maintained','rgba(138,106,18,.14)')}${miniStat('Resolved (30d)',db.fraud.filter(f=>f.status==='Resolved').length+4,'No confirmed losses','rgba(15,122,92,.14)')}${miniStat('Rules active',12,'Velocity, duplicate, geo rules','rgba(31,131,201,.14)')}</div>
  <div class="panel flush">${T('frd',window._tblCfg.frd)}</div>`}
 function vTemplates(){window._tblCfg.tpl={rows:()=>db.templates,cols:[{t:'ID',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Template',k:'name'},{t:'Category',k:'cat',f:r=>badge('t')},{t:'Last updated',f:r=>dFmt(r.updated)}],
   actions:r=>`<button class="btn sm" data-act="tplGenerate" data-id="${r.id}">Generate document</button><button class="btn sm ghost" data-act="tplPreview" data-id="${r.id}">Preview</button>`};
@@ -1337,7 +1369,7 @@ function vCalculator(){const u=ui.calc=ui.calc||{p:1500000,r:12,t:12,m:'reducing
    ${fld('Desired instalment',inp('affD',u.afD||150000,'type="number"'))}
    <button class="btn primary" data-act="affRun">Check affordability</button>
    <div id="affOut"></div></div></div>
-  <div class="panel"><div class="ph"><h3>Payment breakdown</h3></div><div class="pb"><canvas class="chart" id="chCalc"></canvas></div><div class="legend"><span><i style="background:#38bdf8"></i>Principal portion</span><span><i style="background:#a78bfa"></i>Interest portion</span></div></div></div></div>`}
+  <div class="panel"><div class="ph"><h3>Payment breakdown</h3></div><div class="pb"><canvas class="chart" id="chCalc"></canvas></div><div class="legend"><span><i style="background:#1f83c9"></i>Principal portion</span><span><i style="background:#6b4fa8"></i>Interest portion</span></div></div></div></div>`}
 function renderCalc(){const P=+val('calcP')||1,r=+val('calcR')||0,t=Math.max(1,+val('calcT')||1),m=val('calcM');
  ui.calc=Object.assign({},ui.calc,{p:P,r:r,t:t,m:m,prod:val('calcProduct')});const res=calcSchedule(P,r*12,t,m);
  $('#calcOut').innerHTML=`<div class="calc-res">
@@ -1349,7 +1381,7 @@ function renderCalc(){const P=+val('calcP')||1,r=+val('calcR')||0,t=Math.max(1,+
   <div class="twrap" style="max-height:280px;overflow:auto"><table><thead><tr><th>#</th><th>Payment</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody>
   ${res.rows.map(x=>`<tr><td>${x.n}</td><td class="tamt">${num(x.pay)}</td><td>${num(x.pr)}</td><td>${num(x.int)}</td><td>${num(x.bal)}</td></tr>`).join('')}</tbody></table></div></details>`;
  const cv=$('#chCalc');if(cv){const draw=()=>{const pick=res.rows.filter((_,i)=>i%Math.ceil(res.rows.length/10)===0);
-  chartBar(cv,pick.map(x=>'P'+x.n),[{color:'#38bdf8',data:pick.map(x=>x.pr)},{color:'#a78bfa',data:pick.map(x=>x.int)}],{h:220,multi:true})};draw();CHARTS.push(draw)}
+  chartBar(cv,pick.map(x=>'P'+x.n),[{color:'#1f83c9',data:pick.map(x=>x.pr)},{color:'#6b4fa8',data:pick.map(x=>x.int)}],{h:220,multi:true})};draw();CHARTS.push(draw)}
  const affOut=$('#affOut');if(affOut&&ui.calc.aff){affOut.innerHTML=ui.calc.aff}}
 function math_approx(t){return 1+(t-1)/2*0.02}
 function runAfford(){const I=+val('affI')||0,E=+val('affE')||0,D=+val('affD')||0;ui.calc=ui.calc||{};ui.calc.afI=I;ui.calc.afE=E;ui.calc.afD=D;const free=I*db.settings.maxDTI/100-E;
@@ -1377,8 +1409,8 @@ const VIEWS={
  adminUsers:{t:'Admin Users',r:vAdminUsers},roles:{t:'Roles & Permissions',r:vRoles},workflows:{t:'Approval Workflows',r:vWorkflows},
  audit:{t:'Audit Logs',r:vAudit},security:{t:'Security & Sessions',r:vSecurity},compliance:{t:'Compliance & Risk',r:vCompliance},
  settings:{t:'System Settings',r:vSettings},backups:{t:'Backups',r:vBackups},
- reports:{t:'Reports & Analytics',r:vReports,after:()=>{const c=$('#chRpt');if(c){const f=()=>chartLine(c,['Jun','Jul','Aug','Sep','Oct'],[{color:'#34d399',data:[361000,398000,442000,402000,486000]},{color:'#fbbf24',data:[228000,231000,240000,235000,242000]}]);f();CHARTS.push(f)}}},
- risk:{t:'Risk & Portfolio',r:vRisk,after:()=>{const c=$('#chRisk');if(c){const f=()=>chartBar(c,['W1','W2','W3','W4','W5','W6'],[{color:'#60a5fa',data:[2400000,2210000,2680000,2350000,2890000,2410000]},{color:'#34d399',data:[2210000,2080000,2590000,2290000,2760000,2260000]}]);f();CHARTS.push(f)}}},
+ reports:{t:'Reports & Analytics',r:vReports,after:()=>{const c=$('#chRpt');if(c){const f=()=>chartLine(c,['Jun','Jul','Aug','Sep','Oct'],[{color:'#0f7a5c',data:[361000,398000,442000,402000,486000]},{color:'#c9a227',data:[228000,231000,240000,235000,242000]}]);f();CHARTS.push(f)}}},
+ risk:{t:'Risk & Portfolio',r:vRisk,after:()=>{const c=$('#chRisk');if(c){const f=()=>chartBar(c,['W1','W2','W3','W4','W5','W6'],[{color:'#7bb8e8',data:[2400000,2210000,2680000,2350000,2890000,2410000]},{color:'#0f7a5c',data:[2210000,2080000,2590000,2290000,2760000,2260000]}]);f();CHARTS.push(f)}}},
  branches:{t:'Branches',r:vBranches},loanOfficers:{t:'Loan Officers',r:vOfficers},payroll:{t:'Payroll',r:vPayroll},
  accounting:{t:'Accounting',r:vAccounting},investors:{t:'Investors',r:vInvestors},partners:{t:'Partners & Agents',r:vPartners},
  legal:{t:'Legal & Recovery',r:vLegal},api:{t:'API & Integrations',r:vApi},fraud:{t:'Fraud Monitoring',r:vFraud},templates:{t:'Templates',r:vTemplates},
@@ -1728,7 +1760,7 @@ const customActs={
   c.docs=c.docs||[];
   openModal({title:'Documents — '+c.case,size:'',
    body:`<div class="frow">${fld('Add a document',inp('lgDoc','','placeholder="e.g. Demand letter 12 Oct"'))}</div>
-    <div class="lst flush">${c.docs.length?c.docs.map(d=>`<div class="li"><span class="ic" style="background:rgba(96,165,250,.12)">📄</span><div><b>${esc(d.name)}</b><small>${dFmt(d.date)}</small></div></div>`).join(''):'<div class="empty">No documents filed on this case yet.</div>'}</div>`,
+    <div class="lst flush">${c.docs.length?c.docs.map(d=>`<div class="li"><span class="ic" style="background:rgba(31,131,201,.12)">📄</span><div><b>${esc(d.name)}</b><small>${dFmt(d.date)}</small></div></div>`).join(''):'<div class="empty">No documents filed on this case yet.</div>'}</div>`,
    foot:'<button class="btn ghost" data-mclose>Close</button><button class="btn primary" data-mact="ok">File document</button>'});
   modalActs.ok=()=>{const name=val('lgDoc');if(!name){toast('err','Name required','Describe the document first');return;}
    c.docs.push({name,date:new Date().toISOString()});
@@ -1759,7 +1791,7 @@ const customActs={
    return a.name+' → '+a.status;
   },'API & Integrations')},
  apiNote(){toast('info','Secrets never enter the database','Provider keys belong in Railway environment variables; this screen stores only the variable name and the integration status.')},
- apiLogs(e){const a=db.apis.find(x=>x.id===e.dataset.id);openModal({title:'Error log — '+a.name,body:`<div class="lst flush">${a.errors24===0?'<div class="empty">No errors in the last 24 hours.</div>':Array.from({length:a.errors24},(_,i)=>`<div class="li"><span class="ic" style="background:rgba(248,113,113,.12)">✗</span><div><b>HTTP ${504-i}</b><small>${dtFmt(dAgo(i*0.2))} · route retry succeeded after ${2+i*2}s</small></div></div>`).join('')}</div>`})},
+ apiLogs(e){const a=db.apis.find(x=>x.id===e.dataset.id);openModal({title:'Error log — '+a.name,body:`<div class="lst flush">${a.errors24===0?'<div class="empty">No errors in the last 24 hours.</div>':Array.from({length:a.errors24},(_,i)=>`<div class="li"><span class="ic" style="background:rgba(168,59,52,.12)">✗</span><div><b>HTTP ${504-i}</b><small>${dtFmt(dAgo(i*0.2))} · route retry succeeded after ${2+i*2}s</small></div></div>`).join('')}</div>`})},
  frdInvest(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Under investigation';save();render(false);toast('info','Case opened','Investigation notes enabled for '+f.id)},
  frdResolve(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Resolved';audit('Administrator','Fraud alert '+f.id+' resolved — no loss','Fraud');save();render(false);toast('ok','Resolved','False positive recorded for tuning')},
  tplGenerate(e){const t=db.templates.find(x=>x.id===e.dataset.id);openModal({title:'Generate — '+t.name,size:'lg',
@@ -1839,14 +1871,14 @@ function updateNotifCount(){const n=badgeCounts();
  const alerts=(db.staffAlerts||[]).filter(a=>!a.read);
  const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections+alerts.length;
  $('#notifCount').textContent=total;$('#notifCount').style.display=total?'grid':'none';
- const events=alerts.slice(0,4).map(a=>`<div class="it unread" data-alert="${a.id}" data-nav="${a.module||'dashboard'}"><span class="ic" style="background:rgba(52,211,153,.14)">🔔</span><div><b>${esc(a.title)}</b><small>${esc(a.body||'').slice(0,80)}</small></div></div>`).join('');
+ const events=alerts.slice(0,4).map(a=>`<div class="it unread" data-alert="${a.id}" data-nav="${a.module||'dashboard'}"><span class="ic" style="background:rgba(15,122,92,.14)">🔔</span><div><b>${esc(a.title)}</b><small>${esc(a.body||'').slice(0,80)}</small></div></div>`).join('');
  const queues=[
   ['📄',n.loanApps+' loan applications awaiting decision','loanApps',n.loanApps],
   ['🪪',n.kyc+' KYC submissions in queue','kyc',n.kyc],
   ['💸',n.withdrawals+' withdrawal requests pending','withdrawals',n.withdrawals],
   ['✅',n.workflows+' workflow steps awaiting you','workflows',n.workflows],
   ['⚠️',n.collections+' overdue loans in collections','collections',n.collections]]
-  .filter(x=>x[3]>0).map(x=>`<div class="it unread" data-nav="${x[2]}"><span class="ic" style="background:rgba(96,165,250,.12)">${x[0]}</span><div><b>${x[1]}</b><small>Tap to open module</small></div></div>`).join('');
+  .filter(x=>x[3]>0).map(x=>`<div class="it unread" data-nav="${x[2]}"><span class="ic" style="background:rgba(31,131,201,.12)">${x[0]}</span><div><b>${x[1]}</b><small>Tap to open module</small></div></div>`).join('');
  const body=events+(queues?'<h4>Action required</h4>':'')+queues;
  $('#notifDrop').innerHTML='<h4>Notifications</h4>'+(body||'<div class="it"><div><small>All clear — nothing needs attention.</small></div></div>');
 }
@@ -1899,7 +1931,7 @@ function showDataMode(){
   if (!el) return;
   if (!cloud.on) el.innerHTML = 'Not connected · <b style="color:var(--warn)">account service unreachable</b>';
   else if (cloud.state === 'conflict') el.innerHTML = 'Conflict · <b style="color:var(--warn)">reload to sync</b>';
-  else if (cloud.state === 'error') el.innerHTML = 'Write refused · <b style="color:var(--danger, #fda4af)">nothing stored</b>';
+  else if (cloud.state === 'error') el.innerHTML = 'Write refused · <b style="color:var(--bad)">nothing stored</b>';
   else if (cloud.state === 'saving') el.innerHTML = 'Saving · <b style="color:var(--acc)">Supabase</b>';
   else el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
 }
