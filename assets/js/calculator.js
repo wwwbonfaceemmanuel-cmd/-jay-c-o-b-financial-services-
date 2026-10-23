@@ -14,28 +14,77 @@
   var DATA = window.JCOB_DATA;
   var F = window.JCOB_FINANCE;
 
+  /* Every product in the catalogue, so a loan quoted on the products page
+     can be opened here and recomputed with the same arithmetic. */
   var PRESETS = {
-    personal: { label: "Personal Loan", rate: 24, min: 100000, max: 15000000, term: 12, maxTerm: 48, fee: 2 },
-    business: { label: "Business Loan", rate: 22, min: 500000, max: 50000000, term: 36, maxTerm: 60, fee: 2.5 },
-    emergency: { label: "Emergency Loan", rate: 28, min: 50000, max: 2000000, term: 6, maxTerm: 12, fee: 2 },
-    salary: { label: "Salary-based Loan", rate: 23, min: 100000, max: 10000000, term: 18, maxTerm: 36, fee: 2 },
-    short: { label: "Short-term Loan", rate: 29, min: 50000, max: 3000000, term: 3, maxTerm: 6, fee: 3 },
-    long: { label: "Long-term Loan", rate: 21, min: 1000000, max: 60000000, term: 60, maxTerm: 84, fee: 2.5 }
+    personal: { label: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    business: { label: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, term: 36, maxTerm: 60, fee: 2.5 },
+    emergency: { label: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, term: 6, maxTerm: 12, fee: 2 },
+    salary: { label: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 18, maxTerm: 36, fee: 2 },
+    employee: { label: "Employee Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 100000, max: 8000000, minTerm: 6, term: 12, maxTerm: 36, fee: 1.5 },
+    "small-business": { label: "Small-business Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 250000, max: 20000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    agricultural: { label: "Agricultural Loan", rate: 20, rateBasis: "annual", method: "reducing", min: 200000, max: 25000000, minTerm: 6, term: 12, maxTerm: 36, fee: 2 },
+    "short-term": { label: "Short-term Loan", rate: 29, rateBasis: "annual", method: "reducing", min: 50000, max: 3000000, minTerm: 1, term: 3, maxTerm: 6, fee: 3 },
+    "long-term": { label: "Long-term Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 1000000, max: 60000000, minTerm: 24, term: 60, maxTerm: 84, fee: 2.5 },
+    secured: { label: "Secured Loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, term: 24, maxTerm: 84, fee: 1.5 },
+    unsecured: { label: "Unsecured Loan", rate: 26, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 12, maxTerm: 36, fee: 2.5 }
   };
 
-  /* The admin console publishes the catalogue (rate, limits, fee, terms).
-     Re-point the presets at it so the calculator always quotes the site. */
+  var ORDER = Object.keys(PRESETS);
+
+  function shortLabel(name) {
+    return String(name || "")
+      .replace(/ Loan$/i, "")
+      .replace(/^Salary-based$/, "Salary")
+      .replace(/^Small-business$/, "Small business")
+      .replace(/^Short-term$/, "Short-term")
+      .replace(/^Long-term$/, "Long-term");
+  }
+
+  /* The admin console publishes the catalogue (rate, basis, method, limits,
+     fee, terms). Re-point every preset at it, add products the page does not
+     know about yet, and redraw the chips. */
   function syncCatalogue() {
     var store = window.JCOB_SITE;
     if (!store || !store.products) return;
-    Object.keys(PRESETS).forEach(function (key) {
-      var p = store.product(PRESETS[key].label);
-      if (!p) return;
-      if (isFinite(p.rate) && p.rate > 0) PRESETS[key].rate = Number(p.rate);
-      if (isFinite(p.min) && p.min > 0) PRESETS[key].min = Number(p.min);
-      if (isFinite(p.max) && p.max > 0) PRESETS[key].max = Number(p.max);
-      if (isFinite(p.fee) && p.fee >= 0) PRESETS[key].fee = Number(p.fee);
-      if (isFinite(p.maxTerm) && p.maxTerm > 0) PRESETS[key].maxTerm = Number(p.maxTerm);
+    store.products.forEach(function (p) {
+      if (!p || p.active === false || !p.name) return;
+      var key = p.id || String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      var preset = PRESETS[key] || { label: p.name, minTerm: 1, term: 12 };
+      preset.label = p.name;
+      if (isFinite(p.rate) && p.rate > 0) preset.rate = Number(p.rate);
+      if (p.rateBasis === "monthly" || p.rateBasis === "annual") preset.rateBasis = p.rateBasis;
+      if (p.method === "flat" || p.method === "reducing") preset.method = p.method;
+      if (isFinite(p.min) && p.min > 0) preset.min = Number(p.min);
+      if (isFinite(p.max) && p.max > 0) preset.max = Number(p.max);
+      if (isFinite(p.fee) && p.fee >= 0) preset.fee = Number(p.fee);
+      if (isFinite(p.minTerm) && p.minTerm > 0) preset.minTerm = Number(p.minTerm);
+      if (isFinite(p.maxTerm) && p.maxTerm > 0) preset.maxTerm = Number(p.maxTerm);
+      if (!preset.rateBasis) preset.rateBasis = "annual";
+      if (!preset.method) preset.method = "reducing";
+      if (!PRESETS[key]) { PRESETS[key] = preset; ORDER.push(key); }
+    });
+    renderPresetChips();
+  }
+
+  /* Chips are generated from the catalogue so every product is quotable. */
+  function renderPresetChips() {
+    var host = $("calc-presets");
+    if (!host) return;
+    host.innerHTML = ORDER.map(function (key, i) {
+      var p = PRESETS[key];
+      return '<span class="chip-radio"><input type="radio" name="calc-preset" id="preset-' + key + '" value="' + key + '"' +
+        (key === state.preset || (!state.preset && i === 0) ? " checked" : "") + ">" +
+        '<label for="preset-' + key + '">' + shortLabel(p.label) + "</label></span>";
+    }).join("");
+    bindPresetChips();
+  }
+
+  function bindPresetChips() {
+    document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
+      if (radio.dataset.bound) return;
+      radio.dataset.bound = "1";
+      radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
   }
 
@@ -98,20 +147,21 @@
     var hint = $("calc-term-hint");
     var basisHint = $("calc-basis-hint");
     if (!termEl) return;
+    var minMonths = Math.max(Math.round(Number(p.minTerm) || 1), 1);
     if (state.basis === "annual") {
       if (label) label.textContent = "Repayment period (years)";
-      termEl.min = "1";
+      termEl.min = String(Math.max(1, Math.ceil(minMonths / 12)));
       termEl.max = String(Math.max(1, Math.ceil(p.maxTerm / 12)));
       termEl.step = "1";
-      if (!keepValue) termEl.value = "1";
-      if (basisHint) basisHint.textContent = "Annual quotation: 1 year to start (12 instalments)";
+      if (!keepValue) termEl.value = String(Math.max(1, Math.ceil(minMonths / 12)));
+      if (basisHint) basisHint.textContent = "Annual quotation: " + termEl.value + " year" + (termEl.value === "1" ? "" : "s") + " to start";
     } else {
       if (label) label.textContent = "Repayment period (months)";
-      termEl.min = "1";
+      termEl.min = String(minMonths);
       termEl.max = String(p.maxTerm);
       termEl.step = "1";
-      if (!keepValue) termEl.value = "1";
-      if (basisHint) basisHint.textContent = "Monthly quotation: 1 month to start";
+      if (!keepValue) termEl.value = String(minMonths);
+      if (basisHint) basisHint.textContent = "Monthly quotation: " + minMonths + (minMonths === 1 ? " month" : " months") + " to start";
     }
     if (keepValue) {
       var current = Math.max(Math.round(Number(termEl.value) || 1), 1);
@@ -294,21 +344,32 @@
   }
 
   function applyPreset(key) {
-    var p = PRESETS[key];
-    state.preset = key;
-    state.rate = p.rate;
-    state.fee = p.fee;
+    var p = PRESETS[key] || PRESETS[ORDER[0]];
+    if (!p) return;
+    state.preset = key in PRESETS ? key : ORDER[0];
+    /* keep the chip row in step, including when the product came in on a
+       link from the products page */
+    var chip = document.querySelector('input[name="calc-preset"][value="' + state.preset + '"]');
+    if (chip) chip.checked = true;
+    /* The rate is quoted in the unit the product publishes, and the fields
+       say so: a 24% p.a. product fills 24 with an annual basis; a product
+       quoting 5% a month fills 5 with a monthly basis. */
+    state.rateBasis = p.rateBasis === "monthly" ? "monthly" : "annual";
+    if ($("calc-rate-basis")) $("calc-rate-basis").value = state.rateBasis;
+    state.method = p.method === "flat" ? "flat" : "reducing";
+    setMethod(state.method);
+    state.rate = Number(p.rate) || 0;
+    state.fee = Number(p.fee) || 0;
     state.amount = Math.min(Math.max(state.amount, p.min), p.max);
     $("calc-amount").value = state.amount;
     $("calc-amount").min = p.min;
     $("calc-amount").max = p.max;
-    var shownRate = rateForBasis(p.rate);
-    state.rate = shownRate;
-    $("calc-rate").value = shownRate;
-    $("calc-fee").value = p.fee;
+    $("calc-rate").value = state.rate;
+    $("calc-fee").value = state.fee;
     syncTermField(true);
     state.termMonths = termMonths();
     render();
+    syncRateField();
   }
 
   function exportCSV() {
@@ -375,9 +436,8 @@
     /* catalogue rate first, then the admin's default size / term / fee */
     applyPreset(state.preset);
     applyAdminDefaults();
-    document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
-      radio.addEventListener("change", function () { applyPreset(radio.value); });
-    });
+    renderPresetChips();
+    bindPresetChips();
     ["calc-amount", "calc-rate", "calc-term", "calc-frequency", "calc-fee", "calc-admin", "calc-start"].forEach(function (id) {
       var el = $(id);
       if (!el) return;

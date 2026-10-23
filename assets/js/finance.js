@@ -187,6 +187,104 @@
     };
   }
 
+  /* ------------------------------------------------------------------
+     productTerms() / productQuote()
+     ------------------------------------------------------------------
+     Every surface that quotes a loan product goes through here: the
+     product pages, the application flow, the calculator presets and the
+     rates page. One resolver, one arithmetic, so two pages can never
+     disagree about what a product costs.
+
+     The catalogue stores the quote as it is published:
+       rate      the figure the customer is shown
+       rateBasis 'annual' (p.a.) or 'monthly' (% per month)
+       method    'reducing' or 'flat'
+
+     The rate is applied in the unit the product is quoted in. Nothing is
+     silently re-quoted: a product quoting 24% p.a. is charged 2% a month
+     on the falling balance; a product quoting 5% a month flat is charged
+     principal × 5% × months, exactly as the calculator does it.
+     ------------------------------------------------------------------ */
+  function num(value, fallback) {
+    var n = Number(value);
+    return isFinite(n) ? n : fallback;
+  }
+
+  function productTerms(product, opts) {
+    opts = opts || {};
+    var p = product || {};
+    var legacyTerm = Array.isArray(p.term) ? p.term : null;
+    var minTerm = Math.max(Math.round(num(opts.minTerm, num(p.minTerm, legacyTerm ? legacyTerm[0] : 1))), 1);
+    var maxTerm = Math.max(Math.round(num(opts.maxTerm, num(p.maxTerm, legacyTerm ? legacyTerm[1] : 84))), minTerm);
+    var min = Math.max(num(opts.min, num(p.min, 0)), 0);
+    var max = Math.max(num(opts.max, num(p.max, 0)), min);
+    var basis = opts.rateBasis || p.rateBasis;
+    var method = opts.method || p.method;
+
+    var amount = num(opts.amount, num(opts.principal, (min + max) / 2));
+    if (min > 0) amount = Math.max(amount, min);
+    if (max > 0) amount = Math.min(amount, max);
+
+    var termMonths = Math.round(num(opts.termMonths, num(opts.term, minTerm)));
+    termMonths = Math.min(Math.max(termMonths, minTerm), maxTerm);
+
+    return {
+      id: p.id || "",
+      name: p.name || opts.name || "Loan",
+      rate: Math.max(num(p.rate, num(opts.rate, 0)), 0),
+      rateBasis: basis === "monthly" ? "monthly" : "annual",
+      method: method === "flat" ? "flat" : "reducing",
+      fee: Math.max(num(opts.fee, num(p.fee, 0)), 0),
+      min: min,
+      max: max,
+      minTerm: minTerm,
+      maxTerm: maxTerm,
+      amount: amount,
+      termMonths: termMonths,
+      frequency: opts.frequency === "fortnightly" ? "fortnightly" : "monthly",
+      startDate: opts.startDate || null
+    };
+  }
+
+  function productQuote(product, opts) {
+    var t = productTerms(product, opts);
+    var c = amortize({
+      principal: t.amount, rate: t.rate, rateBasis: t.rateBasis,
+      termMonths: t.termMonths, method: t.method, frequency: t.frequency,
+      processingFeePct: t.fee, adminFee: opts && opts.adminFee,
+      startDate: t.startDate
+    });
+    c.terms = t;
+    return c;
+  }
+
+  /* How the rate is spoken about on screen — "24% p.a. reducing balance",
+     "25% per month flat rate". Used by the product pages, the application
+     flow and the calculator so the wording matches the arithmetic. */
+  function ratePhrase(terms) {
+    if (!terms) return "";
+    var r = Number(terms.rate) || 0;
+    var figure = String(Math.round(r * 100) / 100) + "%";
+    if (terms.rateBasis === "monthly") {
+      return figure + " per month " + (terms.method === "flat" ? "flat rate" : "on the falling balance");
+    }
+    return figure + " p.a. " + (terms.method === "flat" ? "flat rate" : "reducing");
+  }
+
+  /* The arithmetic, written out — the same sentence the calculator prints. */
+  function formulaPhrase(c) {
+    if (!c) return "";
+    var mwk = formatMWK;
+    if (c.method === "flat") {
+      var perMonth = c.rateBasis === "monthly" ? c.rateInput : c.monthlyRate;
+      return mwk(c.principal) + " × " + (Math.round(perMonth * 100) / 100) + "% per month × " +
+        c.termMonths + (c.termMonths === 1 ? " month" : " months") + " = " + mwk(c.totalInterest) + " interest";
+    }
+    return (Math.round(c.ratePerPeriod * 100) / 100) + "% per " +
+      (c.frequency === "fortnightly" ? "fortnight" : "month") + " on the falling balance over " +
+      c.periods + (c.periods === 1 ? " instalment" : " instalments") + " = " + mwk(c.totalInterest) + " interest";
+  }
+
   /* Indicative APR: the annual rate that discounts the scheduled payments
      back to the net amount advanced (principal less up-front fees).
      Solved by bisection, so it reflects both interest and fees. */
@@ -241,6 +339,10 @@
     addFortnights: addFortnights,
     shortDate: shortDate,
     amortize: amortize,
+    productTerms: productTerms,
+    productQuote: productQuote,
+    ratePhrase: ratePhrase,
+    formulaPhrase: formulaPhrase,
     aprEstimate: aprEstimate,
     eligibilityAffordability: eligibilityAffordability,
     mask: mask

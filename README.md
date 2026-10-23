@@ -17,9 +17,9 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | --- | --- |
 | `index.html` | Branding, hero with Apply / Login / Register, five loan cards, eligibility overview, working calculator preview with basis selector, live feed + ticker + blog stream, how it works, why choose us, customer benefits, rates & repayment table, testimonials, FAQ, security & trust, contact |
 | `about.html` | Overview, mission & vision, values, history timeline, leadership, registration & licensing, CSR, location & contact |
-| `loan-products.html` | All eleven products with limits, terms, rates, fees, repayment frequency, eligibility, documents, plus a full comparison table |
+| `loan-products.html` | All eleven products with limits, terms, rates, fees, repayment frequency, eligibility and documents — each with a **worked example computed by the shared engine** (edit the amount or term and it re-quotes), plus a comparison table generated from the catalogue |
 | `apply.html` | Five-step application: product & amount → personal/employment → business & bank → documents → review, with draft saving, reference number and confirmation |
-| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **interest-rate basis dropdown (annual % p.a. / monthly % per month — applied exactly as quoted)**, **flat / reducing segmented selector**, amount, rate, term, disbursement date, monthly/fortnightly, processing & admin fees; **results sheet** in a fixed order — total amount, principal, interest rate, interest amount, duration period, schedule with dates, total repayment — plus a worked formula line, fees, APR, interest method, first/last instalment, dated schedule, CSV, print, reset and "Apply for This Loan" |
+| `calculator.html` | **Calculation basis dropdown (Monthly → 1 month, Annually → 1 year)**, **interest-rate basis dropdown (annual % p.a. / monthly % per month — applied exactly as quoted)**, **flat / reducing segmented selector**, amount, rate, term, disbursement date, monthly/fortnightly, processing & admin fees; **one preset per catalogue product (all eleven)** and **results sheet** in a fixed order — total amount, principal, interest rate, interest amount, duration period, schedule with dates, total repayment — plus a worked formula line, fees, APR, interest method, first/last instalment, dated schedule, CSV, print, reset and "Apply for This Loan" |
 | `eligibility.html` | Eight-question preliminary check scored out of 100 with per-criterion explanations and an apply link |
 | `how-it-works.html` | Ten steps from account creation to repayment and monitoring, with timings and requirements |
 | `interest-rates-fees.html` | Rate table with indicative APR, flat vs reducing comparison, every charge, three worked examples, total cost of borrowing |
@@ -34,7 +34,7 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 
 ### Loan maths and rate quoting
 
-`assets/js/finance.js` is the single engine behind the calculator, the application summary, the rates page and the dashboard. It applies the rate in the unit the customer selects:
+`assets/js/finance.js` is the single engine behind the calculator, the product pages, the application summary, the rates page and the dashboard. It applies the rate in the unit the customer selects:
 
 | Selection | Meaning | Example (MWK 100,000) |
 | --- | --- | --- |
@@ -47,6 +47,32 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 - The **first instalment always falls one full period after the disbursement date**; the schedule table and CSV show each dated instalment, with opening/closing balances.
 - Fees stay separate from the repayment figure: *Total repayment* is principal + interest, *Total amount* adds the processing/admin fees.
 - Every figure is MWK and rounded for display only; the engine keeps full precision, adjusting the final instalment.
+
+**One function, every product.** `JCOB_FINANCE.productQuote(product, { amount, termMonths })`
+resolves a catalogue product (its rate, rate basis, method, fee and published limits) and runs the
+same `amortize()` the calculator uses, clamping anything asked of it to those limits. Every surface
+calls it, so no two pages can quote different numbers for the same loan:
+
+| Surface | Quoted by |
+| --- | --- |
+| `index.html` product cards | a computed example line (`product-quotes.js`) |
+| `loan-products.html` cards | the worked example panel, with editable amount and term |
+| `loan-products.html` comparison table | rate, limits, term and fee written from the catalogue |
+| `calculator.html` | the eleven catalogue presets, each loading its own rate, basis, method and fee |
+| `apply.html` and the dashboard's apply flow | the summary, the review step and affordability, in the product's own unit |
+| `interest-rates-fees.html` | the three worked examples, read from the catalogue |
+
+A product card links into the calculator with its figures attached
+(`calculator.html?product=…&amount=…&term=…&fee=…`), and the calculator recomputes the same answer.
+
+### Signature pad
+
+`assets/js/onboard.js` draws the signature with an interpolating spline (Catmull-Rom converted to
+cubic Béziers), so the line passes through every point the pointer visits instead of joining samples
+with straight segments — any shape, cursive or print, loops and flicks included. Points come from
+pointer events with `setPointerCapture` and `getCoalescedEvents()`, the canvas backing store is sized
+for the device pixel ratio, and the pad offers undo, clear and a keyboard backspace. The signature is
+stored as strokes in the customer's document in Supabase, never in this browser.
 
 ### Live blog, announcements and motion system
 
@@ -225,11 +251,13 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 125 assertions
+npm test        # starts the Supabase stand-in + server, runs 431 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
-single-file bundle, an empty dashboard that ignores a stale browser copy), cloud mode (hydration,
+single-file bundle, an empty dashboard that ignores a stale browser copy), the product quotes (the
+flat-monthly rule, clamping, and every page against the engine), the signature pad (trace fidelity,
+curve rendering, undo/clear), cloud mode (hydration,
 catalogue, live feed, staff gate, role refusal, console persistence, decision round-trip,
 registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. The cloud
 suite also proves the browser holds no records: a change written in the dashboard lands in

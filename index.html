@@ -147,62 +147,62 @@
       </div>
 
       <div class="product-grid product-grid--5 mt-3 reveal">
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="personal" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <h3>Personal loan</h3>
           <p>For school fees, medical costs, home improvements or consolidation, repaid from salary.</p>
-          <p class="product-rate">24% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>24% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 100,000 – 15,000,000</b></span>
-            <span>6 – 48 months · monthly</span>
+            <span><b data-pq-limits>MWK 100,000 – 15,000,000</b></span>
+            <span data-pq-term>6 – 48 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="apply.html?product=Personal%20Loan">Apply now</a>
         </article>
 
-        <article class="product-card product-card--featured">
+        <article data-product-quote data-product-mini data-product="business" class="product-card product-card--featured">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>
           <h3>Business loan</h3>
           <p>Working capital, stock, equipment or expansion for registered Malawian businesses.</p>
-          <p class="product-rate">22% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>22% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 500,000 – 50,000,000</b></span>
-            <span>12 – 60 months · monthly</span>
+            <span><b data-pq-limits>MWK 500,000 – 50,000,000</b></span>
+            <span data-pq-term>12 – 60 months · monthly</span>
           </div>
           <a class="btn btn--gold btn--sm" href="apply.html?product=Business%20Loan">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="emergency" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
           <h3>Emergency loan</h3>
           <p>Fast, smaller facility for urgent costs, usually assessed and disbursed within a day.</p>
-          <p class="product-rate">28% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>28% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 50,000 – 2,000,000</b></span>
-            <span>3 – 12 months · monthly</span>
+            <span><b data-pq-limits>MWK 50,000 – 2,000,000</b></span>
+            <span data-pq-term>3 – 12 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="apply.html?product=Emergency%20Loan">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="short-term" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
           <h3>Short-term loan</h3>
           <p>One to six months of breathing room for a temporary cash-flow gap.</p>
-          <p class="product-rate">29% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>29% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 50,000 – 3,000,000</b></span>
+            <span><b data-pq-limits>MWK 50,000 – 3,000,000</b></span>
             <span>1 – 6 months · fortnightly option</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="apply.html?product=Short-term%20Loan">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="long-term" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>
           <h3>Long-term loan</h3>
           <p>Bigger projects spread over five to seven years at our lowest unsecured pricing.</p>
-          <p class="product-rate">21% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>21% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 1,000,000 – 60,000,000</b></span>
-            <span>24 – 84 months · monthly</span>
+            <span><b data-pq-limits>MWK 1,000,000 – 60,000,000</b></span>
+            <span data-pq-term>24 – 84 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="apply.html?product=Long-term%20Loan">Apply now</a>
         </article>
@@ -796,6 +796,7 @@
   <script src="assets/js/main.js" defer></script>
   <script src="assets/js/live.js" defer></script>
   <script src="assets/js/site-content.js" defer></script>
+  <script src="assets/js/product-quotes.js" defer></script>
   <script src="assets/js/quickcalc.js" defer></script>
 </body>
 </html>
