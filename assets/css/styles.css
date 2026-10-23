@@ -5078,3 +5078,263 @@ summary:focus-visible {
 .auth-recover a:hover { border-color: var(--line-strong); background: var(--cream); }
 .auth-recover strong { display: block; font-size: .8rem; color: var(--navy-800); }
 .auth-recover span { display: block; font-size: .74rem; color: var(--muted); margin-top: .12rem; }
+
+/* =====================================================================
+   THEME v6 — PREMIUM SURFACES
+   The white card is gone. Every module now sits on a pearl surface that
+   catches the light from the top-left, framed by the same gold hairline
+   the rest of the brand uses, and floats on layered shadows instead of a
+   flat drop shadow. Works for the public site and both dashboards, since
+   they share this stylesheet.
+
+   Rules are appended, so they win over the flat-white declarations that
+   came before them without those declarations being rewritten.
+   ===================================================================== */
+:root {
+  /* pearl: what "white" became */
+  --pearl: #fbfdff;
+  --pearl-soft: #f6fafd;
+  --pearl-shade: #eef5fb;
+  --pearl-emerald: #f0f8f5;
+
+  /* the lit surface: bright at the top-left corner, cooling to the base */
+  --premium-surface: linear-gradient(157deg, #ffffff 0%, #fdfeff 30%, #f8fbfe 64%, #f1f8fc 100%);
+  --premium-surface-soft: linear-gradient(160deg, #ffffff 0%, #fdfeff 46%, #f7fbfe 82%, #f3f9fd 100%);
+  --premium-surface-warm: linear-gradient(157deg, #ffffff 0%, #fefefd 34%, #fbfaf4 70%, #f8f6ec 100%);
+
+  /* the trim, softer than the full gold edge so a page of cards stays calm */
+  --premium-hair: linear-gradient(135deg,
+    rgba(138, 106, 18, 0.38) 0%, rgba(216, 181, 84, 0.62) 24%,
+    rgba(246, 236, 196, 0.95) 48%, rgba(201, 162, 39, 0.6) 72%,
+    rgba(138, 106, 18, 0.34) 100%);
+
+  /* depth: a long soft pool, a short contact shadow, a 1px seat */
+  --premium-shadow:
+    0 1px 2px rgba(4, 23, 26, 0.05),
+    0 10px 26px -20px rgba(13, 92, 150, 0.28),
+    0 34px 60px -42px rgba(4, 23, 26, 0.5);
+  --premium-shadow-hover:
+    0 1px 2px rgba(4, 23, 26, 0.06),
+    0 16px 34px -22px rgba(13, 92, 150, 0.36),
+    0 44px 76px -40px rgba(4, 23, 26, 0.55);
+  --premium-inset:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(13, 92, 150, 0.05);
+}
+
+/* ---------- 1. The ground the pearl sits on ---------- */
+body {
+  background:
+    radial-gradient(1200px 620px at 88% -12%, rgba(31, 131, 201, 0.13), transparent 62%),
+    radial-gradient(1000px 620px at -8% 2%, rgba(13, 107, 90, 0.12), transparent 60%),
+    radial-gradient(1100px 700px at 52% 112%, rgba(13, 92, 150, 0.12), transparent 64%),
+    linear-gradient(168deg, #f4f9fd 0%, var(--cream) 44%, #e7f0f8 76%, #e2edf5 100%);
+  background-attachment: fixed;
+}
+
+/* Section grounds: no more flat #fff slabs between sections */
+.section--paper { background: linear-gradient(180deg, #ffffff 0%, #fdfeff 48%, #f8fbfe 100%); }
+.section--cream-dark { background: linear-gradient(180deg, #e9f1f9 0%, #e3edf6 58%, #dde9f2 100%); }
+
+/* ---------- 2. Modules: the premium surface ---------- */
+.card,
+.product-card,
+.form-card,
+.auth-card,
+.calc-panel,
+.stat-card,
+.loan-card,
+.doc-card,
+.summary-card,
+.review-box,
+.live-blog,
+.app-panel,
+.table-wrap,
+.metric,
+.schedule-card,
+.modal-card,
+.app-modal-card,
+.legal-body,
+.dash-nav,
+.post-card,
+.price-card,
+.step,
+.steps-h .step-card,
+.live-archive-card {
+  background: var(--premium-surface) padding-box, var(--premium-hair) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--premium-shadow), var(--premium-inset);
+}
+
+/* Secondary modules: slightly quieter surface, same trim */
+.contact-item,
+.help-tile,
+.support-option,
+.quick-action,
+.doc-item,
+.admin-item,
+.bell-panel,
+.profile-panel,
+.toast,
+.segmented,
+.auth-recover a,
+.onb-method,
+.onb-check,
+.chip-radio label,
+.pager button {
+  background: var(--premium-surface-soft) padding-box, var(--premium-hair) border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    0 1px 2px rgba(4, 23, 26, 0.04),
+    0 12px 26px -24px rgba(13, 92, 150, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Severity stripes on toasts must survive the surface rule above */
+.toast--success { border-left-color: var(--success); }
+.toast--danger { border-left-color: var(--danger); }
+.toast--info { border-left-color: var(--gold-500); }
+
+/* Hover lifts the module on its own shadow, gold trim brightens */
+.card:hover,
+.card--link:hover,
+.product-card:hover,
+.post-card:hover,
+.live-blog:hover,
+.stat-card:hover,
+.metric:hover,
+.loan-card:hover,
+.step:hover,
+.doc-item:hover,
+.admin-item:hover,
+.quick-action:hover,
+.help-tile:hover,
+.support-option:hover,
+.live-archive-card:hover,
+.price-card:hover,
+.app-panel:hover {
+  box-shadow: var(--premium-shadow-hover), var(--premium-inset);
+}
+.doc-item:hover,
+.admin-item:hover,
+.quick-action:hover,
+.help-tile:hover,
+.support-option:hover {
+  box-shadow:
+    0 16px 32px -24px rgba(13, 92, 150, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+/* ---------- 3. Inputs and controls sit *in* the surface, not on it ---------- */
+.field input,
+.field select,
+.field textarea,
+.calc-field input,
+.calc-field select,
+.app-topbar .search input {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid rgba(166, 124, 26, 0.2);
+  box-shadow: inset 0 1px 2px rgba(4, 23, 26, 0.05), 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(4, 23, 26, 0.04), 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+
+/* ---------- 4. Dashboards: the same pearl inside the shells ---------- */
+.app-topbar {
+  background: linear-gradient(100deg, rgba(238, 247, 253, 0.94) 0%, rgba(236, 246, 243, 0.94) 58%, rgba(230, 242, 250, 0.94) 100%);
+  border-bottom: 1px solid transparent;
+  border-image: var(--premium-hair) 1;
+  box-shadow: 0 12px 26px -26px rgba(4, 23, 26, 0.7);
+}
+.app-content { position: relative; }
+.app-panel .app-panel-head {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 246, 0.72));
+  border-bottom: 1px solid rgba(166, 124, 26, 0.34);
+}
+.stat-card {
+  background: var(--premium-surface) padding-box, var(--premium-hair) border-box;
+  box-shadow: var(--premium-shadow), var(--premium-inset);
+}
+.table-wrap thead th {
+  background-image: linear-gradient(180deg, rgba(247, 251, 254, 0.98), rgba(235, 245, 242, 0.95));
+  border-bottom: 1px solid rgba(166, 124, 26, 0.34);
+}
+.table-wrap tbody tr:nth-child(even) { background: rgba(246, 250, 253, 0.72); }
+.table-wrap tbody tr:hover { background: rgba(201, 162, 39, 0.07); }
+
+/* ---------- 4b. Dark variants keep their darkness ----------
+   These share a class with a premium surface but are deliberately dark, so
+   they are re-stated after it: dark surface, gold frame, light text. */
+.card--dark,
+.card--feature {
+  background: linear-gradient(160deg, #0a373a 0%, #06262a 52%, #0a3f6b 100%) padding-box,
+    var(--gold-edge) border-box;
+  border: 1px solid transparent;
+  color: #b9c9d6;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(246, 236, 196, 0.18);
+}
+.price-card--featured {
+  background: linear-gradient(170deg, #06262a 0%, #04171a 100%) padding-box, var(--gold-edge) border-box;
+  border: 1px solid transparent;
+  color: #b9c9d6;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(246, 236, 196, 0.18);
+}
+.product-card--featured {
+  background: linear-gradient(160deg, #0b3c32 0%, #031613 100%) padding-box, var(--gold-edge) border-box;
+  border: 1px solid transparent;
+  color: #cfe4de;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(246, 236, 196, 0.18);
+}
+.stat-card--accent {
+  background: linear-gradient(155deg, #0f4e42 0%, #072922 100%) padding-box, var(--gold-edge) border-box;
+  border: 1px solid transparent;
+  color: #d5ece5;
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(246, 236, 196, 0.18);
+}
+.card--dark:hover,
+.card--feature:hover,
+.price-card--featured:hover,
+.product-card--featured:hover,
+.stat-card--accent:hover {
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(201, 162, 39, 0.28) inset;
+}
+
+/* ---------- 4c. The chrome above the pearl ---------- */
+.site-header {
+  background: linear-gradient(100deg, rgba(246, 250, 254, 0.93) 0%, rgba(242, 249, 247, 0.93) 56%, rgba(238, 247, 253, 0.93) 100%);
+  box-shadow: 0 14px 30px -30px rgba(4, 23, 26, 0.75);
+}
+.site-nav a { transition: color 0.18s var(--ease); }
+.site-footer {
+  background:
+    radial-gradient(900px 420px at 88% -20%, rgba(31, 131, 201, 0.22), transparent 62%),
+    linear-gradient(165deg, #06302c 0%, #04211f 62%, #041716 100%);
+}
+/* Primary actions get a gold seat under the emerald face */
+.btn--gold {
+  box-shadow:
+    0 14px 30px -20px rgba(4, 23, 26, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(201, 162, 39, 0.85);
+}
+.btn--ghost,
+.btn--line-gold {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 254, 0.9));
+}
+.brand-chip { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+
+/* ---------- 5. Print: premium surfaces flatten out ---------- */
+@media print {
+  .card, .product-card, .form-card, .auth-card, .calc-panel, .stat-card, .loan-card,
+  .app-panel, .table-wrap, .metric, .schedule-card, .modal-card, .app-modal-card,
+  .post-card, .price-card, .step, .live-archive-card {
+    background: #fff !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+  body { background: #fff !important; }
+}
