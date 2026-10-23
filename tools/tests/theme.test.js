@@ -67,8 +67,10 @@ t.ok("the site's sidebar really is that gradient",
 t.ok("console sidebar copies it exactly",
   /--chrome:linear-gradient\(185deg,#092f27/.test(adminCss) && /#031613 68%\)/.test(adminCss));
 t.ok("console sidebar paints with it", /background:var\(--chrome\)/.test(adminSidebar));
-t.ok("top bar is the site's app top bar",
-  /rgba\(235,\s*239,\s*245/.test(siteTopbar) && /rgba\(235,\s*239,\s*245/.test(adminTopbar));
+t.ok("top bar is a blue-to-emerald band",
+  /linear-gradient\(100deg/.test(adminTopbar) &&
+  /rgba\(219,237,250/.test(adminTopbar) && /rgba\(214,234,229/.test(adminTopbar));
+t.ok("top bar keeps a gold under-edge", /var\(--gold-edge\)/.test(adminCss.slice(adminCss.indexOf(".topbar::after"), adminCss.indexOf(".topbar::after") + 200)));
 
 /* ---- the brand lockup, not a hand-drawn mark ---- */
 t.ok("header uses the website lockup", /class="brand-logo" src="assets\/img\/logo-full\.svg"/.test(admin));
@@ -91,14 +93,40 @@ const left = legacy.filter((hex) => admin.toLowerCase().includes(hex));
 t.eq("old navy palette removed", left.join(", "), "");
 
 /* ---- surfaces are light, chrome is emerald ---- */
-t.ok("body sits on the cream background", /--cream:#eef4fa/.test(adminCss) && /body\{[^}]*radial-gradient/.test(adminCss));
-t.ok("panels are white cards", /\.panel\{[^}]*background:var\(--panel\)/.test(adminCss) && /--panel:rgba\(255,255,255/.test(adminCss));
-t.ok("top bar is the site app-bar", /\.topbar\{[^}]*background:rgba\(235,239,245/.test(adminCss));
+t.ok("body sits on the blue emerald ground", /body\{[^}]*radial-gradient/.test(adminCss) &&
+  /--bg-blue:#d7e9f7/.test(adminCss) && /--bg-emerald:#d2e8e1/.test(adminCss) &&
+  /linear-gradient\(163deg/.test(adminCss));
+t.ok("the ground runs crystal into emerald", /linear-gradient\(163deg,var\(--bg-mist\) 0%,var\(--bg-blue\)/.test(adminCss) && /var\(--bg-emerald\) 68%/.test(adminCss));
+t.ok("panels are white cards", /\.panel\{[^}]*padding-box/.test(adminCss) && /--panel:rgba\(255,255,255/.test(adminCss));
+t.ok("top bar is the blue emerald band", /\.topbar\{[^}]*linear-gradient\(100deg/.test(adminCss));
 t.ok("sidebar is emerald", /\.sidebar\{[^}]*background:var\(--chrome\)/.test(adminCss));
 t.ok("gold edge on the top bar", /\.topbar::after\{[^}]*var\(--gold-edge\)/.test(adminCss));
 
+/* ---- every module wears a gold edge ---- */
+const goldEdge = (sel) => {
+  const body = rule(adminCss, sel);
+  return /var\(--gold-edge\) border-box/.test(body) && /border:1px solid transparent/.test(body);
+};
+[".panel", ".stat", ".rpt-card", ".modal", ".drop"].forEach((sel) => {
+  t.ok(sel + " wears a gold edge", goldEdge(sel), rule(adminCss, sel).slice(0, 80));
+});
+t.ok("module headers carry a gold hairline",
+  /var\(--line\)/.test(rule(adminCss, ".panel .ph")) === false &&
+  /rgba\(201,162,39/.test(rule(adminCss, ".panel .ph")));
+t.ok("table heads carry a gold hairline", /rgba\(201,162,39/.test(rule(adminCss, "thead th")));
+t.ok("footer carries a gold edge", /border-image:var\(--gold-edge\)/.test(rule(adminCss, ".foot")));
+t.ok("the admin gate card wears a gold edge", /var\(--gold-edge\) border-box/.test(rule(adminCss, "#admin-gate .gate-card")));
+t.ok("the admin gate sits on the blue emerald ground", /linear-gradient\(163deg,var\(--bg-mist\)/.test(rule(adminCss, "#admin-gate")));
+
 /* ---- contrast: every text colour against the surface it sits on ---- */
-const surfaces = { white: "#ffffff", cream: "#eef4fa", tint: "#f2f7fb" };
+const surfaces = {
+  white: "#ffffff",
+  cream: "#eef4fa",
+  tint: "#f2f7fb",
+  "ground blue": adminTokens["--bg-blue"],
+  "ground emerald": adminTokens["--bg-emerald"],
+  "ground deep": adminTokens["--bg-deep"]
+};
 const text = {
   "ink": adminTokens["--ink"],
   "body": adminTokens["--body-txt"],
