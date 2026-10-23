@@ -45,10 +45,6 @@ window.JCOB_CONFIG = {
   buckets: {
     media: "site-media",
     kyc: "kyc-documents"
-  },
+  }
 
-  /* Legacy keys kept so older modules keep working. */
-  liveTable: "live_posts",
-  enquiriesTable: "enquiries",
-  clientsTable: "clients"
 };
