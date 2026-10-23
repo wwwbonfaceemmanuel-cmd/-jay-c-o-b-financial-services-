@@ -47,7 +47,11 @@ const { reporter, makeDom, ready, sleep } = require("./lib");
     const text = d.body.textContent.replace(/\s+/g, " ");
     t.ok("interest 25,000", /25,000/.test(text));
     t.ok("repayment 125,000", /125,000/.test(text));
-    t.ok("dated instalment 22 Nov 2026", /22 Nov 2026/.test(text));
+    /* one month from today, in the calculator's own date format */
+    const due = new Date();
+    due.setMonth(due.getMonth() + 1);
+    const stamp = due.getDate() + " " + due.toLocaleString("en-GB", { month: "short" }) + " " + due.getFullYear();
+    t.ok("dated instalment " + stamp, text.includes(stamp));
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }

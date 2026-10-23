@@ -6,7 +6,7 @@ three values and running one SQL file.
 
 **Status: the project is already configured.**
 `assets/js/config.js` carries the public URL and anon key for
-`cybaejegytnvtitznofp.supabase.co`, so the site is in cloud mode as soon as
+`lgftgochlcbakovdhmhb.supabase.co`, so the site is in cloud mode as soon as
 it is served. Two things remain, and both need your Supabase login:
 
 1. **Run `supabase/install.sql`** in the SQL editor — one paste that
@@ -62,8 +62,8 @@ Visitor / customer            Admin console (admin.html)
 
 ## Phase 1 — Supabase (about 10 minutes)
 
-1. The project already exists: **`cybaejegytnvtitznofp`**
-   (`https://cybaejegytnvtitznofp.supabase.co`). If you rebuild it from
+1. The project already exists: **`lgftgochlcbakovdhmhb`**
+   (`https://lgftgochlcbakovdhmhb.supabase.co`). If you rebuild it from
    scratch, create a new project and paste the new URL + anon key into
    `assets/js/config.js` (or into the Railway variables in Phase 2).
    Keep the **service-role** key to yourself — it must never be in the

@@ -209,10 +209,10 @@ Operational details:
   to the right customer's document.
 - **Photos** uploaded in the Live Feed editor go to the public `site-media` bucket after being
   downscaled to 1200 px JPEG; the post stores the public URL.
-- **Fallback**: if the cloud is unreachable the site uses its local cache; the console shows a
-  `Cloud error` badge in the Website connection panel.
+- **Fallback**: if the cloud is unreachable the dashboard shows a banner and refuses to pretend a
+  change was saved; the console shows a `Cloud error` badge in the Website connection panel.
 
-The project is already pointed at Supabase (`cybaejegytnvtitznofp`). Two steps remain:
+The project is already pointed at Supabase (`lgftgochlcbakovdhmhb`, `assets/js/config.js`). Two steps remain:
 run `supabase/install.sql` (schema + seeded content in one paste), then promote your
 administrator. Open
 **`system-check.html`** on the deployed site for a live diagnosis — it tests the configuration,
