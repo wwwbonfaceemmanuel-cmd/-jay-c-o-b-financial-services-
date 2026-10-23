@@ -2,7 +2,7 @@
    (the local stand-in, tools/dev/mock-cloud.js). */
 "use strict";
 
-const { reporter, makeDom, ready, sleep, rest, API } = require("./lib");
+const { ROOT, reporter, makeDom, ready, sleep, rest, API } = require("./lib");
 
 const STAFF = { email: "admin@jaycob.mw", password: "Admin123!" };
 const CUSTOMER = { email: "customer@jaycob.mw", password: "Customer123!" };
@@ -143,6 +143,99 @@ async function signInGate(w, creds) {
     t.ok("edit reloaded from Supabase",
       (w2.JCOB_PORTAL.db().customers || []).some((c) => c.name === "Persisted Customer"));
     w2.close();
+  }
+
+  console.log("\n[cloud mode — every console button has a handler]");
+  {
+    const fs = require("fs");
+    const path = require("path");
+    const html = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
+    const acts = [...new Set([...html.matchAll(/data-act="([A-Za-z0-9_]+)"/g)].map((m) => m[1]))];
+
+    const { dom } = makeDom("admin.html");
+    await ready(dom);
+    const w = dom.window;
+    await signInGate(w, STAFF);
+    await sleep(1500);
+
+    const missing = acts.filter((a) => typeof (w.JCOB_CONSOLE_ACTIONS || {})[a] !== "function");
+    t.eq("no button without a handler", missing.join(","), "");
+    t.ok("no fake confirmations left", !/placeholder — not wired|not wired yet/i.test(html));
+    w.close();
+  }
+
+  console.log("\n[cloud mode — console records reach Supabase]");
+  {
+    const { dom, errors } = makeDom("admin.html");
+    await ready(dom);
+    const w = dom.window;
+    await signInGate(w, STAFF);
+    await sleep(1600);
+    const before = w.JCOB_PORTAL.db().branches.length;
+
+    w.location.hash = "#/branches";
+    await sleep(250);
+    const add = w.document.querySelector('[data-act="brAdd"]');
+    t.ok("add-branch button rendered", !!add);
+    add.click();
+    await sleep(200);
+    t.ok("add form opened", !!w.document.getElementById("brName"));
+    w.document.getElementById("brName").value = "Kasungu Service Point";
+    w.document.getElementById("brDist").value = "Kasungu";
+    w.document.querySelector('[data-mact="ok"]').click();
+    await sleep(1600);
+
+    const branch = w.JCOB_PORTAL.db().branches.find((b) => b.name === "Kasungu Service Point");
+    t.ok("branch added in memory", !!branch);
+    t.eq("branch count grew", w.JCOB_PORTAL.db().branches.length, before + 1);
+    t.eq("console synced", w.JCOB_PORTAL.cloud.state, "synced");
+    t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
+
+    const rows = await rest("portal_docs?id=eq.main&select=data");
+    const stored = (rows[0] && rows[0].data && rows[0].data.branches) || [];
+    t.ok("branch stored in portal_docs", stored.some((b) => b.name === "Kasungu Service Point"));
+    w.close();
+
+    const again = makeDom("admin.html");
+    await ready(again.dom);
+    const w2 = again.dom.window;
+    await signInGate(w2, STAFF);
+    await sleep(1600);
+    t.ok("branch survives a reload",
+      w2.JCOB_PORTAL.db().branches.some((b) => b.name === "Kasungu Service Point"));
+    w2.close();
+  }
+
+  console.log("\n[cloud mode — two staff cannot overwrite each other]");
+  {
+    const a = makeDom("admin.html");
+    await ready(a.dom);
+    const wa = a.dom.window;
+    await signInGate(wa, STAFF);
+    await sleep(1600);
+
+    const b = makeDom("admin.html");
+    await ready(b.dom);
+    const wb = b.dom.window;
+    await signInGate(wb, STAFF);
+    await sleep(1600);
+
+    wa.JCOB_PORTAL.db().branches.push({ id: "BR-TA", name: "First Session Branch", district: "Lilongwe", manager: "", cust: 0, portfolio: 0, cash: 0 });
+    wa.JCOB_PORTAL.save();
+    await sleep(1500);
+    t.eq("first session saved", wa.JCOB_PORTAL.cloud.state, "synced");
+
+    wb.JCOB_PORTAL.db().branches.push({ id: "BR-TB", name: "Second Session Branch", district: "Blantyre", manager: "", cust: 0, portfolio: 0, cash: 0 });
+    wb.JCOB_PORTAL.save();
+    await sleep(1500);
+    t.eq("second session refused", wb.JCOB_PORTAL.cloud.state, "conflict");
+
+    const rows = await rest("portal_docs?id=eq.main&select=data");
+    const stored = (rows[0] && rows[0].data && rows[0].data.branches) || [];
+    t.ok("first session's work kept", stored.some((x) => x.name === "First Session Branch"));
+    t.ok("second session's work not written", !stored.some((x) => x.name === "Second Session Branch"));
+    wa.close();
+    wb.close();
   }
 
   console.log("\n[cloud mode — customer dashboard]");

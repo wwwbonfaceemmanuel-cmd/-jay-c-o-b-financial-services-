@@ -416,6 +416,7 @@ function configDb(){
     auditL:[], sessions:[], savings:[], fees:[], ledger:[], recon:[],
     statements:[], officers:[], investors:[], agents:[], payroll:[],
     legal:[], fraud:[], backups:[], tasks:[], activities:[], ptps:[],
+    documents:[], exceptions:[],
     roles:[
       {name:'Super Admin',perms:{customers:1,kyc:1,loanApprove:1,disburse:1,repayments:1,reverse:1,fees:1,reports:1,admins:1,roles:1,settings:1,writeoff:1}},
       {name:'Loan Officer',perms:{customers:1,kyc:1,loanApprove:1,disburse:0,repayments:1,reverse:0,fees:1,reports:1,admins:0,roles:0,settings:0,writeoff:0}},
@@ -471,14 +472,35 @@ let db=seed();
    back. Nothing is kept in the browser, so the console can never show a
    record the database does not hold. */
 const cloud=(()=>{const c=window.JCOB_CLOUD;return{on:!!(c&&c.enabled),state:(c&&c.enabled)?'connecting':'offline',at:null,error:null,api:c}})();
-let cloudTimer=null;
+let cloudTimer=null,cloudBusy=false,cloudAgain=false;
+
+/* One write at a time, and every write carries the updated_at of the
+   version this page loaded. Two staff editing the same book therefore
+   cannot silently overwrite each other: the second save is refused with
+   a CONFLICT and the page says so instead of losing the first person's
+   work. */
 function cloudPush(){
   if(!cloud.on){cloud.state='offline';return;}
+  if(cloudBusy){cloudAgain=true;return;}
   clearTimeout(cloudTimer);
-  cloud.state='saving';
   cloudTimer=setTimeout(async()=>{
-    try{await cloud.api.docs.put('portal','main',db);cloud.state='synced';cloud.at=new Date().toISOString();cloud.error=null;}
-    catch(e){cloud.state='error';cloud.error=String(e&&e.message||e);}
+    cloudBusy=true;cloud.state='saving';
+    try{
+      const row=await cloud.api.docs.put('portal','main',db,cloud.at);
+      cloud.state='synced';cloud.error=null;
+      cloud.at=(row&&row.updated_at)||new Date().toISOString();
+    }catch(e){
+      if(e&&e.code==='CONFLICT'){
+        cloud.state='conflict';cloud.error=e.message;
+        toast('warn','Not saved — edited elsewhere','Another session saved changes first. Reload to take their version before editing further.');
+      }else{
+        cloud.state='error';cloud.error=String(e&&e.message||e);
+        toast('err','Not saved','The database refused the write. Nothing was stored — check your connection.');
+      }
+    }
+    cloudBusy=false;
+    if(cloudAgain){cloudAgain=false;cloudPush();}
+    if(typeof showDataMode==='function')showDataMode();
     try{window.JCOB_ADMIN_SITE&&window.JCOB_ADMIN_SITE.refreshCloud&&window.JCOB_ADMIN_SITE.refreshCloud();}catch(e){}
   },500);
 }
@@ -576,6 +598,23 @@ function confirmAct(title,msg,btnLabel,fn,type){openModal({title,size:'',body:`<
  foot:`<button class="btn ghost" data-mclose>Cancel</button><button class="btn ${type||'primary'}" data-mact="ok">${btnLabel}</button>`});
  modalActs.ok=()=>{fn();closeModal()}}
 function val(id){const el=$('#'+id);return el?el.value.trim():''}
+
+/* Every "+ Add" / "Register" / "Open case" button goes through addForm, so a
+   button can never report success without writing a record. The record lands
+   in the console document and save() sends it to Supabase. */
+function addForm(title, fields, apply, module){
+  openModal({title,
+    body:'<div class="frow">'+fields.map(f=>fld(f[0],f[1])).join('')+'</div>',
+    foot:'<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="ok">Save record</button>'});
+  modalActs.ok=()=>{
+    const label=apply();
+    if(!label) return;
+    audit('Administrator','Created '+title.toLowerCase()+' — '+label,module);
+    save();closeModal();render(false);
+    toast('ok','Saved',label+' written to the database');
+  };
+}
+function nextId(prefix,list){let n=list.length+1;while(list.some(r=>r.id===prefix+String(n).padStart(2,'0')))n++;return prefix+String(n).padStart(2,'0')}
 
 /* ---------------- canvas charts ---------------- */
 function setupCanvas(cv,h){const dpr=window.devicePixelRatio||1;const w=cv.clientWidth||(cv.parentElement&&cv.parentElement.clientWidth)||600;cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
@@ -676,7 +715,15 @@ function buildNav(){const counts=badgeCounts();
   const items=g.items.map(([id,label,ic])=>`<button class="navlink ${route===id?'active':''}" data-nav="${id}">${ICONS[ic]}<span>${label}</span>${counts[id]?`<span class="cnt">${counts[id]}</span>`:''}</button>`).join('');
   const open=(ui.navClosed||[]).includes(g.g)?'closed':'';
   return `<div class="navgrp ${open}"><button class="gh" data-grp="${g.g}">${g.g}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="items">${items}</div></div>`}).join('')+
-  `<div class="syncbox"><b><span class="pulse"></span> WEBSITE CONNECTED</b><br>Website connected · every record is read from and written to Supabase.</div>`}
+  `<div class="syncbox"><b><span class="pulse"></span> ${cloud.on?'WEBSITE CONNECTED':'NOT CONNECTED'}</b><br>${cloudStateText()}</div>`}
+function cloudStateText(){
+  if(!cloud.on)return 'Supabase is unreachable. The console will not accept changes until it is back.';
+  if(cloud.state==='conflict')return 'Conflict: another session saved first. Reload before editing further.';
+  if(cloud.state==='error')return 'Last write was refused. Nothing was stored — check the connection.';
+  if(cloud.state==='saving')return 'Saving to Supabase…';
+  if(cloud.state==='synced'&&cloud.at)return 'Every record is stored in Supabase · last saved '+new Date(cloud.at).toLocaleTimeString('en-GB');
+  return 'Every record is read from and written to Supabase.';
+}
 let route=location.hash.replace('#/','')||'dashboard';
 window.addEventListener('hashchange',()=>{route=location.hash.replace('#/','')||'dashboard';render(true)});
 document.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');if(n){location.hash='#/'+n.dataset.nav;$('.sidebar').classList.remove('open')}
@@ -1394,7 +1441,17 @@ const customActs={
    if(amt<p.min||amt>p.max)return toast('err','Amount out of range',p.name+' allows '+num(p.min)+' — '+num(p.max));
    const id=uid('APP-30');db.applications.unshift({id,cust:val('naC'),product:p.name,amount:amt,term:+val('naT'),date:new Date().toISOString(),status:'Pending',officer:'Unassigned',score:60+Math.floor(Math.random()*25),purpose:val('naPu')});
    audit('Administrator','New application '+id+' — '+val('naC'),'Loan Applications');save();closeModal();render(false);toast('ok','Application received',id)}},
- assessException(){toast('info','Exception path opened','Senior credit committee note field added to case file (placeholder — not wired yet)')},
+ assessException(e){const app=db.applications.find(a=>a.id===e.dataset.id);if(!app)return;
+  addForm('Manual credit exception — '+app.id,[
+    ['Reason',sel('exR',['Debt-to-income above policy','Thin credit file','Irregular income','Committee discretion','Other'],'Committee discretion')],
+    ['Committee note',inp('exN','','placeholder="What was considered"')],
+    ['Policy override (months of term)',inp('exT','0','type="number" min="0"')]
+  ],()=>{
+    const reason=val('exR');
+    db.exceptions.unshift({id:uid('EXC'),app:app.id,cust:app.cust,reason,note:val('exN'),extraTerm:+val('exT')||0,by:'Administrator',date:new Date().toISOString()});
+    app.exception=reason;
+    return reason+' on '+app.id;
+  },'Credit Assessment')},
  // products
  prodNew(){prodModal(null)},prodEdit(e){prodModal(e.dataset.id)},
  prodToggle(e){const p=db.products.find(x=>x.id===e.dataset.id);p.active=!p.active;audit('Administrator',(p.active?'Activated':'Deactivated')+' product '+p.name,'Loan Products');save();render(false);toast('ok','Product updated',p.name)},
@@ -1558,7 +1615,14 @@ const customActs={
    <p class="hint">An invite email with a temporary password and 2FA enrolment link is sent automatically.</p>`});
   modalActs.go=()=>{db.admins.push({id:uid('ADM'),name:val('adN')||'New Staff',email:val('adE')||'staff@jaycobfinancial.mw',role:val('adR'),status:'Active',lastLogin:new Date().toISOString()});
    audit('Administrator','Created admin account for '+val('adN'),'Admin Users');save();closeModal();render(false);toast('ok','Account created','Invitation sent')}},
- admEdit(e){toast('info','Profile editor','Edit drawer for '+e.dataset.id+' (role changes audit-logged)')},
+ admEdit(e){const a=db.admins.find(x=>x.id===e.dataset.id);if(!a)return;
+  openModal({title:'Edit staff account — '+a.id,
+   body:`<div class="frow">${fld('Full name',inp('adEN',a.name))}${fld('Role',sel('adER',db.roles.map(r=>r.name),a.role))}</div>
+    <div class="frow">${fld('Status',sel('adES',['Active','Inactive'],a.status))}${fld('Branch',sel('adEB',db.branches.map(b=>b.name),a.branch))}</div>`,
+   foot:'<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="ok">Save changes</button>'});
+  modalActs.ok=()=>{a.name=val('adEN')||a.name;a.role=val('adER')||a.role;a.status=val('adES')||a.status;a.branch=val('adEB')||a.branch;
+   audit('Administrator','Updated staff account '+a.id+' — '+a.role+' / '+a.status,'Admin Users');save();closeModal();render(false);
+   toast('ok','Updated',a.name+' · '+a.role)}},
  admToggle(e){const a=db.admins.find(x=>x.id===e.dataset.id);a.status=a.status==='Active'?'Inactive':'Active';audit('Administrator',(a.status==='Active'?'Reactivated':'Deactivated')+' admin '+a.name,'Admin Users');save();render(false);toast('ok','Updated',a.name)},
  permToggle(e){const r=db.roles[+e.dataset.ri];if(r.name==='Super Admin')return;const k=e.dataset.k;r.perms[k]=r.perms[k]?0:1;e.classList.toggle('on');
   audit('Administrator','Permission '+(r.perms[k]?'granted':'revoked')+' — '+PERM_LABELS[k]+' on '+r.name,'Roles');save();toast('ok','RBAC updated',r.name+' · '+PERM_LABELS[k])},
@@ -1579,11 +1643,31 @@ const customActs={
  bkpVerify(e){toast('ok','Integrity check passed','All row hashes verified for '+e.dataset.id)},
  // reports / risk
  rptRun(e){runReport(e.dataset.id,e.dataset.pdf)},
- brAdd(){toast('info','Branch wizard','District, manager and float setup captured (placeholder — not wired yet)')},
+ brAdd(){addForm('Add branch',[
+   ['Branch name',inp('brName','','placeholder="e.g. Kasungu Service Point"')],
+   ['District',inp('brDist')],
+   ['Manager',inp('brMgr')],
+   ['Opening cash (MWK)',inp('brCash','0','type="number" min="0"')]
+  ],()=>{
+   const name=val('brName'); if(!name){toast('err','Name required','Enter the branch name first');return null;}
+   const id=nextId('BR-',db.branches);
+   db.branches.push({id,name,district:val('brDist')||'—',manager:val('brMgr')||'—',cust:0,portfolio:0,cash:+val('brCash')||0});
+   return name+' ('+id+')';
+  },'Branches')},
  brReport(e){const b=db.branches.find(x=>x.id===e.dataset.id);openModal({title:'Branch performance — '+b.name,size:'lg',
   body:`<div class="calc-res" style="grid-template-columns:repeat(3,1fr)"><div class="cr"><span>Customers</span><b>${num(b.cust)}</b></div><div class="cr"><span>Portfolio</span><b style="font-size:14px">${mwk(b.portfolio)}</b></div><div class="cr"><span>Cash cover</span><b>${pct(100*b.cash/b.portfolio)}</b></div>
   <div class="cr"><span>NPL (30d)</span><b>2.8%</b></div><div class="cr"><span>Growth QoQ</span><b class="up">+11%</b></div><div class="cr"><span>Staff</span><b>6 officers</b></div></div>`})},
- loAdd(){toast('info','Officer onboarding','Profile + branch assignment flow opened (placeholder — not wired yet)')},
+ loAdd(){addForm('Add loan officer',[
+   ['Full name',inp('loName')],
+   ['Branch',sel('loBr',db.branches.map(b=>b.name),db.branches[0]&&db.branches[0].name)],
+   ['Borrower portfolio (MWK)',inp('loPf','0','type="number" min="0"')],
+   ['Repayment rate (%)',inp('loRate','0','type="number" min="0" max="100"')]
+  ],()=>{
+   const name=val('loName'); if(!name){toast('err','Name required','Enter the officer name first');return null;}
+   const id=nextId('OFF-',db.officers);
+   db.officers.push({id,name,branch:val('loBr')||'—',apps:0,portfolio:+val('loPf')||0,repaidRate:+val('loRate')||0,dpd30:0});
+   return name+' ('+id+')';
+  },'Loan Officers')},
  loAssign(e){const o=db.officers.find(x=>x.id===e.dataset.id);toast('info','Worklist','Balancing queue for '+o.name+' — 2 reassignments proposed')},
  prlVerify(e){const p=db.payroll.find(x=>x.id===e.dataset.id);p.verified=true;audit('Administrator','Salary verified with '+p.employer,'Payroll');save();render(false);toast('ok','Verified',p.employer+' confirmed employment')},
  prlRun(){db.payroll.forEach(p=>{if(p.status==='Deducted'){const l=db.loans.find(x=>x.cust===p.cust&&x.status==='Active');if(l){l.paidTotal+=p.deduction;l.balance=Math.max(0,l.balance-p.deduction+Math.round(p.deduction*0.1))}}});
@@ -1596,33 +1680,108 @@ const customActs={
    db.ledger.unshift({id:uid('JR'),date:new Date().toISOString(),ref:val('glR'),account:dr.name,debit:amt,credit:0,narr:val('glN')});
    db.ledger.unshift({id:uid('JR'),date:new Date().toISOString(),ref:val('glR'),account:cr.name,debit:0,credit:amt,narr:val('glN')});
    audit('Administrator','Journal posted '+val('glR')+' — '+mwk(amt),'Accounting');save();closeModal();render(false);toast('ok','Journal posted','Books remain balanced')}},
- glEntries(){toast('info','Ledger entries','Filtered journal listing opened (see Transaction Ledger)')},
- invAdd(){toast('info','Investor onboarding','Capital agreement + rate card flow (placeholder — not wired yet)')},
+ glEntries(){const rows=db.ledger.slice(0,40);
+  openModal({title:'Journal entries',size:'lg',
+   body:rows.length?`<table style="font-size:12px"><thead><tr><th>Ref</th><th>Date</th><th>Account</th><th style="text-align:right">Debit</th><th style="text-align:right">Credit</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td class="tid">${esc(r.ref)}</td><td>${dFmt(r.date)}</td><td>${esc(r.account)}</td><td style="text-align:right" class="tamt">${r.debit?mwk(r.debit):''}</td><td style="text-align:right" class="tamt">${r.credit?mwk(r.credit):''}</td></tr>`).join('')}
+   </tbody></table>`:'<div class="empty">No journal entries yet. Post one from Accounting.</div>',
+   foot:'<button class="btn ghost" data-mclose>Close</button>'})},
+ invAdd(){addForm('Register investor',[
+   ['Investor name',inp('ivName')],
+   ['Capital committed (MWK)',inp('ivCap','0','type="number" min="0"')],
+   ['Rate p.a. (%)',inp('ivRate','0','type="number" min="0" max="100"')]
+  ],()=>{
+   const name=val('ivName'); if(!name){toast('err','Name required','Enter the investor name first');return null;}
+   const id=nextId('INV-',db.investors);
+   db.investors.push({id,name,capital:+val('ivCap')||0,rate:+val('ivRate')||0,returns:0,paid:0,status:'Active'});
+   return name+' ('+id+')';
+  },'Investors')},
  invPay(e){const i=db.investors.find(x=>x.id===e.dataset.id);const due=i.returns-i.paid;i.paid=i.returns;audit('Administrator','Paid investor distribution '+mwk(due)+' to '+i.name,'Investors');save();render(false);toast('ok','Distribution paid',mwk(due)+' to '+i.name)},
- invStm(){toast('ok','Statement created','Investor statement queued for delivery')},
- agtAdd(){toast('info','Agent registration','KYC + commission structure flow (placeholder — not wired yet)')},
+ invStm(e){const i=db.investors.find(x=>x.id===e.dataset.id);if(!i)return;
+  const ref=uid('STM');
+  db.statements.unshift({id:ref,ref,type:'Investor statement',party:i.name,period:new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}),
+    capital:i.capital,returns:i.returns,paid:i.paid,date:new Date().toISOString()});
+  audit('Administrator','Investor statement '+ref+' for '+i.name,'Investors');save();render(false);
+  toast('ok','Statement created',ref+' saved — available to the investor')},
+ agtAdd(){addForm('Register agent or partner',[
+   ['Agent / partner name',inp('agName')],
+   ['Commission due (MWK)',inp('agCom','0','type="number" min="0"')],
+   ['Status',sel('agSt',['Active','Deactivated'],'Active')]
+  ],()=>{
+   const name=val('agName'); if(!name){toast('err','Name required','Enter the partner name first');return null;}
+   const id=nextId('AGT-',db.agents);
+   db.agents.push({id,name,refs:0,commission:+val('agCom')||0,paid:0,status:val('agSt')||'Active'});
+   return name+' ('+id+')';
+  },'Partners')},
  agtPay(e){const a=db.agents.find(x=>x.id===e.dataset.id);a.paid=a.commission;audit('Administrator','Paid commission to '+a.name,'Partners');save();render(false);toast('ok','Commission paid',a.name)},
  agtToggle(e){const a=db.agents.find(x=>x.id===e.dataset.id);a.status=a.status==='Active'?'Deactivated':'Active';save();render(false);toast('ok','Updated',a.name)},
  lglAdvance(e){const l=db.legal.find(x=>x.id===e.dataset.id);const stages=['Demand letter issued','Court filing','Judgment obtained','Enforcement / attachment','Settlement agreement','Closed'];
   const i=stages.indexOf(l.stage)+1;l.stage=stages[Math.min(i,stages.length-2)];l.updated=new Date().toISOString();
   audit('Administrator','Legal case '+l.id+' advanced — '+l.stage,'Legal');save();render(false);toast('ok','Stage updated',l.stage)},
- lglDoc(){toast('info','Documents','Signed filings and notices listed in case folder (placeholder — not wired yet)')},
- lglAdd(){toast('info','Recovery case','Case intake requires delinquency > 90 days + committee approval (placeholder — not wired yet)')},
- apiConfig(){toast('info','API configuration','Provider keys stored with vault encryption (placeholder — not wired yet)')},
+ lglDoc(e){const c=db.legal.find(x=>x.id===e.dataset.id);if(!c)return;
+  c.docs=c.docs||[];
+  openModal({title:'Documents — '+c.case,size:'',
+   body:`<div class="frow">${fld('Add a document',inp('lgDoc','','placeholder="e.g. Demand letter 12 Oct"'))}</div>
+    <div class="lst flush">${c.docs.length?c.docs.map(d=>`<div class="li"><span class="ic" style="background:rgba(96,165,250,.12)">📄</span><div><b>${esc(d.name)}</b><small>${dFmt(d.date)}</small></div></div>`).join(''):'<div class="empty">No documents filed on this case yet.</div>'}</div>`,
+   foot:'<button class="btn ghost" data-mclose>Close</button><button class="btn primary" data-mact="ok">File document</button>'});
+  modalActs.ok=()=>{const name=val('lgDoc');if(!name){toast('err','Name required','Describe the document first');return;}
+   c.docs.push({name,date:new Date().toISOString()});
+   audit('Administrator','Filed document on '+c.id+' — '+name,'Legal');save();closeModal();render(false);
+   toast('ok','Filed',name+' saved on the case')}},
+ lglAdd(){addForm('Open recovery case',[
+   ['Case title',inp('lgCase','','placeholder="e.g. Defaulted personal loan"')],
+   ['Amount at stake (MWK)',inp('lgAmt','0','type="number" min="0"')],
+   ['Recovery partner',inp('lgOff')],
+   ['Loan reference (optional)',inp('lgLoan')],
+   ['Opening stage',sel('lgStage',['Demand letter issued','Court filing','Judgment obtained','Enforcement / attachment','Settlement agreement'],'Demand letter issued')]
+  ],()=>{
+   const title=val('lgCase'); if(!title){toast('err','Title required','Describe the case first');return null;}
+   const id=nextId('CASE-',db.legal);
+   db.legal.unshift({id,case:title,stage:val('lgStage')||'Demand letter issued',amount:+val('lgAmt')||0,
+     officer:val('lgOff')||'—',loan:val('lgLoan')||'',updated:new Date().toISOString(),docs:[]});
+   return title+' ('+id+')';
+  },'Legal')},
+ apiConfig(){addForm('Configure integration',[
+   ['Integration',sel('acApi',db.apis.map(a=>a.name),db.apis[0]&&db.apis[0].name)],
+   ['Status',sel('acSt',['Operational','Degraded','Not configured'],'Not configured')],
+   ['Latency (e.g. 240 ms)',inp('acLat','—')],
+   ['Environment variable that holds the key',inp('acEnv','','placeholder="e.g. AIRTEL_CLIENT_SECRET"')]
+  ],()=>{
+   const a=db.apis.find(x=>x.name===val('acApi')); if(!a){toast('err','Choose an integration','Pick one from the list');return null;}
+   a.status=val('acSt')||'Not configured'; a.latency=val('acLat')||'—'; a.env=val('acEnv')||'';
+   a.configuredAt=new Date().toISOString();
+   return a.name+' → '+a.status;
+  },'API & Integrations')},
+ apiNote(){toast('info','Secrets never enter the database','Provider keys belong in Railway environment variables; this screen stores only the variable name and the integration status.')},
  apiLogs(e){const a=db.apis.find(x=>x.id===e.dataset.id);openModal({title:'Error log — '+a.name,body:`<div class="lst flush">${a.errors24===0?'<div class="empty">No errors in the last 24 hours.</div>':Array.from({length:a.errors24},(_,i)=>`<div class="li"><span class="ic" style="background:rgba(248,113,113,.12)">✗</span><div><b>HTTP ${504-i}</b><small>${dtFmt(dAgo(i*0.2))} · route retry succeeded after ${2+i*2}s</small></div></div>`).join('')}</div>`})},
  frdInvest(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Under investigation';save();render(false);toast('info','Case opened','Investigation notes enabled for '+f.id)},
  frdResolve(e){const f=db.fraud.find(x=>x.id===e.dataset.id);f.status='Resolved';audit('Administrator','Fraud alert '+f.id+' resolved — no loss','Fraud');save();render(false);toast('ok','Resolved','False positive recorded for tuning')},
  tplGenerate(e){const t=db.templates.find(x=>x.id===e.dataset.id);openModal({title:'Generate — '+t.name,size:'lg',
   body:`<div class="frow">${fld('Customer',sel('tgC',db.customers.map(c=>c.name),undefined))}${fld('For loan (optional)',sel('tgL',['—'].concat(db.loans.map(l=>l.id)),undefined))}</div>`,
   foot:`<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="go">Generate PDF</button>`});
-  modalActs.go=()=>{closeModal();toast('ok','Document generated','Saved to customer document store & console')} },
+  modalActs.go=()=>{const who=val('tgC'),loan=val('tgL');
+   const id=uid('DOC');
+   db.documents.unshift({id,template:t.name,customer:who||'—',loan:loan&&loan!=='—'?loan:'—',date:new Date().toISOString(),status:'Generated'});
+   audit('Administrator','Generated '+t.name+' for '+(who||'—')+' ('+id+')','Document Templates');
+   save();closeModal();render(false);
+   toast('ok','Document generated',id+' recorded — download it from the customer file')} },
  tplPreview(e){const t=db.templates.find(x=>x.id===e.dataset.id);openModal({title:t.name,size:'lg',body:`<div style="background:#fff;color:#111;border-radius:10px;padding:26px;font-size:12.5px;line-height:1.8;min-height:300px">
   <h2 style="font-size:16px;margin-bottom:4px">JAY C O B FINANCIAL SERVICES</h2><div style="color:#666;font-size:11px;margin-bottom:14px">${t.name} — Template preview</div>
   <p>This agreement is made between <b>{{customer_name}}</b> of {{district}} (the "Borrower") and JAY C O B FINANCIAL SERVICES (the "Lender").</p>
   <p><b>Principal:</b> MWK {{amount}} · <b>Rate:</b> {{rate}}% per month · <b>Term:</b> {{term}} months · <b>Instalment:</b> MWK {{emi}}</p>
   <p>The Borrower consents to repayment per the amortization schedule and authorizes recovery action on default beyond the grace period…</p>
   <div style="margin-top:30px;color:#999;font-size:11px">Signature: __________________ &nbsp;&nbsp; Date: ____ / ____ / 2026</div></div>`})},
- tplNew(){toast('info','Template editor','WYSIWYG blocks + merge fields (placeholder — not wired yet)')},
+ tplNew(){addForm('New document template',[
+   ['Template name',inp('tpName','','placeholder="e.g. Restructure Addendum"')],
+   ['Category',sel('tpCat',['Agreements','Consent','Receipts','Statements','Letters','Notices'],'Agreements')],
+   ['Merge fields (comma separated)',inp('tpFields','customer_name, amount, rate, term, emi')]
+  ],()=>{
+   const name=val('tpName'); if(!name){toast('err','Name required','Enter the template name first');return null;}
+   const id=nextId('TPL-',db.templates);
+   db.templates.push({id,name,cat:val('tpCat')||'Agreements',updated:new Date().toISOString(),
+     fields:val('tpFields').split(',').map(f=>f.trim()).filter(Boolean)});
+   return name+' ('+id+')';
+  },'Document Templates')},
  // calculator actions
  openCalc(){location.hash='#/calculator'},
  calcRun(){renderCalc();toast('ok','Calculated','Schedule generated below')},
@@ -1644,6 +1803,9 @@ function prodModal(id){const p=id?db.products.find(x=>x.id===id):{name:'New Prod
   audit('Administrator','Saved product '+p.name,'Loan Products');save();closeModal();render(false);toast('ok','Product saved',p.name)}}
 // wire custom action dispatcher
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const fn=customActs[b.dataset.act];if(fn){e.preventDefault();fn(b)}});
+/* Test surface: buttons are declared as data-act names; the suite checks
+   that every one of them resolves to a real handler. */
+window.JCOB_CONSOLE_ACTIONS=customActs;
 
 /* ---------------- topbar behaviours ---------------- */
 function updateNotifCount(){const n=badgeCounts();const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections;
@@ -1702,8 +1864,11 @@ function showIdentity(){
 function showDataMode(){
   const el = document.getElementById('dataMode');
   if (!el) return;
-  if (cloud.on) el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
-  else el.innerHTML = 'Not connected · <b style="color:var(--warn)">account service unreachable</b>';
+  if (!cloud.on) el.innerHTML = 'Not connected · <b style="color:var(--warn)">account service unreachable</b>';
+  else if (cloud.state === 'conflict') el.innerHTML = 'Conflict · <b style="color:var(--warn)">reload to sync</b>';
+  else if (cloud.state === 'error') el.innerHTML = 'Write refused · <b style="color:var(--danger, #fda4af)">nothing stored</b>';
+  else if (cloud.state === 'saving') el.innerHTML = 'Saving · <b style="color:var(--acc)">Supabase</b>';
+  else el.innerHTML = 'System Operational · Data source: <b style="color:var(--teal)">Supabase</b>';
 }
 showIdentity();
 showDataMode();

@@ -28,7 +28,10 @@
      from(table)              → query builder (select/insert/update/
                                 upsert/delete + eq/in/order/limit/single)
      docs.get(kind, id)       → { data, updated_at } | null
-     docs.put(kind, id, data) → saved row
+     docs.put(kind, id, data, expected?) → saved row
+                                (expected = updated_at for a
+                                 conditional write; throws code
+                                 CONFLICT instead of clobbering)
      customer.load() / customer.save(data)
      auth.signIn / signUp / signOut / session / user / profile /
      auth.isStaff / auth.onChange
@@ -275,12 +278,33 @@
       .catch(function () { return null; });
   }
 
-  function putDoc(kind, id, data) {
+  /* Write one document.
+     `expected` is the updated_at of the version this page loaded. When it is
+     supplied the write is conditional: if somebody else saved in between,
+     nothing is overwritten and the caller gets a CONFLICT error. */
+  function putDoc(kind, id, data, expected) {
     if (!enabled) return Promise.resolve(null);
+    var row = { id: id, data: data, updated_at: new Date().toISOString() };
+    if (!expected) {
+      return from(docTable(kind))
+        .upsert(row, "id")
+        .run()
+        .then(function (rows) { return Array.isArray(rows) ? rows[0] : rows; });
+    }
     return from(docTable(kind))
-      .upsert({ id: id, data: data, updated_at: new Date().toISOString() }, "id")
+      .update(row)
+      .eq("id", id)
+      .eq("updated_at", expected)
       .run()
-      .then(function (rows) { return Array.isArray(rows) ? rows[0] : rows; });
+      .then(function (rows) {
+        var list = Array.isArray(rows) ? rows : (rows ? [rows] : []);
+        if (!list.length) {
+          var err = new Error("Another session saved changes to this document first.");
+          err.code = "CONFLICT";
+          throw err;
+        }
+        return list[0];
+      });
   }
 
   /* ---------------- customer document ---------------- */
