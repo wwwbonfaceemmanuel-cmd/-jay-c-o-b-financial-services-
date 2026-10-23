@@ -126,5 +126,26 @@ check("install.sql contains the seed", /insert into public\.site_docs/.test(inst
 check("schema runs before the seed",
   install.indexOf("enable row level security") < install.indexOf("insert into public.site_docs"));
 
+/* rebuild.sql: the repair script must carry the whole schema, the profile
+   backfill, the content and the verification report — in that order. */
+const rebuild = fs.readFileSync(path.join(ROOT, "supabase", "rebuild.sql"), "utf8");
+const at = (needle) => rebuild.indexOf(needle);
+check("rebuild.sql has a pre-flight report", rebuild.includes("-- 1. PRE-FLIGHT"));
+check("rebuild.sql carries every table",
+  ["profiles", "site_docs", "portal_docs", "customer_docs", "enquiries", "audit_log"]
+    .every((t) => rebuild.includes("create table if not exists public." + t)));
+check("rebuild.sql creates both buckets",
+  rebuild.includes("('site-media', 'site-media', true)") &&
+  rebuild.includes("('kyc-documents', 'kyc-documents', false)"));
+check("rebuild.sql backfills existing logins",
+  rebuild.includes("where not exists (select 1 from public.profiles p where p.id = u.id)"));
+check("rebuild.sql keeps the seed", /insert into public\.site_docs/.test(rebuild));
+check("rebuild.sql order: schema → backfill → content → verify",
+  at("create table if not exists public.customer_docs") < at("-- 3. BACKFILL") &&
+  at("-- 3. BACKFILL") < at("insert into public.site_docs") &&
+  at("insert into public.site_docs") < at("-- 5. VERIFY"));
+check("rebuild.sql hard reset is commented out",
+  !/^drop table if exists public\.profiles/m.test(rebuild));
+
 console.log("\nRESULT " + pass + "/" + (pass + fail));
 process.exit(fail ? 1 : 0);
