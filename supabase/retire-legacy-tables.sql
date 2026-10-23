@@ -123,7 +123,14 @@ $$;
 -- ---------------------------------------------------------------------
 do $$
 declare
-  allow_data_loss boolean := false;   -- set to true only after exporting
+  -- =====================================================================
+  -- THE ONLY LINE YOU EDIT.
+  --   false (default) = dry run: it counts the rows, names them, deletes
+  --                     nothing and stops with an error.
+  --   true            = the drop actually runs.
+  -- Leave it false until you have exported anything you may need.
+  -- =====================================================================
+  allow_data_loss boolean := false;
   t text;
   n bigint;
   dirty text[] := array[]::text[];
