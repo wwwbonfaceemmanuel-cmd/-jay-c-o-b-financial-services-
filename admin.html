@@ -85,6 +85,9 @@ input,select,textarea{font-family:inherit}
 /* ---------- CONTENT ---------- */
 .content{flex:1;min-width:0;padding:22px 26px 40px;overflow-x:hidden}
 .page-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:18px}
+.aback{display:inline-flex;align-items:center;gap:6px;background:rgba(96,165,250,.09);border:1px solid rgba(96,165,250,.22);color:#9fc4f2;font:600 11.5px/1 Inter,system-ui,sans-serif;padding:6px 11px;border-radius:8px;cursor:pointer;margin-bottom:11px;letter-spacing:.02em;transition:background .15s,color .15s}
+.aback:hover{background:rgba(96,165,250,.18);color:#cfe3ff}
+.aback:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
 .page-h h2{font-size:22px;font-weight:800;letter-spacing:.01em}
 .page-h p{color:var(--muted);font-size:13px;margin-top:4px;max-width:720px}
 .btn{display:inline-flex;align-items:center;gap:7px;border-radius:11px;border:1px solid var(--line2);padding:9px 15px;font-size:12.5px;font-weight:700;color:var(--txt);background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(99,102,241,.2));transition:.18s}
@@ -416,7 +419,7 @@ function configDb(){
     auditL:[], sessions:[], savings:[], fees:[], ledger:[], recon:[],
     statements:[], officers:[], investors:[], agents:[], payroll:[],
     legal:[], fraud:[], backups:[], tasks:[], activities:[], ptps:[],
-    documents:[], exceptions:[],
+    documents:[], exceptions:[], staffAlerts:[],
     roles:[
       {name:'Super Admin',perms:{customers:1,kyc:1,loanApprove:1,disburse:1,repayments:1,reverse:1,fees:1,reports:1,admins:1,roles:1,settings:1,writeoff:1}},
       {name:'Loan Officer',perms:{customers:1,kyc:1,loanApprove:1,disburse:0,repayments:1,reverse:0,fees:1,reports:1,admins:0,roles:0,settings:0,writeoff:0}},
@@ -726,7 +729,8 @@ function cloudStateText(){
 }
 let route=location.hash.replace('#/','')||'dashboard';
 window.addEventListener('hashchange',()=>{route=location.hash.replace('#/','')||'dashboard';render(true)});
-document.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');if(n){location.hash='#/'+n.dataset.nav;$('.sidebar').classList.remove('open')}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-alert]');if(a){const it=(db.staffAlerts||[]).find(x=>x.id===a.dataset.alert);if(it&&!it.read){it.read=true;save();updateNotifCount()}}
+ const n=e.target.closest('[data-nav]');if(n){location.hash='#/'+n.dataset.nav;$('.sidebar').classList.remove('open')}
  const g=e.target.closest('[data-grp]');if(g){ui.navClosed=ui.navClosed||[];const i=ui.navClosed.indexOf(g.dataset.grp);i>=0?ui.navClosed.splice(i,1):ui.navClosed.push(g.dataset.grp);buildNav()}
  const m=e.target.closest('[data-mtab]');if(m){const p=m.dataset.mtab;tabsModal[p]=m.dataset.v;renderModalTab(p)}});
 
@@ -807,7 +811,9 @@ function vCustomers(){window._tblCfg.customers={rows:()=>db.customers,per:9,
    ${miniStat('Combined balances',mwk(db.customers.reduce((a,c)=>a+Math.max(c.balance,0),0)),'Positive wallet balances','rgba(56,189,248,.14)')}
    ${miniStat('Combined savings',mwk(db.customers.reduce((a,c)=>a+c.savings,0)),'Across '+db.savings.length+' savings accounts','rgba(167,139,250,.14)')}</div>
  <div class="panel flush">${T('customers',window._tblCfg.customers)}</div>`}
-function pageHead(t,d,btns){return `<div class="page-h"><div><h2>${t}</h2><p>${d}</p></div><div style="display:flex;gap:9px;flex-wrap:wrap">${btns||''}</div></div>`}
+/* Every module except the main dashboard carries a way back. */
+function pageHead(t,d,btns){return `${route==='dashboard'?'':'<button class="aback" type="button" data-back>← Back</button>'}
+<div class="page-h"><div><h2>${t}</h2><p>${d}</p></div><div style="display:flex;gap:9px;flex-wrap:wrap">${btns||''}</div></div>`}
 function miniStat(lb,vl,sb,bg){return `<div class="stat" style="--glow:${bg};--ibg:${bg}"><div class="lb">${lb}</div><div class="vl" style="font-size:20px">${vl}</div><div class="sb">${sb}</div></div>`}
 let tabsModal={};
 function renderModalTab(){/* re-open customer profile with chosen tab */}
@@ -1803,20 +1809,47 @@ function prodModal(id){const p=id?db.products.find(x=>x.id===id):{name:'New Prod
   audit('Administrator','Saved product '+p.name,'Loan Products');save();closeModal();render(false);toast('ok','Product saved',p.name)}}
 // wire custom action dispatcher
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const fn=customActs[b.dataset.act];if(fn){e.preventDefault();fn(b)}});
+/* Back navigation: return to the module you came from, or the main
+   dashboard when this is the first page of the session. */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-back]');if(!b)return;e.preventDefault();
+ if(history.length>1){history.back()}else{location.hash='#/dashboard'}});
 /* Test surface: buttons are declared as data-act names; the suite checks
    that every one of them resolves to a real handler. */
 window.JCOB_CONSOLE_ACTIONS=customActs;
 
 /* ---------------- topbar behaviours ---------------- */
-function updateNotifCount(){const n=badgeCounts();const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections;
+/* ---------------- staff notifications ----------------
+   Raised by real events (a new website application, a new ticket, a KYC
+   submission, a failed message). Stored in the console document, so they
+   survive a reload and are shared by every staff member. */
+function staffAlert(kind,title,body,module){
+  db.staffAlerts=db.staffAlerts||[];
+  const key=kind+'|'+title;
+  if(db.staffAlerts.some(a=>a.key===key))return null;
+  const item={id:uid('ALT'),key,kind,title,body,module,at:new Date().toISOString(),read:false};
+  db.staffAlerts.unshift(item);
+  if(db.staffAlerts.length>60)db.staffAlerts.length=60;
+  save();updateNotifCount();
+  if(window.JCOB_CONSOLE_ACTIONS)toast('info',title,body);
+  return item;
+}
+window.JCOB_STAFF_ALERT=staffAlert;
+
+function updateNotifCount(){const n=badgeCounts();
+ const alerts=(db.staffAlerts||[]).filter(a=>!a.read);
+ const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections+alerts.length;
  $('#notifCount').textContent=total;$('#notifCount').style.display=total?'grid':'none';
- $('#notifDrop').innerHTML='<h4>Action required</h4>'+[
+ const events=alerts.slice(0,4).map(a=>`<div class="it unread" data-alert="${a.id}" data-nav="${a.module||'dashboard'}"><span class="ic" style="background:rgba(52,211,153,.14)">🔔</span><div><b>${esc(a.title)}</b><small>${esc(a.body||'').slice(0,80)}</small></div></div>`).join('');
+ const queues=[
   ['📄',n.loanApps+' loan applications awaiting decision','loanApps',n.loanApps],
   ['🪪',n.kyc+' KYC submissions in queue','kyc',n.kyc],
   ['💸',n.withdrawals+' withdrawal requests pending','withdrawals',n.withdrawals],
   ['✅',n.workflows+' workflow steps awaiting you','workflows',n.workflows],
   ['⚠️',n.collections+' overdue loans in collections','collections',n.collections]]
-  .filter(x=>x[3]>0).map(x=>`<div class="it unread" data-nav="${x[2]}"><span class="ic" style="background:rgba(96,165,250,.12)">${x[0]}</span><div><b>${x[1]}</b><small>Tap to open module</small></div></div>`).join('')||'<div class="it"><div><small>All clear — nothing needs attention.</small></div></div>'}
+  .filter(x=>x[3]>0).map(x=>`<div class="it unread" data-nav="${x[2]}"><span class="ic" style="background:rgba(96,165,250,.12)">${x[0]}</span><div><b>${x[1]}</b><small>Tap to open module</small></div></div>`).join('');
+ const body=events+(queues?'<h4>Action required</h4>':'')+queues;
+ $('#notifDrop').innerHTML='<h4>Notifications</h4>'+(body||'<div class="it"><div><small>All clear — nothing needs attention.</small></div></div>');
+}
 let clockTick=0;
 setInterval(()=>{clockTick++;$('#clock').textContent=new Date().toLocaleString('en-GB',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' · Blantyre'},1000);
 $('#clock').textContent=new Date().toLocaleString('en-GB');

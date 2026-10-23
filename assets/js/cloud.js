@@ -453,9 +453,13 @@
     }, true);
   }
 
-  function signIn(email, password) {
+  /* Sign in with an email address or with a phone number and password. */
+  function signIn(identifier, password) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
-    return authCall("token?grant_type=password", { email: email, password: password })
+    var body = { password: password };
+    if (String(identifier || "").indexOf("@") >= 0) body.email = String(identifier).trim();
+    else body.phone = normalisePhone(identifier);
+    return authCall("token?grant_type=password", body)
       .then(function (payload) {
         var next = normaliseAuth(payload);
         if (!next) throw new Error("No session returned");
@@ -469,14 +473,22 @@
       });
   }
 
+  /* Create an account. Supabase accepts an email address or a phone
+     number as the identity; when there is no email the phone is the
+     account and the one-time code goes by SMS. */
   function signUp(input) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
     var meta = {
       full_name: input.fullName || "",
       phone: input.phone || "",
+      email: input.email || "",
       account_no: input.accountNo || ""
     };
-    return authCall("signup", { email: input.email, password: input.password, data: meta })
+    var identity = input.email ? { email: input.email } : { phone: input.phone };
+    if (!identity.email && !identity.phone) {
+      return Promise.reject(new Error("An email address or a phone number is required."));
+    }
+    return authCall("signup", Object.assign(identity, { password: input.password, data: meta }))
       .then(function (payload) {
         var next = normaliseAuth(payload);
         if (!next) return { needsConfirmation: true, user: (payload && payload.user) || (payload && payload.id ? payload : null) };
@@ -522,6 +534,16 @@
     return Promise.resolve(true);
   }
 
+  /* Local numbers arrive as 0999…, 265999… or +265999…. Supabase stores
+     E.164, so every path sends the same digits. */
+  function normalisePhone(v) {
+    var d = String(v || "").replace(/[^\d]/g, "");
+    if (!d) return "";
+    if (d.charAt(0) === "0") d = "265" + d.slice(1);
+    else if (d.indexOf("265") !== 0 && d.length <= 9) d = "265" + d;
+    return "+" + d;
+  }
+
   function recover(email) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
     return authCall("recover", { email: email });
@@ -544,6 +566,42 @@
     });
   }
 
+  /* ---------------- Phone sign-in and sign-up (SMS one-time codes) -------
+     Used when the customer has no email, or prefers the phone. Supabase
+     generates the code, sends it by SMS and checks it; the browser never
+     decides whether a code is right. */
+  function sendPhoneOtp(phone) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("otp", { phone: String(phone || "").trim(), channel: "sms", should_create_user: true });
+  }
+
+  function verifyPhoneOtp(phone, token) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("verify", { type: "sms", phone: String(phone || "").trim(), token: String(token || "").trim() })
+      .then(adoptSession);
+  }
+
+  /* Turn a successful auth response into the signed-in state every page
+     expects: session stored, profile loaded, listeners told. */
+  function adoptSession(payload) {
+    var next = normaliseAuth(payload);
+    if (!next) throw new Error("That code is incorrect or has expired.");
+    session = next;
+    writeSession(session);
+    return loadProfile().then(function (p) {
+      if (p) return p;
+      return ensureProfile({
+        fullName: (session.user && (session.user.user_metadata || {}).full_name) || "",
+        phone: (session.user && session.user.phone) || "",
+        email: (session.user && session.user.email) || ""
+      });
+    }).then(function (p) {
+      bridgeUiSession();
+      emit();
+      return { session: session, profile: p };
+    });
+  }
+
   /* A one-time code sent to the address on the account. Supabase issues,
      stores and expires it; nothing is validated in the browser. */
   function sendOtp(email) {
@@ -554,18 +612,7 @@
   /* Exchange the emailed code for a session. */
   function verifyOtp(email, token) {
     if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
-    return authCall("verify", { type: "email", email: email, token: token })
-      .then(function (payload) {
-        var next = normaliseAuth(payload);
-        if (!next) throw new Error("That code is incorrect or has expired.");
-        session = next;
-        writeSession(session);
-        return loadProfile().then(function (p) {
-          bridgeUiSession();
-          emit();
-          return { session: session, profile: p };
-        });
-      });
+    return authCall("verify", { type: "email", email: email, token: token }).then(adoptSession);
   }
 
   function isStaff(p) {
@@ -651,11 +698,14 @@
     refresh: refresh,
     auth: {
       signIn: signIn,
+      normalisePhone: normalisePhone,
       signUp: signUp,
       recover: recover,
       updatePassword: updatePassword,
       adoptedLink: adoptedLink,
       sendOtp: sendOtp,
+      sendPhoneOtp: sendPhoneOtp,
+      verifyPhoneOtp: verifyPhoneOtp,
       verifyOtp: verifyOtp,
       signOut: signOut,
       ensureProfile: ensureProfile,

@@ -173,6 +173,13 @@
           origin: "website"
         });
         changed = true;
+        /* The console is told about the new application as it arrives. */
+        if (window.JCOB_STAFF_ALERT) {
+          window.JCOB_STAFF_ALERT("application",
+            "New application " + a.ref,
+            (profile.fullName || "A customer") + " applied for " + a.product + " — MWK " + Number(a.amount || 0).toLocaleString("en-MW"),
+            "loanApps");
+        }
       });
 
       (site.tickets || []).forEach(function (t) {
@@ -188,6 +195,12 @@
           origin: "website", body: first.text || ""
         });
         changed = true;
+        if (window.JCOB_STAFF_ALERT) {
+          window.JCOB_STAFF_ALERT("ticket",
+            "New support ticket " + t.ref,
+            (profile.fullName || "A customer") + ": " + (t.subject || "Support request"),
+            "support");
+        }
       });
     });
 

@@ -63,6 +63,7 @@ const tables = {
 const PK = { site_docs: "id", portal_docs: "id", customer_docs: "owner", profiles: "id", enquiries: "id", audit_log: "id" };
 const tokens = new Map();
 const refreshTokens = new Map();
+const otps = new Map();
 
 function sessionFor(user) {
   const token = "tok-" + Math.random().toString(36).slice(2) + "-" + user.id.slice(0, 6);
@@ -74,7 +75,7 @@ function sessionFor(user) {
     token_type: "bearer",
     expires_in: 3600,
     refresh_token: refresh,
-    user: { id: user.id, email: user.email, user_metadata: user.meta }
+    user: { id: user.id, email: user.email, phone: user.phone || null, user_metadata: user.meta }
   };
 }
 
@@ -135,7 +136,11 @@ const server = http.createServer(async (req, res) => {
       if (!user) return send(res, 400, { error: "invalid_grant", message: "Invalid refresh token" });
       return send(res, 200, sessionFor(user));
     }
-    const user = users.find((u) => u.email.toLowerCase() === String(data && data.email || "").toLowerCase());
+    const email = String((data && data.email) || "").toLowerCase();
+    const phone = String((data && data.phone) || "");
+    const user = email
+      ? users.find((u) => String(u.email || "").toLowerCase() === email)
+      : users.find((u) => u.phone && u.phone === phone);
     if (!user || user.password !== (data && data.password)) {
       return send(res, 400, { error: "invalid_grant", message: "Invalid login credentials" });
     }
@@ -144,20 +149,27 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/auth/v1/signup") {
     const data = (await body(req)) || {};
-    if (users.some((u) => u.email.toLowerCase() === String(data.email || "").toLowerCase())) {
+    if (!data.email && !data.phone) {
+      return send(res, 400, { message: "An email address or phone number is required" });
+    }
+    if (data.email && users.some((u) => String(u.email || "").toLowerCase() === String(data.email).toLowerCase())) {
+      return send(res, 400, { message: "User already registered" });
+    }
+    if (data.phone && users.some((u) => u.phone && u.phone === data.phone)) {
       return send(res, 400, { message: "User already registered" });
     }
     const user = {
       id: "u-" + Math.random().toString(36).slice(2, 10),
-      email: data.email,
+      email: data.email || null,
+      phone: data.phone || null,
       password: data.password,
       role: "customer",
-      meta: data.data || {}
+      meta: Object.assign({}, data.data || {}, data.phone ? { phone: data.phone } : {})
     };
     users.push(user);
     tables.profiles.push({
-      id: user.id, full_name: user.meta.full_name || "", email: user.email,
-      phone: user.meta.phone || "", account_no: "JC-ACC-" + user.id.slice(0, 6).toUpperCase(),
+      id: user.id, full_name: user.meta.full_name || "", email: user.email || "",
+      phone: user.phone || user.meta.phone || "", account_no: "JC-ACC-" + user.id.slice(0, 6).toUpperCase(),
       role: "customer", status: "active", created_at: new Date().toISOString(), updated_at: new Date().toISOString()
     });
     return send(res, 200, sessionFor(user));
@@ -169,15 +181,54 @@ const server = http.createServer(async (req, res) => {
     const token = String(req.headers.authorization || "").replace("Bearer ", "");
     const user = users.find((u) => u.id === tokens.get(token));
     if (!user) return send(res, 401, { message: "Invalid token" });
-    return send(res, 200, { id: user.id, email: user.email, user_metadata: user.meta });
+    return send(res, 200, { id: user.id, email: user.email, phone: user.phone || null, user_metadata: user.meta });
   }
 
   if (pathname === "/auth/v1/recover") return send(res, 200, {});
 
+  /* One-time codes, by email or by SMS. Every code issued here is 123456
+     and is deleted once used, like the real service. */
+  if (pathname === "/auth/v1/otp") {
+    const data = (await body(req)) || {};
+    const identifier = data.phone || data.email;
+    if (!identifier) return send(res, 400, { message: "A phone number or email address is required" });
+    otps.set(String(identifier), "123456");
+    return send(res, 200, {});
+  }
+
+  if (pathname === "/auth/v1/verify") {
+    const data = (await body(req)) || {};
+    const identifier = String(data.phone || data.email || "");
+    if (!identifier) return send(res, 400, { message: "A phone number or email address is required" });
+    if (otps.get(identifier) !== String(data.token || "")) {
+      return send(res, 400, { message: "Token has expired or is invalid" });
+    }
+    otps.delete(identifier);
+    let user = users.find((u) => (data.phone && u.phone === data.phone) ||
+      (data.email && String(u.email || "").toLowerCase() === String(data.email).toLowerCase()));
+    if (!user) {
+      user = {
+        id: "u-" + Math.random().toString(36).slice(2, 10),
+        email: data.email || null,
+        phone: data.phone || null,
+        password: "",
+        role: "customer",
+        meta: data.phone ? { phone: data.phone } : {}
+      };
+      users.push(user);
+      tables.profiles.push({
+        id: user.id, full_name: "", email: user.email || "", phone: user.phone || "",
+        account_no: "JC-ACC-" + user.id.slice(0, 6).toUpperCase(), role: "customer",
+        status: "active", created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+      });
+    }
+    return send(res, 200, sessionFor(user));
+  }
+
   if (pathname === "/auth/v1/settings") {
     return send(res, 200, {
       mailer_autoconfirm: true,
-      external: { email: true, phone: false }
+      external: { email: true, phone: true }
     });
   }
 

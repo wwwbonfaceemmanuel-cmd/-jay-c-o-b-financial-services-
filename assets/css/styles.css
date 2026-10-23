@@ -4878,3 +4878,203 @@ summary:focus-visible {
 @media print {
   .calc-formula { color: #222 !important; background: transparent; border-left-color: #a67c1a; }
 }
+
+/* =====================================================================
+   Application gate — terms, acceptance, account, signature
+   ===================================================================== */
+.onb-grid { grid-template-columns: 1.65fr .85fr; align-items: start; }
+@media (max-width: 900px) { .onb-grid { grid-template-columns: 1fr; } }
+.onb-title { font-size: clamp(1.3rem, 2.4vw, 1.7rem); margin-top: 1rem; }
+.onb-sub { font-size: .9rem; color: var(--muted); margin-top: .35rem; }
+.onb-steps { margin-bottom: 1.1rem; }
+.onb-aside .onb-card { padding: 1.1rem 1.15rem; }
+.onb-aside .onb-card h3 { font-size: .95rem; margin-bottom: .5rem; }
+
+.onb-terms {
+  margin-top: 1rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.1rem 1.2rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-size: .85rem;
+  line-height: 1.6;
+  color: var(--body);
+  scrollbar-width: thin;
+}
+.onb-terms:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+.onb-terms h3 {
+  font-size: .84rem;
+  letter-spacing: .01em;
+  color: var(--navy-800);
+  margin: 1rem 0 .25rem;
+}
+.onb-terms h3:first-child { margin-top: 0; }
+.onb-terms p { margin: 0 0 .6rem; }
+.onb-terms a { color: var(--teal); text-decoration: underline; }
+.onb-terms .onb-end {
+  margin-top: 1rem;
+  padding-top: .8rem;
+  border-top: 1px dashed var(--line-strong);
+  color: var(--navy-800);
+}
+
+.onb-progress {
+  height: 6px;
+  margin-top: .9rem;
+  border-radius: 999px;
+  background: var(--cream-dark);
+  overflow: hidden;
+}
+.onb-progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--gold-edge);
+  transition: width .18s ease;
+}
+.onb-readnote { font-size: .78rem; color: var(--muted); margin-top: .45rem; }
+
+.onb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: center;
+  margin-top: 1.2rem;
+}
+.onb-hint { font-size: .75rem; color: var(--muted); margin-left: auto; }
+.onb-error {
+  margin-top: .8rem;
+  padding: .6rem .8rem;
+  border-radius: 10px;
+  background: #fbebeb;
+  border: 1px solid rgba(178, 59, 59, .22);
+  color: var(--danger);
+  font-size: .8rem;
+}
+
+.onb-check {
+  display: flex;
+  gap: .65rem;
+  align-items: flex-start;
+  margin-top: .9rem;
+  padding: .8rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font-size: .84rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.onb-check:hover { border-color: var(--line-strong); }
+.onb-check input { width: 18px; height: 18px; margin-top: .1rem; accent-color: var(--navy-700); flex-shrink: 0; }
+.onb-check a { color: var(--teal); text-decoration: underline; }
+
+.onb-methods { border: 0; padding: 0; margin: 1rem 0 0; }
+.onb-methods legend { font-size: .8rem; font-weight: 600; color: var(--ink); margin-bottom: .5rem; }
+.onb-method {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  padding: .75rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-bottom: .5rem;
+  cursor: pointer;
+  background: #fff;
+}
+.onb-method:has(input:checked) { border-color: var(--navy-600); box-shadow: 0 0 0 1px var(--navy-600) inset; }
+.onb-method input { margin-top: .2rem; accent-color: var(--navy-700); width: 17px; height: 17px; }
+.onb-method b { display: block; font-size: .85rem; color: var(--ink); }
+.onb-method small { display: block; font-size: .75rem; color: var(--muted); margin-top: .1rem; }
+.onb-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .8rem; }
+.onb-fields[hidden] { display: none; }
+
+/* ---------- Signature pad ---------- */
+.sigpad {
+  position: relative;
+  margin-top: .45rem;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(13, 107, 90, .06) 27px 28px),
+    #fff;
+  overflow: hidden;
+  touch-action: none;
+}
+.sigpad:focus-within { border-color: var(--navy-600); }
+.sigpad canvas {
+  display: block;
+  width: 100%;
+  height: 190px;
+  cursor: crosshair;
+  outline: none;
+  touch-action: none;
+}
+.sigpad.is-signing { border-style: solid; border-color: var(--navy-600); }
+.sigpad-baseline {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 34px;
+  border-bottom: 1.5px solid rgba(6, 38, 42, .28);
+  pointer-events: none;
+}
+.sigpad-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #9db0bd;
+  pointer-events: none;
+}
+.sigpad-empty.is-error { font-family: inherit; font-style: normal; font-size: .78rem; color: var(--danger); padding: 1rem; text-align: center; }
+.sigpad-foot { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-top: .45rem; }
+
+@media (max-width: 780px) {
+  .onb-fields { grid-template-columns: 1fr; }
+  .onb-hint { margin-left: 0; }
+  .sigpad canvas { height: 160px; }
+}
+
+/* =====================================================================
+   Back navigation — every module and section
+   ===================================================================== */
+.page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: .1rem 0;
+  margin-bottom: .45rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.page-back:hover { color: var(--navy-800); }
+.page-back svg { width: 15px; height: 15px; }
+.page-back:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; border-radius: 4px; }
+
+/* Sign-in helpers: recovery routes next to the form */
+.auth-recover { display: grid; gap: .45rem; margin-top: .9rem; }
+.auth-recover a {
+  display: block;
+  padding: .6rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.auth-recover a:hover { border-color: var(--line-strong); background: var(--cream); }
+.auth-recover strong { display: block; font-size: .8rem; color: var(--navy-800); }
+.auth-recover span { display: block; font-size: .74rem; color: var(--muted); margin-top: .12rem; }

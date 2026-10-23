@@ -155,6 +155,14 @@
 
   function get() { return db; }
   function save() { return persist(); }
+
+  /* Write now instead of on the debounce, and report whether the database
+     accepted it. Used where the page must not move on until the record is
+     really stored — a signature, for example. */
+  function saveNow() {
+    if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
+    return pushCloud();
+  }
   function reset() {
     db = empty();
     loaded = false;
@@ -271,6 +279,91 @@
     return db.notifications.filter(function (n) { return !n.read; }).length;
   }
 
+  /* ---------------- Notification engine ----------------
+     Notifications are generated from real records, never invented. Each
+     one carries a key so the same reminder is never raised twice: the
+     engine can run on every page load and will add only what is new. */
+  function pushOnce(key, type, title, body, channel) {
+    if (!db.notifications) db.notifications = [];
+    if (db.notifications.some(function (n) { return n.key === key; })) return null;
+    var item = {
+      id: "N-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 900 + 100),
+      key: key,
+      type: type,
+      title: title,
+      body: body,
+      date: new Date().toISOString(),
+      read: false,
+      channel: channel || "In-app"
+    };
+    db.notifications.unshift(item);
+    return item;
+  }
+
+  function dayKey(d) {
+    return new Date(d).toISOString().slice(0, 10);
+  }
+
+  /* Repayment reminders, overdue notices and KYC nudges, derived from the
+     loans and profile this customer actually has. */
+  function runEngine() {
+    if (!loaded) return 0;
+    var made = 0;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    activeLoans().forEach(function (loan) {
+      if (!loan.nextDue) return;
+      var due = new Date(loan.nextDue);
+      if (isNaN(due.getTime())) return;
+      var days = Math.round((due - today) / 86400000);
+      if (days < 0) {
+        if (pushOnce("overdue:" + loan.id + ":" + dayKey(due), "Repayment overdue",
+          "Loan " + loan.id + " is overdue",
+          "Your instalment of " + fmt(loan.nextAmount) + " was due on " + fmtDate(due) + ". " +
+          "Pay now to avoid late charges, or contact us to arrange a new date.", "In-app + SMS")) made += 1;
+        return;
+      }
+      if (days <= 3) {
+        var when = days === 0 ? "today" : days === 1 ? "tomorrow" : "in " + days + " days";
+        if (pushOnce("due:" + loan.id + ":" + dayKey(due), "Repayment reminder",
+          "Instalment due " + when,
+          "Loan " + loan.id + ": " + fmt(loan.nextAmount) + " is due on " + fmtDate(due) + ". " +
+          "Pay by Airtel Money, TNM Mpamba or bank transfer from the Repayments page.", "In-app + SMS")) made += 1;
+      }
+    });
+
+    db.applications.forEach(function (a) {
+      if (a.status === "approved" && !a.seenApproved) {
+        if (pushOnce("approved:" + a.ref, "Application update", "Application " + a.ref + " approved",
+          "Your " + a.product + " application for " + fmt(a.amount) + " was approved. " +
+          "Review the offer and sign the agreement to continue.", "In-app + SMS + Email")) made += 1;
+        a.seenApproved = true;
+      }
+      if (a.status === "info_required" && !a.seenInfo) {
+        if (pushOnce("info:" + a.ref, "Application update", "More information needed",
+          "Application " + a.ref + " needs more information before it can be assessed.", "In-app + Email")) made += 1;
+        a.seenInfo = true;
+      }
+    });
+
+    if (!db.profile.signature && loaded) {
+      if (pushOnce("signature:missing", "Account", "Signature needed",
+        "Add your signature to your profile so loan agreements can be completed without a branch visit.", "In-app")) made += 1;
+    }
+
+    if (made) persist();
+    return made;
+  }
+
+  function fmt(v) {
+    var n = Number(v || 0);
+    return "MWK " + n.toLocaleString("en-MW", { maximumFractionDigits: 0 });
+  }
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
   function activeLoans() {
     return db.loans.filter(function (l) {
       return l.status === "Active" || l.status === "In arrears";
@@ -333,11 +426,13 @@
     KEY: KEY,
     get: get,
     save: save,
+    saveNow: saveNow,
     reset: reset,
     seed: seed,
     uid: uid,
     reference: reference,
     notify: notify,
+    runEngine: runEngine,
     unreadCount: unreadCount,
     activeLoans: activeLoans,
     totals: totals,
