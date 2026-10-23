@@ -5448,3 +5448,210 @@ body {
   }
   body { background: #fff !important; }
 }
+
+/* =====================================================================
+   THEME v7 — THE HEADER WEARS THE FOOTER'S EMERALD
+   ---------------------------------------------------------------------
+   One token, --emerald-chrome, is now the ground of both the footer and
+   the header, so the top and the bottom of every page are literally the
+   same colour. Everything inside the header is restated for that dark
+   ground: light nav text, a light lockup, gold trim on hover and on the
+   active item, and a gold rail along the bottom edge exactly as the
+   footer has one along its top. The dashboard's app bar follows.
+   ===================================================================== */
+:root {
+  --emerald-chrome:
+    radial-gradient(900px 420px at 88% -20%, rgba(31, 131, 201, 0.22), transparent 62%),
+    linear-gradient(165deg, #06302c 0%, #04211f 62%, #041716 100%);
+  --chrome-text: #d3e7e1;
+  --chrome-text-strong: #f4fbf8;
+  --chrome-muted-text: #b9d3ca;
+  --chrome-rule: rgba(246, 236, 196, 0.22);
+}
+
+/* ---- the footer and the header are the same object ---- */
+.site-footer { background: var(--emerald-chrome); }
+
+.site-header {
+  background: var(--emerald-chrome);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 0;
+  color: var(--chrome-text);
+  box-shadow: 0 18px 40px -34px rgba(4, 23, 26, 0.9);
+}
+.site-header.is-scrolled {
+  background: var(--emerald-chrome);
+  border-bottom-color: transparent;
+  box-shadow: 0 24px 48px -30px rgba(4, 23, 26, 0.95);
+}
+/* the gold rail the footer carries on its top edge, on the header's bottom */
+.site-header::before {
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.18) 8%,
+    rgba(201, 162, 39, 0.88) 30%, rgba(246, 236, 196, 0.98) 50%,
+    rgba(201, 162, 39, 0.88) 70%, rgba(201, 162, 39, 0.18) 92%, transparent 100%);
+  opacity: 1;
+}
+
+/* the announcement strip is part of the same block of colour */
+.header-topline {
+  background: transparent;
+  color: var(--chrome-muted-text);
+  border-bottom: 1px solid var(--chrome-rule);
+}
+.header-topline a { color: var(--gold-200); }
+.header-topline a:hover { color: #fff; }
+
+/* ---- navigation on emerald ---- */
+.nav-link { color: var(--chrome-text); }
+.nav-link:hover { background: rgba(255, 255, 255, 0.08); color: var(--chrome-text-strong); }
+.nav-link.is-active { color: var(--gold-200); font-weight: 600; }
+.nav-link.is-active::after { background: var(--gold-edge); height: 2.5px; }
+
+/* the Apply menu: emerald panel, gold hairline, light text */
+.nav-dd-menu {
+  background: linear-gradient(168deg, #072d28 0%, #04211f 64%, #041716 100%) padding-box,
+    var(--gold-edge) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 30px 60px -30px rgba(3, 18, 16, 0.9), inset 0 1px 0 rgba(246, 236, 196, 0.14);
+}
+.nav-dd-menu a { color: var(--chrome-text); }
+.nav-dd-menu a:hover { background: rgba(255, 255, 255, 0.09); color: var(--chrome-text-strong); }
+.nav-dd-menu a span.dd-note { color: #9dbcae; }
+
+/* ---- the controls that sit on the dark bar ---- */
+.site-header .btn--ghost,
+.site-header .btn--line-gold {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 236, 196, 0.34);
+  color: var(--chrome-text-strong);
+}
+.site-header .btn--ghost:hover,
+.site-header .btn--line-gold:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(246, 236, 196, 0.6);
+  color: #fff;
+}
+.site-header .btn--gold {
+  box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.nav-toggle {
+  border-color: rgba(246, 236, 196, 0.34);
+  background: rgba(255, 255, 255, 0.06);
+}
+.nav-toggle span { background: var(--chrome-text-strong); }
+.nav-toggle:hover { border-color: rgba(246, 236, 196, 0.6); }
+
+/* the light lockup reads on the emerald; the dark one would disappear */
+.site-header .brand-logo { filter: none; }
+
+/* ---- the mobile drawer continues the same colour ---- */
+@media (max-width: 960px) {
+  .nav {
+    background: var(--emerald-chrome);
+    border-bottom: 1px solid var(--chrome-rule);
+    box-shadow: 0 30px 60px -30px rgba(3, 18, 16, 0.9);
+  }
+  .nav-link.is-active { background: rgba(255, 255, 255, 0.09); color: var(--gold-200); }
+  .nav-dd-menu {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--chrome-rule);
+    box-shadow: none;
+  }
+}
+
+/* =====================================================================
+   The dashboard's app bar takes the same emerald, so the customer area
+   opens and closes on the flat's own colour.
+   ===================================================================== */
+.app-topbar {
+  background: var(--emerald-chrome);
+  border-bottom: 1px solid transparent;
+  border-image: none;
+  box-shadow: 0 18px 40px -34px rgba(4, 23, 26, 0.9);
+  color: var(--chrome-text);
+}
+.app-topbar::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--gold-edge);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.app-topbar { position: sticky; }
+.app-search svg { color: var(--chrome-muted-text); }
+.app-search input {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(246, 236, 196, 0.26);
+  color: var(--chrome-text-strong);
+}
+.app-search input::placeholder { color: #a9c6bc; }
+.app-search input:focus {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.22);
+}
+.app-menu-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 236, 196, 0.32);
+}
+.app-menu-btn span { background: var(--chrome-text-strong); }
+.app-topbar .icon-btn-lg {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 236, 196, 0.28);
+  color: var(--chrome-text-strong);
+}
+.app-topbar .icon-btn-lg:hover {
+  border-color: var(--gold-400);
+  color: var(--gold-200);
+  background: rgba(255, 255, 255, 0.14);
+}
+.app-topbar .bell-dot { border-color: #04211f; }
+.app-topbar .app-sync {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(246, 236, 196, 0.3);
+  color: var(--chrome-text);
+}
+.app-topbar .app-sync.is-ok { color: #9fe3c8; border-color: rgba(159, 227, 200, 0.45); background: rgba(15, 122, 92, 0.24); }
+.app-topbar .app-sync.is-warn { color: #f2d79a; border-color: rgba(242, 215, 154, 0.45); background: rgba(138, 106, 18, 0.22); }
+.app-topbar .app-sync.is-error { color: #f3b4ae; border-color: rgba(243, 180, 174, 0.45); background: rgba(168, 59, 52, 0.24); }
+
+/* the account chip is a glass pill on the emerald, not a white card */
+.app-topbar .profile-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(246, 236, 196, 0.3);
+  color: var(--chrome-text-strong);
+}
+.app-topbar .profile-btn:hover,
+.app-topbar .profile-btn[aria-expanded="true"] {
+  border-color: var(--gold-400);
+  background: rgba(255, 255, 255, 0.16);
+}
+.app-topbar .profile-btn .avatar {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(246, 236, 196, 0.4);
+  color: var(--gold-200);
+}
+.app-topbar .profile-btn .profile-name { color: var(--chrome-text-strong); }
+.app-topbar .profile-btn .profile-name small { color: var(--chrome-muted-text); }
+
+/* system-check.html's compact header nav */
+.header-nav { display: flex; align-items: center; gap: .4rem; margin-left: auto; flex-wrap: wrap; }
+.header-nav a {
+  font-size: .82rem; font-weight: 600; text-decoration: none;
+  color: var(--chrome-text); padding: .4rem .7rem; border-radius: 8px;
+  border: 1px solid transparent;
+}
+.header-nav a:hover { background: rgba(255, 255, 255, 0.09); color: var(--chrome-text-strong); border-color: rgba(246, 236, 196, 0.3); }
+.header-nav a:focus-visible { outline: 2px solid var(--gold-400); outline-offset: 2px; }
+@media (max-width: 640px) { .header-nav { width: 100%; margin-left: 0; } }
+
+/* print: no chrome */
+@media print {
+  .site-header, .app-topbar { background: #fff !important; }
+  .site-header::before, .app-topbar::after { display: none !important; }
+  .nav-link, .header-topline, .header-topline a { color: #000 !important; }
+}

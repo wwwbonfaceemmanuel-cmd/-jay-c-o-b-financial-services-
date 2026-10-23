@@ -63,30 +63,33 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-.01e
 
 /* ---------- TOP BAR ---------- */
 .topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:18px;padding:12px 22px;
-  background:linear-gradient(100deg,rgba(219,237,250,.95) 0%,rgba(214,234,229,.95) 58%,rgba(205,226,241,.95) 100%);
-  backdrop-filter:blur(16px);
+  /* same emerald as .foot — the console opens and closes on one colour */
+  background:var(--chrome);color:var(--chrome-txt);
   border-bottom:1px solid rgba(201,162,39,.35);
-  box-shadow:0 14px 30px -30px rgba(4,23,26,.7)}
+  box-shadow:0 18px 40px -34px rgba(4,23,26,.9)}
 .topbar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold-edge);opacity:.85}
-.brand{display:flex;align-items:center;gap:12px;min-width:250px;color:var(--ink)}
+.brand{display:flex;align-items:center;gap:12px;min-width:250px;color:var(--chrome-txt)}
 .brand-logo{height:44px;width:auto;display:block}
-.brand-chip{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.2em;font-weight:800;color:var(--emerald-700);
-  border:1px solid rgba(13,107,90,.35);border-radius:999px;padding:4px 9px;white-space:nowrap;background:rgba(13,107,90,.07)}
+.brand-chip{font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.2em;font-weight:800;color:var(--gold-200);
+  border:1px solid rgba(246,236,196,.34);border-radius:999px;padding:4px 9px;white-space:nowrap;background:rgba(246,236,196,.08)}
 @media(max-width:1240px){.brand-chip{display:none}}
 .foot-logo{height:44px;width:auto;display:block}
-.crumbs{flex:1;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crumbs b{color:var(--ink);font-weight:600}
-.topsearch{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;width:280px}
-.topsearch input{background:none;border:none;outline:none;color:var(--ink);width:100%;font-size:13px}
-.topsearch input::placeholder{color:var(--dim)}
+.crumbs{flex:1;color:var(--chrome-muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumbs b{color:var(--chrome-txt);font-weight:600}
+.topsearch{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1px solid rgba(246,236,196,.26);border-radius:12px;padding:8px 12px;width:280px}
+.topsearch input{background:none;border:none;outline:none;color:var(--chrome-txt);width:100%;font-size:13px}
+.topsearch input::placeholder{color:var(--chrome-muted)}
 .top-actions{display:flex;align-items:center;gap:10px}
-.chip-clock{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:12px;white-space:nowrap}
-.icon-btn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);display:grid;place-items:center;transition:.2s}
-.icon-btn:hover{border-color:rgba(13,107,90,.4);box-shadow:0 0 0 3px rgba(13,107,90,.10)}
+.chip-clock{font-size:12px;color:var(--chrome-muted);background:rgba(255,255,255,.08);border:1px solid rgba(246,236,196,.24);padding:8px 12px;border-radius:12px;white-space:nowrap}
+.icon-btn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid rgba(246,236,196,.28);background:rgba(255,255,255,.08);color:var(--chrome-txt);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{border-color:var(--gold-400);background:rgba(255,255,255,.14);box-shadow:0 0 0 3px rgba(201,162,39,.18)}
 .icon-btn .dot{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:linear-gradient(135deg,#a83b34,#c05a4e);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
-.userbox{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px 12px 5px 5px;cursor:pointer;position:relative;color:var(--ink)}
+.userbox{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(246,236,196,.24);border-radius:12px;padding:5px 12px 5px 5px;cursor:pointer;position:relative;color:var(--chrome-txt)}
 .avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,var(--emerald-500),var(--emerald-800));display:grid;place-items:center;font-weight:800;font-size:13px;color:#eaf6f1}
-.userbox .nm{font-size:12px;font-weight:700;color:var(--ink)}.userbox .rl{font-size:10px;color:var(--muted)}
+.userbox .nm{font-size:12px;font-weight:700;color:var(--chrome-txt)}.userbox .rl{font-size:10px;color:var(--chrome-muted)}
+.topbar .btn{background:rgba(255,255,255,.08);border-color:rgba(246,236,196,.30);color:var(--chrome-txt)}
+.topbar .btn:hover{background:rgba(255,255,255,.15);border-color:var(--gold-400);color:#fff}
+.topbar .btn.gold{background:var(--gold-liquid);color:#0a1722;border-color:transparent}
 
 /* dropdowns float over the cream content as white cards */
 .drop{position:absolute;top:110%;right:0;width:330px;background:var(--premium-surface) padding-box,var(--gold-edge) border-box;border:1px solid transparent;border-radius:14px;box-shadow:0 26px 60px -30px rgba(4,23,26,.55),var(--premium-inset);padding:10px;display:none;z-index:80}
@@ -354,7 +357,7 @@ body.locked { overflow: hidden; }
 <header class="topbar">
   <button class="icon-btn" id="menuBtn" aria-label="menu">☰</button>
   <a class="brand" href="index.html" target="_blank" rel="noopener" aria-label="JAY C O B FINANCIAL SERVICES — open the website">
-    <img class="brand-logo" src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+    <img class="brand-logo" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
     <span class="brand-chip">ADMIN PORTAL</span>
   </a>
   <div class="crumbs" id="crumbs">Home / <b>Main Dashboard</b></div>
@@ -608,7 +611,7 @@ function T(id,cfg){ui[id]=ui[id]||{};const t=ui[id];t.page=t.page||1;
   pager+=`<button data-pt="${id}" data-p="${t.page+1}" ${t.page>=pages?'disabled':''}>›</button></div>`}
  const filters=(cfg.filters||[]).map(f=>`<select class="fsel" data-fid="${id}" data-fk="${f.k}"><option value="">${f.label}</option>${[...new Set(cfg.rows().map(r=>r[f.k]))].map(v=>`<option ${t.f&&t.f.v===v?'selected':''} value="${esc(v)}">${esc(v)}</option>`).join('')}</select>`).join('');
  return `<div class="ttools">
-   <div class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a6373" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input data-qid="${id}" value="${esc(t.q||'')}" placeholder="Search…"></div>
+   <div class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a3c3ba" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input data-qid="${id}" value="${esc(t.q||'')}" placeholder="Search…"></div>
    ${filters}
    <div class="tspace"></div>
    ${cfg.head||''}

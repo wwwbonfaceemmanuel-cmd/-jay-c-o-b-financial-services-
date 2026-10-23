@@ -67,13 +67,14 @@ t.ok("the site's sidebar really is that gradient",
 t.ok("console sidebar copies it exactly",
   /--chrome:linear-gradient\(185deg,#092f27/.test(adminCss) && /#031613 68%\)/.test(adminCss));
 t.ok("console sidebar paints with it", /background:var\(--chrome\)/.test(adminSidebar));
-t.ok("top bar is a blue-to-emerald band",
-  /linear-gradient\(100deg/.test(adminTopbar) &&
-  /rgba\(219,237,250/.test(adminTopbar) && /rgba\(214,234,229/.test(adminTopbar));
+t.ok("top bar is the footer's emerald", /background:var\(--chrome\)/.test(adminTopbar));
+const adminFoot = rule(adminCss, ".foot");
+t.ok("header and footer are literally the same colour",
+  /background:var\(--chrome\)/.test(adminFoot) && /background:var\(--chrome\)/.test(adminTopbar));
 t.ok("top bar keeps a gold under-edge", /var\(--gold-edge\)/.test(adminCss.slice(adminCss.indexOf(".topbar::after"), adminCss.indexOf(".topbar::after") + 200)));
 
 /* ---- the brand lockup, not a hand-drawn mark ---- */
-t.ok("header uses the website lockup", /class="brand-logo" src="assets\/img\/logo-full\.svg"/.test(admin));
+t.ok("header uses the light lockup on the emerald bar", /class="brand-logo" src="assets\/img\/logo-full-light\.svg"/.test(admin));
 t.ok("gate uses the website lockup", /class="gate-mark" src="assets\/img\/logo-full\.svg"/.test(admin));
 t.ok("footer uses the website lockup", /class="foot-logo" src="assets\/img\/logo-full-light\.svg"/.test(admin));
 t.ok("favicon is the website's", /rel="icon" href="assets\/img\/favicon\.svg"/.test(admin));
@@ -98,9 +99,10 @@ t.ok("body sits on the blue emerald ground", /body\{[^}]*radial-gradient/.test(a
   /linear-gradient\(163deg/.test(adminCss));
 t.ok("the ground runs crystal into emerald", /linear-gradient\(163deg,var\(--bg-mist\) 0%,var\(--bg-blue\)/.test(adminCss) && /var\(--bg-emerald\) 68%/.test(adminCss));
 t.ok("panels are white cards", /\.panel\{[^}]*padding-box/.test(adminCss) && /--panel:rgba\(255,255,255/.test(adminCss));
-t.ok("top bar is the blue emerald band", /\.topbar\{[^}]*linear-gradient\(100deg/.test(adminCss));
+t.ok("top bar is no longer a light band", !/linear-gradient\(100deg/.test(rule(adminCss, ".topbar")));
 t.ok("sidebar is emerald", /\.sidebar\{[^}]*background:var\(--chrome\)/.test(adminCss));
 t.ok("gold edge on the top bar", /\.topbar::after\{[^}]*var\(--gold-edge\)/.test(adminCss));
+t.ok("top bar text is the chrome text", /\.topbar\{[^}]*color:var\(--chrome-txt\)/.test(adminCss));
 
 /* ---- every module wears a gold edge ---- */
 const goldEdge = (sel) => {
