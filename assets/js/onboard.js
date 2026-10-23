@@ -256,19 +256,36 @@
     });
   }
 
-  /* ---------------- Stage 3: the account ---------------- */
+  /* ---------------- Stage 3: the account ----------------
+     SMS is a convenience, not a requirement. When no messaging provider is
+     connected the phone becomes an ordinary sign-in identifier: number plus
+     password, confirmed later if SMS is switched on. */
+  function smsReady() {
+    return !!(CLOUD && CLOUD.auth && CLOUD.auth.smsAvailable && CLOUD.auth.smsAvailable());
+  }
+
   function stageAccount() {
     var both = state.method === "both";
+    var sms = smsReady();
+    var phoneOnlyNoSms = !both && !sms;
     return shell(
       '<h2 class="onb-title">Create your account</h2>' +
       '<p class="onb-sub">Your account keeps this application, your repayments and your documents in one place. ' +
-        "We will send a one-time code to confirm it is you.</p>" +
+        (sms ? "We will send a one-time code to confirm it is you." : "You choose a password, and a code is sent later if the messaging service is connected.") + "</p>" +
+
+      (sms ? "" : '<div class="notice notice--info" id="onb-sms-note">' + UI.ICONS.info +
+        "<div><strong>SMS is not connected yet</strong>No part of the application waits for a text message. " +
+        "Phone accounts use a password, and we can verify the number by SMS once the messaging provider is live.</div></div>") +
 
       '<fieldset class="onb-methods"><legend>How should we reach you?</legend>' +
         '<label class="onb-method"><input type="radio" name="onb-method" value="both"' + (both ? " checked" : "") + ">" +
-          "<span><b>Email address and phone number</b><small>A confirmation link by email, plus SMS for repayments.</small></span></label>" +
+          "<span><b>Email address and phone number</b><small>" +
+          (sms ? "Confirmation by email, codes by SMS." : "Confirmation by email. The phone is used for repayment reminders.") +
+          "</small></span></label>" +
         '<label class="onb-method"><input type="radio" name="onb-method" value="phone"' + (both ? "" : " checked") + ">" +
-          "<span><b>Phone number only</b><small>No email? Use your phone. The one-time code arrives by SMS.</small></span></label>" +
+          "<span><b>Phone number only</b><small>" +
+          (sms ? "No email? Use your phone. The code arrives by SMS." : "No email? Use your phone and a password. No text message is needed.") +
+          "</small></span></label>" +
       "</fieldset>" +
 
       '<div class="onb-fields">' +
@@ -278,12 +295,13 @@
           '<span class="error-msg">Enter a valid email address</span>' +
         "</div>" +
         '<div class="field" id="onb-phone-field">' +
-          '<label for="onb-phone">Phone number (for the one-time code)</label>' +
+          '<label for="onb-phone">Phone number</label>' +
           '<input id="onb-phone" type="tel" autocomplete="tel" placeholder="+265 999 123 456" inputmode="tel">' +
           '<span class="error-msg">Enter a valid phone number, for example +265 999 123 456</span>' +
         "</div>" +
       "</div>" +
-      '<div class="onb-fields" id="onb-password-fields"' + (both ? "" : ' hidden') + ">" +
+
+      '<div class="onb-fields" id="onb-password-fields"' + (both || phoneOnlyNoSms ? "" : ' hidden') + ">" +
         '<div class="field"><label for="onb-password">Password</label>' +
           '<div class="pw-wrap"><input id="onb-password" type="password" autocomplete="new-password" placeholder="At least 8 characters">' +
           '<button class="pw-toggle" type="button" data-pw-toggle="onb-password" aria-label="Show password" aria-pressed="false">' +
@@ -295,13 +313,17 @@
       "</div>" +
 
       '<div class="notice notice--info" id="onb-phone-note"' + (both ? " hidden" : "") + ">" + UI.ICONS.info +
-        "<div><strong>No email needed</strong>We will text a six-digit code to your phone. You can sign in with that code every time — " +
-        "there is no password to remember.</div></div>" +
+        "<div><strong>" + (sms ? "No email needed" : "No email and no text message needed") + "</strong>" +
+        (sms
+          ? "We will text a six-digit code to your phone. You can sign in with that code every time — there is no password to remember."
+          : "Your phone number and the password above are your sign-in. When the SMS provider is connected you can add text-message verification from Account security.") +
+        "</div></div>" +
 
       '<p class="onb-error" id="onb-account-error" role="alert" hidden></p>' +
       '<div class="onb-actions">' +
         '<button class="btn btn--ghost" type="button" id="onb-account-back">Back</button>' +
-        '<button class="btn btn--gold" type="button" id="onb-account-next">Send my code</button>' +
+        '<button class="btn btn--gold" type="button" id="onb-account-next">' +
+          (both || !sms ? "Create my account" : "Send my code") + "</button>" +
         '<a class="btn btn--ghost" href="login.html">I already have an account</a>' +
       "</div>" +
       '<p class="text-small text-muted" style="margin-top:.8rem;">Already registered? Signing in skips this step and keeps this application.</p>',
@@ -325,13 +347,21 @@
     var next = $("onb-account-next");
     if (!next) return;
 
+    function syncMethod() {
+      var both = state.method === "both";
+      var sms = smsReady();
+      $("onb-email-field").hidden = !both;
+      $("onb-password-fields").hidden = !(both || !sms);
+      $("onb-phone-note").hidden = both;
+      next.textContent = both || !sms ? "Create my account" : "Send my code";
+      var err = $("onb-account-error");
+      if (err) err.hidden = true;
+    }
+
     document.querySelectorAll('input[name="onb-method"]').forEach(function (radio) {
       radio.addEventListener("change", function () {
         state.method = radio.value;
-        var both = state.method === "both";
-        $("onb-email-field").hidden = !both;
-        $("onb-password-fields").hidden = !both;
-        $("onb-phone-note").hidden = both;
+        syncMethod();
       });
     });
 
@@ -342,6 +372,7 @@
       var phone = $("onb-phone").value.trim();
       var email = $("onb-email") ? $("onb-email").value.trim() : "";
       var both = state.method === "both";
+      var sms = smsReady();
       function fail(msg, el) {
         err.hidden = false; err.textContent = msg;
         if (el) el.focus();
@@ -354,48 +385,62 @@
       if (!isPhone(phone)) return fail("Enter a valid phone number, for example +265 999 123 456.", $("onb-phone"));
       if (both && !isEmail(email)) return fail("Enter a valid email address, or choose phone number only.", $("onb-email"));
 
-      var pw = both ? $("onb-password").value : "";
-      if (both) {
+      var needsPassword = both || !sms;
+      var pw = needsPassword ? $("onb-password").value : "";
+      if (needsPassword) {
         if (String(pw).length < 8 || !/\d/.test(pw)) return fail("Choose a password of at least 8 characters that includes a number.", $("onb-password"));
         if (pw !== $("onb-password2").value) return fail("Passwords do not match.", $("onb-password2"));
       }
 
-      busy(next, true, "Sending…");
+      busy(next, true, both || !sms ? "Creating…" : "Sending…");
 
-      if (both) {
-        CLOUD.auth.signUp({
-          email: email, phone: normalPhone(phone), password: pw,
-          fullName: profileDoc().fullName || "",
-          accountNo: profileDoc().accountNumber || ""
-        }).then(function (res) {
+      /* Phone only, with SMS connected: a code does the work. */
+      if (!both && sms) {
+        CLOUD.auth.sendPhoneOtp(normalPhone(phone)).then(function () {
           busy(next, false);
-          if (res && res.session) {
-            state.account = { identifier: email, channel: "email" };
-            return afterSignIn();
-          }
-          /* Email confirmation is switched on: confirm with a code. */
-          state.otp = { channel: "email", identifier: email, code: "" };
-          state.account = { identifier: email, channel: "email" };
-          return go("verify");
+          state.otp = { channel: "sms", identifier: normalPhone(phone), code: "" };
+          state.account = { identifier: normalPhone(phone), channel: "sms" };
+          go("verify");
         }).catch(function (e) {
           busy(next, false);
-          var msg = String((e && e.message) || "We could not create the account.");
-          if (/already|exists|registered/i.test(msg)) msg = "An account already uses that email address. Sign in instead, or use the phone number only.";
-          fail(msg);
+          fail(String((e && e.message) || "We could not send a code to that number."));
         });
         return;
       }
 
-      CLOUD.auth.sendPhoneOtp(normalPhone(phone)).then(function () {
+      /* Email, or phone with a password. No code is required either way. */
+      var details = {
+        password: pw,
+        fullName: profileDoc().fullName || "",
+        accountNo: profileDoc().accountNumber || ""
+      };
+      if (email) details.email = email;
+      details.phone = normalPhone(phone);
+
+      CLOUD.auth.signUp(details).then(function (res) {
         busy(next, false);
-        state.otp = { channel: "sms", identifier: normalPhone(phone), code: "" };
-        state.account = { identifier: normalPhone(phone), channel: "sms" };
-        go("verify");
+        state.account = { identifier: email || normalPhone(phone), channel: email ? "email" : "phone" };
+        if (res && res.session) return afterSignIn();
+
+        /* Email confirmation is on: finish with a code to the address. */
+        if (email) {
+          state.otp = { channel: "email", identifier: email, code: "" };
+          return go("verify");
+        }
+        return fail("We could not finish creating the account just now. Please use an email address or call +265 999 123 456.");
       }).catch(function (e) {
         busy(next, false);
-        fail(String((e && e.message) || "We could not send a code to that number."));
+        var msg = String((e && e.message) || "We could not create the account.");
+        if (/already|exists|registered/i.test(msg)) {
+          msg = email
+            ? "An account already uses that email address. Sign in instead, or use the phone number only."
+            : "An account already uses that phone number. Sign in instead, or reset your password.";
+        }
+        fail(msg);
       });
     });
+
+    syncMethod();
   }
 
   /* ---------------- Stage 3b: the one-time code ---------------- */
@@ -708,7 +753,13 @@
       signerName: fullName
     };
     doc.profile.termsAccepted = state.accepted;
-    doc.profile.accountMethod = state.account && state.account.channel === "sms" ? "phone" : "email";
+    var verifiedByCode = !!(state.account && state.account.channel === "sms");
+    doc.profile.accountMethod = verifiedByCode ? "phone" : (state.account && state.account.channel === "phone" ? "phone-password" : "email");
+    /* A phone number is only "verified" when a code actually confirmed it.
+       Until SMS is connected it stays pending, and the dashboard says so. */
+    doc.profile.phoneVerified = verifiedByCode;
+    if (verifiedByCode) doc.profile.phoneVerifiedAt = new Date().toISOString();
+    doc.profile.smsAvailable = smsReady();
     DATA.notify("Account", "Account created",
       "Welcome, " + fullName.split(" ")[0] + ". Your account is ready and your application can now be completed.", "In-app");
 
@@ -779,6 +830,12 @@
   window.JCOB_ONBOARD = {
     intercept: true,
     start: function () {
+      /* Ask what the account service can do before offering it anything. */
+      if (cloudOn() && CLOUD.auth && CLOUD.auth.loadCapabilities) {
+        CLOUD.auth.loadCapabilities().then(function () {
+          if (state.stage === "account") render();
+        });
+      }
       if (signedIn() && DATA && DATA.hydrate) DATA.hydrate();
       if (signedIn()) {
         var p = profileDoc();

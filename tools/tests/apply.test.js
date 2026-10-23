@@ -8,6 +8,15 @@ const { reporter, makeDom, ready, sleep, rest, API } = require("./lib");
 const ANON = process.env.TEST_ANON || "dev-anon";
 const STAFF = { email: "admin@jaycob.mw", password: "Admin123!" };
 
+async function setSms(on) {
+  const res = await fetch(API + "/__mock/sms", {
+    method: "POST",
+    headers: { apikey: ANON, "Content-Type": "application/json" },
+    body: JSON.stringify({ on })
+  });
+  return res.ok;
+}
+
 function click(w, el) {
   el.dispatchEvent(new w.MouseEvent("click", { bubbles: true, cancelable: true }));
 }
@@ -21,6 +30,13 @@ function fakeScroll(w, el, { scrollHeight = 2400, clientHeight = 500 } = {}) {
 function scrollTo(w, el, top) {
   el.scrollTop = top;
   el.dispatchEvent(new w.Event("scroll"));
+}
+
+/* Unique per run, so a repeated suite never collides with an account the
+   previous run created in the same stand-in. */
+function testPhone() {
+  const tail = String(Date.now()).slice(-6);
+  return { input: "0999 " + tail.slice(0, 3) + " " + tail.slice(3), e164: "+265999" + tail };
 }
 
 function draw(w, pad, points) {
@@ -92,27 +108,32 @@ async function sessionSeeds(creds) {
     t.ok("account step opens", !!d.getElementById("onb-phone"));
     t.eq("email offered by default", d.getElementById("onb-email-field").hidden, false);
 
-    /* No email service: the phone alone carries the account. */
+    /* No email and no SMS provider: the phone plus a password is enough. */
+    t.ok("page says SMS is not connected", /SMS is not connected yet/i.test(d.getElementById("onb-sms-note").textContent));
     const phoneRadio = d.querySelector('input[name="onb-method"][value="phone"]');
     phoneRadio.checked = true;
     phoneRadio.dispatchEvent(new w.Event("change", { bubbles: true }));
     await sleep(60);
     t.eq("email field withdrawn", d.getElementById("onb-email-field").hidden, true);
-    t.eq("password field withdrawn", d.getElementById("onb-password-fields").hidden, true);
-    t.eq("explains the SMS code", d.getElementById("onb-phone-note").hidden, false);
+    t.eq("password field offered instead", d.getElementById("onb-password-fields").hidden, false);
+    t.eq("button asks to create, not to text", d.getElementById("onb-account-next").textContent, "Create my account");
+    t.ok("explains why no code is needed", /text-message|SMS/i.test(d.getElementById("onb-phone-note").textContent));
 
-    d.getElementById("onb-phone").value = "0999 555 123";
+    const phone = testPhone();
+    d.getElementById("onb-phone").value = phone.input;
+    d.getElementById("onb-password").value = "Short1";
+    d.getElementById("onb-password2").value = "Short1";
     click(w, d.getElementById("onb-account-next"));
-    await sleep(900);
-    t.ok("code step opens", !!d.getElementById("onb-otp-row"));
-    t.eq("code goes to the phone", d.getElementById("onb-otp-target").textContent, "+265999555123");
-    t.eq("still signed out before the code", w.JCOB_CLOUD.auth.isSignedIn(), false);
+    await sleep(200);
+    t.ok("weak password refused", /at least 8 characters/i.test(d.getElementById("onb-account-error").textContent));
+    t.eq("still signed out", w.JCOB_CLOUD.auth.isSignedIn(), false);
 
-    const digits = [...d.querySelectorAll("#onb-otp-row input")];
-    "123456".split("").forEach((c, i) => { digits[i].value = c; });
-    click(w, d.getElementById("onb-otp-next"));
-    await sleep(1400);
-    t.eq("account created by SMS code", w.JCOB_CLOUD.auth.isSignedIn(), true);
+    d.getElementById("onb-password").value = "Chisomo2026";
+    d.getElementById("onb-password2").value = "Chisomo2026";
+    click(w, d.getElementById("onb-account-next"));
+    await sleep(1500);
+    t.eq("account created without any SMS", w.JCOB_CLOUD.auth.isSignedIn(), true);
+    t.eq("no code step appeared", d.getElementById("onb-otp-row"), null);
     t.ok("signature step opens", !!d.getElementById("onb-sig"));
 
     const pad = d.getElementById("onb-sig");
@@ -131,7 +152,9 @@ async function sessionSeeds(creds) {
     t.ok("signature has real points", doc.profile.signature.strokes.reduce((n, s) => n + s.length, 0) >= 12);
     t.eq("full name recorded", doc.profile.fullName, "Chisomo Banda");
     t.eq("terms version recorded", doc.profile.termsAccepted.version, "2026-10-23");
-    t.eq("account method recorded", doc.profile.accountMethod, "phone");
+    t.eq("account method recorded", doc.profile.accountMethod, "phone-password");
+    t.eq("phone is not claimed as verified", doc.profile.phoneVerified, false);
+    t.eq("SMS capability recorded", doc.profile.smsAvailable, false);
     t.eq("write reached the database", w.JCOB_DATA.remote.state, "synced");
     t.eq("welcome notification raised", doc.notifications.some((n) => n.title === "Account created"), true);
 
@@ -210,9 +233,9 @@ async function sessionSeeds(creds) {
     d.getElementById("forgot-form").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
     await sleep(900);
     const status = d.getElementById("forgot-status");
-    t.ok("phone recovery explains the SMS code", /recovery code/i.test(status.innerHTML));
-    t.ok("recovery remembered for the code page",
-      /"mode":"recover"/.test(w.sessionStorage.getItem("jcob_pending_verify") || ""));
+    t.ok("phone recovery says SMS is not connected",
+      /not connected yet/i.test(status.innerHTML) && /sign in with it|call/i.test(status.innerHTML));
+    t.eq("no pending code is stored", w.sessionStorage.getItem("jcob_pending_verify"), null);
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }
@@ -285,6 +308,78 @@ async function sessionSeeds(creds) {
     t.eq("one reminder per instalment", reminders.length, 1);
     t.ok("reminder says when it is due", /in 2 days|tomorrow|today/.test(reminders[0].body + reminders[0].title));
     t.ok("bell shows the unread count", Number(w.document.querySelector("[data-notif-total]").textContent) >= 1);
+    t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
+    w.close();
+  }
+
+  /* ------------------------------------------------------------------ */
+  console.log("\n[SMS connected later — the code path returns]");
+  {
+    await setSms(true);
+    const { dom, errors } = makeDom("apply.html");
+    await ready(dom, 900);
+    const w = dom.window;
+    const d = w.document;
+    const terms = d.getElementById("onb-terms");
+    fakeScroll(w, terms, { scrollHeight: 2000, clientHeight: 500 });
+    scrollTo(w, terms, 1600);
+    click(w, d.getElementById("onb-terms-next"));
+    await sleep(100);
+    d.getElementById("onb-agree").checked = true;
+    d.getElementById("onb-truth").checked = true;
+    click(w, d.getElementById("onb-agree-next"));
+    await sleep(150);
+
+    t.eq("no SMS warning when the provider is live", d.getElementById("onb-sms-note"), null);
+    const phoneRadio = d.querySelector('input[name="onb-method"][value="phone"]');
+    phoneRadio.checked = true;
+    phoneRadio.dispatchEvent(new w.Event("change", { bubbles: true }));
+    await sleep(60);
+    t.eq("no password needed for a coded account", d.getElementById("onb-password-fields").hidden, true);
+    t.eq("button offers a code", d.getElementById("onb-account-next").textContent, "Send my code");
+
+    const phone2 = testPhone();
+    d.getElementById("onb-phone").value = phone2.input;
+    click(w, d.getElementById("onb-account-next"));
+    await sleep(900);
+    t.ok("code step returns with SMS", !!d.getElementById("onb-otp-row"));
+    const digits = [...d.querySelectorAll("#onb-otp-row input")];
+    "123456".split("").forEach((c, i) => { digits[i].value = c; });
+    click(w, d.getElementById("onb-otp-next"));
+    await sleep(1400);
+    t.eq("coded account is signed in", w.JCOB_CLOUD.auth.isSignedIn(), true);
+    t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
+    w.close();
+    await setSms(false);
+  }
+
+  /* ------------------------------------------------------------------ */
+  console.log("\n[login and security without SMS]");
+  {
+    const { dom, errors } = makeDom("login.html");
+    await ready(dom, 600);
+    const w = dom.window;
+    const d = w.document;
+    d.getElementById("login-id").value = "0999 777 888";
+    click(w, d.getElementById("login-otp"));
+    await sleep(600);
+    t.ok("phone code sign-in explains it is not connected",
+      /not connected yet/i.test(d.getElementById("login-id").closest(".field").textContent));
+    t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
+    w.close();
+  }
+
+  {
+    const seed = await sessionSeeds({ email: "customer@jaycob.mw", password: "Customer123!" });
+    const { dom, errors } = makeDom("dashboard.html", { seed, hash: "#security" });
+    await ready(dom, 1500);
+    const w = dom.window;
+    const d = w.document;
+
+    t.ok("security page shows the phone status", /Awaiting SMS/i.test(d.getElementById("app-content").textContent));
+    const card = [...d.querySelectorAll(".app-panel")].find((el) => /Verification & MFA/i.test(el.textContent));
+    t.ok("verification panel present", !!card);
+    t.ok("panel does not claim the number is verified", !/Phone number[\s\S]{0,160}Verified/.test(card ? card.innerHTML : ""));
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
   }

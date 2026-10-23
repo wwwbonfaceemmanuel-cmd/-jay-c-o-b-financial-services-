@@ -98,6 +98,30 @@ Visitor / customer            Admin console (admin.html)
    * Before going live, switch it back on and edit the templates under
      **Authentication → Email Templates**.
 
+   **SMS is optional.** You do not need a messaging provider to take
+   applications. With no provider connected:
+
+   * **Email + phone** accounts are created and confirmed by email, and
+     sign in with the password.
+   * **Phone-only** accounts are created with the number plus a password.
+     No text message is sent, and none is expected — the page says so
+     plainly instead of pretending a code went out.
+   * The phone number is shown as **Awaiting SMS** under *Account security*,
+     never as "verified", until a code actually confirms it.
+
+   If **Providers → Phone** is switched on with nothing to send the
+   message, Supabase asks for a confirmation that can never arrive. In that
+   state, turn **Confirm phone** off (or leave Phone disabled) so sign-up
+   completes. When you are ready for SMS:
+
+   1. **Authentication → Providers → Phone** — choose Twilio, Vonage,
+      MessageBird or Textlocal and paste the credentials.
+   2. Leave **Confirm phone** off if you want password sign-up to stay
+      instant; switch it on if every number must be proven first.
+   3. Nothing in the site changes. The account page notices the provider on
+      its own and starts offering codes, and *Account security* grows a
+      **Verify by SMS** button that marks the number verified.
+
 5. Create the administrator:
    * **Authentication → Users → Add user** — email + password, tick
      “Auto confirm”.

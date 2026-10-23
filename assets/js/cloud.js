@@ -491,6 +491,14 @@
     return authCall("signup", Object.assign(identity, { password: input.password, data: meta }))
       .then(function (payload) {
         var next = normaliseAuth(payload);
+        if (!next && identity.phone && !smsAvailable()) {
+          /* The account exists but Supabase wants the phone confirmed and
+             has no way to send the code. Say exactly that. */
+          var err = new Error("The account service is set to confirm phone numbers by text, but no SMS provider is connected yet. " +
+            "Either create the account with an email address, or turn off phone confirmation in Supabase → Authentication → Providers → Phone.");
+          err.code = "PHONE_CONFIRMATION_BLOCKED";
+          throw err;
+        }
         if (!next) return { needsConfirmation: true, user: (payload && payload.user) || (payload && payload.id ? payload : null) };
         session = next;
         writeSession(session);
@@ -565,6 +573,44 @@
       });
     });
   }
+
+  /* ---------------- What the account service supports ----------------
+     SMS is optional. Until a messaging provider is connected, Supabase
+     cannot deliver a text, so accounts are created and confirmed without
+     one: a phone number plus a password, or an email address. Asking the
+     service means the page never offers a code it cannot send. */
+  var capabilities = { checked: false, email: true, phone: false, phoneAutoconfirm: false };
+
+  function loadCapabilities() {
+    if (!enabled) {
+      capabilities.checked = true;
+      capabilities.email = false;
+      capabilities.phone = false;
+      return Promise.resolve(capabilities);
+    }
+    if (capabilities.checked) return Promise.resolve(capabilities);
+    return window.fetch(url + "/auth/v1/settings", {
+      headers: { apikey: key },
+      cache: "no-store"
+    }).then(function (res) {
+      if (!res.ok) throw new Error("settings " + res.status);
+      return res.json();
+    }).then(function (cfg) {
+      var external = (cfg && cfg.external) || {};
+      capabilities.checked = true;
+      capabilities.email = external.email !== false;
+      capabilities.phone = external.phone === true;
+      capabilities.phoneAutoconfirm = !!(cfg && cfg.phone_autoconfirm);
+      return capabilities;
+    }).catch(function () {
+      /* Unreadable settings are treated as "no SMS", never as "yes". */
+      capabilities.checked = true;
+      capabilities.phone = false;
+      return capabilities;
+    });
+  }
+
+  function smsAvailable() { return !!(capabilities.checked && capabilities.phone); }
 
   /* ---------------- Phone sign-in and sign-up (SMS one-time codes) -------
      Used when the customer has no email, or prefers the phone. Supabase
@@ -706,6 +752,9 @@
       sendOtp: sendOtp,
       sendPhoneOtp: sendPhoneOtp,
       verifyPhoneOtp: verifyPhoneOtp,
+      capabilities: function () { return capabilities; },
+      loadCapabilities: loadCapabilities,
+      smsAvailable: smsAvailable,
       verifyOtp: verifyOtp,
       signOut: signOut,
       ensureProfile: ensureProfile,
