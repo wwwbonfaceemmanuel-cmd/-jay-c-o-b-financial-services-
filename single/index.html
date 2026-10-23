@@ -10221,6 +10221,14 @@ window.JCOB_CONFIG = {
     return authCall("signup", Object.assign(identity, { password: input.password, data: meta }))
       .then(function (payload) {
         var next = normaliseAuth(payload);
+        if (!next && identity.phone && !smsAvailable()) {
+          /* The account exists but Supabase wants the phone confirmed and
+             has no way to send the code. Say exactly that. */
+          var err = new Error("The account service is set to confirm phone numbers by text, but no SMS provider is connected yet. " +
+            "Either create the account with an email address, or turn off phone confirmation in Supabase → Authentication → Providers → Phone.");
+          err.code = "PHONE_CONFIRMATION_BLOCKED";
+          throw err;
+        }
         if (!next) return { needsConfirmation: true, user: (payload && payload.user) || (payload && payload.id ? payload : null) };
         session = next;
         writeSession(session);
@@ -10295,6 +10303,44 @@ window.JCOB_CONFIG = {
       });
     });
   }
+
+  /* ---------------- What the account service supports ----------------
+     SMS is optional. Until a messaging provider is connected, Supabase
+     cannot deliver a text, so accounts are created and confirmed without
+     one: a phone number plus a password, or an email address. Asking the
+     service means the page never offers a code it cannot send. */
+  var capabilities = { checked: false, email: true, phone: false, phoneAutoconfirm: false };
+
+  function loadCapabilities() {
+    if (!enabled) {
+      capabilities.checked = true;
+      capabilities.email = false;
+      capabilities.phone = false;
+      return Promise.resolve(capabilities);
+    }
+    if (capabilities.checked) return Promise.resolve(capabilities);
+    return window.fetch(url + "/auth/v1/settings", {
+      headers: { apikey: key },
+      cache: "no-store"
+    }).then(function (res) {
+      if (!res.ok) throw new Error("settings " + res.status);
+      return res.json();
+    }).then(function (cfg) {
+      var external = (cfg && cfg.external) || {};
+      capabilities.checked = true;
+      capabilities.email = external.email !== false;
+      capabilities.phone = external.phone === true;
+      capabilities.phoneAutoconfirm = !!(cfg && cfg.phone_autoconfirm);
+      return capabilities;
+    }).catch(function () {
+      /* Unreadable settings are treated as "no SMS", never as "yes". */
+      capabilities.checked = true;
+      capabilities.phone = false;
+      return capabilities;
+    });
+  }
+
+  function smsAvailable() { return !!(capabilities.checked && capabilities.phone); }
 
   /* ---------------- Phone sign-in and sign-up (SMS one-time codes) -------
      Used when the customer has no email, or prefers the phone. Supabase
@@ -10436,6 +10482,9 @@ window.JCOB_CONFIG = {
       sendOtp: sendOtp,
       sendPhoneOtp: sendPhoneOtp,
       verifyPhoneOtp: verifyPhoneOtp,
+      capabilities: function () { return capabilities; },
+      loadCapabilities: loadCapabilities,
+      smsAvailable: smsAvailable,
       verifyOtp: verifyOtp,
       signOut: signOut,
       ensureProfile: ensureProfile,
@@ -13651,14 +13700,23 @@ window.JCOB_CONFIG = {
           return;
         }
         var channel = isEmail(identifier) ? "email" : "sms";
-        try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
-        } catch (err) {}
-        var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
-        send.then(function () {
-          window.location.href = "#/verify";
-        }).catch(function (err) {
-          fieldError(idInput, String((err && err.message) || "We could not send a code to that number."));
+        var ready = CLOUD.auth.loadCapabilities ? CLOUD.auth.loadCapabilities() : Promise.resolve({});
+        ready.then(function () {
+          if (channel === "sms" && !(CLOUD.auth.smsAvailable && CLOUD.auth.smsAvailable())) {
+            fieldError(idInput, "Text-message codes are not connected yet. Sign in with your phone number and password — SMS will be added when the provider is live.");
+            return;
+          }
+          try {
+            sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
+          } catch (err) {}
+          var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
+          send.then(function () {
+            window.location.href = "#/verify";
+          }).catch(function (err) {
+            var msg = String((err && err.message) || "We could not send a code to that number.");
+            if (/sms|provider|phone/i.test(msg)) msg = "Text-message codes are not connected yet. Sign in with your password instead.";
+            fieldError(idInput, msg);
+          });
         });
       });
     }
@@ -13701,17 +13759,31 @@ window.JCOB_CONFIG = {
         return;
       }
 
+      var ready = CLOUD.auth.loadCapabilities ? CLOUD.auth.loadCapabilities() : Promise.resolve({});
+      status.textContent = "Checking recovery options…";
+      ready.then(function () {
+        if (!(CLOUD.auth.smsAvailable && CLOUD.auth.smsAvailable())) {
+          status.className = "form-status is-visible";
+          status.innerHTML = "Text-message recovery is not connected yet. If you signed up with this number and set a password, " +
+            '<a href="#/login">sign in with it</a>. If you have forgotten it, call +265 999 123 456 and we will verify your identity.';
+          return;
+        }
+        restoreByCode(id);
+      });
+
+      function restoreByCode(identifier) {
       status.textContent = "Sending a recovery code by SMS…";
       try {
-        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: id }));
+        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: identifier }));
       } catch (err) {}
-      CLOUD.auth.sendPhoneOtp(id).then(function () {
+      CLOUD.auth.sendPhoneOtp(identifier).then(function () {
         status.innerHTML = 'If an account matches <strong>' + id + '</strong>, a six-digit recovery code has been sent by SMS. ' +
           '<a href="#/verify">Enter the code</a> to sign in and set a new password.';
       }).catch(function () {
         status.className = "form-status is-visible form-status--error";
         status.textContent = "We could not send a recovery code just now. Please try again.";
       });
+      }
     });
   }
 
@@ -16614,6 +16686,89 @@ try {
   }
 
   /* ---------------- Security ---------------- */
+  /* Phone verification is honest about what is possible: a number is only
+     "verified" when a code confirmed it, and a code can only be sent once a
+     messaging provider is connected. */
+  function phoneVerificationRow() {
+    var p = profile();
+    var sms = !!(window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.smsAvailable &&
+      window.JCOB_CLOUD.auth.smsAvailable());
+    var verified = !!p.phoneVerified;
+    var right;
+    if (!p.phone) {
+      right = '<span class="pill pill--warn">No number</span>';
+    } else if (verified) {
+      right = UI.statusPill("Verified");
+    } else if (sms) {
+      right = '<button class="btn btn--ghost btn--xs" type="button" data-verify-phone="1">Verify by SMS</button>';
+    } else {
+      right = '<span class="pill pill--warn">Awaiting SMS</span>';
+    }
+    return '<div class="switch-row"><div><strong>Phone number</strong><span>' + esc(p.phone || "Not added") +
+      (verified ? "" : " · text-message codes are not connected yet, so this number is not verified") +
+      "</span></div>" + right + "</div>";
+  }
+
+  function verifyPhoneDialog() {
+    var phone = profile().phone;
+    if (!phone) {
+      UI.toast({ title: "No phone number", message: "Add a phone number to your profile first.", type: "danger" });
+      return;
+    }
+    if (!(window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.smsAvailable && window.JCOB_CLOUD.auth.smsAvailable())) {
+      UI.modal({
+        title: "Phone verification",
+        subtitle: "Not available yet",
+        body: '<p>SMS is not connected to the account service yet, so we cannot send a code to ' + esc(phone) + ". " +
+          "Your number is saved and your account works normally. When the messaging provider is connected, " +
+          "this button will send a code and mark the number verified.</p>",
+        actions: [{ label: "Close", variant: "ghost", close: true }]
+      });
+      return;
+    }
+    var AUTH = window.JCOB_CLOUD.auth;
+    AUTH.sendPhoneOtp(phone).then(function () {
+      UI.modal({
+        title: "Verify your phone",
+        subtitle: "We sent a six-digit code to " + phone,
+        body: '<div class="field"><label for="vp-code">Six-digit code</label>' +
+          '<input id="vp-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>' +
+          '<p class="form-status" id="vp-status"></p>',
+        actions: [
+          { label: "Cancel", variant: "ghost", close: true },
+          {
+            label: "Verify", variant: "gold", onClick: function (wrap) {
+              var input = wrap.querySelector("#vp-code");
+              var status = wrap.querySelector("#vp-status");
+              var code = String(input.value || "").trim();
+              if (code.length !== 6) {
+                status.className = "form-status is-visible form-status--error";
+                status.textContent = "Enter all six digits.";
+                return false;
+              }
+              AUTH.verifyPhoneOtp(phone, code).then(function () {
+                var d = db();
+                d.profile.phoneVerified = true;
+                d.profile.phoneVerifiedAt = new Date().toISOString();
+                DATA.notify("Security", "Phone number verified", "Your phone number " + phone + " is now confirmed.", "In-app");
+                DATA.save();
+                UI.toast({ title: "Phone verified", message: phone, type: "success" });
+                UI.closeModal();
+                render(false);
+              }).catch(function (e) {
+                status.className = "form-status is-visible form-status--error";
+                status.textContent = String((e && e.message) || "That code is incorrect or has expired.");
+              });
+              return false;
+            }
+          }
+        ]
+      });
+    }).catch(function (e) {
+      UI.toast({ title: "Could not send a code", message: String((e && e.message) || "Try again later."), type: "danger" });
+    });
+  }
+
   function panelSecurity() {
     var s = db().security;
     var mfa = s.mfa;
@@ -16650,8 +16805,9 @@ try {
             '<p class="form-status" id="security-status"></p>' +
           "</form>") +
         panel("Verification & MFA", null,
-          '<div class="switch-row"><div><strong>Email verified</strong><span>' + esc(profile().email) + "</span></div>" + UI.statusPill("Verified") + "</div>" +
-          '<div class="switch-row"><div><strong>Phone verified</strong><span>' + esc(profile().phone) + "</span></div>" + UI.statusPill("Verified") + "</div>" +
+          '<div class="switch-row"><div><strong>Email address</strong><span>' + esc(profile().email || "Not added") + "</span></div>" +
+            (profile().email ? UI.statusPill("Verified") : '<span class="pill pill--warn">Not added</span>') + "</div>" +
+          phoneVerificationRow() +
           '<div class="switch-row"><div><strong>Multi-factor authentication</strong><span>Require a one-time code at every sign-in</span></div>' +
             '<label class="switch"><input type="checkbox" id="mfa-toggle"' + (mfa ? " checked" : "") + '><i></i></label></div>' +
           '<div class="switch-row"><div><strong>Last password change</strong><span>' + dtTime(s.passwordChanged) + "</span></div></div>" +
@@ -16798,6 +16954,9 @@ try {
   }
 
   function bind(route) {
+    content.querySelectorAll("[data-verify-phone]").forEach(function (btn) {
+      btn.addEventListener("click", function () { verifyPhoneDialog(); });
+    });
     /* generic: loan modals */
     content.querySelectorAll("[data-payoff]").forEach(function (btn) {
       btn.addEventListener("click", function () { payoffDialog(btn.getAttribute("data-payoff")); });

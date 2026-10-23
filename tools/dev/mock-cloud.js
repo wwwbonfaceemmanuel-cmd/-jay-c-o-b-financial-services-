@@ -21,6 +21,9 @@
 const http = require("http");
 
 const PORT = Number(process.env.MOCK_PORT || 54321);
+/* No messaging provider by default, like the real project until one is
+   connected. MOCK_SMS=on simulates a connected provider. */
+let smsOn = process.env.MOCK_SMS === "on";
 const ANON_KEY = process.env.MOCK_ANON_KEY || "dev-anon";
 
 let seq = 0;
@@ -186,6 +189,13 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/auth/v1/recover") return send(res, 200, {});
 
+  /* Test hook: connect or disconnect the pretend SMS provider. */
+  if (pathname === "/__mock/sms") {
+    const data = (await body(req)) || {};
+    smsOn = data.on === true;
+    return send(res, 200, { sms: smsOn });
+  }
+
   /* One-time codes, by email or by SMS. Every code issued here is 123456
      and is deleted once used, like the real service. */
   if (pathname === "/auth/v1/otp") {
@@ -228,7 +238,8 @@ const server = http.createServer(async (req, res) => {
   if (pathname === "/auth/v1/settings") {
     return send(res, 200, {
       mailer_autoconfirm: true,
-      external: { email: true, phone: true }
+      phone_autoconfirm: smsOn,
+      external: { email: true, phone: smsOn }
     });
   }
 

@@ -1165,6 +1165,89 @@
   }
 
   /* ---------------- Security ---------------- */
+  /* Phone verification is honest about what is possible: a number is only
+     "verified" when a code confirmed it, and a code can only be sent once a
+     messaging provider is connected. */
+  function phoneVerificationRow() {
+    var p = profile();
+    var sms = !!(window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.smsAvailable &&
+      window.JCOB_CLOUD.auth.smsAvailable());
+    var verified = !!p.phoneVerified;
+    var right;
+    if (!p.phone) {
+      right = '<span class="pill pill--warn">No number</span>';
+    } else if (verified) {
+      right = UI.statusPill("Verified");
+    } else if (sms) {
+      right = '<button class="btn btn--ghost btn--xs" type="button" data-verify-phone="1">Verify by SMS</button>';
+    } else {
+      right = '<span class="pill pill--warn">Awaiting SMS</span>';
+    }
+    return '<div class="switch-row"><div><strong>Phone number</strong><span>' + esc(p.phone || "Not added") +
+      (verified ? "" : " · text-message codes are not connected yet, so this number is not verified") +
+      "</span></div>" + right + "</div>";
+  }
+
+  function verifyPhoneDialog() {
+    var phone = profile().phone;
+    if (!phone) {
+      UI.toast({ title: "No phone number", message: "Add a phone number to your profile first.", type: "danger" });
+      return;
+    }
+    if (!(window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.smsAvailable && window.JCOB_CLOUD.auth.smsAvailable())) {
+      UI.modal({
+        title: "Phone verification",
+        subtitle: "Not available yet",
+        body: '<p>SMS is not connected to the account service yet, so we cannot send a code to ' + esc(phone) + ". " +
+          "Your number is saved and your account works normally. When the messaging provider is connected, " +
+          "this button will send a code and mark the number verified.</p>",
+        actions: [{ label: "Close", variant: "ghost", close: true }]
+      });
+      return;
+    }
+    var AUTH = window.JCOB_CLOUD.auth;
+    AUTH.sendPhoneOtp(phone).then(function () {
+      UI.modal({
+        title: "Verify your phone",
+        subtitle: "We sent a six-digit code to " + phone,
+        body: '<div class="field"><label for="vp-code">Six-digit code</label>' +
+          '<input id="vp-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>' +
+          '<p class="form-status" id="vp-status"></p>',
+        actions: [
+          { label: "Cancel", variant: "ghost", close: true },
+          {
+            label: "Verify", variant: "gold", onClick: function (wrap) {
+              var input = wrap.querySelector("#vp-code");
+              var status = wrap.querySelector("#vp-status");
+              var code = String(input.value || "").trim();
+              if (code.length !== 6) {
+                status.className = "form-status is-visible form-status--error";
+                status.textContent = "Enter all six digits.";
+                return false;
+              }
+              AUTH.verifyPhoneOtp(phone, code).then(function () {
+                var d = db();
+                d.profile.phoneVerified = true;
+                d.profile.phoneVerifiedAt = new Date().toISOString();
+                DATA.notify("Security", "Phone number verified", "Your phone number " + phone + " is now confirmed.", "In-app");
+                DATA.save();
+                UI.toast({ title: "Phone verified", message: phone, type: "success" });
+                UI.closeModal();
+                render(false);
+              }).catch(function (e) {
+                status.className = "form-status is-visible form-status--error";
+                status.textContent = String((e && e.message) || "That code is incorrect or has expired.");
+              });
+              return false;
+            }
+          }
+        ]
+      });
+    }).catch(function (e) {
+      UI.toast({ title: "Could not send a code", message: String((e && e.message) || "Try again later."), type: "danger" });
+    });
+  }
+
   function panelSecurity() {
     var s = db().security;
     var mfa = s.mfa;
@@ -1201,8 +1284,9 @@
             '<p class="form-status" id="security-status"></p>' +
           "</form>") +
         panel("Verification & MFA", null,
-          '<div class="switch-row"><div><strong>Email verified</strong><span>' + esc(profile().email) + "</span></div>" + UI.statusPill("Verified") + "</div>" +
-          '<div class="switch-row"><div><strong>Phone verified</strong><span>' + esc(profile().phone) + "</span></div>" + UI.statusPill("Verified") + "</div>" +
+          '<div class="switch-row"><div><strong>Email address</strong><span>' + esc(profile().email || "Not added") + "</span></div>" +
+            (profile().email ? UI.statusPill("Verified") : '<span class="pill pill--warn">Not added</span>') + "</div>" +
+          phoneVerificationRow() +
           '<div class="switch-row"><div><strong>Multi-factor authentication</strong><span>Require a one-time code at every sign-in</span></div>' +
             '<label class="switch"><input type="checkbox" id="mfa-toggle"' + (mfa ? " checked" : "") + '><i></i></label></div>' +
           '<div class="switch-row"><div><strong>Last password change</strong><span>' + dtTime(s.passwordChanged) + "</span></div></div>" +
@@ -1349,6 +1433,9 @@
   }
 
   function bind(route) {
+    content.querySelectorAll("[data-verify-phone]").forEach(function (btn) {
+      btn.addEventListener("click", function () { verifyPhoneDialog(); });
+    });
     /* generic: loan modals */
     content.querySelectorAll("[data-payoff]").forEach(function (btn) {
       btn.addEventListener("click", function () { payoffDialog(btn.getAttribute("data-payoff")); });

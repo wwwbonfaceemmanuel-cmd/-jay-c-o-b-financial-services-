@@ -100,7 +100,14 @@
       add("Authentication service", "ok",
         "Email sign-in is available · email confirmation is " +
         (confirm ? "<strong>off</strong> (sign-up signs in immediately)" : "<strong>on</strong> (users must click the link first)"));
-      var providers = Object.keys(json.external || {}).filter(function (k) { return json.external[k]; });
+      var phone = !!(json.external && json.external.phone);
+      add("Phone / SMS messaging", phone ? "ok" : "warn",
+        phone
+          ? "Text-message codes are available: phone sign-in and phone verification work."
+          : "No SMS provider is connected. Accounts still work — sign-up uses a password or an email address, " +
+            "and phone numbers stay marked <strong>Awaiting SMS</strong> until a code confirms them.",
+        phone ? "" : "Optional. Add a provider under Authentication → Providers → Phone when you are ready.");
+      var providers = Object.keys(json.external || {}).filter(function (k) { return json.external[k] && k !== "phone"; });
       if (providers.length) {
         add("External providers", "warn",
           "Also enabled: " + esc(providers.join(", ")) + " — not used by this site yet.", "");

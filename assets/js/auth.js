@@ -413,14 +413,23 @@
           return;
         }
         var channel = isEmail(identifier) ? "email" : "sms";
-        try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
-        } catch (err) {}
-        var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
-        send.then(function () {
-          window.location.href = "verify.html";
-        }).catch(function (err) {
-          fieldError(idInput, String((err && err.message) || "We could not send a code to that number."));
+        var ready = CLOUD.auth.loadCapabilities ? CLOUD.auth.loadCapabilities() : Promise.resolve({});
+        ready.then(function () {
+          if (channel === "sms" && !(CLOUD.auth.smsAvailable && CLOUD.auth.smsAvailable())) {
+            fieldError(idInput, "Text-message codes are not connected yet. Sign in with your phone number and password — SMS will be added when the provider is live.");
+            return;
+          }
+          try {
+            sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", channel: channel, identifier: identifier }));
+          } catch (err) {}
+          var send = channel === "sms" ? CLOUD.auth.sendPhoneOtp(identifier) : CLOUD.auth.sendOtp(identifier);
+          send.then(function () {
+            window.location.href = "verify.html";
+          }).catch(function (err) {
+            var msg = String((err && err.message) || "We could not send a code to that number.");
+            if (/sms|provider|phone/i.test(msg)) msg = "Text-message codes are not connected yet. Sign in with your password instead.";
+            fieldError(idInput, msg);
+          });
         });
       });
     }
@@ -463,17 +472,31 @@
         return;
       }
 
+      var ready = CLOUD.auth.loadCapabilities ? CLOUD.auth.loadCapabilities() : Promise.resolve({});
+      status.textContent = "Checking recovery options…";
+      ready.then(function () {
+        if (!(CLOUD.auth.smsAvailable && CLOUD.auth.smsAvailable())) {
+          status.className = "form-status is-visible";
+          status.innerHTML = "Text-message recovery is not connected yet. If you signed up with this number and set a password, " +
+            '<a href="login.html">sign in with it</a>. If you have forgotten it, call +265 999 123 456 and we will verify your identity.';
+          return;
+        }
+        restoreByCode(id);
+      });
+
+      function restoreByCode(identifier) {
       status.textContent = "Sending a recovery code by SMS…";
       try {
-        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: id }));
+        sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "recover", channel: "sms", identifier: identifier }));
       } catch (err) {}
-      CLOUD.auth.sendPhoneOtp(id).then(function () {
+      CLOUD.auth.sendPhoneOtp(identifier).then(function () {
         status.innerHTML = 'If an account matches <strong>' + id + '</strong>, a six-digit recovery code has been sent by SMS. ' +
           '<a href="verify.html">Enter the code</a> to sign in and set a new password.';
       }).catch(function () {
         status.className = "form-status is-visible form-status--error";
         status.textContent = "We could not send a recovery code just now. Please try again.";
       });
+      }
     });
   }
 
