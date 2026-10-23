@@ -251,13 +251,14 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 436 assertions
+npm test        # starts the Supabase stand-in + server, runs 479 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
 single-file bundle, an empty dashboard that ignores a stale browser copy), the product quotes (the
 flat-monthly rule, clamping, and every page against the engine), the signature pad (trace fidelity,
-curve rendering, undo/clear), cloud mode (hydration,
+curve rendering, undo/clear), the header chrome (the bar and the footer share one emerald
+token, every control restated on that ground, contrast maths, print), cloud mode (hydration,
 catalogue, live feed, staff gate, role refusal, console persistence, decision round-trip,
 registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. The cloud
 suite also proves the browser holds no records: a change written in the dashboard lands in
@@ -372,6 +373,11 @@ root as-is — there is no build step at runtime.
 
 - Emerald (`#04171a` → `#0d4a4b`) with blue liquid crystal (`#0a3f6b` → `#e6f3fd`) on an ice-paper base
   (`#eef4fa`), frosted glass surfaces, iridescent facet highlights and a slow ambient drift.
+- **One chrome (v7):** the header block — announcement strip, nav bar and mobile drawer — is painted
+  with the exact same `--emerald-chrome` gradient as the footer, with a gold rail along its bottom
+  edge and light `--chrome-text` type restated for every control on that ground. The customer
+  dashboard's app bar and the admin console's top bar use the same bar, so site and tools read as
+  one product.
 - **Golden edges (v5):** a fine gold frame around the viewport, a gold rail under the header and above
   the footer, gold hairline borders and a 3px gold top rail on every card, gold-edged panels, tables,
   legal documents and dashboard modules, plus gold figures, focus rings and separators. Gold is trim

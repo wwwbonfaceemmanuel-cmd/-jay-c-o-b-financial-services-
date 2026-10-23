@@ -155,9 +155,9 @@ Object.keys(darks).forEach((sel) => {
 });
 
 /* ---- 7. dashboards: shell and tables ---- */
-t.ok("dashboard top bar is a blue-emerald band", (() => {
+t.ok("dashboard top bar is the app chrome", (() => {
   const bg = lastDecl(siteRules, ".app-topbar", "background");
-  return !!bg && /linear-gradient/.test(bg.value);
+  return !!bg && /var\(--emerald-chrome\)/.test(bg.value);
 })());
 t.ok("panel heads carry a gold rule", (() => {
   const r = lastDecl(siteRules, ".app-panel .app-panel-head", "border-bottom", { exact: false });
