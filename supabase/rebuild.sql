@@ -619,7 +619,7 @@ select id,
 -- ---------------------------------------------------------------------
 select 'tables' as check_name,
        (select count(*) from information_schema.tables
-         where table_schema = 'public' and table_type = 'BASE TABLE')::text || ' / 6' as value
+         where table_schema = 'public' and table_type = 'BASE TABLE')::text || ' (profiles, site_docs, portal_docs, customer_docs, enquiries, audit_log)' as value
 union all
 select 'row level security on',
        (select count(*) from pg_class c
