@@ -69,7 +69,11 @@
       sessions: [], logins: [],
       security: defaultSecurity(),
       settings: defaultSettings(),
-      statements: [], drafts: [], wallet: {}
+      statements: [], drafts: [], wallet: {},
+      /* Confidential-detail changes are requests, not edits: a customer
+         files one with a reason and staff approve or decline it. */
+      changeRequests: [],
+      profileAudit: []
     };
   }
 
@@ -190,12 +194,15 @@
     var out = Object.assign({}, data);
     ["applications", "loans", "transactions", "deposits", "withdrawals", "transfers",
       "notifications", "tickets", "documents", "statements", "drafts",
-      "sessions", "logins"].forEach(function (k) {
+      "sessions", "logins", "changeRequests", "profileAudit"].forEach(function (k) {
       if (!Array.isArray(out[k])) out[k] = [];
     });
     if (!out.savings || typeof out.savings !== "object" || Array.isArray(out.savings)) out.savings = blankSavings();
     if (!Array.isArray(out.savings.goals)) out.savings.goals = [];
     if (!out.profile) out.profile = shape.profile;
+    if (!out.profile.nextOfKin || typeof out.profile.nextOfKin !== "object") {
+      out.profile.nextOfKin = { name: "", relationship: "", phone: "" };
+    }
     if (!out.security) out.security = shape.security;
     if (!out.settings) out.settings = shape.settings;
     if (!out.wallet || typeof out.wallet !== "object") out.wallet = {};

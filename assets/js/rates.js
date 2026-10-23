@@ -48,7 +48,7 @@
 
   /* Seeded figures — used until the store answers, then replaced. */
   var FALLBACK = {
-    personal: { name: "Personal loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    personal: { name: "Personal loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2 },
     business: { name: "Business loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
     secured: { name: "Secured loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, maxTerm: 84, fee: 1.5 }
   };
@@ -64,7 +64,8 @@
      to" and the APR band stay policy figures, which the engine cannot derive
      from a single product record. */
   var table = document.querySelector("[data-rate-table]");
-  if (table) {
+  function fillRateTable() {
+    if (!table) return;
     [].slice.call(table.querySelectorAll("tbody tr")).forEach(function (row) {
       var name = row.querySelector("th").textContent.trim();
       var key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -74,13 +75,16 @@
       if (!p) return;
       var cells = row.querySelectorAll("td");
       if (cells.length < 6) return;
-      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%";
+      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%" +
+        (p.rateBasis === "monthly" ? " /mo" : "");
       cells[3].textContent = p.method === "flat" ? "Flat rate" : "Reducing balance";
       cells[4].textContent = p.minTerm + "–" + p.maxTerm + " months";
     });
   }
 
-  if (examples) {
+  function paintExamples() {
+    fillRateTable();
+    if (!examples) return;
     examples.innerHTML = CASES.map(function (k) {
       var p = productFor(k.id);
       var c = F.productQuote(p, { amount: k.amount, termMonths: k.term });
@@ -102,5 +106,13 @@
           encodeURIComponent(p.name) + "&amount=" + Math.round(t.amount) + "&term=" + t.termMonths + '">Apply for this loan</a>' +
         "</div>";
     }).join("");
+  }
+
+  paintExamples();
+  /* the catalogue can land after first paint — repaint when it does */
+  document.addEventListener("jcob:site-updated", paintExamples);
+  if (window.JCOB_SITE) {
+    if (window.JCOB_SITE.subscribe) window.JCOB_SITE.subscribe(paintExamples);
+    if (window.JCOB_SITE.ready && window.JCOB_SITE.ready.then) window.JCOB_SITE.ready.then(paintExamples).catch(function () {});
   }
 })();

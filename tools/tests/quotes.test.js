@@ -244,7 +244,8 @@ const F = engine();
     const drift = rows.filter((row) => {
       const name = row.querySelector("th").textContent.trim().toLowerCase();
       const p = w.JCOB_SITE.products.filter((x) => x.name.toLowerCase().indexOf(name) === 0)[0];
-      return !p || row.children[1].textContent.trim() !== String(p.rate) + "%";
+      const shown = String(p.rate) + "%" + (p.rateBasis === "monthly" ? " /mo" : "");
+      return !p || row.children[1].textContent.trim() !== shown;
     }).map((r) => r.querySelector("th").textContent.trim());
     t.eq("every published rate is the catalogue rate", drift.join(", "), "");
 

@@ -99,6 +99,15 @@ const { reporter, makeDom, ready, sleep } = require("./lib");
     const w = dom.window;
     t.ok("bundle boots", !!(w.JCOB_APP || w.JCOB_SITE));
     t.eq("bundle marked single", w.document.body.getAttribute("data-single"), "true");
+    /* the single-file deliverable ships the theme generator, or the admin's
+       choice would be ignored the moment the bundle is opened */
+    t.ok("the bundle carries the theme engine", !!(w.JCOB_THEME && w.JCOB_THEME.list));
+    t.eq("and all five themes", w.JCOB_THEME.list().length, 5);
+    w.JCOB_THEME.apply("site", "royal");
+    t.eq("a theme repaints the bundle", w.document.documentElement.getAttribute("data-theme"), "royal");
+    w.JCOB_THEME.apply("site", "emerald");
+    t.eq("the house theme leaves it unpainted",
+      w.document.documentElement.style.getPropertyValue("--navy-700"), "");
     const relevant = errors.filter((e) => !/Could not load link/i.test(e));
     t.eq("no script errors", relevant.length, 0, relevant.slice(0, 2).join(" | "));
     w.close();

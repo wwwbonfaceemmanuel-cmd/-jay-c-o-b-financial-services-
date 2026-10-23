@@ -5663,11 +5663,247 @@ body {
 .header-nav a:focus-visible { outline: 2px solid var(--gold-400); outline-offset: 2px; }
 @media (max-width: 640px) { .header-nav { width: 100%; margin-left: 0; } }
 
+
+/* =====================================================================
+   THEME v8 — THE PAGE'S OWN HEADER BAND WEARS THE SAME EMERALD
+   ---------------------------------------------------------------------
+   The site header is emerald; the band that opens every inner page (the
+   calculator, the products, the application, the forms, the legal pages)
+   now wears the same ground, so a page opens on the same colour it
+   closes on. Receipts, statements and every downloaded document carry the
+   same band with the light lockup, so paper and screen agree too.
+   ===================================================================== */
+
+/* ---- 1. the page header band (was cream) ---- */
+.page-hero {
+  background: var(--emerald-chrome);
+  color: var(--chrome-text);
+  border-bottom: 0;
+  box-shadow: inset 0 6px 22px -18px rgba(201, 162, 39, 0.75);
+}
+.page-hero::before {
+  background: radial-gradient(circle, rgba(31, 131, 201, 0.26), transparent 62%);
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.18) 8%,
+    rgba(201, 162, 39, 0.88) 30%, rgba(246, 236, 196, 0.98) 50%,
+    rgba(201, 162, 39, 0.88) 70%, rgba(201, 162, 39, 0.18) 92%, transparent 100%);
+  pointer-events: none;
+}
+.page-hero h1,
+.page-hero h2 { color: var(--chrome-text-strong); }
+.page-hero .lead,
+.page-hero p { color: var(--chrome-text); }
+.page-hero .eyebrow { color: var(--gold-200); }
+.page-hero .eyebrow::before { background: var(--gold-edge); opacity: 1; }
+.page-hero .breadcrumb,
+.page-hero .breadcrumb a { color: var(--chrome-muted-text); }
+.page-hero .breadcrumb a:hover { color: var(--gold-200); }
+.page-hero .breadcrumb .sep { color: var(--chrome-muted-text); }
+.page-hero .btn--ghost,
+.page-hero .btn--line-gold {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 236, 196, 0.34);
+  color: var(--chrome-text-strong);
+}
+.page-hero .btn--ghost:hover,
+.page-hero .btn--line-gold:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--gold-400);
+  color: var(--gold-200);
+}
+.page-hero .btn--gold { color: #12251f; }
+.page-hero .chip,
+.page-hero .pill {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(246, 236, 196, 0.3);
+  color: var(--chrome-text);
+}
+.page-hero .stat-strip,
+.page-hero .hero-facts { border-color: rgba(246, 236, 196, 0.22); }
+.page-hero .muted,
+.page-hero .text-muted,
+.page-hero .text-small { color: var(--chrome-muted-text); }
+
+/* ---- 2. the document header — receipts, statements, auth, print ---- */
+.doc-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.05rem 1.25rem;
+  background: var(--emerald-chrome);
+  color: var(--chrome-text);
+  border: 1px solid rgba(246, 236, 196, 0.26);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.doc-head::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.35) 20%,
+    rgba(246, 236, 196, 0.95) 50%, rgba(201, 162, 39, 0.35) 80%, transparent 100%);
+  pointer-events: none;
+}
+.doc-head__logo { height: 40px; width: auto; flex: none; }
+.doc-head__text { margin-left: auto; text-align: right; min-width: 0; }
+.doc-head__kicker {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-200);
+}
+.doc-head h1,
+.doc-head h2,
+.doc-head__title {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: var(--chrome-text-strong);
+}
+.doc-head p,
+.doc-head__meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--chrome-muted-text);
+}
+.doc-head a { color: var(--gold-200); }
+
+/* the document body that sits under the band */
+.doc-sheet {
+  border: 1px solid rgba(246, 236, 196, 0.26);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--paper);
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+/* ---- 3. auth pages: the lockup and the page title sit on the band ---- */
+.doc-head--compact { padding: 1rem 1.2rem; }
+.doc-head--compact .auth-logo { margin: 0; justify-content: flex-start; }
+.doc-head--compact .auth-logo img { height: 42px; }
+.doc-head--compact .doc-head__text { text-align: right; }
+.doc-head--compact h1 { font-size: 1.28rem; }
+.doc-head + .auth-card {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+  background: rgba(255, 255, 255, 0.96);
+}
+@media (max-width: 520px) {
+  .doc-head__text,
+  .doc-head--compact .doc-head__text { margin-left: 0; text-align: left; }
+  .doc-head__logo { height: 34px; }
+}
+
+/* ---- 4. print: the band stays coloured, everything else is paper ---- */
+@media print {
+  .page-hero,
+  .doc-head {
+    background: var(--emerald-chrome) !important;
+    color: var(--chrome-text) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page-hero h1, .page-hero .lead,
+  .doc-head h1, .doc-head p { color: #fff !important; }
+}
+
 /* print: no chrome */
 @media print {
   .site-header, .app-topbar { background: #fff !important; }
   .site-header::before, .app-topbar::after { display: none !important; }
   .nav-link, .header-topline, .header-topline a { color: #000 !important; }
+}
+
+/* =====================================================================
+   THEME v9 — THE INSIGHT ARTICLE OPENS ON THE SAME BAND
+   ---------------------------------------------------------------------
+   The reading pages were the last public surface opening on paper. Their
+   header now wears the emerald ground the site header and footer share,
+   full-bleed past the reading column, with the gold rail at its foot.
+   ===================================================================== */
+.article-hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(1.8rem, 3.4vw, 2.8rem) 0;
+  color: var(--chrome-text);
+  background: transparent;
+}
+/* the colour runs the full window width, not just the reading column */
+.article-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--emerald-chrome);
+  z-index: -1;
+  pointer-events: none;
+}
+/* the gold rail the header, page bands and receipts all carry */
+.article-hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.18) 8%,
+    rgba(201, 162, 39, 0.88) 30%, rgba(246, 236, 196, 0.98) 50%,
+    rgba(201, 162, 39, 0.88) 70%, rgba(201, 162, 39, 0.18) 92%, transparent 100%);
+  pointer-events: none;
+}
+.article-hero .breadcrumb,
+.article-hero .breadcrumb a { color: var(--chrome-muted-text); }
+.article-hero .breadcrumb a:hover { color: var(--gold-200); }
+.article-hero .breadcrumb .sep { color: var(--chrome-muted-text); opacity: 1; }
+.article-hero h1 { color: var(--chrome-text-strong); }
+.article-hero .article-dek { color: var(--chrome-text); }
+.article-hero .article-byline { color: var(--chrome-muted-text); }
+.article-hero .article-byline strong { color: var(--chrome-text-strong); }
+.article-hero .post-meta { color: var(--chrome-muted-text); }
+.article-hero .post-meta .tag {
+  background: rgba(246, 236, 196, 0.12);
+  border: 1px solid rgba(246, 236, 196, 0.34);
+  color: var(--gold-200);
+}
+.article-hero .post-meta .sep { background: rgba(246, 236, 196, 0.45); }
+.article-hero .article-byline .sep { background: rgba(246, 236, 196, 0.45); }
+.article-hero .avatar {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(246, 236, 196, 0.4);
+  color: var(--gold-200);
+}
+.article-hero .article-header { border-bottom-color: var(--chrome-rule); }
+.article-hero .article-wrap > .breadcrumb { margin-bottom: 0.5rem; }
+
+@media (max-width: 640px) {
+  .article-hero { padding-block: 1.4rem 0; }
+  .article-hero h1 { font-size: clamp(1.6rem, 7vw, 2.1rem); }
+}
+
+@media print {
+  .article-hero::before { display: none; }
+  .article-hero, .article-hero h1, .article-hero .article-dek { color: #000 !important; }
 }
 
 /* ---- single-file bundle ---- */
@@ -5813,7 +6049,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <h3>Personal loan</h3>
           <p>For school fees, medical costs, home improvements or consolidation, repaid from salary.</p>
-          <p class="product-rate" data-pq-rate>24% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>2% <small>per month reducing</small></p>
           <div class="product-meta">
             <span><b data-pq-limits>MWK 100,000 – 15,000,000</b></span>
             <span data-pq-term>6 – 48 months · monthly</span>
@@ -6179,7 +6415,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <tr><th scope="col">Product</th><th scope="col">Amount range (MWK)</th><th scope="col">Term</th><th scope="col">Rate from</th><th scope="col">Processing fee</th><th scope="col">Repayment</th></tr>
           </thead>
           <tbody>
-            <tr><td><a href="#/loan-products#personal">Personal loan</a></td><td class="num">100,000 – 15,000,000</td><td>6 – 48 months</td><td class="num">24% p.a.</td><td class="num">2.0%</td><td>Monthly</td></tr>
+            <tr><td><a href="#/loan-products#personal">Personal loan</a></td><td class="num">100,000 – 15,000,000</td><td>1 – 48 months</td><td class="num">2% per month</td><td class="num">2.0%</td><td>Monthly</td></tr>
             <tr><td><a href="#/loan-products#business">Business loan</a></td><td class="num">500,000 – 50,000,000</td><td>12 – 60 months</td><td class="num">22% p.a.</td><td class="num">2.5%</td><td>Monthly</td></tr>
             <tr><td><a href="#/loan-products#emergency">Emergency loan</a></td><td class="num">50,000 – 2,000,000</td><td>3 – 12 months</td><td class="num">28% p.a.</td><td class="num">2.0%</td><td>Monthly</td></tr>
             <tr><td><a href="#/loan-products#salary">Salary-based loan</a></td><td class="num">100,000 – 10,000,000</td><td>6 – 36 months</td><td class="num">23% p.a.</td><td class="num">2.0%</td><td>Monthly (payroll)</td></tr>
@@ -6575,7 +6811,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">A flexible facility for school fees, medical costs, home improvements, travel or consolidating expensive debt. Repaid monthly from salary or regular income.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">24% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">2% <small style="font-size:.75rem;color:var(--muted);">per month reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
@@ -6867,7 +7103,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <tr><th scope="col">Product</th><th scope="col">Amount (MWK)</th><th scope="col">Term</th><th scope="col">Rate from</th><th scope="col">Fee</th><th scope="col">Security</th><th scope="col">Best for</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row"><a href="#personal">Personal</a></th><td class="num">100k – 15m</td><td>6–48 mo</td><td class="num">24%</td><td class="num">2.0%</td><td>Unsecured</td><td>Household needs</td></tr>
+            <tr><th scope="row"><a href="#personal">Personal</a></th><td class="num">100k – 15m</td><td>1–48 mo</td><td class="num">2% /mo</td><td class="num">2.0%</td><td>Unsecured</td><td>Household needs</td></tr>
             <tr><th scope="row"><a href="#business">Business</a></th><td class="num">500k – 50m</td><td>12–60 mo</td><td class="num">22%</td><td class="num">2.5%</td><td>Unsecured / asset</td><td>Working capital</td></tr>
             <tr><th scope="row"><a href="#emergency">Emergency</a></th><td class="num">50k – 2m</td><td>3–12 mo</td><td class="num">28%</td><td class="num">2.0%</td><td>Unsecured</td><td>Urgent costs</td></tr>
             <tr><th scope="row"><a href="#salary">Salary-based</a></th><td class="num">100k – 10m</td><td>6–36 mo</td><td class="num">23%</td><td class="num">2.0%</td><td>Payroll</td><td>Salaried employees</td></tr>
@@ -7502,18 +7738,18 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
       <div class="section-head">
         <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Rates</p>
-        <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem);">Indicative annual interest rates.</h2>
-        <p class="lead">Rates depend on product, amount, term, security and your credit profile. The rate you are offered is stated in your agreement before you sign.</p>
+        <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem);">Indicative interest rates.</h2>
+        <p class="lead">Rates depend on product, amount, term, security and your credit profile. Rates are quoted per annum unless the table marks them <strong>/mo</strong> — the personal loan is charged monthly and opens on a one-month term. The rate you are offered is stated in your agreement before you sign.</p>
       </div>
 
       <div class="table-wrap" style="margin-top:1.4rem;">
         <table class="data" data-rate-table>
           <caption class="sr-only">Interest rates and indicative APR by loan product</caption>
           <thead>
-            <tr><th scope="col">Product</th><th scope="col">Rate from</th><th scope="col">Rate up to</th><th scope="col">Indicative APR*</th><th scope="col">Interest method</th><th scope="col">Term</th></tr>
+            <tr><th scope="col">Product</th><th scope="col">Rate from (p.a. unless /mo)</th><th scope="col">Rate up to</th><th scope="col">Indicative APR*</th><th scope="col">Interest method</th><th scope="col">Term</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Personal</th><td class="num">24%</td><td class="num">29%</td><td class="num">29.5% – 37.0%</td><td>Reducing balance</td><td>6–48 months</td></tr>
+            <tr><th scope="row">Personal</th><td class="num">2% /mo</td><td class="num">29%</td><td class="num">29.5% – 37.0%</td><td>Reducing balance</td><td>1–48 months</td></tr>
             <tr><th scope="row">Business</th><td class="num">22%</td><td class="num">27%</td><td class="num">27.5% – 35.0%</td><td>Reducing balance</td><td>12–60 months</td></tr>
             <tr><th scope="row">Emergency</th><td class="num">28%</td><td class="num">32%</td><td class="num">35.0% – 41.5%</td><td>Reducing balance</td><td>3–12 months</td></tr>
             <tr><th scope="row">Salary-based</th><td class="num">23%</td><td class="num">27%</td><td class="num">28.5% – 35.0%</td><td>Reducing balance</td><td>6–36 months</td></tr>
@@ -7548,7 +7784,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       <div class="section-head" id="methods" style="margin-top:2.4rem;">
         <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Interest methods</p>
         <h2 style="font-size:clamp(1.5rem,2.8vw,2.1rem);">Flat versus reducing balance.</h2>
-        <p class="lead">The method changes the total you pay, even at the same headline rate. Worked on a MWK 2,000,000 loan over 12 months at 24% with a 2% processing fee:</p>
+        <p class="lead">The method changes the total you pay, even at the same headline rate. Worked on a MWK 2,000,000 loan over 12 months at 2% per month (24% p.a.) with a 2% processing fee:</p>
       </div>
 
       <div class="table-wrap" style="margin-top:1.2rem;">
@@ -8632,7 +8868,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
           </section>
           <section>
             <h2>5. Worked example</h2>
-            <p>Borrow MWK 2,000,000 for 12 months at 24% reducing balance with a 2% processing fee. Instalment approximately MWK 189,100. Total interest approximately MWK 269,400. Processing fee MWK 40,000. Total cost of credit approximately MWK 309,400. Illustrative only; your agreement controls.</p>
+            <p>Borrow MWK 2,000,000 for 12 months at 2% per month (24% p.a.) reducing balance with a 2% processing fee. Instalment approximately MWK 189,100. Total interest approximately MWK 269,400. Processing fee MWK 40,000. Total cost of credit approximately MWK 309,400. Illustrative only; your agreement controls.</p>
           </section>
           <section>
             <h2>6. Disclosure</h2>
@@ -8662,13 +8898,17 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <div class="auth-main">
       <div class="auth-box">
-        <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
-        </a>
-
+        <header class="doc-head doc-head--compact">
+          <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+          </a>
+          <div class="doc-head__text">
+            <span class="doc-head__kicker">Secure customer access</span>
+            <h1>Forgot your password?</h1>
+            <p>Enter your email or phone number and we will send recovery instructions.</p>
+          </div>
+        </header>
         <div class="auth-card">
-          <h1 style="font-size:1.5rem;">Forgot your password?</h1>
-          <p class="text-small text-muted" style="margin-top:.3rem;">Enter your email or phone number and we will send recovery instructions.</p>
 
           <form id="forgot-form" novalidate style="margin-top:1.2rem;">
             <div class="field">
@@ -9460,13 +9700,17 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <div class="auth-main">
       <div class="auth-box">
-        <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
-        </a>
-
+        <header class="doc-head doc-head--compact">
+          <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+          </a>
+          <div class="doc-head__text">
+            <span class="doc-head__kicker">Secure customer access</span>
+            <h1>Customer login</h1>
+            <p>Sign in with your email address or phone number.</p>
+          </div>
+        </header>
         <div class="auth-card">
-          <h1 style="font-size:1.5rem;">Customer login</h1>
-          <p class="text-small text-muted" style="margin-top:.3rem;">Sign in with your email address or phone number.</p>
 
           <form id="login-form" novalidate style="margin-top:1.2rem;">
             <div class="field">
@@ -9603,13 +9847,17 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <div class="auth-main">
       <div class="auth-box" style="max-width:32rem;">
-        <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
-        </a>
-
+        <header class="doc-head doc-head--compact">
+          <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+          </a>
+          <div class="doc-head__text">
+            <span class="doc-head__kicker">Secure customer access</span>
+            <h1>Create your account</h1>
+            <p>All fields marked * are required. You must be 18 or older.</p>
+          </div>
+        </header>
         <div class="auth-card">
-          <h1 style="font-size:1.5rem;">Create your account</h1>
-          <p class="text-small text-muted" style="margin-top:.3rem;">All fields marked * are required. You must be 18 or older.</p>
 
           <form id="register-form" novalidate style="margin-top:1.2rem;">
             <div class="form-grid">
@@ -9668,13 +9916,17 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <div class="auth-main">
       <div class="auth-box">
-        <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
-        </a>
-
+        <header class="doc-head doc-head--compact">
+          <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+          </a>
+          <div class="doc-head__text">
+            <span class="doc-head__kicker">Secure customer access</span>
+            <h1>Set a new password</h1>
+            <p>Your reset link is valid for 30 minutes and can be used once.</p>
+          </div>
+        </header>
         <div class="auth-card">
-          <h1 style="font-size:1.5rem;">Set a new password</h1>
-          <p class="text-small text-muted" style="margin-top:.3rem;">Your reset link is valid for 30 minutes and can be used once.</p>
 
           <form id="reset-form" novalidate style="margin-top:1.2rem;">
             <div class="field">
@@ -10103,13 +10355,17 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <div class="auth-main">
       <div class="auth-box">
-        <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
-        </a>
-
+        <header class="doc-head doc-head--compact">
+          <a class="auth-logo brand" href="#/" aria-label="JAY C O B FINANCIAL SERVICES — home">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
+          </a>
+          <div class="doc-head__text">
+            <span class="doc-head__kicker">Secure customer access</span>
+            <h1>Verify your account</h1>
+            <p>Enter the six-digit code we sent to <strong id="verify-target">your email and phone</strong>.</p>
+          </div>
+        </header>
         <div class="auth-card">
-          <h1 style="font-size:1.5rem;">Verify your account</h1>
-          <p class="text-small text-muted" style="margin-top:.3rem;">Enter the six-digit code we sent to <strong id="verify-target">your email and phone</strong>.</p>
 
           <form id="verify-form" novalidate style="margin-top:1.2rem;">
             <fieldset style="border:0;padding:0;">
@@ -10139,7 +10395,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
         <div class="notice">
           <strong>Where is my code?</strong>
-          <p>We email a 6-digit code to the address on your account. It expires after one hour and can only be used once. If it has not arrived, check your spam folder, then request a new code.</p>
+            <p>We email a 6-digit code to the address on your account. It expires after one hour and can only be used once. If it has not arrived, check your spam folder, then request a new code.</p>
         </div>
       </div>
     </div>
@@ -11150,6 +11406,14 @@ window.JCOB_CONFIG = {
       whatsapp: "https://wa.me/265999123456",
       x: "https://x.com/jaycobfinancial"
     },
+    /* Which theme the administrator has published. See assets/js/theme.js
+       for the registry; "emerald" is the house style and writes nothing. */
+    theme: {
+      site: "emerald",
+      dashboard: "emerald",
+      updated: null,
+      updatedBy: ""
+    },
     calc: {
       amount: 5000000,
       rate: 24,
@@ -11172,7 +11436,7 @@ window.JCOB_CONFIG = {
   };
 
   var PRODUCTS = [
-    { id: "personal", name: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2, active: true,
+    { id: "personal", name: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2, active: true,
       summary: "Unsecured cash for school fees, home improvement and personal plans.",
       eligibility: ["Age 18+ with a valid national ID", "Resident in Malawi", "Net income from MWK 120,000 per month", "No current arrears with other lenders"] },
     { id: "business", name: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5, active: true,
@@ -11503,6 +11767,7 @@ window.JCOB_CONFIG = {
     out.social = Object.assign(clone(SETTINGS).social, (saved || {}).social || {});
     out.calc = Object.assign(clone(SETTINGS).calc, (saved || {}).calc || {});
     out.policy = Object.assign(clone(SETTINGS).policy, (saved || {}).policy || {});
+    out.theme = Object.assign(clone(SETTINGS).theme, (saved || {}).theme || {});
     return out;
   }
 
@@ -11588,6 +11853,289 @@ window.JCOB_CONFIG = {
     remote: remote,
     push: push
   };
+})();
+
+
+/* ==== theme.js ==== */
+/* =====================================================================
+   JAY C O B FINANCIAL SERVICES — theme engine
+   ---------------------------------------------------------------------
+   The administrator picks a theme in the console (Website Settings →
+   Theme generator). The choice is stored in Supabase (site_docs/settings →
+   settings.theme) and this file applies it to whichever surface is open:
+
+     theme.site       → the public website
+     theme.dashboard  → the customer dashboard and the admin console
+
+   A theme is a set of CSS custom properties written onto <html>, so every
+   page, receipt band and console panel changes together. The emerald
+   theme is the published default and writes nothing, which keeps the
+   stylesheet's own values authoritative for the untouched design.
+
+   PUBLIC API (window.JCOB_THEME)
+     list()                 → [{ id, name, note, swatch }]
+     current(kind)          → the theme id in force for "site" | "dashboard"
+     apply(kind, id)        → paint immediately (does not save)
+     refresh()              → re-read the saved choice and paint
+     DEFAULT                → "emerald"
+   ===================================================================== */
+(function () {
+  "use strict";
+
+  var DEFAULT = "emerald";
+
+  /* Each entry paints: the chrome (header, footer, page bands, receipts),
+     its type, the app surfaces and the accent ramp. Grounds stay light so
+     body text keeps its contrast. */
+  var THEMES = {
+    emerald: {
+      name: "Emerald & liquid gold",
+      note: "The published house style — deep emerald chrome with gold trim.",
+      swatch: ["#06302c", "#0a3f6b", "#f2e3b6"],
+      tokens: {}
+    },
+    royal: {
+      name: "Royal blue & crystal",
+      note: "Royal-blue chrome, ice-crystal accents, cooler grounds.",
+      swatch: ["#0b2b4d", "#1f83c9", "#c4e2fb"],
+      tokens: {
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(168, 216, 251, 0.26), transparent 62%), linear-gradient(165deg, #0b2b4d 0%, #081f39 62%, #061527 100%)",
+        "--chrome-text": "#dbe9f7",
+        "--chrome-text-strong": "#f6fbff",
+        "--chrome-muted-text": "#b3c8dd",
+        "--chrome-rule": "rgba(196, 226, 251, 0.24)",
+        "--emerald-liquid": "linear-gradient(150deg, #0b2b4d 0%, #081f39 55%, #061527 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #081f39 0%, #0d3f66 45%, #12588a 100%)",
+        "--navy-900": "#061527",
+        "--navy-800": "#081f39",
+        "--navy-700": "#0b2b4d",
+        "--navy-600": "#114272",
+        "--navy-500": "#155289",
+        "--crystal-900": "#0a3f6b",
+        "--crystal-700": "#0d5c96",
+        "--crystal-500": "#1f83c9",
+        "--crystal-300": "#7bb8e8",
+        "--crystal-200": "#a8d8fb",
+        "--crystal-100": "#dff1ff",
+        "--cream": "#edf2fa",
+        "--cream-dark": "#dbe6f4",
+        "--gold-liquid": "linear-gradient(115deg, #a8d8fb 0%, #dff1ff 22%, #8ec7f0 46%, #c8e8ff 62%, #7bb8e8 82%, #e8f6ff 100%)"
+      }
+    },
+    midnight: {
+      name: "Midnight & champagne",
+      note: "Near-black chrome with champagne trim and a neutral ground.",
+      swatch: ["#181c22", "#101318", "#e8d59c"],
+      tokens: {
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(232, 213, 156, 0.16), transparent 62%), linear-gradient(165deg, #1b2028 0%, #101318 62%, #080a0d 100%)",
+        "--chrome-text": "#e6e2d8",
+        "--chrome-text-strong": "#fbf8f1",
+        "--chrome-muted-text": "#bdb8ab",
+        "--chrome-rule": "rgba(232, 213, 156, 0.22)",
+        "--emerald-liquid": "linear-gradient(150deg, #1b2028 0%, #101318 55%, #080a0d 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #101318 0%, #1b2028 55%, #262c35 100%)",
+        "--navy-900": "#080a0d",
+        "--navy-800": "#101318",
+        "--navy-700": "#1b2028",
+        "--navy-600": "#262c35",
+        "--navy-500": "#343b46",
+        "--cream": "#f1f2f4",
+        "--cream-dark": "#e2e4e8",
+        "--gold-700": "#7d5f0e",
+        "--gold-500": "#c9a227",
+        "--gold-400": "#dcbb5a",
+        "--gold-200": "#f2e3b6",
+        "--gold-100": "#fbf3dc",
+        "--gold-edge": "linear-gradient(135deg, #7d5f0e 0%, #d8b554 26%, #f6ecc4 48%, #c9a227 70%, #7d5f0e 100%)"
+      }
+    },
+    copper: {
+      name: "Copper & ivory",
+      note: "Espresso chrome, copper accents, warm ivory grounds.",
+      swatch: ["#3a2118", "#8a5322", "#f0d6bb"],
+      tokens: {
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(214, 140, 80, 0.24), transparent 62%), linear-gradient(165deg, #3a2118 0%, #271610 62%, #180d09 100%)",
+        "--chrome-text": "#f1dfd1",
+        "--chrome-text-strong": "#fdf3ea",
+        "--chrome-muted-text": "#d3b9a6",
+        "--chrome-rule": "rgba(240, 214, 187, 0.24)",
+        "--emerald-liquid": "linear-gradient(150deg, #3a2118 0%, #271610 55%, #180d09 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #271610 0%, #4a2c1c 55%, #6b3f22 100%)",
+        "--navy-900": "#180d09",
+        "--navy-800": "#271610",
+        "--navy-700": "#3a2118",
+        "--navy-600": "#4a2c1c",
+        "--navy-500": "#5c3a24",
+        "--cream": "#f7f1ec",
+        "--cream-dark": "#efe3d9",
+        "--gold-900": "#4a2a10",
+        "--gold-700": "#8a5322",
+        "--gold-600": "#a2622a",
+        "--gold-500": "#b87333",
+        "--gold-400": "#d59a63",
+        "--gold-200": "#f0d6bb",
+        "--gold-100": "#f8ebdd",
+        "--gold-edge": "linear-gradient(135deg, #8a5322 0%, #d59a63 26%, #f6e2c8 48%, #b87333 70%, #8a5322 100%)",
+        "--gold-edge-soft": "rgba(138, 83, 34, 0.34)",
+        "--gold-edge-strong": "rgba(138, 83, 34, 0.62)",
+        "--gold-liquid": "linear-gradient(115deg, #d59a63 0%, #f8ebdd 22%, #e2b48a 46%, #f6e2c8 62%, #cf9a6a 82%, #fbf0e4 100%)"
+      }
+    },
+    forest: {
+      name: "Forest & brass",
+      note: "Deep forest chrome, brass trim, moss-tinted grounds.",
+      swatch: ["#0d3324", "#b08d57", "#dfeae3"],
+      tokens: {
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(120, 200, 150, 0.2), transparent 62%), linear-gradient(165deg, #0d3324 0%, #082418 62%, #051510 100%)",
+        "--chrome-text": "#d8e8dd",
+        "--chrome-text-strong": "#f4fbf6",
+        "--chrome-muted-text": "#b5cdbd",
+        "--chrome-rule": "rgba(213, 232, 220, 0.22)",
+        "--emerald-liquid": "linear-gradient(150deg, #0d3324 0%, #082418 55%, #051510 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #082418 0%, #124a30 55%, #1a5c3c 100%)",
+        "--navy-900": "#051510",
+        "--navy-800": "#082418",
+        "--navy-700": "#0d3324",
+        "--navy-600": "#124a30",
+        "--navy-500": "#1a5c3c",
+        "--cream": "#eef4f0",
+        "--cream-dark": "#dfeae3",
+        "--gold-900": "#3f3218",
+        "--gold-700": "#6d5a2c",
+        "--gold-600": "#8a7038",
+        "--gold-500": "#b08d57",
+        "--gold-400": "#c8a877",
+        "--gold-200": "#eadcc2",
+        "--gold-100": "#f5eedd",
+        "--gold-edge": "linear-gradient(135deg, #6d5a2c 0%, #c8a877 26%, #f2e6cd 48%, #b08d57 70%, #6d5a2c 100%)",
+        "--gold-edge-soft": "rgba(109, 90, 44, 0.34)",
+        "--gold-edge-strong": "rgba(109, 90, 44, 0.62)",
+        "--gold-liquid": "linear-gradient(115deg, #c8a877 0%, #f5eedd 22%, #dcc9a3 46%, #f2e6cd 62%, #c0a377 82%, #f8f2e6 100%)"
+      }
+    }
+  };
+
+  var WRITTEN = [];
+
+  function isDashboard() {
+    var body = document.body;
+    if (!body) return false;
+    if (body.classList.contains("app-body")) return true;
+    if (body.getAttribute("data-page") === "dashboard") return true;
+    /* the console marks itself by its sidebar */
+    return !!document.getElementById("sidebar");
+  }
+
+  function websiteKind() { return isDashboard() ? "dashboard" : "site"; }
+
+  function themeId(id) {
+    var key = String(id || "").toLowerCase();
+    return THEMES[key] ? key : DEFAULT;
+  }
+
+  function tokensFor(id) {
+    var t = THEMES[themeId(id)];
+    return (t && t.tokens) || {};
+  }
+
+  /* Paint one surface. `dashboard` also drives the console's own --chrome
+     aliases, so the admin bar follows the same choice. */
+  function apply(kind, id) {
+    var root = document.documentElement;
+    var target = themeId(id);
+
+    WRITTEN.forEach(function (prop) { root.style.removeProperty(prop); });
+    WRITTEN = [];
+
+    var tokens = tokensFor(target);
+    Object.keys(tokens).forEach(function (prop) {
+      root.style.setProperty(prop, tokens[prop]);
+      WRITTEN.push(prop);
+    });
+
+    /* The console's own aliases follow the choice. On the house theme there
+       is nothing to follow: admin.html already declares them, so leave the
+       stylesheet's values in charge rather than writing a near-miss copy. */
+    if (kind === "dashboard" && tokens["--emerald-chrome"]) {
+      root.style.setProperty("--chrome", tokens["--emerald-chrome"]);
+      WRITTEN.push("--chrome");
+    }
+    if (kind === "dashboard" && tokens["--chrome-text"]) {
+      root.style.setProperty("--chrome-txt", tokens["--chrome-text"]);
+      WRITTEN.push("--chrome-txt");
+    }
+
+    root.setAttribute("data-theme-" + (kind === "dashboard" ? "dashboard" : "site"), target);
+    if (kind === websiteKind()) root.setAttribute("data-theme", target);
+
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", (swatchOf(target)[0] || "#06262a"));
+    return target;
+  }
+
+  function swatchOf(id) {
+    var t = THEMES[themeId(id)];
+    return (t && t.swatch) || ["#06262a"];
+  }
+
+  function savedTheme() {
+    var site = window.JCOB_SITE;
+    var t = site && site.settings && site.settings.theme;
+    return t && typeof t === "object" ? t : {};
+  }
+
+  function paint() {
+    var theme = savedTheme();
+    var kind = websiteKind();
+    return apply(kind, theme[kind] || theme.site || DEFAULT);
+  }
+
+  /* The public site hydrates settings asynchronously, so repaint when the
+     published documents arrive. */
+  function watch() {
+    document.addEventListener("jcob:site-updated", function () { paint(); });
+    var site = window.JCOB_SITE;
+    if (site && site.ready && site.ready.then) site.ready.then(paint).catch(function () {});
+    if (site && site.subscribe) site.subscribe(function () { paint(); });
+  }
+
+  /* Pages without site-store (the customer dashboard) read the same
+     document straight from Supabase. */
+  function fetchSaved() {
+    var cloud = window.JCOB_CLOUD;
+    if (!cloud || !cloud.enabled || !cloud.docs || !cloud.docs.get) return;
+    if (window.JCOB_SITE && window.JCOB_SITE.settings) return;
+    cloud.docs.get("site", "settings").then(function (row) {
+      var t = row && row.data && row.data.theme;
+      if (!t) return;
+      var kind = websiteKind();
+      apply(kind, t[kind] || t.site || DEFAULT);
+    }).catch(function () {});
+  }
+
+  function list() {
+    return Object.keys(THEMES).map(function (id) {
+      return { id: id, name: THEMES[id].name, note: THEMES[id].note, swatch: THEMES[id].swatch };
+    });
+  }
+
+  window.JCOB_THEME = {
+    DEFAULT: DEFAULT,
+    list: list,
+    apply: apply,
+    paint: paint,
+    refresh: paint,
+    current: function (kind) {
+      var theme = savedTheme();
+      return themeId(theme[kind || websiteKind()] || theme.site || DEFAULT);
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { paint(); watch(); fetchSaved(); });
+  } else {
+    paint(); watch(); fetchSaved();
+  }
 })();
 
 
@@ -12016,7 +12564,11 @@ window.JCOB_CONFIG = {
       sessions: [], logins: [],
       security: defaultSecurity(),
       settings: defaultSettings(),
-      statements: [], drafts: [], wallet: {}
+      statements: [], drafts: [], wallet: {},
+      /* Confidential-detail changes are requests, not edits: a customer
+         files one with a reason and staff approve or decline it. */
+      changeRequests: [],
+      profileAudit: []
     };
   }
 
@@ -12137,12 +12689,15 @@ window.JCOB_CONFIG = {
     var out = Object.assign({}, data);
     ["applications", "loans", "transactions", "deposits", "withdrawals", "transfers",
       "notifications", "tickets", "documents", "statements", "drafts",
-      "sessions", "logins"].forEach(function (k) {
+      "sessions", "logins", "changeRequests", "profileAudit"].forEach(function (k) {
       if (!Array.isArray(out[k])) out[k] = [];
     });
     if (!out.savings || typeof out.savings !== "object" || Array.isArray(out.savings)) out.savings = blankSavings();
     if (!Array.isArray(out.savings.goals)) out.savings.goals = [];
     if (!out.profile) out.profile = shape.profile;
+    if (!out.profile.nextOfKin || typeof out.profile.nextOfKin !== "object") {
+      out.profile.nextOfKin = { name: "", relationship: "", phone: "" };
+    }
     if (!out.security) out.security = shape.security;
     if (!out.settings) out.settings = shape.settings;
     if (!out.wallet || typeof out.wallet !== "object") out.wallet = {};
@@ -12706,6 +13261,110 @@ window.JCOB_CONFIG = {
     return lines.join("\n");
   }
 
+  /* ---------------- Document headers ----------------
+     Every receipt, statement and downloaded document opens on the same
+     emerald band the site header uses, with the light platform lockup.
+     The markup is shared so paper, download and screen cannot drift. */
+
+  var DOC_ACCENT = "#c9a227";
+  var DOC_EMERALD = "#06302c";
+
+  function assetBase() {
+    return location.origin + location.pathname.replace(/[^/]*$/, "");
+  }
+
+  /* Inline SVG lockup — used inside downloaded documents, where an
+     external image path would break the moment the file is moved. */
+  function inlineLockup(height) {
+    var h = height || 40;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" ' +
+      'aria-label="JAY C O B Financial Services" style="height:' + h + 'px;width:auto;display:block">' +
+      '<defs><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#0d4a4a"/><stop offset=".52" stop-color="#0a3f6b"/>' +
+      '<stop offset="1" stop-color="#04171a"/></linearGradient>' +
+      '<linearGradient id="lw" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c4e2fb"/></linearGradient></defs>' +
+      '<rect width="64" height="64" rx="16" fill="url(#lc)"/>' +
+      '<rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#a8d8fb" stroke-opacity=".6"/>' +
+      '<text x="32" y="43" text-anchor="middle" font-family="Georgia, \'Times New Roman\', serif" ' +
+      'font-size="27" font-weight="600" fill="#eaf6ff" letter-spacing="-1">JC</text>' +
+      '<text x="80" y="32" font-family="Georgia, \'Times New Roman\', serif" font-size="23" ' +
+      'font-weight="600" fill="url(#lw)" letter-spacing="-.4">JAY C O B</text>' +
+      '<text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" ' +
+      'font-weight="600" fill="#b8d4e6" letter-spacing="2.3">FINANCIAL SERVICES</text></svg>';
+  }
+
+  /* A document header for a dashboard dialog. */
+  function docHead(o) {
+    o = o || {};
+    var logo = o.inline
+      ? inlineLockup(o.logoHeight || 40)
+      : '<img class="doc-head__logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudExpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjcnlzdGFsU2hlZW5MaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4wOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOGQ4ZmIiIHN0b3Atb3BhY2l0eT0iMC4yMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id29yZE1hcmtMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzRlMmZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnRMaWdodCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNjcnlzdGFsU2hlZW5MaWdodCkiLz4KICA8cmVjdCB4PSIzLjUiIHk9IjMuNSIgd2lkdGg9IjU3IiBoZWlnaHQ9IjU3IiByeD0iMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ZDhmYiIgc3Ryb2tlLW9wYWNpdHk9Ii42Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZWFmNmZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFya0xpZ2h0KSIgbGV0dGVyLXNwYWNpbmc9Ii0wLjQiPkpBWSBDIE8gQjwvdGV4dD4KICA8dGV4dCB4PSI4MC41IiB5PSI0OCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC40IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjYjhkNGU2IiBsZXR0ZXItc3BhY2luZz0iMi4zIj5GSU5BTkNJQUwgU0VSVklDRVM8L3RleHQ+Cjwvc3ZnPgo=" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">';
+    return '<div class="doc-head' + (o.compact ? " doc-head--compact" : "") + '">' + logo +
+      '<div class="doc-head__text">' +
+        '<span class="doc-head__kicker">' + (o.kicker || "JAY C O B FINANCIAL SERVICES") + '</span>' +
+        '<span class="doc-head__title">' + (o.title || "") + '</span>' +
+        (o.meta ? '<p class="doc-head__meta">' + o.meta + '</p>' : "") +
+      '</div></div>';
+  }
+
+  /* A complete, self-contained HTML document: emerald band, gold rail,
+     logo, table styles. Used by every download so the file itself is
+     branded, not just the screen it came from. */
+  function documentHTML(o) {
+    o = o || {};
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>' + (o.title || "JAY C O B document") + '</title><style>' +
+      'body{margin:0;background:#eef4fa;color:#0b201c;font:13px/1.6 Inter,Arial,sans-serif;padding:28px;}' +
+      '.sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;' +
+      'box-shadow:0 24px 60px -40px rgba(6,48,44,.55);border:1px solid rgba(4,23,22,.12);}' +
+      '.band{position:relative;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 24px;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
+      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      '.band .txt{margin-left:auto;text-align:right;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
+      '.band h1{margin:4px 0 0;font:600 17px/1.2 Georgia,serif;color:#f4fbf8;}' +
+      '.band p{margin:4px 0 0;font-size:11px;color:#b9d3ca;}' +
+      '.body{padding:22px 24px 26px;}' +
+      '.body h2{font:600 14px Georgia,serif;margin:0 0 10px;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}' +
+      'th,td{border-bottom:1px solid #dbe6ef;padding:8px 10px;text-align:left;vertical-align:top;}' +
+      'th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#4a6373;background:#f4f8fc;}' +
+      'td.num{text-align:right;font-variant-numeric:tabular-nums;}' +
+      '.muted{color:#5c7383;font-size:11px;}' +
+      '.kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:0;}' +
+      '.kv dt{color:#5c7383;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}' +
+      '.kv dd{margin:0;font-weight:600;}' +
+      '.foot{margin-top:18px;padding-top:12px;border-top:1px dashed #dbe6ef;color:#5c7383;font-size:10.5px;}' +
+      '@media print{body{background:#fff;padding:0}.sheet{border:0;box-shadow:none}}' +
+      '</style></head><body><div class="sheet">' +
+      '<div class="band">' + inlineLockup(44) +
+      '<div class="txt"><span class="kicker">' + (o.kicker || "JAY C O B FINANCIAL SERVICES") + '</span>' +
+      '<h1>' + (o.title || "") + '</h1>' + (o.meta ? '<p>' + o.meta + '</p>' : '') + '</div></div>' +
+      '<div class="body">' + (o.body || "") +
+      '<p class="foot">JAY C O B FINANCIAL SERVICES · Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi · ' +
+      'hello@jaycobfinancial.mw · +265 999 123 456<br>All amounts in Malawian Kwacha (MWK). ' +
+      (o.note || "") + '</p></div></div></body></html>';
+  }
+
+  /* Download the branded HTML document built above. */
+  function downloadDocument(filename, o) {
+    var content = documentHTML(o);
+    var blob = new Blob(["\ufeff", content], { type: "text/html;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1200);
+  }
+
   function printElement(id) {
     var el = document.getElementById(id);
     if (!el) { window.print(); return; }
@@ -12715,14 +13374,27 @@ window.JCOB_CONFIG = {
     var doc = frame.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head><title>JAY C O B Financial Services</title>' +
-      '<style>body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:24px;font-size:12px;}' +
-      'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;} table{width:100%;border-collapse:collapse;margin-top:12px;}' +
-      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;} th{font-size:10px;text-transform:uppercase;color:#658982;}' +
-      '.muted{color:#658982;font-size:11px;} .brand{display:flex;gap:12px;align-items:center;margin-bottom:14px;}' +
-      '.brand img{height:40px;} .totals{margin-top:12px;font-weight:700;}</style></head><body>' +
-      '<div class="brand"><img src="' + location.origin + location.pathname.replace(/[^/]*$/, "") + 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B Financial Services">' +
-      "<div><strong>JAY C O B FINANCIAL SERVICES</strong><div class=\"muted\">Plot 47/3, Area 47, Sector 3, Lilongwe · MWK</div></div></div>" +
-      el.innerHTML + "</body></html>");
+      '<style>@page{margin:14mm}body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:0;font-size:12px;margin:0;}' +
+      'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;}' +
+      '.band{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 20px;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
+      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      '.band .txt{margin-left:auto;text-align:right;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
+      '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#f4fbf8;margin-top:3px;}' +
+      '.band .muted{color:#b9d3ca;font-size:11px;}' +
+      '.wrap{padding:18px 4px 0;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:12px;}' +
+      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;}th{font-size:10px;text-transform:uppercase;color:#658982;}' +
+      '.muted{color:#658982;font-size:11px;} .totals{margin-top:12px;font-weight:700;}</style></head><body>' +
+      '<div class="band">' + inlineLockup(44) +
+      '<div class="txt"><span class="kicker">JAY C O B FINANCIAL SERVICES</span>' +
+      '<strong>' + (el.getAttribute("data-doc-title") || "Document") + '</strong>' +
+      '<span class="muted">Plot 47/3, Area 47, Sector 3, Lilongwe · MWK</span></div></div>' +
+      '<div class="wrap">' + el.innerHTML + '</div></body></html>');
     doc.close();
     frame.contentWindow.focus();
     setTimeout(function () {
@@ -12855,6 +13527,10 @@ window.JCOB_CONFIG = {
     downloadCSV: downloadCSV,
     tableCSV: tableCSV,
     printElement: printElement,
+    docHead: docHead,
+    documentHTML: documentHTML,
+    downloadDocument: downloadDocument,
+    inlineLockup: inlineLockup,
     paginate: paginate,
     pagerHTML: pagerHTML,
     statusPill: statusPill,
@@ -14553,7 +15229,7 @@ window.JCOB_CONFIG = {
   if (!UI || !DATA || !F) return;
 
   var PRODUCTS = {
-    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Personal Loan": { min: 100000, max: 15000000, rate: 2, term: [1, 48], fee: 2, rateBasis: "monthly", method: "reducing", defaultTerm: 1 },
     "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5, rateBasis: "annual", method: "reducing" },
     "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2, rateBasis: "annual", method: "reducing" },
     "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
@@ -14597,7 +15273,7 @@ window.JCOB_CONFIG = {
     step: 1,
     product: "Personal Loan",
     amount: 5000000,
-    term: 24,
+    term: 1,
     docs: {},
     draftId: null,
     submitted: null,
@@ -15270,7 +15946,7 @@ window.JCOB_CONFIG = {
   /* Every product in the catalogue, so a loan quoted on the products page
      can be opened here and recomputed with the same arithmetic. */
   var PRESETS = {
-    personal: { label: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    personal: { label: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, term: 1, defaultTerm: 1, maxTerm: 48, fee: 2 },
     business: { label: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, term: 36, maxTerm: 60, fee: 2.5 },
     emergency: { label: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, term: 6, maxTerm: 12, fee: 2 },
     salary: { label: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 18, maxTerm: 36, fee: 2 },
@@ -15312,6 +15988,7 @@ window.JCOB_CONFIG = {
       if (isFinite(p.max) && p.max > 0) preset.max = Number(p.max);
       if (isFinite(p.fee) && p.fee >= 0) preset.fee = Number(p.fee);
       if (isFinite(p.minTerm) && p.minTerm > 0) preset.minTerm = Number(p.minTerm);
+      if (isFinite(p.defaultTerm) && p.defaultTerm > 0) preset.defaultTerm = Number(p.defaultTerm);
       if (isFinite(p.maxTerm) && p.maxTerm > 0) preset.maxTerm = Number(p.maxTerm);
       if (!preset.rateBasis) preset.rateBasis = "annual";
       if (!preset.method) preset.method = "reducing";
@@ -15620,6 +16297,18 @@ window.JCOB_CONFIG = {
     $("calc-rate").value = state.rate;
     $("calc-fee").value = state.fee;
     syncTermField(true);
+    /* The product's own opening term (the personal loan opens on one month)
+       wins when the customer picks the chip. */
+    var openTerm = Number(p.defaultTerm || p.term) || 0;
+    var termEl = $("calc-term");
+    if (openTerm > 0 && termEl && state.basis === "monthly") {
+      var lo = Number(termEl.min) || 1;
+      var hi = Number(termEl.max) || 84;
+      termEl.value = String(Math.min(Math.max(openTerm, lo), hi));
+      state.term = Math.round(Number(termEl.value) || 1);
+      var hint = $("calc-term-hint");
+      if (hint) hint.textContent = state.term + (state.term === 1 ? " monthly instalment" : " monthly instalments");
+    }
     state.termMonths = termMonths();
     render();
     syncRateField();
@@ -16094,7 +16783,7 @@ window.JCOB_CONFIG = {
 
   /* Seeded figures — used until the store answers, then replaced. */
   var FALLBACK = {
-    personal: { name: "Personal loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    personal: { name: "Personal loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2 },
     business: { name: "Business loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
     secured: { name: "Secured loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, maxTerm: 84, fee: 1.5 }
   };
@@ -16110,7 +16799,8 @@ window.JCOB_CONFIG = {
      to" and the APR band stay policy figures, which the engine cannot derive
      from a single product record. */
   var table = document.querySelector("[data-rate-table]");
-  if (table) {
+  function fillRateTable() {
+    if (!table) return;
     [].slice.call(table.querySelectorAll("tbody tr")).forEach(function (row) {
       var name = row.querySelector("th").textContent.trim();
       var key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -16120,13 +16810,16 @@ window.JCOB_CONFIG = {
       if (!p) return;
       var cells = row.querySelectorAll("td");
       if (cells.length < 6) return;
-      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%";
+      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%" +
+        (p.rateBasis === "monthly" ? " /mo" : "");
       cells[3].textContent = p.method === "flat" ? "Flat rate" : "Reducing balance";
       cells[4].textContent = p.minTerm + "–" + p.maxTerm + " months";
     });
   }
 
-  if (examples) {
+  function paintExamples() {
+    fillRateTable();
+    if (!examples) return;
     examples.innerHTML = CASES.map(function (k) {
       var p = productFor(k.id);
       var c = F.productQuote(p, { amount: k.amount, termMonths: k.term });
@@ -16148,6 +16841,14 @@ window.JCOB_CONFIG = {
           encodeURIComponent(p.name) + "&amount=" + Math.round(t.amount) + "&term=" + t.termMonths + '">Apply for this loan</a>' +
         "</div>";
     }).join("");
+  }
+
+  paintExamples();
+  /* the catalogue can land after first paint — repaint when it does */
+  document.addEventListener("jcob:site-updated", paintExamples);
+  if (window.JCOB_SITE) {
+    if (window.JCOB_SITE.subscribe) window.JCOB_SITE.subscribe(paintExamples);
+    if (window.JCOB_SITE.ready && window.JCOB_SITE.ready.then) window.JCOB_SITE.ready.then(paintExamples).catch(function () {});
   }
 })();
 
@@ -16367,6 +17068,15 @@ try {
   function dt(iso) { return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); }
   function dtTime(iso) {
     return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  /* A loan may be quoted per month (the personal loan is) or per year.
+     The record carries its basis, so the label follows it rather than
+     pretending every loan is annual. */
+  function rateLabel(l, withMethod) {
+    if (!l) return "";
+    var figure = (Math.round((Number(l.rate) || 0) * 100) / 100) + "%";
+    var basis = l.rateBasis === "monthly" ? " per month" : " p.a.";
+    return figure + basis + (withMethod ? " · " + (l.method === "flat" ? "flat" : "reducing") : "");
   }
   function db() { return DATA.get(); }
   function profile() { return db().profile; }
@@ -16641,7 +17351,7 @@ try {
             "<div>Outstanding<strong>" + mwk(loan.outstandingPrincipal + loan.outstandingInterest) + "</strong></div>" +
             "<div>Repaid<strong>" + mwk(loan.paid) + "</strong></div>" +
             "<div>Matures<strong>" + dt(loan.maturity) + "</strong></div>" +
-            "<div>Rate<strong>" + loan.rate + "% p.a.</strong></div>" +
+            "<div>Rate<strong>" + rateLabel(loan) + "</strong></div>" +
             "<div>Method<strong>" + (loan.method === "flat" ? "Flat" : "Reducing") + "</strong></div>" +
             "<div>Status<strong>" + UI.statusPill(loan.status) + "</strong></div>" +
           "</div>" : "") +
@@ -16671,7 +17381,7 @@ try {
         "<div>Outstanding<strong>" + mwk(outstanding) + "</strong></div>" +
         "<div>Next payment<strong>" + mwk(l.nextAmount) + "</strong></div>" +
         "<div>Due date<strong>" + dt(l.nextDue) + "</strong></div>" +
-        "<div>Rate<strong>" + l.rate + "% p.a. · " + (l.method === "flat" ? "flat" : "reducing") + "</strong></div>" +
+        "<div>Rate<strong>" + rateLabel(l, true) + "</strong></div>" +
         "<div>Maturity<strong>" + dt(l.maturity) + "</strong></div>" +
       "</div>" +
       '<div class="progress" style="height:6px;"><span style="width:' + l.progress + '%"></span></div>' +
@@ -16705,7 +17415,7 @@ try {
         panel("Loan terms", null,
           '<div class="form-grid">' +
             reviewItem("Loan ID", l.id) + reviewItem("Product", l.product) +
-            reviewItem("Principal", mwk(l.principal)) + reviewItem("Interest rate", l.rate + "% p.a.") +
+            reviewItem("Principal", mwk(l.principal)) + reviewItem("Interest rate", rateLabel(l)) +
             reviewItem("Interest method", l.method === "flat" ? "Flat rate" : "Reducing balance") +
             reviewItem("Repayment frequency", l.frequency) +
             reviewItem("Start date", dt(l.startDate)) + reviewItem("Maturity", dt(l.maturity)) +
@@ -17432,57 +18142,6 @@ try {
   }
 
   /* ---------------- Profile ---------------- */
-  function panelProfile() {
-    var p = profile();
-    return pageHead("My profile", "Your personal, contact and employment details.",
-      '<a class="btn btn--ghost btn--sm" href="#security">Account security</a>') +
-      '<div class="dash-grid">' +
-        panel("Profile", "Fields marked with a lock require re-verification when changed",
-          '<form id="profile-form">' +
-            '<div class="flex items-center gap-2" style="margin-bottom:1rem;">' +
-              '<span class="avatar" style="width:58px;height:58px;font-size:1.05rem;background:var(--emerald-liquid);color:var(--gold-200);">' + esc(p.avatar) + "</span>" +
-              "<div><strong style=\"display:block;color:var(--ink);\">" + esc(p.fullName) + "</strong>" +
-              '<span class="text-tiny text-muted">Client since ' + dt(p.memberSince) + " · " + esc(p.accountNumber) + "</span>" +
-              '<div style="margin-top:.3rem;">' + UI.statusPill(p.verification) + "</div></div>" +
-              '<button class="btn btn--ghost btn--xs" type="button" style="margin-left:auto;" data-avatar-upload="1">Change photo</button>' +
-            "</div>" +
-            '<div class="form-grid">' +
-              '<div class="field"><label for="pf-first">First name</label><input id="pf-first" value="' + esc(p.firstName) + '"></div>' +
-              '<div class="field"><label for="pf-last">Surname</label><input id="pf-last" value="' + esc(p.lastName) + '"></div>' +
-              '<div class="field"><label for="pf-dob">Date of birth 🔒</label><input id="pf-dob" type="date" value="' + esc(p.dob) + '" readonly></div>' +
-              '<div class="field"><label for="pf-gender">Gender</label><select id="pf-gender">' +
-                ["Female", "Male", "Prefer not to say"].map(function (g) { return "<option" + (p.gender === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></div>" +
-              '<div class="field"><label for="pf-nid">National ID 🔒</label><input id="pf-nid" class="masked" value="' + esc(F.mask(p.nid, 4)) + '" readonly></div>' +
-              '<div class="field"><label for="pf-phone">Phone number</label><input id="pf-phone" value="' + esc(p.phone) + '"></div>' +
-              '<div class="field"><label for="pf-email">Email address</label><input id="pf-email" type="email" value="' + esc(p.email) + '"></div>' +
-              '<div class="field"><label for="pf-pref">Contact preference</label><select id="pf-pref">' +
-                ["WhatsApp", "Phone call", "Email", "SMS"].map(function (c) { return "<option" + (p.contactPreference === c ? " selected" : "") + ">" + c + "</option>"; }).join("") + "</select></div>" +
-              '<div class="field field--full"><label for="pf-address">Residential address</label><input id="pf-address" value="' + esc(p.address) + '"></div>' +
-              '<div class="field"><label for="pf-occupation">Occupation</label><input id="pf-occupation" value="' + esc(p.occupation) + '"></div>' +
-              '<div class="field"><label for="pf-employer">Employer / business</label><input id="pf-employer" value="' + esc(p.employer) + '"></div>' +
-              '<div class="field"><label for="pf-income">Monthly income (MWK)</label><input id="pf-income" type="number" value="' + p.monthlyIncome + '"></div>' +
-              '<div class="field"><label for="pf-expenses">Monthly expenses (MWK)</label><input id="pf-expenses" type="number" value="' + p.monthlyExpenses + '"></div>' +
-            "</div>" +
-            '<div class="fieldset-title">Next of kin</div>' +
-            '<div class="form-grid form-grid--3">' +
-              '<div class="field"><label for="pf-nok-name">Full name</label><input id="pf-nok-name" value="' + esc(p.nextOfKin.name) + '"></div>' +
-              '<div class="field"><label for="pf-nok-rel">Relationship</label><input id="pf-nok-rel" value="' + esc(p.nextOfKin.relationship) + '"></div>' +
-              '<div class="field"><label for="pf-nok-phone">Phone</label><input id="pf-nok-phone" value="' + esc(p.nextOfKin.phone) + '"></div>' +
-            "</div>" +
-            '<div class="flex flex-wrap gap-1" style="margin-top:1.1rem;">' +
-              '<button class="btn btn--gold" type="submit">Save profile changes</button>' +
-              '<button class="btn btn--ghost" type="button" data-data-request="1">Request my data</button>' +
-            "</div>" +
-            '<p class="form-status" id="profile-status"></p>' +
-          "</form>") +
-        panel("Account summary", null,
-          '<div class="form-grid">' + reviewItem("Account number", p.accountNumber) + reviewItem("Account status", UI.statusPill(p.accountStatus)) +
-          reviewItem("Verification", UI.statusPill(p.verification)) + reviewItem("KYC", UI.statusPill(p.kyc)) +
-          reviewItem("Member since", dt(p.memberSince)) + reviewItem("Last update", dt(db().security.passwordChanged)) + "</div>" +
-          '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.lock + "<div><strong>Protected fields</strong>Date of birth and national ID cannot be edited here. Contact support to change them — re-verification is required.</div></div>") +
-      "</div>";
-  }
-
   /* ---------------- Security ---------------- */
   /* Phone verification is honest about what is possible: a number is only
      "verified" when a code confirmed it, and a code can only be sent once a
@@ -17627,14 +18286,267 @@ try {
         "</div>");
   }
 
+  /* ==================================================================
+     CONFIDENTIAL DETAILS — a request, not an edit
+     ------------------------------------------------------------------
+     The identity and contact fields that a lender relies on cannot be
+     typed over. The customer files a change request with a reason; staff
+     see it in the console, and only an approval moves the stored value.
+     Everything else that can be edited still asks for a reason, and the
+     reason is kept with the change.
+     ================================================================== */
+  var CONFIDENTIAL = [
+    { key: "fullName", label: "Legal name", type: "text",
+      policy: "The name printed on your national ID and on your loan agreement.",
+      value: function (p) { return p.fullName || "—"; } },
+    { key: "dob", label: "Date of birth", type: "date",
+      policy: "Age, eligibility and responsible-lending limits are assessed from this date.",
+      value: function (p) { return p.dob || "—"; } },
+    { key: "nid", label: "National ID", type: "text",
+      policy: "Identity verification and credit reporting both quote this number.",
+      value: function (p) { return F.mask(p.nid || "—", 4); } },
+    { key: "phone", label: "Registered phone", type: "tel",
+      policy: "Used for sign-in, one-time codes and account recovery.",
+      value: function (p) { return p.phone || "—"; } },
+    { key: "email", label: "Registered email", type: "email",
+      policy: "Used for sign-in, statements, notices and recovery.",
+      value: function (p) { return p.email || "—"; } }
+  ];
+
+  var REASONS = [
+    "Correction of a typing error",
+    "Name change (marriage, deed poll or court order)",
+    "Document reissued or replaced",
+    "Change of contact details",
+    "Employment or income change",
+    "Other — explained below"
+  ];
+
+  function confidentialFor(key) {
+    return CONFIDENTIAL.filter(function (c) { return c.key === key; })[0] || null;
+  }
+  function openRequests() {
+    return (db().changeRequests || []).filter(function (r) { return r.status === "Pending review"; });
+  }
+  function pendingFor(key) {
+    return openRequests().filter(function (r) { return r.field === key; })[0] || null;
+  }
+  function reasonOptions() {
+    return REASONS.map(function (r) { return "<option>" + esc(r) + "</option>"; }).join("");
+  }
+  function newRequestId() {
+    return "CHG-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+  }
+
+  /* File a request to change one protected detail. */
+  function requestChangeDialog(key) {
+    var meta = confidentialFor(key);
+    if (!meta) return;
+    var p = profile();
+    if (pendingFor(key)) {
+      UI.toast({ title: "Already under review",
+        message: "Your request to change " + meta.label.toLowerCase() + " is waiting for staff review.",
+        type: "warn" });
+      return;
+    }
+    var body =
+      '<p class="text-small text-muted" style="margin-top:0;">' + esc(meta.policy) +
+        " A protected detail cannot be edited in place: file a request with a reason and staff will review it.</p>" +
+      '<div class="form-grid">' +
+        '<div class="field"><label>Current value</label><input value="' + esc(meta.value(p)) + '" readonly></div>' +
+        '<div class="field"><label for="cr-value">New value</label>' +
+          '<input id="cr-value" type="' + meta.type + '" autocomplete="off" aria-describedby="cr-status"></div>' +
+      "</div>" +
+      '<div class="field"><label for="cr-reason-type">Reason for the change</label>' +
+        '<select id="cr-reason-type">' + reasonOptions() + "</select></div>" +
+      '<div class="field"><label for="cr-reason">Explain the change — at least 20 characters</label>' +
+        '<textarea id="cr-reason" rows="3" placeholder="For example: my national ID was reissued after marriage and I can upload the new card."></textarea></div>' +
+      '<label class="check-row" style="margin-top:.4rem;"><input type="checkbox" id="cr-confirm">' +
+        "<span>I confirm the new details are accurate and I can produce supporting documents if asked.</span></label>" +
+      '<p class="form-status" id="cr-status"></p>';
+
+    UI.modal({
+      title: "Request a change — " + meta.label,
+      subtitle: "Nothing changes until staff approve the request",
+      body: body,
+      actions: [
+        { label: "Cancel", variant: "ghost" },
+        { label: "Submit request", variant: "gold", onClick: function (wrap) {
+            var value = (wrap.querySelector("#cr-value").value || "").trim();
+            var category = wrap.querySelector("#cr-reason-type").value;
+            var reason = (wrap.querySelector("#cr-reason").value || "").trim();
+            var confirmed = wrap.querySelector("#cr-confirm").checked;
+            var status = wrap.querySelector("#cr-status");
+            var fail = function (msg) {
+              status.className = "form-status is-visible form-status--error";
+              status.textContent = msg;
+            };
+            if (!value) return fail("Enter the new value you are asking for."), false;
+            if (value.toLowerCase() === String(meta.value(p)).toLowerCase()) return fail("That is the value already on file."), false;
+            if (reason.length < 20) return fail("Give a reason of at least 20 characters — staff review these requests."), false;
+            if (!confirmed) return fail("Tick the confirmation before submitting."), false;
+
+            var request = {
+              id: newRequestId(),
+              field: key,
+              label: meta.label,
+              current: meta.value(p),
+              requested: value,
+              category: category,
+              reason: reason,
+              status: "Pending review",
+              createdAt: new Date().toISOString(),
+              decidedAt: null,
+              decision: ""
+            };
+            db().changeRequests = db().changeRequests || [];
+            db().changeRequests.unshift(request);
+            db().profileAudit = db().profileAudit || [];
+            db().profileAudit.unshift({
+              id: request.id, at: request.createdAt, action: "Requested change to " + meta.label,
+              category: category, reason: reason, by: p.fullName || p.accountNumber || "Customer"
+            });
+            DATA.notify("Security", "Change request received",
+              "Your request to change " + meta.label.toLowerCase() + " is under review. " + request.id + ".",
+              "In-app + Email");
+            DATA.save();
+            render(false);
+            UI.toast({ title: "Request submitted",
+              message: request.id + " · your " + meta.label.toLowerCase() + " stays unchanged until staff approve it.",
+              type: "success" });
+            return true;
+          } }
+      ]
+    });
+  }
+
+  /* Every ordinary profile change asks why, and the answer is kept. */
+  function reasonDialog(labels, onConfirm) {
+    var body =
+      '<p class="text-small text-muted" style="margin-top:0;">We record why a customer record changes. ' +
+        "Fields changing: <strong>" + esc(labels.join(", ")) + "</strong>.</p>" +
+      '<div class="field"><label for="ed-reason-type">Reason</label>' +
+        '<select id="ed-reason-type">' + reasonOptions() + "</select></div>" +
+      '<div class="field"><label for="ed-reason">Explain the change — at least 20 characters</label>' +
+        '<textarea id="ed-reason" rows="3" placeholder="For example: I moved house last month and need statements sent to the new address."></textarea></div>' +
+      '<label class="check-row" style="margin-top:.4rem;"><input type="checkbox" id="ed-confirm">' +
+        "<span>I confirm these details are accurate and I am authorised to change them.</span></label>" +
+      '<p class="form-status" id="ed-status"></p>';
+    UI.modal({
+      title: "Reason for this change",
+      subtitle: "Required — saved with the record",
+      body: body,
+      actions: [
+        { label: "Cancel", variant: "ghost" },
+        { label: "Save with reason", variant: "gold", onClick: function (wrap) {
+            var category = wrap.querySelector("#ed-reason-type").value;
+            var reason = (wrap.querySelector("#ed-reason").value || "").trim();
+            var confirmed = wrap.querySelector("#ed-confirm").checked;
+            var status = wrap.querySelector("#ed-status");
+            var fail = function (msg) {
+              status.className = "form-status is-visible form-status--error";
+              status.textContent = msg;
+            };
+            if (reason.length < 20) return fail("Give a reason of at least 20 characters."), false;
+            if (!confirmed) return fail("Tick the confirmation before saving."), false;
+            onConfirm(category, reason);
+            return true;
+          } }
+      ]
+    });
+  }
+
+  /* ---------------- Profile ---------------- */
+  function lockedField(meta, inputId, extra) {
+    var p = profile();
+    var pending = pendingFor(meta.key);
+    return '<div class="field"><label for="' + inputId + '">' + esc(meta.label) +
+        ' <span class="pill pill--warn" style="font-size:.6rem;padding:.1rem .4rem;">Protected</span></label>' +
+      '<input id="' + inputId + '" value="' + esc(meta.value(p)) + '" readonly aria-describedby="' + inputId + '-note"' + (extra || "") + ">" +
+      '<div class="flex items-center gap-1" style="margin-top:.35rem;flex-wrap:wrap;">' +
+        '<span class="text-tiny text-muted" id="' + inputId + '-note">' +
+          (pending ? "Change requested · " + esc(pending.id) + " under review" : "Locked — changes need a reason and approval") +
+        "</span>" +
+        (pending ? "" : '<button class="linkish" type="button" data-request-change="' + meta.key + '">Request change</button>') +
+      "</div></div>";
+  }
+
+  function panelProfile() {
+    var p = profile();
+    var kin = p.nextOfKin || { name: "", relationship: "", phone: "" };
+    var byKey = {};
+    CONFIDENTIAL.forEach(function (c) { byKey[c.key] = c; });
+    return pageHead("My profile", "Your personal, contact and employment details. Protected details change by request, with a reason.",
+      '<a class="btn btn--ghost btn--sm" href="#security">Account security</a>') +
+      '<div class="dash-grid">' +
+        panel("Profile", "Protected details are locked; every other change needs a reason",
+          '<form id="profile-form">' +
+            '<div class="flex items-center gap-2" style="margin-bottom:1rem;">' +
+              '<span class="avatar" style="width:58px;height:58px;font-size:1.05rem;background:var(--emerald-liquid);color:var(--gold-200);">' + esc(p.avatar) + "</span>" +
+              "<div><strong style=\"display:block;color:var(--ink);\">" + esc(p.fullName) + "</strong>" +
+              '<span class="text-tiny text-muted">Client since ' + dt(p.memberSince) + " · " + esc(p.accountNumber) + "</span>" +
+              '<div style="margin-top:.3rem;">' + UI.statusPill(p.verification) + "</div></div>" +
+              '<button class="btn btn--ghost btn--xs" type="button" style="margin-left:auto;" data-avatar-upload="1">Change photo</button>' +
+            "</div>" +
+            '<div class="form-grid">' +
+              lockedField(byKey.fullName, "pf-name") +
+              lockedField(byKey.dob, "pf-dob", ' type="date"') +
+              lockedField(byKey.nid, "pf-nid", ' class="masked"') +
+              lockedField(byKey.phone, "pf-phone", ' type="tel"') +
+              lockedField(byKey.email, "pf-email") +
+              '<div class="field"><label for="pf-gender">Gender</label><select id="pf-gender">' +
+                ["Female", "Male", "Prefer not to say"].map(function (g) { return "<option" + (p.gender === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></div>" +
+              '<div class="field"><label for="pf-pref">Contact preference</label><select id="pf-pref">' +
+                ["WhatsApp", "Phone call", "Email", "SMS"].map(function (c) { return "<option" + (p.contactPreference === c ? " selected" : "") + ">" + c + "</option>"; }).join("") + "</select></div>" +
+              '<div class="field field--full"><label for="pf-address">Residential address</label><input id="pf-address" value="' + esc(p.address) + '"></div>' +
+              '<div class="field"><label for="pf-occupation">Occupation</label><input id="pf-occupation" value="' + esc(p.occupation) + '"></div>' +
+              '<div class="field"><label for="pf-employer">Employer / business</label><input id="pf-employer" value="' + esc(p.employer) + '"></div>' +
+              '<div class="field"><label for="pf-income">Monthly income (MWK)</label><input id="pf-income" type="number" value="' + p.monthlyIncome + '"></div>' +
+              '<div class="field"><label for="pf-expenses">Monthly expenses (MWK)</label><input id="pf-expenses" type="number" value="' + p.monthlyExpenses + '"></div>' +
+            "</div>" +
+            '<div class="fieldset-title">Next of kin</div>' +
+            '<div class="form-grid form-grid--3">' +
+              '<div class="field"><label for="pf-nok-name">Full name</label><input id="pf-nok-name" value="' + esc(kin.name || "") + '"></div>' +
+              '<div class="field"><label for="pf-nok-rel">Relationship</label><input id="pf-nok-rel" value="' + esc(kin.relationship || "") + '"></div>' +
+              '<div class="field"><label for="pf-nok-phone">Phone</label><input id="pf-nok-phone" value="' + esc(kin.phone || "") + '"></div>' +
+            "</div>" +
+            '<div class="flex flex-wrap gap-1" style="margin-top:1.1rem;">' +
+              '<button class="btn btn--gold" type="submit">Save changes with a reason</button>' +
+              '<button class="btn btn--ghost" type="button" data-data-request="1">Request my data</button>' +
+            "</div>" +
+            '<p class="form-status" id="profile-status"></p>' +
+          "</form>") +
+        panel("Account summary", null,
+          '<div class="form-grid">' + reviewItem("Account number", p.accountNumber) + reviewItem("Account status", UI.statusPill(p.accountStatus)) +
+          reviewItem("Verification", UI.statusPill(p.verification)) + reviewItem("KYC", UI.statusPill(p.kyc)) +
+          reviewItem("Member since", dt(p.memberSince)) + reviewItem("Last update", dt(db().security.passwordChanged)) + "</div>" +
+          '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.lock + "<div><strong>Protected details</strong>Legal name, date of birth, national ID, registered phone and registered email cannot be typed over. Use <em>Request change</em> and give a reason — staff verify the evidence before the record moves.</div></div>") +
+      "</div>";
+  }
+
   /* ---------------- Settings ---------------- */
   function panelSettings() {
     var s = db().settings;
+    var p = profile();
     function row(id, title, note, checked) {
       return '<div class="switch-row"><div><strong>' + title + "</strong><span>" + note + "</span></div>" +
         '<label class="switch"><input type="checkbox" id="' + id + '"' + (checked ? " checked" : "") + "><i></i></label></div>";
     }
-    return pageHead("Settings", "Preferences for language, notifications, privacy and accessibility.") +
+    var protectedRows = CONFIDENTIAL.map(function (c) {
+      var pending = pendingFor(c.key);
+      return '<tr><th scope="row">' + esc(c.label) + "</th>" +
+        "<td>" + esc(c.value(p)) + "</td>" +
+        "<td>" + (pending
+          ? '<span class="pill pill--warn">Under review</span> <span class="text-tiny text-muted">' + esc(pending.id) + "</span>"
+          : '<button class="btn btn--ghost btn--xs" type="button" data-request-change="' + c.key + '">Request change</button>') + "</td></tr>";
+    }).join("");
+    var requests = (db().changeRequests || []);
+    var requestRows = requests.slice(0, 6).map(function (r) {
+      return "<tr><td>" + esc(r.id) + "</td><td>" + esc(r.label) + "</td><td>" + dt(r.createdAt) + "</td>" +
+        "<td>" + UI.statusPill(r.status === "Pending review" ? "Pending" : r.status) + "</td>" +
+        '<td class="text-tiny">' + esc(r.category) + "</td></tr>";
+    }).join("");
+    return pageHead("Settings", "Preferences, privacy, protected details and change requests.") +
       '<div class="dash-grid">' +
         panel("Personal preferences", null,
           '<div class="form-grid">' +
@@ -17658,6 +18570,22 @@ try {
           row("set-share", "Share data with my advisor", "Advisors can view statements and KYC status", s.privacy.shareWithAdvisors) +
           row("set-analytics", "Anonymous analytics", "Help improve the portal", s.privacy.analytics)) +
       "</div>" +
+      panel("Protected details", "System policy — a change is a request, not an edit",
+        '<div class="table-wrap" style="border:0;"><table class="data"><thead><tr><th scope="col">Detail</th><th scope="col">On file</th><th scope="col">Change</th></tr></thead>' +
+        "<tbody>" + protectedRows + "</tbody></table></div>" +
+        '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.shield +
+        "<div><strong>Why this is locked</strong>These details decide who you are and how you can be reached for recovery. " +
+        "A request needs a reason of at least 20 characters; staff check it and the evidence, then approve or decline. " +
+        "Nothing on this page changes a protected detail directly — including for staff in the customer dashboard.</div></div>",
+        null, true) +
+      panel("Your change requests", requests.length ? requests.length + " on file" : "None yet",
+        requests.length
+          ? '<div class="table-wrap" style="border:0;"><table class="data"><thead><tr><th scope="col">Reference</th><th scope="col">Detail</th>' +
+            '<th scope="col">Filed</th><th scope="col">Status</th><th scope="col">Reason</th></tr></thead><tbody>' +
+            requestRows + "</tbody></table></div>" +
+            (requests.length > 6 ? '<p class="text-tiny text-muted">Showing the six most recent requests.</p>' : "")
+          : '<p class="text-small text-muted">No change requests yet. Use <em>Request change</em> beside a protected detail.</p>',
+        null, true) +
       panel("Your data and policies", null,
         '<div class="flex flex-wrap gap-1">' +
           '<button class="btn btn--ghost btn--sm" type="button" data-data-request="1">Request a copy of my data</button>' +
@@ -17780,12 +18708,23 @@ try {
       btn.addEventListener("click", function () {
         var l = DATA.findLoan(btn.getAttribute("data-csv-schedule"));
         if (!l) return;
-        var csv = UI.tableCSV(["#", "Due date", "Instalment", "Principal", "Interest", "Fees", "Balance", "Status"],
-          l.rows.map(function (r) {
-            return [r.n, new Date(r.date).toISOString().slice(0, 10), r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), (r.fees || 0).toFixed(2), r.closing.toFixed(2), r.status];
-          }));
-        UI.downloadCSV("JC-schedule-" + l.id + ".csv", "JAY C O B FINANCIAL SERVICES — repayment schedule (MWK)\n" + csv);
-        UI.toast({ title: "Schedule downloaded", message: l.id + " repayment schedule (CSV).", type: "success" });
+        UI.downloadDocument("JC-schedule-" + l.id + ".html", {
+          kicker: "Repayment schedule",
+          title: l.product + " — " + l.id,
+          meta: profile().fullName + " · " + mwk(l.principal) + " · " + l.rows.length + " instalments",
+          body: "<table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th><th>Principal</th>" +
+            "<th>Interest</th><th>Fees</th><th>Balance</th><th>Status</th></tr></thead><tbody>" +
+            l.rows.map(function (r) {
+              return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + '</td><td class="num">' + mwk(r.payment) +
+                '</td><td class="num">' + mwk(r.principal) + '</td><td class="num">' + mwk(r.interest) +
+                '</td><td class="num">' + mwk(r.fees || 0) + '</td><td class="num">' + mwk(r.closing) +
+                "</td><td>" + esc(r.status) + "</td></tr>";
+            }).join("") + "</tbody></table>" +
+            '<p class="muted" style="margin-top:10px">Total repayment ' + mwk(l.totalRepayment) +
+            " · Total interest " + mwk(l.totalRepayment - l.principal) + "</p>",
+          note: "Repayment schedule — quote " + l.id + " in any query."
+        });
+        UI.toast({ title: "Schedule downloaded", message: l.id + " repayment schedule.", type: "success" });
       });
     });
 
@@ -17862,8 +18801,18 @@ try {
           actions: [
             { label: "Close", variant: "ghost" },
             { label: "Download summary", variant: "gold", onClick: function () {
-                UI.downloadCSV("JC-application-" + a.ref + ".csv",
-                  UI.tableCSV(["Field", "Value"], [["Reference", a.ref], ["Product", a.product], ["Amount (MWK)", a.amount], ["Term (months)", a.term], ["Purpose", a.purpose], ["Status", a.status]]));
+                UI.downloadDocument("JC-application-" + a.ref + ".html", {
+                  kicker: "Loan application",
+                  title: a.product + " — " + a.ref,
+                  meta: profile().fullName + " · " + dt(a.date || a.submitted || new Date().toISOString()),
+                  body: '<dl class="kv"><dt>Reference</dt><dd>' + esc(a.ref) + "</dd>" +
+                    "<dt>Product</dt><dd>" + esc(a.product) + "</dd>" +
+                    "<dt>Amount</dt><dd>" + mwk(a.amount) + "</dd>" +
+                    "<dt>Term</dt><dd>" + esc(a.term) + " months</dd>" +
+                    "<dt>Purpose</dt><dd>" + esc(a.purpose) + "</dd>" +
+                    "<dt>Status</dt><dd>" + esc(a.status) + "</dd></dl>",
+                  note: "System-generated summary — quote " + a.ref + " in any query."
+                });
                 return false;
               } }
           ]
@@ -18118,11 +19067,34 @@ try {
       btn.addEventListener("click", function () {
         var ref = btn.getAttribute("data-transfer-receipt");
         var t = db().transfers.filter(function (x) { return x.ref === ref; })[0];
+        var trBody = '<div id="transfer-print" data-doc-title="Transfer receipt">' +
+          docHeader({ kicker: "Transfer receipt", title: mwk(t.amount), meta: esc(ref) + " · " + dt(t.date) }) +
+          '<div class="doc-sheet"><div class="form-grid">' +
+            reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
+            reviewItem("From", t.from) + reviewItem("To", t.to) +
+            reviewItem("Fee", mwk(t.fee)) + reviewItem("Status", UI.statusPill(t.status)) + "</div></div></div>";
         UI.modal({
           title: "Transfer receipt", subtitle: ref,
-          body: '<div class="form-grid">' + reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
-            reviewItem("From", t.from) + reviewItem("To", t.to) + reviewItem("Fee", mwk(t.fee)) + reviewItem("Status", UI.statusPill(t.status)) + "</div>",
-          actions: [{ label: "Close", variant: "ghost" }, { label: "Print", variant: "gold", onClick: function () { window.print(); return false; } }]
+          body: trBody,
+          actions: [
+            { label: "Close", variant: "ghost" },
+            { label: "Print", variant: "ghost", onClick: function () { UI.printElement("transfer-print"); return false; } },
+            { label: "Download", variant: "gold", onClick: function () {
+                UI.downloadDocument("JC-transfer-receipt-" + ref + ".html", {
+                  kicker: "Transfer receipt", title: "Transfer " + ref,
+                  meta: dtTime(t.date) + " · " + mwk(t.amount),
+                  body: '<dl class="kv">' +
+                    "<dt>Date</dt><dd>" + esc(dtTime(t.date)) + "</dd>" +
+                    "<dt>Amount</dt><dd>" + esc(mwk(t.amount)) + "</dd>" +
+                    "<dt>From</dt><dd>" + esc(t.from) + "</dd>" +
+                    "<dt>To</dt><dd>" + esc(t.to) + "</dd>" +
+                    "<dt>Fee</dt><dd>" + esc(mwk(t.fee)) + "</dd>" +
+                    "<dt>Status</dt><dd>" + esc(t.status) + "</dd></dl>",
+                  note: "System-generated receipt — quote " + ref + " in any query."
+                });
+                return false;
+              } }
+          ]
         });
       });
     });
@@ -18207,7 +19179,7 @@ try {
       btn.addEventListener("click", function () { statementDialog(btn.getAttribute("data-statement")); });
     });
     content.querySelectorAll("[data-statement-dl]").forEach(function (btn) {
-      btn.addEventListener("click", function () { downloadStatementCSV(btn.getAttribute("data-statement-dl")); });
+      btn.addEventListener("click", function () { downloadStatement(btn.getAttribute("data-statement-dl")); });
     });
 
     /* documents */
@@ -18266,29 +19238,76 @@ try {
       pf.addEventListener("submit", function (e) {
         e.preventDefault();
         var p = profile();
-        p.firstName = $("pf-first").value.trim() || p.firstName;
-        p.lastName = $("pf-last").value.trim() || p.lastName;
-        p.fullName = p.firstName + " " + p.lastName;
-        p.avatar = (p.firstName[0] + p.lastName[0]).toUpperCase();
-        p.gender = $("pf-gender").value;
-        p.phone = $("pf-phone").value.trim();
-        p.email = $("pf-email").value.trim();
-        p.contactPreference = $("pf-pref").value;
-        p.address = $("pf-address").value.trim();
-        p.occupation = $("pf-occupation").value.trim();
-        p.employer = $("pf-employer").value.trim();
-        p.monthlyIncome = Number($("pf-income").value) || p.monthlyIncome;
-        p.monthlyExpenses = Number($("pf-expenses").value) || p.monthlyExpenses;
-        p.nextOfKin = { name: $("pf-nok-name").value, relationship: $("pf-nok-rel").value, phone: $("pf-nok-phone").value };
-        DATA.save();
-        DATA.notify("Profile", "Profile updated", "Your contact and employment details were updated successfully.", "In-app + Email");
+        var next = {
+          gender: $("pf-gender").value,
+          contactPreference: $("pf-pref").value,
+          address: $("pf-address").value.trim(),
+          occupation: $("pf-occupation").value.trim(),
+          employer: $("pf-employer").value.trim(),
+          monthlyIncome: Number($("pf-income").value) || 0,
+          monthlyExpenses: Number($("pf-expenses").value) || 0,
+          kin: {
+            name: $("pf-nok-name").value.trim(),
+            relationship: $("pf-nok-rel").value.trim(),
+            phone: $("pf-nok-phone").value.trim()
+          }
+        };
+        /* Only the fields that can move here are compared; the protected
+           ones are read-only and travel through a request instead. */
+        var labels = [];
+        if (next.gender !== p.gender) labels.push("Gender");
+        if (next.contactPreference !== p.contactPreference) labels.push("Contact preference");
+        if (next.address !== p.address) labels.push("Residential address");
+        if (next.occupation !== p.occupation) labels.push("Occupation");
+        if (next.employer !== p.employer) labels.push("Employer");
+        if (next.monthlyIncome !== p.monthlyIncome) labels.push("Monthly income");
+        if (next.monthlyExpenses !== p.monthlyExpenses) labels.push("Monthly expenses");
+        var kinNow = p.nextOfKin || { name: "", relationship: "", phone: "" };
+        if (next.kin.name !== (kinNow.name || "") || next.kin.relationship !== (kinNow.relationship || "") || next.kin.phone !== (kinNow.phone || "")) {
+          labels.push("Next of kin");
+        }
         var status = $("profile-status");
-        status.className = "form-status is-visible";
-        status.textContent = "Profile saved. Contact changes may require re-verification.";
-        renderSidebar();
-        UI.toast({ title: "Profile updated", message: "Your details have been saved.", type: "success" });
+        if (!labels.length) {
+          status.className = "form-status is-visible";
+          status.textContent = "Nothing has changed. Protected details use Request change.";
+          return;
+        }
+        reasonDialog(labels, function (category, reason) {
+          p.gender = next.gender;
+          p.contactPreference = next.contactPreference;
+          p.address = next.address;
+          p.occupation = next.occupation;
+          p.employer = next.employer;
+          p.monthlyIncome = next.monthlyIncome;
+          p.monthlyExpenses = next.monthlyExpenses;
+          p.nextOfKin = { name: next.kin.name, relationship: next.kin.relationship, phone: next.kin.phone };
+          db().profileAudit = db().profileAudit || [];
+          db().profileAudit.unshift({
+            id: "AUD-" + Date.now().toString(36).toUpperCase(),
+            at: new Date().toISOString(),
+            action: "Updated " + labels.join(", "),
+            category: category,
+            reason: reason,
+            by: p.fullName || p.accountNumber || "Customer"
+          });
+          if (db().profileAudit.length > 60) db().profileAudit.length = 60;
+          DATA.save();
+          DATA.notify("Profile", "Profile updated",
+            labels.join(", ") + " updated. The reason is saved with your record.", "In-app + Email");
+          var st = $("profile-status");
+          if (st) {
+            st.className = "form-status is-visible";
+            st.textContent = "Saved. Reason recorded against your record.";
+          }
+          renderSidebar();
+          render(false);
+          UI.toast({ title: "Profile updated", message: "Your changes and the reason were saved.", type: "success" });
+        });
       });
     }
+    content.querySelectorAll("[data-request-change]").forEach(function (btn) {
+      btn.addEventListener("click", function () { requestChangeDialog(btn.getAttribute("data-request-change")); });
+    });
     content.querySelectorAll("[data-avatar-upload]").forEach(function (btn) {
       btn.addEventListener("click", function () { uploadDocument("avatar"); });
     });
@@ -18548,20 +19567,35 @@ try {
     });
   }
 
+  /* Every document opens on the platform's emerald band with the light
+     lockup — the same header the site uses, on screen, in print and in the
+     downloaded file. One helper, so a receipt and a statement cannot
+     disagree about what the header looks like. */
+  function docHeader(o) { return UI.docHead(o); }
+
   function receiptDialog(ref) {
     var t = db().transactions.filter(function (x) { return x.ref === ref; })[0];
     if (!t) return;
-    var body = '<div id="receipt-print">' +
-      '<div style="display:flex;gap:.8rem;align-items:center;border-bottom:1px dashed var(--line-strong);padding-bottom:.8rem;">' +
-        '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" style="height:42px;">' +
-        '<div style="margin-left:auto;text-align:right;"><strong style="display:block;color:var(--ink);font-size:.9rem;">Payment receipt</strong>' +
-        '<span style="font-size:.72rem;color:var(--muted);">' + esc(t.ref) + "</span></div></div>" +
-      '<div class="form-grid" style="margin-top:.8rem;">' + reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
-      reviewItem("Method", t.method) + reviewItem("Status", UI.statusPill(t.status)) +
-      reviewItem("Description", t.description) + reviewItem("Client", profile().fullName) + "</div>" +
-      '<p style="font-size:.68rem;color:var(--muted);margin-top:.9rem;border-top:1px dashed var(--line-strong);padding-top:.7rem;">' +
-      "JAY C O B FINANCIAL SERVICES · Plot 47/3, Area 47, Sector 3, Lilongwe · hello@jaycobfinancial.mw · +265 999 123 456<br>" +
-      "All amounts in Malawian Kwacha (MWK). This receipt is system-generated — quote " + esc(t.ref) + " in any query.</p></div>";
+    var rows = [
+      ["Date", dtTime(t.date)], ["Amount", mwk(t.amount)],
+      ["Method", t.method], ["Status", t.status],
+      ["Description", t.description], ["Client", profile().fullName]
+    ];
+    var body = '<div id="receipt-print" data-doc-title="Payment receipt">' +
+      docHeader({
+        kicker: "Payment receipt", title: mwk(t.amount),
+        meta: esc(t.ref) + " · " + dt(t.date)
+      }) +
+      '<div class="doc-sheet">' +
+        '<div class="form-grid">' +
+          reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
+          reviewItem("Method", t.method) + reviewItem("Status", UI.statusPill(t.status)) +
+          reviewItem("Description", t.description) + reviewItem("Client", profile().fullName) +
+        "</div>" +
+        '<p class="text-tiny text-muted" style="margin-top:1rem;">' +
+          "All amounts in Malawian Kwacha (MWK). This receipt is system-generated — quote " +
+          esc(t.ref) + " in any query.</p>" +
+      "</div></div>";
     UI.modal({
       title: "Receipt", subtitle: mwk(t.amount),
       body: body,
@@ -18569,10 +19603,16 @@ try {
         { label: "Close", variant: "ghost" },
         { label: "Print", variant: "ghost", onClick: function () { UI.printElement("receipt-print"); return false; } },
         { label: "Download", variant: "gold", onClick: function () {
-            UI.downloadCSV("JC-receipt-" + t.ref + ".csv", UI.tableCSV(["Field", "Value"], [
-              ["Receipt", t.ref], ["Date", new Date(t.date).toISOString()], ["Client", profile().fullName],
-              ["Description", t.description], ["Amount (MWK)", t.amount], ["Method", t.method], ["Status", t.status]
-            ]));
+            UI.downloadDocument("JC-receipt-" + t.ref + ".html", {
+              kicker: "Payment receipt",
+              title: "Receipt " + t.ref,
+              meta: dtTime(t.date) + " · " + mwk(t.amount),
+              body: '<dl class="kv">' + rows.map(function (r) {
+                return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>";
+              }).join("") + "</dl>",
+              note: "This receipt is system-generated — quote " + t.ref + " in any query."
+            });
+            UI.toast({ title: "Receipt downloaded", message: t.ref, type: "success" });
             return false;
           } }
       ]
@@ -18587,44 +19627,59 @@ try {
       return "<tr><td>" + dt(t.date) + "</td><td>" + esc(t.description) + "</td><td>" + esc(t.type) + "</td>" +
         '<td class="num">' + (t.direction === "credit" ? "+" : "−") + " " + mwk(t.amount) + "</td><td>" + UI.statusPill(t.status) + "</td></tr>";
     }).join("");
-    var body = '<div id="statement-print">' +
-      '<div style="display:flex;gap:.8rem;align-items:center;border-bottom:1px dashed var(--line-strong);padding-bottom:.8rem;">' +
-        '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjggNjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSkFZIEMgTyBCIEZpbmFuY2lhbCBTZXJ2aWNlcyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvY2tHcmFkaWVudCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwZDRhNGEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA0MTcxYSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY3J5c3RhbFNoZWVuIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjQyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41NSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E4ZDhmYiIgc3RvcC1vcGFjaXR5PSIwLjE4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ3b3JkTWFyayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwNjI0MzAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjZiIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNsb2NrR3JhZGllbnQpIi8+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9InVybCgjY3J5c3RhbFNoZWVuKSIvPgogIDxyZWN0IHg9IjMuNSIgeT0iMy41IiB3aWR0aD0iNTciIGhlaWdodD0iNTciIHJ4PSIxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2JiOGU4IiBzdHJva2Utb3BhY2l0eT0iLjU1Ii8+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjI3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZGZmMWZmIiBsZXR0ZXItc3BhY2luZz0iLTEiPkpDPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIzMiIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsICdUaW1lcyBOZXcgUm9tYW4nLCBzZXJpZiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN3b3JkTWFyaykiIGxldHRlci1zcGFjaW5nPSItMC40Ij5KQVkgQyBPIEI8L3RleHQ+CiAgPHRleHQgeD0iODAuNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjguNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzUyNmI3ZCIgbGV0dGVyLXNwYWNpbmc9IjIuMyI+RklOQU5DSUFMIFNFUlZJQ0VTPC90ZXh0Pgo8L3N2Zz4K" alt="JAY C O B FINANCIAL SERVICES" style="height:42px;">' +
-        '<div style="margin-left:auto;text-align:right;"><strong style="display:block;color:var(--ink);">Account statement</strong>' +
-        '<span style="font-size:.72rem;color:var(--muted);">' + esc(s.ref) + " · " + esc(s.period) + "</span></div></div>" +
-      '<div class="form-grid" style="margin-top:.8rem;">' + reviewItem("Client", profile().fullName) + reviewItem("Account", profile().accountNumber) +
-      reviewItem("Opening balance", mwk(s.opening)) + reviewItem("Closing balance", mwk(s.closing)) +
-      reviewItem("Currency", "MWK") + reviewItem("Verification code", "JC-" + s.ref.slice(-4) + "-VERIFIED") + "</div>" +
-      '<table class="data" style="margin-top:.8rem;"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
-      (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>" +
-      '<p style="font-size:.68rem;color:var(--muted);margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. System-generated statement — quote ' + esc(s.ref) + ' in any query.</p></div>';
+    var body = '<div id="statement-print" data-doc-title="Account statement">' +
+      docHeader({
+        kicker: "Account statement", title: esc(s.ref),
+        meta: esc(s.period) + " · " + esc(profile().fullName)
+      }) +
+      '<div class="doc-sheet">' +
+        '<div class="form-grid">' + reviewItem("Client", profile().fullName) + reviewItem("Account", profile().accountNumber) +
+        reviewItem("Opening balance", mwk(s.opening)) + reviewItem("Closing balance", mwk(s.closing)) +
+        reviewItem("Currency", "MWK") + reviewItem("Verification code", "JC-" + s.ref.slice(-4) + "-VERIFIED") + "</div>" +
+        '<table class="data" style="margin-top:.8rem;"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>" +
+        '<p class="text-tiny text-muted" style="margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. System-generated statement — quote ' + esc(s.ref) + " in any query.</p>" +
+      "</div></div>";
     UI.modal({
       title: "Statement " + s.ref, subtitle: s.period,
       body: body,
       actions: [
         { label: "Close", variant: "ghost" },
         { label: "Print", variant: "ghost", onClick: function () { UI.printElement("statement-print"); return false; } },
-        { label: "Download CSV", variant: "gold", onClick: function () { downloadStatementCSV(ref); return false; } }
+        { label: "Download", variant: "gold", onClick: function () { downloadStatement(ref); return false; } }
       ]
     });
   }
 
-  function downloadStatementCSV(ref) {
+  function downloadStatement(ref) {
     var s = db().statements.filter(function (x) { return x.ref === ref; })[0];
     if (!s) return;
     var txs = s.rows || db().transactions;
-    var csv = "JAY C O B FINANCIAL SERVICES — account statement (MWK)\n" +
-      "Statement," + s.ref + "\nClient," + profile().fullName + "\nPeriod," + s.period +
-      "\nOpening balance," + s.opening + "\nClosing balance," + s.closing + "\n\n";
-    csv += UI.tableCSV(["Date", "Description", "Type", "Amount (MWK)", "Direction", "Status"],
-      txs.map(function (t) { return [t.date, t.description, t.type, t.amount, t.direction, t.status]; }));
-    UI.downloadCSV("JC-statement-" + s.ref + ".csv", csv);
+    var rows = txs.map(function (t) {
+      return "<tr><td>" + dt(t.date) + "</td><td>" + esc(t.description) + "</td><td>" + esc(t.type) +
+        '</td><td class="num">' + (t.direction === "credit" ? "+" : "−") + " " + mwk(t.amount) +
+        "</td><td>" + esc(t.status) + "</td></tr>";
+    }).join("");
+    UI.downloadDocument("JC-statement-" + s.ref + ".html", {
+      kicker: "Account statement",
+      title: s.ref,
+      meta: s.period + " · " + profile().fullName,
+      body: '<dl class="kv"><dt>Client</dt><dd>' + esc(profile().fullName) + "</dd>" +
+        "<dt>Account</dt><dd>" + esc(profile().accountNumber) + "</dd>" +
+        "<dt>Opening balance</dt><dd>" + mwk(s.opening) + "</dd>" +
+        "<dt>Closing balance</dt><dd>" + mwk(s.closing) + "</dd>" +
+        "<dt>Currency</dt><dd>MWK</dd></dl>" +
+        "<h2>Transactions</h2><table><thead><tr><th>Date</th><th>Description</th><th>Type</th>" +
+        '<th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>",
+      note: "System-generated statement — quote " + s.ref + " in any query."
+    });
     UI.toast({ title: "Statement downloaded", message: s.ref, type: "success" });
   }
 
   function printSchedule(l) {
     var html = '<h2>' + esc(l.product) + " — repayment schedule</h2>" +
-      '<p class="muted">' + esc(l.id) + " · " + l.rate + "% p.a. · " + (l.method === "flat" ? "Flat rate" : "Reducing balance") + " · " + l.frequency + "</p>" +
+      '<p class="muted">' + esc(l.id) + " · " + esc(rateLabel(l)) + " · " + (l.method === "flat" ? "Flat rate" : "Reducing balance") + " · " + l.frequency + "</p>" +
       "<table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th><th>Principal</th><th>Interest</th><th>Balance</th><th>Status</th></tr></thead><tbody>" +
       l.rows.map(function (r) {
         return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + "</td><td>" + mwk(r.payment) + "</td><td>" + mwk(r.principal) + "</td><td>" + mwk(r.interest) + "</td><td>" + mwk(r.closing) + "</td><td>" + r.status + "</td></tr>";
@@ -18632,6 +19687,7 @@ try {
       '<p class="totals">Total repayment: ' + mwk(l.totalRepayment) + " · Total interest: " + mwk(l.totalRepayment - l.principal) + "</p>";
     var holder = document.createElement("div");
     holder.id = "print-holder";
+    holder.setAttribute("data-doc-title", l.product + " — repayment schedule");
     holder.innerHTML = html;
     holder.style.display = "none";
     document.body.appendChild(holder);
@@ -18642,25 +19698,34 @@ try {
   function downloadAgreement(loanId) {
     var l = DATA.findLoan(loanId);
     if (!l) return;
-    var text = [
-      "JAY C O B FINANCIAL SERVICES — LOAN AGREEMENT",
-      "Loan ID," + l.id,
-      "Borrower," + profile().fullName,
-      "Client reference," + profile().accountNumber,
-      "Product," + l.product,
-      "Principal (MWK)," + l.principal,
-      "Interest rate," + l.rate + "% per annum",
-      "Interest method," + (l.method === "flat" ? "Flat rate" : "Reducing balance"),
-      "Term," + (l.rows.length) + " instalments (" + l.frequency + ")",
-      "Total amount payable (MWK)," + l.totalRepayment,
-      "Disbursement date," + dt(l.startDate),
-      "Maturity date," + dt(l.maturity),
-      "Guarantor," + (l.guarantor ? l.guarantor.name : "Not required"),
-      "",
-      "This extract is generated from the loan record. The signed agreement held on file is the binding document.",
-      "Read with the Terms and Conditions, Fees and Charges Disclosure and Responsible Lending Policy."
-    ].join("\n");
-    UI.downloadCSV("JC-loan-agreement-" + l.id + ".txt", text);
+    var rateLine = (l.rateBasis === "monthly")
+      ? l.rate + "% per month (" + (Math.round((l.rate * 12) * 100) / 100) + "% p.a. equivalent)"
+      : l.rate + "% per annum";
+    var rows = [
+      ["Loan ID", l.id], ["Borrower", profile().fullName], ["Client reference", profile().accountNumber],
+      ["Product", l.product], ["Principal", mwk(l.principal)], ["Interest rate", rateLine],
+      ["Interest method", l.method === "flat" ? "Flat rate" : "Reducing balance"],
+      ["Term", l.rows.length + " instalments (" + l.frequency + ")"],
+      ["Total amount payable", mwk(l.totalRepayment)],
+      ["Disbursement date", dt(l.startDate)], ["Maturity date", dt(l.maturity)],
+      ["Guarantor", l.guarantor ? l.guarantor.name : "Not required"]
+    ];
+    UI.downloadDocument("JC-loan-agreement-" + l.id + ".html", {
+      kicker: "Loan agreement",
+      title: l.product + " — " + l.id,
+      meta: profile().fullName + " · " + dt(l.startDate),
+      body: '<dl class="kv">' + rows.map(function (r) {
+        return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>";
+      }).join("") + "</dl><h2>Schedule</h2><table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th>" +
+        "<th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody>" +
+        (l.rows || []).map(function (r) {
+          return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + '</td><td class="num">' + mwk(r.payment) +
+            '</td><td class="num">' + mwk(r.principal) + '</td><td class="num">' + mwk(r.interest) +
+            '</td><td class="num">' + mwk(r.closing) + "</td></tr>";
+        }).join("") + "</tbody></table>",
+      note: "This extract is generated from the loan record. The signed agreement held on file is the binding document. " +
+        "Read with the Terms and Conditions, Fees and Charges Disclosure and Responsible Lending Policy."
+    });
     UI.toast({ title: "Agreement downloaded", message: l.id + " loan agreement.", type: "success" });
   }
 
@@ -18974,7 +20039,7 @@ try {
   /* Seeded catalogue — mirrors assets/js/site-store.js so the page still
      quotes correctly on a cold start. The live store always wins. */
   var FALLBACK = [
-    { id: "personal", name: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    { id: "personal", name: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2 },
     { id: "business", name: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
     { id: "emergency", name: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, maxTerm: 12, fee: 2 },
     { id: "salary", name: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, maxTerm: 36, fee: 2 },
@@ -19033,8 +20098,12 @@ try {
     return Math.min(Math.max(rounded, p.min), Math.min(p.max, 10000000));
   }
 
+  /* A product can publish the term its example should open on. The personal
+     loan is quoted monthly and opens on one month, so the card shows a
+     one-month cost as the default reading. */
   function exampleTerm(p) {
-    return Math.min(Math.max(12, p.minTerm), p.maxTerm);
+    var want = Number(p.defaultTerm) > 0 ? Number(p.defaultTerm) : 12;
+    return Math.min(Math.max(want, p.minTerm), p.maxTerm);
   }
 
   function quote(p, amount, termMonths) {
@@ -19234,9 +20303,15 @@ try {
   } else {
     init();
   }
-  /* the catalogue may arrive from Supabase after first paint */
+  /* the catalogue may arrive from Supabase after first paint — and it may
+     arrive after this script has already run, so subscribe as well as
+     listen for the event */
   document.addEventListener("jcob:site-updated", init);
   document.addEventListener("jcob:products-updated", init);
+  if (window.JCOB_SITE) {
+    if (window.JCOB_SITE.subscribe) window.JCOB_SITE.subscribe(init);
+    if (window.JCOB_SITE.ready && window.JCOB_SITE.ready.then) window.JCOB_SITE.ready.then(init).catch(function () {});
+  }
 
   window.JCOB_PRODUCT_QUOTES = {
     catalogue: catalogue,

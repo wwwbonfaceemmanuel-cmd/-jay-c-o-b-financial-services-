@@ -192,7 +192,99 @@ t.ok("the dashboard account chip's name reads light",
 t.ok("the dashboard account chip's caption is muted chrome",
   /color:\s*var\(--chrome-muted-text\)/.test(chipMail));
 
-/* ---- 7. print keeps the page readable ---- */
+/* ---- 7. the bar's small controls follow the bar ---- */
+const search = lastBody(siteRules, ".app-search input");
+const iconBtn = lastBody(siteRules, ".app-topbar .icon-btn-lg");
+const sync = lastBody(siteRules, ".app-topbar .app-sync");
+const bell = lastBody(siteRules, ".app-topbar .bell-dot");
+t.ok("the dashboard search is glass on emerald",
+  /background:\s*rgba\(255,\s*255,\s*255,\s*0?\.1\)/.test(search) &&
+  /color:\s*var\(--chrome-text-strong\)/.test(search));
+t.ok("the top bar's icon buttons read light",
+  /color:\s*var\(--chrome-text-strong\)/.test(iconBtn));
+t.ok("the sync chip is glass, not a white label",
+  /background:\s*rgba\(255,\s*255,\s*255,\s*0?\.1\)/.test(sync));
+t.ok("the notification dot is ringed in the emerald, not white",
+  /border-color:\s*#04211f/.test(bell));
+
+/* =====================================================================
+   8. every inner page opens on the same band — page heroes, receipts,
+      statements, the auth cards and every downloaded document
+   ===================================================================== */
+const ui = read("assets/js/ui.js");
+const allPages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"));
+
+t.eq("the page band paints with the same emerald token",
+  lastDecl(siteRules, ".page-hero", "background"), "var(--emerald-chrome)");
+t.ok("the page band carries the gold rail",
+  /linear-gradient\(90deg/.test(lastBody(siteRules, ".page-hero::after")));
+t.ok("the page band's kicker is gold",
+  /color:\s*var\(--gold-200\)/.test(lastBody(siteRules, ".page-hero .eyebrow")));
+t.ok("the page band's headings are near-white",
+  /color:\s*var\(--chrome-text-strong\)/.test(lastBody(siteRules, ".page-hero h1,.page-hero h2") ||
+    lastBody(siteRules, ".page-hero h1, .page-hero h2") ||
+    lastBody(siteRules, ".page-hero h1") + lastBody(siteRules, ".page-hero h2")));
+
+t.eq("the receipt and document band paints with the same emerald token",
+  lastDecl(siteRules, ".doc-head", "background"), "var(--emerald-chrome)");
+t.ok("the document band prints in colour",
+  /print-color-adjust:\s*exact/.test(lastBody(siteRules, ".doc-head")));
+t.ok("the document band's kicker is gold",
+  /color:\s*var\(--gold-200\)/.test(lastBody(siteRules, ".doc-head__kicker")));
+t.ok("the document band's title is near-white",
+  /color:\s*var\(--chrome-text-strong\)/.test(lastBody(siteRules, ".doc-head__title")));
+t.ok("the auth card joins the band without a white shoulder",
+  /border-top-left-radius:\s*0/.test(lastBody(siteRules, ".doc-head + .auth-card")));
+t.ok("print keeps the band coloured",
+  /@media print[\s\S]{0,400}background:\s*var\(--emerald-chrome\) !important/.test(site));
+
+/* the insight article's band */
+t.eq("the article band paints the emerald token",
+  lastDecl(siteRules, ".article-hero", "background"), "transparent");
+t.ok("the article band is painted full width",
+  /width:\s*100vw/.test(lastBody(siteRules, ".article-hero::before")));
+t.ok("the article band carries the gold rail",
+  /linear-gradient\(90deg/.test(lastBody(siteRules, ".article-hero::after")));
+t.ok("the article title reads near-white",
+  /color:\s*var\(--chrome-text-strong\)/.test(lastBody(siteRules, ".article-hero h1")));
+t.ok("the article standfirst reads on the band",
+  /color:\s*var\(--chrome-text\)/.test(lastBody(siteRules, ".article-hero .article-dek")));
+
+/* Every page opens on a coloured band. The exceptions are the surfaces that
+   are not pages in that sense: the home hero (its own composition), the two
+   dashboards, the two redirect stubs, the diagnostic page and the 404. */
+const NO_BAND = ["index.html", "admin.html", "dashboard.html", "portal.html",
+  "products.html", "system-check.html", "404.html"];
+const noBand = allPages.filter((f) => {
+  if (NO_BAND.indexOf(f) > -1) return false;
+  const body = read(f);
+  return !/class="[^"]*\bpage-hero\b/.test(body) &&
+    !/class="[^"]*\bdoc-head\b/.test(body) &&
+    !/class="[^"]*\barticle-hero\b/.test(body);
+});
+t.eq("every content page opens on a coloured band", noBand.join(", "), "");
+
+/* the auth pages put the platform lockup on that band */
+const authPages = ["login.html", "register.html", "verify.html", "forgot-password.html", "reset-password.html"];
+const badAuth = authPages.filter((f) => {
+  const body = read(f);
+  return !/doc-head--compact/.test(body) ||
+    !/doc-head[\s\S]{0,400}logo-full-light\.svg/.test(body);
+});
+t.eq("all five auth pages carry the light lockup on the band", badAuth.join(", "), "");
+
+/* the shared document header cannot drift from the stylesheet */
+t.ok("the shared document header emits the band class", /'<div class="doc-head'/.test(ui));
+t.ok("the shared document header carries the light lockup",
+  /logo-full-light\.svg/.test(ui) && /inlineLockup\(/.test(ui));
+t.ok("downloaded documents carry the emerald band",
+  /linear-gradient\(165deg,#06302c 0%,#04211f 62%,#041716 100%\)/.test(ui));
+t.ok("downloaded documents print their band",
+  /print-color-adjust:exact/.test(ui));
+t.ok("downloaded documents carry the gold rail",
+  /#f6ecc4 50%/.test(ui));
+
+/* ---- 9. print keeps the page readable ---- */
 t.ok("print strips the header colour", /@media print\{\s*\.site-header, \.app-topbar \{ background: #fff/.test(site.replace(/\n\s*/g, " ")) ||
   /\.site-header, \.app-topbar \{ background: #fff/.test(site));
 

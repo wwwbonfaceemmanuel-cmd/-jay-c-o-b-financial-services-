@@ -86,6 +86,12 @@
   var CLOUD = window.JCOB_CLOUD;
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
 
+  function themeLabel(id) {
+    var list = (window.JCOB_THEME && window.JCOB_THEME.list) ? window.JCOB_THEME.list() : [];
+    var hit = list.filter(function (t) { return t.id === id; })[0];
+    return hit ? hit.name : "Emerald & liquid gold";
+  }
+
   /* Every customer document in Supabase is a website record. There is no
      browser-side copy: the console reads the database and writes back to it. */
   var siteDocs = null;
@@ -200,6 +206,27 @@
             "New support ticket " + t.ref,
             (profile.fullName || "A customer") + ": " + (t.subject || "Support request"),
             "support");
+        }
+      });
+
+      /* Protected-detail change requests filed in the customer dashboard. */
+      db.changeRequests = db.changeRequests || [];
+      (site.changeRequests || []).forEach(function (cr) {
+        if (db.changeRequests.some(function (x) { return x.id === cr.id; })) return;
+        db.changeRequests.unshift({
+          id: cr.id, siteUid: doc.owner || null,
+          cust: profile.fullName || "Website customer",
+          field: cr.field, label: cr.label, current: cr.current, requested: cr.requested,
+          category: cr.category, reason: cr.reason,
+          status: cr.status === "Approved" ? "Approved" : cr.status === "Declined" ? "Declined" : "Pending review",
+          createdAt: cr.createdAt, decidedAt: cr.decidedAt || null, decision: cr.decision || ""
+        });
+        changed = true;
+        if (window.JCOB_STAFF_ALERT && cr.status === "Pending review") {
+          window.JCOB_STAFF_ALERT("kyc",
+            "Change request " + cr.id,
+            (profile.fullName || "A customer") + " — " + cr.label + " → " + cr.requested,
+            "changeRequests");
         }
       });
     });
@@ -716,7 +743,135 @@
   /* ------------------------------------------------------------------
      ACTIONS
      ------------------------------------------------------------------ */
+
+  /* Apply (or decline) a customer's protected-detail request inside their
+     own document, then notify them. Nothing is faked: the write is the same
+     Supabase upsert every other console action uses. */
+  /* Re-read one customer's document before writing a decision. The console
+     holds a cached copy; approving against a stale copy would silently drop
+     anything the customer saved since it was read. */
+  function freshCustomerDoc(owner) {
+    if (!owner || !cloudOn()) return Promise.resolve(null);
+    return CLOUD.from(CLOUD.tables.customer).select("owner,data").eq("owner", owner).limit(1).run()
+      .then(function (rows) {
+        var row = Array.isArray(rows) ? rows[0] : rows;
+        return row && row.data ? row.data : null;
+      })
+      .catch(function () { return null; });
+  }
+
+  function decideChange(req, approve, note) {
+    freshCustomerDoc(req.siteUid).then(function (fresh) {
+      applyChange(req, approve, note, fresh);
+    });
+  }
+
+  function applyChange(req, approve, note, fresh) {
+    var doc = allDocs().filter(function (d) { return d.owner && d.owner === req.siteUid; })[0];
+    var site = fresh || (doc && doc.data);
+    var when = new Date().toISOString();
+
+    if (site) {
+      site.changeRequests = site.changeRequests || [];
+      var target = site.changeRequests.filter(function (x) { return x.id === req.id; })[0];
+      if (target) {
+        target.status = approve ? "Approved" : "Declined";
+        target.decidedAt = when;
+        target.decision = note;
+      }
+      if (approve) {
+        site.profile = site.profile || {};
+        if (req.field === "fullName") {
+          var parts = String(req.requested).trim().split(/\s+/);
+          site.profile.fullName = req.requested;
+          site.profile.firstName = parts[0] || "";
+          site.profile.lastName = parts.slice(1).join(" ");
+          site.profile.avatar = (parts[0] || "?").charAt(0) + ((parts[1] || "?").charAt(0));
+        } else {
+          site.profile[req.field] = req.requested;
+        }
+      }
+      site.notifications = site.notifications || [];
+      site.notifications.unshift({
+        id: "N-CR" + Date.now().toString(36).toUpperCase(),
+        type: "Security",
+        title: "Change request " + (approve ? "approved" : "declined"),
+        body: req.label + ": " + (approve
+          ? "approved and applied to your record."
+          : "declined. " + note),
+        date: when, read: false, channel: "In-app + Email"
+      });
+      if (cloudOn()) {
+        CLOUD.customer.saveFor(req.siteUid, site);
+        /* the cached copy is now behind — force a reload next read */
+        siteDocs = null; docsAt = 0;
+      }
+    }
+
+    var local = (db.changeRequests || []).filter(function (x) { return x.id === req.id; })[0];
+    if (local) {
+      local.status = approve ? "Approved" : "Declined";
+      local.decidedAt = when;
+      local.decision = note;
+    }
+    var customer = db.customers.filter(function (c) { return c.siteUid === req.siteUid; })[0];
+    if (approve && customer) {
+      if (req.field === "fullName") customer.name = req.requested;
+      if (req.field === "phone") customer.phone = req.requested;
+      if (req.field === "email") customer.email = req.requested;
+      if (req.field === "nid") customer.nid = req.requested;
+    }
+    audit("Administrator", (approve ? "Approved" : "Declined") + " change request " + req.id + " — " + req.label, "Change Requests");
+    save();
+    render(false);
+    toast(approve ? "ok" : "info",
+      approve ? "Request approved" : "Request declined",
+      req.id + " · " + req.label + (approve ? " updated in the customer record." : " — reason sent to the customer."));
+  }
+
   Object.assign(customActs, {
+    /* ---- protected detail change requests ---- */
+    crView: function (btn) {
+      var r = (db.changeRequests || []).filter(function (x) { return x.id === btn.dataset.id; })[0];
+      if (!r) return;
+      openModal({
+        title: "Change request " + r.id, size: "lg",
+        body: '<div class="kv"><b>Customer</b><span>' + esc(r.cust || "—") + "</span>" +
+          "<b>Detail</b><span>" + esc(r.label) + "</span>" +
+          "<b>Current value</b><span>" + esc(r.current) + "</span>" +
+          "<b>Requested value</b><span><strong>" + esc(r.requested) + "</strong></span>" +
+          "<b>Reason</b><span>" + esc(r.category || "") + "</span>" +
+          "<b>Explanation</b><span>" + esc(r.reason || "") + "</span>" +
+          "<b>Filed</b><span>" + esc(dFmt(r.createdAt)) + "</span>" +
+          "<b>Status</b><span>" + esc(r.status) + "</span>" +
+          (r.decision ? "<b>Decision</b><span>" + esc(r.decision) + "</span>" : "") + "</div>",
+        foot: '<button class="btn ghost" data-mclose>Close</button>'
+      });
+    },
+    crApprove: function (btn) {
+      var r = (db.changeRequests || []).filter(function (x) { return x.id === btn.dataset.id; })[0];
+      if (!r || r.status !== "Pending review") return;
+      confirmAct("Approve " + r.id,
+        "Apply <b>" + esc(r.label) + "</b> = <b>" + esc(r.requested) + "</b> to " + esc(r.cust || "this customer") +
+        "? The new value is written into their record and they are notified.",
+        "Approve and apply", function () { decideChange(r, true, "Approved — details verified by staff."); }, "ok");
+    },
+    crDecline: function (btn) {
+      var r = (db.changeRequests || []).filter(function (x) { return x.id === btn.dataset.id; })[0];
+      if (!r || r.status !== "Pending review") return;
+      openModal({
+        title: "Decline " + r.id, size: "",
+        body: '<p class="tsub" style="margin:0 0 10px;line-height:1.6">The customer sees this reason in their dashboard. Be specific about the evidence needed.</p>' +
+          '<div class="fld"><label>Reason for declining</label><textarea id="crDeclineReason" rows="3"></textarea></div>',
+        foot: '<button class="btn ghost" data-mclose>Cancel</button><button class="btn warn" data-mact="crDeclineGo">Decline request</button>'
+      });
+      modalActs.crDeclineGo = function () {
+        var why = val("crDeclineReason");
+        if (why.length < 10) return toast("err", "Reason needed", "Give at least 10 characters so the customer knows what to fix.");
+        closeModal();
+        decideChange(r, false, why);
+      };
+    },
     cmsReload: function () { delete cmsCache[cmsState.page]; loadPage(cmsState.page); },
     cmsSave: function (btn) {
       var row = btn.closest(".cms-row");
@@ -787,6 +942,39 @@
       toast("ok", "Cards added", extra.length + " About Us / section cards added.");
     },
     catEdit: function (btn) { openCatalogue(btn.dataset.id); },
+
+    /* ---- theme generator ---- */
+    themeApply: function () {
+      var T = window.JCOB_THEME;
+      if (!T) return toast("err", "Theme engine not loaded", "Reload the console and try again.");
+      var site = val("thSite") || "emerald";
+      var dash = val("thDash") || "emerald";
+      var user = (window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.user && window.JCOB_CLOUD.auth.user()) || {};
+      S.settings.theme = Object.assign({}, S.settings.theme, {
+        site: site, dashboard: dash,
+        updated: new Date().toISOString(),
+        updatedBy: user.email || "Administrator"
+      });
+      S.save(["settings"]);
+      T.apply("site", site);
+      T.apply("dashboard", dash);
+      render(false);
+      toast("ok", "Theme published",
+        "Website: " + themeLabel(site) + " · Dashboards: " + themeLabel(dash) +
+        ". Saved to Supabase with the rest of the website settings.");
+    },
+    themeReset: function () {
+      var T = window.JCOB_THEME;
+      S.settings.theme = Object.assign({}, S.settings.theme, {
+        site: "emerald", dashboard: "emerald",
+        updated: new Date().toISOString(),
+        updatedBy: ((window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.user && window.JCOB_CLOUD.auth.user()) || {}).email || "Administrator"
+      });
+      S.save(["settings"]);
+      if (T) { T.apply("site", "emerald"); T.apply("dashboard", "emerald"); }
+      render(false);
+      toast("info", "House theme restored", "Emerald and liquid gold are published again.");
+    },
     siteSettingsSave: function () {
       var s = S.settings;
       s.brand = val("ssBrand").trim();

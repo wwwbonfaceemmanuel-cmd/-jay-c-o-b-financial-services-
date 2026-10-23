@@ -22,7 +22,10 @@ const SITE_PORT = Number(process.env.TEST_SITE_PORT || 8099);
 const MOCK_PORT = Number(process.env.TEST_MOCK_PORT || 54399);
 const ANON = "dev-anon";
 
-const SUITES = ["production.test.js", "local.test.js", "cloud.test.js", "apply.test.js", "quotes.test.js", "signature.test.js", "theme.test.js", "premium.test.js", "header.test.js", "check.test.js"];
+/* requests.test.js rewrites records in the stand-in database (it approves a
+   name change), so it runs last; theme-generator.test.js publishes and then
+   resets the house theme, so it runs before the suites that read settings. */
+const SUITES = ["production.test.js", "local.test.js", "cloud.test.js", "apply.test.js", "quotes.test.js", "signature.test.js", "theme.test.js", "theme-generator.test.js", "premium.test.js", "header.test.js", "check.test.js", "requests.test.js"];
 
 function waitForPort(port, timeoutMs) {
   const deadline = Date.now() + (timeoutMs || 20000);

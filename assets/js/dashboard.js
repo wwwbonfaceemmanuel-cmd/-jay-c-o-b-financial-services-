@@ -49,6 +49,15 @@
   function dtTime(iso) {
     return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   }
+  /* A loan may be quoted per month (the personal loan is) or per year.
+     The record carries its basis, so the label follows it rather than
+     pretending every loan is annual. */
+  function rateLabel(l, withMethod) {
+    if (!l) return "";
+    var figure = (Math.round((Number(l.rate) || 0) * 100) / 100) + "%";
+    var basis = l.rateBasis === "monthly" ? " per month" : " p.a.";
+    return figure + basis + (withMethod ? " · " + (l.method === "flat" ? "flat" : "reducing") : "");
+  }
   function db() { return DATA.get(); }
   function profile() { return db().profile; }
   function walletBalance() {
@@ -322,7 +331,7 @@
             "<div>Outstanding<strong>" + mwk(loan.outstandingPrincipal + loan.outstandingInterest) + "</strong></div>" +
             "<div>Repaid<strong>" + mwk(loan.paid) + "</strong></div>" +
             "<div>Matures<strong>" + dt(loan.maturity) + "</strong></div>" +
-            "<div>Rate<strong>" + loan.rate + "% p.a.</strong></div>" +
+            "<div>Rate<strong>" + rateLabel(loan) + "</strong></div>" +
             "<div>Method<strong>" + (loan.method === "flat" ? "Flat" : "Reducing") + "</strong></div>" +
             "<div>Status<strong>" + UI.statusPill(loan.status) + "</strong></div>" +
           "</div>" : "") +
@@ -352,7 +361,7 @@
         "<div>Outstanding<strong>" + mwk(outstanding) + "</strong></div>" +
         "<div>Next payment<strong>" + mwk(l.nextAmount) + "</strong></div>" +
         "<div>Due date<strong>" + dt(l.nextDue) + "</strong></div>" +
-        "<div>Rate<strong>" + l.rate + "% p.a. · " + (l.method === "flat" ? "flat" : "reducing") + "</strong></div>" +
+        "<div>Rate<strong>" + rateLabel(l, true) + "</strong></div>" +
         "<div>Maturity<strong>" + dt(l.maturity) + "</strong></div>" +
       "</div>" +
       '<div class="progress" style="height:6px;"><span style="width:' + l.progress + '%"></span></div>' +
@@ -386,7 +395,7 @@
         panel("Loan terms", null,
           '<div class="form-grid">' +
             reviewItem("Loan ID", l.id) + reviewItem("Product", l.product) +
-            reviewItem("Principal", mwk(l.principal)) + reviewItem("Interest rate", l.rate + "% p.a.") +
+            reviewItem("Principal", mwk(l.principal)) + reviewItem("Interest rate", rateLabel(l)) +
             reviewItem("Interest method", l.method === "flat" ? "Flat rate" : "Reducing balance") +
             reviewItem("Repayment frequency", l.frequency) +
             reviewItem("Start date", dt(l.startDate)) + reviewItem("Maturity", dt(l.maturity)) +
@@ -1113,57 +1122,6 @@
   }
 
   /* ---------------- Profile ---------------- */
-  function panelProfile() {
-    var p = profile();
-    return pageHead("My profile", "Your personal, contact and employment details.",
-      '<a class="btn btn--ghost btn--sm" href="#security">Account security</a>') +
-      '<div class="dash-grid">' +
-        panel("Profile", "Fields marked with a lock require re-verification when changed",
-          '<form id="profile-form">' +
-            '<div class="flex items-center gap-2" style="margin-bottom:1rem;">' +
-              '<span class="avatar" style="width:58px;height:58px;font-size:1.05rem;background:var(--emerald-liquid);color:var(--gold-200);">' + esc(p.avatar) + "</span>" +
-              "<div><strong style=\"display:block;color:var(--ink);\">" + esc(p.fullName) + "</strong>" +
-              '<span class="text-tiny text-muted">Client since ' + dt(p.memberSince) + " · " + esc(p.accountNumber) + "</span>" +
-              '<div style="margin-top:.3rem;">' + UI.statusPill(p.verification) + "</div></div>" +
-              '<button class="btn btn--ghost btn--xs" type="button" style="margin-left:auto;" data-avatar-upload="1">Change photo</button>' +
-            "</div>" +
-            '<div class="form-grid">' +
-              '<div class="field"><label for="pf-first">First name</label><input id="pf-first" value="' + esc(p.firstName) + '"></div>' +
-              '<div class="field"><label for="pf-last">Surname</label><input id="pf-last" value="' + esc(p.lastName) + '"></div>' +
-              '<div class="field"><label for="pf-dob">Date of birth 🔒</label><input id="pf-dob" type="date" value="' + esc(p.dob) + '" readonly></div>' +
-              '<div class="field"><label for="pf-gender">Gender</label><select id="pf-gender">' +
-                ["Female", "Male", "Prefer not to say"].map(function (g) { return "<option" + (p.gender === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></div>" +
-              '<div class="field"><label for="pf-nid">National ID 🔒</label><input id="pf-nid" class="masked" value="' + esc(F.mask(p.nid, 4)) + '" readonly></div>' +
-              '<div class="field"><label for="pf-phone">Phone number</label><input id="pf-phone" value="' + esc(p.phone) + '"></div>' +
-              '<div class="field"><label for="pf-email">Email address</label><input id="pf-email" type="email" value="' + esc(p.email) + '"></div>' +
-              '<div class="field"><label for="pf-pref">Contact preference</label><select id="pf-pref">' +
-                ["WhatsApp", "Phone call", "Email", "SMS"].map(function (c) { return "<option" + (p.contactPreference === c ? " selected" : "") + ">" + c + "</option>"; }).join("") + "</select></div>" +
-              '<div class="field field--full"><label for="pf-address">Residential address</label><input id="pf-address" value="' + esc(p.address) + '"></div>' +
-              '<div class="field"><label for="pf-occupation">Occupation</label><input id="pf-occupation" value="' + esc(p.occupation) + '"></div>' +
-              '<div class="field"><label for="pf-employer">Employer / business</label><input id="pf-employer" value="' + esc(p.employer) + '"></div>' +
-              '<div class="field"><label for="pf-income">Monthly income (MWK)</label><input id="pf-income" type="number" value="' + p.monthlyIncome + '"></div>' +
-              '<div class="field"><label for="pf-expenses">Monthly expenses (MWK)</label><input id="pf-expenses" type="number" value="' + p.monthlyExpenses + '"></div>' +
-            "</div>" +
-            '<div class="fieldset-title">Next of kin</div>' +
-            '<div class="form-grid form-grid--3">' +
-              '<div class="field"><label for="pf-nok-name">Full name</label><input id="pf-nok-name" value="' + esc(p.nextOfKin.name) + '"></div>' +
-              '<div class="field"><label for="pf-nok-rel">Relationship</label><input id="pf-nok-rel" value="' + esc(p.nextOfKin.relationship) + '"></div>' +
-              '<div class="field"><label for="pf-nok-phone">Phone</label><input id="pf-nok-phone" value="' + esc(p.nextOfKin.phone) + '"></div>' +
-            "</div>" +
-            '<div class="flex flex-wrap gap-1" style="margin-top:1.1rem;">' +
-              '<button class="btn btn--gold" type="submit">Save profile changes</button>' +
-              '<button class="btn btn--ghost" type="button" data-data-request="1">Request my data</button>' +
-            "</div>" +
-            '<p class="form-status" id="profile-status"></p>' +
-          "</form>") +
-        panel("Account summary", null,
-          '<div class="form-grid">' + reviewItem("Account number", p.accountNumber) + reviewItem("Account status", UI.statusPill(p.accountStatus)) +
-          reviewItem("Verification", UI.statusPill(p.verification)) + reviewItem("KYC", UI.statusPill(p.kyc)) +
-          reviewItem("Member since", dt(p.memberSince)) + reviewItem("Last update", dt(db().security.passwordChanged)) + "</div>" +
-          '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.lock + "<div><strong>Protected fields</strong>Date of birth and national ID cannot be edited here. Contact support to change them — re-verification is required.</div></div>") +
-      "</div>";
-  }
-
   /* ---------------- Security ---------------- */
   /* Phone verification is honest about what is possible: a number is only
      "verified" when a code confirmed it, and a code can only be sent once a
@@ -1308,14 +1266,267 @@
         "</div>");
   }
 
+  /* ==================================================================
+     CONFIDENTIAL DETAILS — a request, not an edit
+     ------------------------------------------------------------------
+     The identity and contact fields that a lender relies on cannot be
+     typed over. The customer files a change request with a reason; staff
+     see it in the console, and only an approval moves the stored value.
+     Everything else that can be edited still asks for a reason, and the
+     reason is kept with the change.
+     ================================================================== */
+  var CONFIDENTIAL = [
+    { key: "fullName", label: "Legal name", type: "text",
+      policy: "The name printed on your national ID and on your loan agreement.",
+      value: function (p) { return p.fullName || "—"; } },
+    { key: "dob", label: "Date of birth", type: "date",
+      policy: "Age, eligibility and responsible-lending limits are assessed from this date.",
+      value: function (p) { return p.dob || "—"; } },
+    { key: "nid", label: "National ID", type: "text",
+      policy: "Identity verification and credit reporting both quote this number.",
+      value: function (p) { return F.mask(p.nid || "—", 4); } },
+    { key: "phone", label: "Registered phone", type: "tel",
+      policy: "Used for sign-in, one-time codes and account recovery.",
+      value: function (p) { return p.phone || "—"; } },
+    { key: "email", label: "Registered email", type: "email",
+      policy: "Used for sign-in, statements, notices and recovery.",
+      value: function (p) { return p.email || "—"; } }
+  ];
+
+  var REASONS = [
+    "Correction of a typing error",
+    "Name change (marriage, deed poll or court order)",
+    "Document reissued or replaced",
+    "Change of contact details",
+    "Employment or income change",
+    "Other — explained below"
+  ];
+
+  function confidentialFor(key) {
+    return CONFIDENTIAL.filter(function (c) { return c.key === key; })[0] || null;
+  }
+  function openRequests() {
+    return (db().changeRequests || []).filter(function (r) { return r.status === "Pending review"; });
+  }
+  function pendingFor(key) {
+    return openRequests().filter(function (r) { return r.field === key; })[0] || null;
+  }
+  function reasonOptions() {
+    return REASONS.map(function (r) { return "<option>" + esc(r) + "</option>"; }).join("");
+  }
+  function newRequestId() {
+    return "CHG-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+  }
+
+  /* File a request to change one protected detail. */
+  function requestChangeDialog(key) {
+    var meta = confidentialFor(key);
+    if (!meta) return;
+    var p = profile();
+    if (pendingFor(key)) {
+      UI.toast({ title: "Already under review",
+        message: "Your request to change " + meta.label.toLowerCase() + " is waiting for staff review.",
+        type: "warn" });
+      return;
+    }
+    var body =
+      '<p class="text-small text-muted" style="margin-top:0;">' + esc(meta.policy) +
+        " A protected detail cannot be edited in place: file a request with a reason and staff will review it.</p>" +
+      '<div class="form-grid">' +
+        '<div class="field"><label>Current value</label><input value="' + esc(meta.value(p)) + '" readonly></div>' +
+        '<div class="field"><label for="cr-value">New value</label>' +
+          '<input id="cr-value" type="' + meta.type + '" autocomplete="off" aria-describedby="cr-status"></div>' +
+      "</div>" +
+      '<div class="field"><label for="cr-reason-type">Reason for the change</label>' +
+        '<select id="cr-reason-type">' + reasonOptions() + "</select></div>" +
+      '<div class="field"><label for="cr-reason">Explain the change — at least 20 characters</label>' +
+        '<textarea id="cr-reason" rows="3" placeholder="For example: my national ID was reissued after marriage and I can upload the new card."></textarea></div>' +
+      '<label class="check-row" style="margin-top:.4rem;"><input type="checkbox" id="cr-confirm">' +
+        "<span>I confirm the new details are accurate and I can produce supporting documents if asked.</span></label>" +
+      '<p class="form-status" id="cr-status"></p>';
+
+    UI.modal({
+      title: "Request a change — " + meta.label,
+      subtitle: "Nothing changes until staff approve the request",
+      body: body,
+      actions: [
+        { label: "Cancel", variant: "ghost" },
+        { label: "Submit request", variant: "gold", onClick: function (wrap) {
+            var value = (wrap.querySelector("#cr-value").value || "").trim();
+            var category = wrap.querySelector("#cr-reason-type").value;
+            var reason = (wrap.querySelector("#cr-reason").value || "").trim();
+            var confirmed = wrap.querySelector("#cr-confirm").checked;
+            var status = wrap.querySelector("#cr-status");
+            var fail = function (msg) {
+              status.className = "form-status is-visible form-status--error";
+              status.textContent = msg;
+            };
+            if (!value) return fail("Enter the new value you are asking for."), false;
+            if (value.toLowerCase() === String(meta.value(p)).toLowerCase()) return fail("That is the value already on file."), false;
+            if (reason.length < 20) return fail("Give a reason of at least 20 characters — staff review these requests."), false;
+            if (!confirmed) return fail("Tick the confirmation before submitting."), false;
+
+            var request = {
+              id: newRequestId(),
+              field: key,
+              label: meta.label,
+              current: meta.value(p),
+              requested: value,
+              category: category,
+              reason: reason,
+              status: "Pending review",
+              createdAt: new Date().toISOString(),
+              decidedAt: null,
+              decision: ""
+            };
+            db().changeRequests = db().changeRequests || [];
+            db().changeRequests.unshift(request);
+            db().profileAudit = db().profileAudit || [];
+            db().profileAudit.unshift({
+              id: request.id, at: request.createdAt, action: "Requested change to " + meta.label,
+              category: category, reason: reason, by: p.fullName || p.accountNumber || "Customer"
+            });
+            DATA.notify("Security", "Change request received",
+              "Your request to change " + meta.label.toLowerCase() + " is under review. " + request.id + ".",
+              "In-app + Email");
+            DATA.save();
+            render(false);
+            UI.toast({ title: "Request submitted",
+              message: request.id + " · your " + meta.label.toLowerCase() + " stays unchanged until staff approve it.",
+              type: "success" });
+            return true;
+          } }
+      ]
+    });
+  }
+
+  /* Every ordinary profile change asks why, and the answer is kept. */
+  function reasonDialog(labels, onConfirm) {
+    var body =
+      '<p class="text-small text-muted" style="margin-top:0;">We record why a customer record changes. ' +
+        "Fields changing: <strong>" + esc(labels.join(", ")) + "</strong>.</p>" +
+      '<div class="field"><label for="ed-reason-type">Reason</label>' +
+        '<select id="ed-reason-type">' + reasonOptions() + "</select></div>" +
+      '<div class="field"><label for="ed-reason">Explain the change — at least 20 characters</label>' +
+        '<textarea id="ed-reason" rows="3" placeholder="For example: I moved house last month and need statements sent to the new address."></textarea></div>' +
+      '<label class="check-row" style="margin-top:.4rem;"><input type="checkbox" id="ed-confirm">' +
+        "<span>I confirm these details are accurate and I am authorised to change them.</span></label>" +
+      '<p class="form-status" id="ed-status"></p>';
+    UI.modal({
+      title: "Reason for this change",
+      subtitle: "Required — saved with the record",
+      body: body,
+      actions: [
+        { label: "Cancel", variant: "ghost" },
+        { label: "Save with reason", variant: "gold", onClick: function (wrap) {
+            var category = wrap.querySelector("#ed-reason-type").value;
+            var reason = (wrap.querySelector("#ed-reason").value || "").trim();
+            var confirmed = wrap.querySelector("#ed-confirm").checked;
+            var status = wrap.querySelector("#ed-status");
+            var fail = function (msg) {
+              status.className = "form-status is-visible form-status--error";
+              status.textContent = msg;
+            };
+            if (reason.length < 20) return fail("Give a reason of at least 20 characters."), false;
+            if (!confirmed) return fail("Tick the confirmation before saving."), false;
+            onConfirm(category, reason);
+            return true;
+          } }
+      ]
+    });
+  }
+
+  /* ---------------- Profile ---------------- */
+  function lockedField(meta, inputId, extra) {
+    var p = profile();
+    var pending = pendingFor(meta.key);
+    return '<div class="field"><label for="' + inputId + '">' + esc(meta.label) +
+        ' <span class="pill pill--warn" style="font-size:.6rem;padding:.1rem .4rem;">Protected</span></label>' +
+      '<input id="' + inputId + '" value="' + esc(meta.value(p)) + '" readonly aria-describedby="' + inputId + '-note"' + (extra || "") + ">" +
+      '<div class="flex items-center gap-1" style="margin-top:.35rem;flex-wrap:wrap;">' +
+        '<span class="text-tiny text-muted" id="' + inputId + '-note">' +
+          (pending ? "Change requested · " + esc(pending.id) + " under review" : "Locked — changes need a reason and approval") +
+        "</span>" +
+        (pending ? "" : '<button class="linkish" type="button" data-request-change="' + meta.key + '">Request change</button>') +
+      "</div></div>";
+  }
+
+  function panelProfile() {
+    var p = profile();
+    var kin = p.nextOfKin || { name: "", relationship: "", phone: "" };
+    var byKey = {};
+    CONFIDENTIAL.forEach(function (c) { byKey[c.key] = c; });
+    return pageHead("My profile", "Your personal, contact and employment details. Protected details change by request, with a reason.",
+      '<a class="btn btn--ghost btn--sm" href="#security">Account security</a>') +
+      '<div class="dash-grid">' +
+        panel("Profile", "Protected details are locked; every other change needs a reason",
+          '<form id="profile-form">' +
+            '<div class="flex items-center gap-2" style="margin-bottom:1rem;">' +
+              '<span class="avatar" style="width:58px;height:58px;font-size:1.05rem;background:var(--emerald-liquid);color:var(--gold-200);">' + esc(p.avatar) + "</span>" +
+              "<div><strong style=\"display:block;color:var(--ink);\">" + esc(p.fullName) + "</strong>" +
+              '<span class="text-tiny text-muted">Client since ' + dt(p.memberSince) + " · " + esc(p.accountNumber) + "</span>" +
+              '<div style="margin-top:.3rem;">' + UI.statusPill(p.verification) + "</div></div>" +
+              '<button class="btn btn--ghost btn--xs" type="button" style="margin-left:auto;" data-avatar-upload="1">Change photo</button>' +
+            "</div>" +
+            '<div class="form-grid">' +
+              lockedField(byKey.fullName, "pf-name") +
+              lockedField(byKey.dob, "pf-dob", ' type="date"') +
+              lockedField(byKey.nid, "pf-nid", ' class="masked"') +
+              lockedField(byKey.phone, "pf-phone", ' type="tel"') +
+              lockedField(byKey.email, "pf-email") +
+              '<div class="field"><label for="pf-gender">Gender</label><select id="pf-gender">' +
+                ["Female", "Male", "Prefer not to say"].map(function (g) { return "<option" + (p.gender === g ? " selected" : "") + ">" + g + "</option>"; }).join("") + "</select></div>" +
+              '<div class="field"><label for="pf-pref">Contact preference</label><select id="pf-pref">' +
+                ["WhatsApp", "Phone call", "Email", "SMS"].map(function (c) { return "<option" + (p.contactPreference === c ? " selected" : "") + ">" + c + "</option>"; }).join("") + "</select></div>" +
+              '<div class="field field--full"><label for="pf-address">Residential address</label><input id="pf-address" value="' + esc(p.address) + '"></div>' +
+              '<div class="field"><label for="pf-occupation">Occupation</label><input id="pf-occupation" value="' + esc(p.occupation) + '"></div>' +
+              '<div class="field"><label for="pf-employer">Employer / business</label><input id="pf-employer" value="' + esc(p.employer) + '"></div>' +
+              '<div class="field"><label for="pf-income">Monthly income (MWK)</label><input id="pf-income" type="number" value="' + p.monthlyIncome + '"></div>' +
+              '<div class="field"><label for="pf-expenses">Monthly expenses (MWK)</label><input id="pf-expenses" type="number" value="' + p.monthlyExpenses + '"></div>' +
+            "</div>" +
+            '<div class="fieldset-title">Next of kin</div>' +
+            '<div class="form-grid form-grid--3">' +
+              '<div class="field"><label for="pf-nok-name">Full name</label><input id="pf-nok-name" value="' + esc(kin.name || "") + '"></div>' +
+              '<div class="field"><label for="pf-nok-rel">Relationship</label><input id="pf-nok-rel" value="' + esc(kin.relationship || "") + '"></div>' +
+              '<div class="field"><label for="pf-nok-phone">Phone</label><input id="pf-nok-phone" value="' + esc(kin.phone || "") + '"></div>' +
+            "</div>" +
+            '<div class="flex flex-wrap gap-1" style="margin-top:1.1rem;">' +
+              '<button class="btn btn--gold" type="submit">Save changes with a reason</button>' +
+              '<button class="btn btn--ghost" type="button" data-data-request="1">Request my data</button>' +
+            "</div>" +
+            '<p class="form-status" id="profile-status"></p>' +
+          "</form>") +
+        panel("Account summary", null,
+          '<div class="form-grid">' + reviewItem("Account number", p.accountNumber) + reviewItem("Account status", UI.statusPill(p.accountStatus)) +
+          reviewItem("Verification", UI.statusPill(p.verification)) + reviewItem("KYC", UI.statusPill(p.kyc)) +
+          reviewItem("Member since", dt(p.memberSince)) + reviewItem("Last update", dt(db().security.passwordChanged)) + "</div>" +
+          '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.lock + "<div><strong>Protected details</strong>Legal name, date of birth, national ID, registered phone and registered email cannot be typed over. Use <em>Request change</em> and give a reason — staff verify the evidence before the record moves.</div></div>") +
+      "</div>";
+  }
+
   /* ---------------- Settings ---------------- */
   function panelSettings() {
     var s = db().settings;
+    var p = profile();
     function row(id, title, note, checked) {
       return '<div class="switch-row"><div><strong>' + title + "</strong><span>" + note + "</span></div>" +
         '<label class="switch"><input type="checkbox" id="' + id + '"' + (checked ? " checked" : "") + "><i></i></label></div>";
     }
-    return pageHead("Settings", "Preferences for language, notifications, privacy and accessibility.") +
+    var protectedRows = CONFIDENTIAL.map(function (c) {
+      var pending = pendingFor(c.key);
+      return '<tr><th scope="row">' + esc(c.label) + "</th>" +
+        "<td>" + esc(c.value(p)) + "</td>" +
+        "<td>" + (pending
+          ? '<span class="pill pill--warn">Under review</span> <span class="text-tiny text-muted">' + esc(pending.id) + "</span>"
+          : '<button class="btn btn--ghost btn--xs" type="button" data-request-change="' + c.key + '">Request change</button>') + "</td></tr>";
+    }).join("");
+    var requests = (db().changeRequests || []);
+    var requestRows = requests.slice(0, 6).map(function (r) {
+      return "<tr><td>" + esc(r.id) + "</td><td>" + esc(r.label) + "</td><td>" + dt(r.createdAt) + "</td>" +
+        "<td>" + UI.statusPill(r.status === "Pending review" ? "Pending" : r.status) + "</td>" +
+        '<td class="text-tiny">' + esc(r.category) + "</td></tr>";
+    }).join("");
+    return pageHead("Settings", "Preferences, privacy, protected details and change requests.") +
       '<div class="dash-grid">' +
         panel("Personal preferences", null,
           '<div class="form-grid">' +
@@ -1339,6 +1550,22 @@
           row("set-share", "Share data with my advisor", "Advisors can view statements and KYC status", s.privacy.shareWithAdvisors) +
           row("set-analytics", "Anonymous analytics", "Help improve the portal", s.privacy.analytics)) +
       "</div>" +
+      panel("Protected details", "System policy — a change is a request, not an edit",
+        '<div class="table-wrap" style="border:0;"><table class="data"><thead><tr><th scope="col">Detail</th><th scope="col">On file</th><th scope="col">Change</th></tr></thead>' +
+        "<tbody>" + protectedRows + "</tbody></table></div>" +
+        '<div class="notice notice--info" style="margin-top:1rem;">' + ICON.shield +
+        "<div><strong>Why this is locked</strong>These details decide who you are and how you can be reached for recovery. " +
+        "A request needs a reason of at least 20 characters; staff check it and the evidence, then approve or decline. " +
+        "Nothing on this page changes a protected detail directly — including for staff in the customer dashboard.</div></div>",
+        null, true) +
+      panel("Your change requests", requests.length ? requests.length + " on file" : "None yet",
+        requests.length
+          ? '<div class="table-wrap" style="border:0;"><table class="data"><thead><tr><th scope="col">Reference</th><th scope="col">Detail</th>' +
+            '<th scope="col">Filed</th><th scope="col">Status</th><th scope="col">Reason</th></tr></thead><tbody>' +
+            requestRows + "</tbody></table></div>" +
+            (requests.length > 6 ? '<p class="text-tiny text-muted">Showing the six most recent requests.</p>' : "")
+          : '<p class="text-small text-muted">No change requests yet. Use <em>Request change</em> beside a protected detail.</p>',
+        null, true) +
       panel("Your data and policies", null,
         '<div class="flex flex-wrap gap-1">' +
           '<button class="btn btn--ghost btn--sm" type="button" data-data-request="1">Request a copy of my data</button>' +
@@ -1461,12 +1688,23 @@
       btn.addEventListener("click", function () {
         var l = DATA.findLoan(btn.getAttribute("data-csv-schedule"));
         if (!l) return;
-        var csv = UI.tableCSV(["#", "Due date", "Instalment", "Principal", "Interest", "Fees", "Balance", "Status"],
-          l.rows.map(function (r) {
-            return [r.n, new Date(r.date).toISOString().slice(0, 10), r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), (r.fees || 0).toFixed(2), r.closing.toFixed(2), r.status];
-          }));
-        UI.downloadCSV("JC-schedule-" + l.id + ".csv", "JAY C O B FINANCIAL SERVICES — repayment schedule (MWK)\n" + csv);
-        UI.toast({ title: "Schedule downloaded", message: l.id + " repayment schedule (CSV).", type: "success" });
+        UI.downloadDocument("JC-schedule-" + l.id + ".html", {
+          kicker: "Repayment schedule",
+          title: l.product + " — " + l.id,
+          meta: profile().fullName + " · " + mwk(l.principal) + " · " + l.rows.length + " instalments",
+          body: "<table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th><th>Principal</th>" +
+            "<th>Interest</th><th>Fees</th><th>Balance</th><th>Status</th></tr></thead><tbody>" +
+            l.rows.map(function (r) {
+              return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + '</td><td class="num">' + mwk(r.payment) +
+                '</td><td class="num">' + mwk(r.principal) + '</td><td class="num">' + mwk(r.interest) +
+                '</td><td class="num">' + mwk(r.fees || 0) + '</td><td class="num">' + mwk(r.closing) +
+                "</td><td>" + esc(r.status) + "</td></tr>";
+            }).join("") + "</tbody></table>" +
+            '<p class="muted" style="margin-top:10px">Total repayment ' + mwk(l.totalRepayment) +
+            " · Total interest " + mwk(l.totalRepayment - l.principal) + "</p>",
+          note: "Repayment schedule — quote " + l.id + " in any query."
+        });
+        UI.toast({ title: "Schedule downloaded", message: l.id + " repayment schedule.", type: "success" });
       });
     });
 
@@ -1543,8 +1781,18 @@
           actions: [
             { label: "Close", variant: "ghost" },
             { label: "Download summary", variant: "gold", onClick: function () {
-                UI.downloadCSV("JC-application-" + a.ref + ".csv",
-                  UI.tableCSV(["Field", "Value"], [["Reference", a.ref], ["Product", a.product], ["Amount (MWK)", a.amount], ["Term (months)", a.term], ["Purpose", a.purpose], ["Status", a.status]]));
+                UI.downloadDocument("JC-application-" + a.ref + ".html", {
+                  kicker: "Loan application",
+                  title: a.product + " — " + a.ref,
+                  meta: profile().fullName + " · " + dt(a.date || a.submitted || new Date().toISOString()),
+                  body: '<dl class="kv"><dt>Reference</dt><dd>' + esc(a.ref) + "</dd>" +
+                    "<dt>Product</dt><dd>" + esc(a.product) + "</dd>" +
+                    "<dt>Amount</dt><dd>" + mwk(a.amount) + "</dd>" +
+                    "<dt>Term</dt><dd>" + esc(a.term) + " months</dd>" +
+                    "<dt>Purpose</dt><dd>" + esc(a.purpose) + "</dd>" +
+                    "<dt>Status</dt><dd>" + esc(a.status) + "</dd></dl>",
+                  note: "System-generated summary — quote " + a.ref + " in any query."
+                });
                 return false;
               } }
           ]
@@ -1799,11 +2047,34 @@
       btn.addEventListener("click", function () {
         var ref = btn.getAttribute("data-transfer-receipt");
         var t = db().transfers.filter(function (x) { return x.ref === ref; })[0];
+        var trBody = '<div id="transfer-print" data-doc-title="Transfer receipt">' +
+          docHeader({ kicker: "Transfer receipt", title: mwk(t.amount), meta: esc(ref) + " · " + dt(t.date) }) +
+          '<div class="doc-sheet"><div class="form-grid">' +
+            reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
+            reviewItem("From", t.from) + reviewItem("To", t.to) +
+            reviewItem("Fee", mwk(t.fee)) + reviewItem("Status", UI.statusPill(t.status)) + "</div></div></div>";
         UI.modal({
           title: "Transfer receipt", subtitle: ref,
-          body: '<div class="form-grid">' + reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
-            reviewItem("From", t.from) + reviewItem("To", t.to) + reviewItem("Fee", mwk(t.fee)) + reviewItem("Status", UI.statusPill(t.status)) + "</div>",
-          actions: [{ label: "Close", variant: "ghost" }, { label: "Print", variant: "gold", onClick: function () { window.print(); return false; } }]
+          body: trBody,
+          actions: [
+            { label: "Close", variant: "ghost" },
+            { label: "Print", variant: "ghost", onClick: function () { UI.printElement("transfer-print"); return false; } },
+            { label: "Download", variant: "gold", onClick: function () {
+                UI.downloadDocument("JC-transfer-receipt-" + ref + ".html", {
+                  kicker: "Transfer receipt", title: "Transfer " + ref,
+                  meta: dtTime(t.date) + " · " + mwk(t.amount),
+                  body: '<dl class="kv">' +
+                    "<dt>Date</dt><dd>" + esc(dtTime(t.date)) + "</dd>" +
+                    "<dt>Amount</dt><dd>" + esc(mwk(t.amount)) + "</dd>" +
+                    "<dt>From</dt><dd>" + esc(t.from) + "</dd>" +
+                    "<dt>To</dt><dd>" + esc(t.to) + "</dd>" +
+                    "<dt>Fee</dt><dd>" + esc(mwk(t.fee)) + "</dd>" +
+                    "<dt>Status</dt><dd>" + esc(t.status) + "</dd></dl>",
+                  note: "System-generated receipt — quote " + ref + " in any query."
+                });
+                return false;
+              } }
+          ]
         });
       });
     });
@@ -1888,7 +2159,7 @@
       btn.addEventListener("click", function () { statementDialog(btn.getAttribute("data-statement")); });
     });
     content.querySelectorAll("[data-statement-dl]").forEach(function (btn) {
-      btn.addEventListener("click", function () { downloadStatementCSV(btn.getAttribute("data-statement-dl")); });
+      btn.addEventListener("click", function () { downloadStatement(btn.getAttribute("data-statement-dl")); });
     });
 
     /* documents */
@@ -1947,29 +2218,76 @@
       pf.addEventListener("submit", function (e) {
         e.preventDefault();
         var p = profile();
-        p.firstName = $("pf-first").value.trim() || p.firstName;
-        p.lastName = $("pf-last").value.trim() || p.lastName;
-        p.fullName = p.firstName + " " + p.lastName;
-        p.avatar = (p.firstName[0] + p.lastName[0]).toUpperCase();
-        p.gender = $("pf-gender").value;
-        p.phone = $("pf-phone").value.trim();
-        p.email = $("pf-email").value.trim();
-        p.contactPreference = $("pf-pref").value;
-        p.address = $("pf-address").value.trim();
-        p.occupation = $("pf-occupation").value.trim();
-        p.employer = $("pf-employer").value.trim();
-        p.monthlyIncome = Number($("pf-income").value) || p.monthlyIncome;
-        p.monthlyExpenses = Number($("pf-expenses").value) || p.monthlyExpenses;
-        p.nextOfKin = { name: $("pf-nok-name").value, relationship: $("pf-nok-rel").value, phone: $("pf-nok-phone").value };
-        DATA.save();
-        DATA.notify("Profile", "Profile updated", "Your contact and employment details were updated successfully.", "In-app + Email");
+        var next = {
+          gender: $("pf-gender").value,
+          contactPreference: $("pf-pref").value,
+          address: $("pf-address").value.trim(),
+          occupation: $("pf-occupation").value.trim(),
+          employer: $("pf-employer").value.trim(),
+          monthlyIncome: Number($("pf-income").value) || 0,
+          monthlyExpenses: Number($("pf-expenses").value) || 0,
+          kin: {
+            name: $("pf-nok-name").value.trim(),
+            relationship: $("pf-nok-rel").value.trim(),
+            phone: $("pf-nok-phone").value.trim()
+          }
+        };
+        /* Only the fields that can move here are compared; the protected
+           ones are read-only and travel through a request instead. */
+        var labels = [];
+        if (next.gender !== p.gender) labels.push("Gender");
+        if (next.contactPreference !== p.contactPreference) labels.push("Contact preference");
+        if (next.address !== p.address) labels.push("Residential address");
+        if (next.occupation !== p.occupation) labels.push("Occupation");
+        if (next.employer !== p.employer) labels.push("Employer");
+        if (next.monthlyIncome !== p.monthlyIncome) labels.push("Monthly income");
+        if (next.monthlyExpenses !== p.monthlyExpenses) labels.push("Monthly expenses");
+        var kinNow = p.nextOfKin || { name: "", relationship: "", phone: "" };
+        if (next.kin.name !== (kinNow.name || "") || next.kin.relationship !== (kinNow.relationship || "") || next.kin.phone !== (kinNow.phone || "")) {
+          labels.push("Next of kin");
+        }
         var status = $("profile-status");
-        status.className = "form-status is-visible";
-        status.textContent = "Profile saved. Contact changes may require re-verification.";
-        renderSidebar();
-        UI.toast({ title: "Profile updated", message: "Your details have been saved.", type: "success" });
+        if (!labels.length) {
+          status.className = "form-status is-visible";
+          status.textContent = "Nothing has changed. Protected details use Request change.";
+          return;
+        }
+        reasonDialog(labels, function (category, reason) {
+          p.gender = next.gender;
+          p.contactPreference = next.contactPreference;
+          p.address = next.address;
+          p.occupation = next.occupation;
+          p.employer = next.employer;
+          p.monthlyIncome = next.monthlyIncome;
+          p.monthlyExpenses = next.monthlyExpenses;
+          p.nextOfKin = { name: next.kin.name, relationship: next.kin.relationship, phone: next.kin.phone };
+          db().profileAudit = db().profileAudit || [];
+          db().profileAudit.unshift({
+            id: "AUD-" + Date.now().toString(36).toUpperCase(),
+            at: new Date().toISOString(),
+            action: "Updated " + labels.join(", "),
+            category: category,
+            reason: reason,
+            by: p.fullName || p.accountNumber || "Customer"
+          });
+          if (db().profileAudit.length > 60) db().profileAudit.length = 60;
+          DATA.save();
+          DATA.notify("Profile", "Profile updated",
+            labels.join(", ") + " updated. The reason is saved with your record.", "In-app + Email");
+          var st = $("profile-status");
+          if (st) {
+            st.className = "form-status is-visible";
+            st.textContent = "Saved. Reason recorded against your record.";
+          }
+          renderSidebar();
+          render(false);
+          UI.toast({ title: "Profile updated", message: "Your changes and the reason were saved.", type: "success" });
+        });
       });
     }
+    content.querySelectorAll("[data-request-change]").forEach(function (btn) {
+      btn.addEventListener("click", function () { requestChangeDialog(btn.getAttribute("data-request-change")); });
+    });
     content.querySelectorAll("[data-avatar-upload]").forEach(function (btn) {
       btn.addEventListener("click", function () { uploadDocument("avatar"); });
     });
@@ -2229,20 +2547,35 @@
     });
   }
 
+  /* Every document opens on the platform's emerald band with the light
+     lockup — the same header the site uses, on screen, in print and in the
+     downloaded file. One helper, so a receipt and a statement cannot
+     disagree about what the header looks like. */
+  function docHeader(o) { return UI.docHead(o); }
+
   function receiptDialog(ref) {
     var t = db().transactions.filter(function (x) { return x.ref === ref; })[0];
     if (!t) return;
-    var body = '<div id="receipt-print">' +
-      '<div style="display:flex;gap:.8rem;align-items:center;border-bottom:1px dashed var(--line-strong);padding-bottom:.8rem;">' +
-        '<img src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" style="height:42px;">' +
-        '<div style="margin-left:auto;text-align:right;"><strong style="display:block;color:var(--ink);font-size:.9rem;">Payment receipt</strong>' +
-        '<span style="font-size:.72rem;color:var(--muted);">' + esc(t.ref) + "</span></div></div>" +
-      '<div class="form-grid" style="margin-top:.8rem;">' + reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
-      reviewItem("Method", t.method) + reviewItem("Status", UI.statusPill(t.status)) +
-      reviewItem("Description", t.description) + reviewItem("Client", profile().fullName) + "</div>" +
-      '<p style="font-size:.68rem;color:var(--muted);margin-top:.9rem;border-top:1px dashed var(--line-strong);padding-top:.7rem;">' +
-      "JAY C O B FINANCIAL SERVICES · Plot 47/3, Area 47, Sector 3, Lilongwe · hello@jaycobfinancial.mw · +265 999 123 456<br>" +
-      "All amounts in Malawian Kwacha (MWK). This receipt is system-generated — quote " + esc(t.ref) + " in any query.</p></div>";
+    var rows = [
+      ["Date", dtTime(t.date)], ["Amount", mwk(t.amount)],
+      ["Method", t.method], ["Status", t.status],
+      ["Description", t.description], ["Client", profile().fullName]
+    ];
+    var body = '<div id="receipt-print" data-doc-title="Payment receipt">' +
+      docHeader({
+        kicker: "Payment receipt", title: mwk(t.amount),
+        meta: esc(t.ref) + " · " + dt(t.date)
+      }) +
+      '<div class="doc-sheet">' +
+        '<div class="form-grid">' +
+          reviewItem("Date", dtTime(t.date)) + reviewItem("Amount", mwk(t.amount)) +
+          reviewItem("Method", t.method) + reviewItem("Status", UI.statusPill(t.status)) +
+          reviewItem("Description", t.description) + reviewItem("Client", profile().fullName) +
+        "</div>" +
+        '<p class="text-tiny text-muted" style="margin-top:1rem;">' +
+          "All amounts in Malawian Kwacha (MWK). This receipt is system-generated — quote " +
+          esc(t.ref) + " in any query.</p>" +
+      "</div></div>";
     UI.modal({
       title: "Receipt", subtitle: mwk(t.amount),
       body: body,
@@ -2250,10 +2583,16 @@
         { label: "Close", variant: "ghost" },
         { label: "Print", variant: "ghost", onClick: function () { UI.printElement("receipt-print"); return false; } },
         { label: "Download", variant: "gold", onClick: function () {
-            UI.downloadCSV("JC-receipt-" + t.ref + ".csv", UI.tableCSV(["Field", "Value"], [
-              ["Receipt", t.ref], ["Date", new Date(t.date).toISOString()], ["Client", profile().fullName],
-              ["Description", t.description], ["Amount (MWK)", t.amount], ["Method", t.method], ["Status", t.status]
-            ]));
+            UI.downloadDocument("JC-receipt-" + t.ref + ".html", {
+              kicker: "Payment receipt",
+              title: "Receipt " + t.ref,
+              meta: dtTime(t.date) + " · " + mwk(t.amount),
+              body: '<dl class="kv">' + rows.map(function (r) {
+                return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>";
+              }).join("") + "</dl>",
+              note: "This receipt is system-generated — quote " + t.ref + " in any query."
+            });
+            UI.toast({ title: "Receipt downloaded", message: t.ref, type: "success" });
             return false;
           } }
       ]
@@ -2268,44 +2607,59 @@
       return "<tr><td>" + dt(t.date) + "</td><td>" + esc(t.description) + "</td><td>" + esc(t.type) + "</td>" +
         '<td class="num">' + (t.direction === "credit" ? "+" : "−") + " " + mwk(t.amount) + "</td><td>" + UI.statusPill(t.status) + "</td></tr>";
     }).join("");
-    var body = '<div id="statement-print">' +
-      '<div style="display:flex;gap:.8rem;align-items:center;border-bottom:1px dashed var(--line-strong);padding-bottom:.8rem;">' +
-        '<img src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" style="height:42px;">' +
-        '<div style="margin-left:auto;text-align:right;"><strong style="display:block;color:var(--ink);">Account statement</strong>' +
-        '<span style="font-size:.72rem;color:var(--muted);">' + esc(s.ref) + " · " + esc(s.period) + "</span></div></div>" +
-      '<div class="form-grid" style="margin-top:.8rem;">' + reviewItem("Client", profile().fullName) + reviewItem("Account", profile().accountNumber) +
-      reviewItem("Opening balance", mwk(s.opening)) + reviewItem("Closing balance", mwk(s.closing)) +
-      reviewItem("Currency", "MWK") + reviewItem("Verification code", "JC-" + s.ref.slice(-4) + "-VERIFIED") + "</div>" +
-      '<table class="data" style="margin-top:.8rem;"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
-      (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>" +
-      '<p style="font-size:.68rem;color:var(--muted);margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. System-generated statement — quote ' + esc(s.ref) + ' in any query.</p></div>';
+    var body = '<div id="statement-print" data-doc-title="Account statement">' +
+      docHeader({
+        kicker: "Account statement", title: esc(s.ref),
+        meta: esc(s.period) + " · " + esc(profile().fullName)
+      }) +
+      '<div class="doc-sheet">' +
+        '<div class="form-grid">' + reviewItem("Client", profile().fullName) + reviewItem("Account", profile().accountNumber) +
+        reviewItem("Opening balance", mwk(s.opening)) + reviewItem("Closing balance", mwk(s.closing)) +
+        reviewItem("Currency", "MWK") + reviewItem("Verification code", "JC-" + s.ref.slice(-4) + "-VERIFIED") + "</div>" +
+        '<table class="data" style="margin-top:.8rem;"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>" +
+        '<p class="text-tiny text-muted" style="margin-top:.8rem;">JAY C O B FINANCIAL SERVICES · Lilongwe · MWK. System-generated statement — quote ' + esc(s.ref) + " in any query.</p>" +
+      "</div></div>";
     UI.modal({
       title: "Statement " + s.ref, subtitle: s.period,
       body: body,
       actions: [
         { label: "Close", variant: "ghost" },
         { label: "Print", variant: "ghost", onClick: function () { UI.printElement("statement-print"); return false; } },
-        { label: "Download CSV", variant: "gold", onClick: function () { downloadStatementCSV(ref); return false; } }
+        { label: "Download", variant: "gold", onClick: function () { downloadStatement(ref); return false; } }
       ]
     });
   }
 
-  function downloadStatementCSV(ref) {
+  function downloadStatement(ref) {
     var s = db().statements.filter(function (x) { return x.ref === ref; })[0];
     if (!s) return;
     var txs = s.rows || db().transactions;
-    var csv = "JAY C O B FINANCIAL SERVICES — account statement (MWK)\n" +
-      "Statement," + s.ref + "\nClient," + profile().fullName + "\nPeriod," + s.period +
-      "\nOpening balance," + s.opening + "\nClosing balance," + s.closing + "\n\n";
-    csv += UI.tableCSV(["Date", "Description", "Type", "Amount (MWK)", "Direction", "Status"],
-      txs.map(function (t) { return [t.date, t.description, t.type, t.amount, t.direction, t.status]; }));
-    UI.downloadCSV("JC-statement-" + s.ref + ".csv", csv);
+    var rows = txs.map(function (t) {
+      return "<tr><td>" + dt(t.date) + "</td><td>" + esc(t.description) + "</td><td>" + esc(t.type) +
+        '</td><td class="num">' + (t.direction === "credit" ? "+" : "−") + " " + mwk(t.amount) +
+        "</td><td>" + esc(t.status) + "</td></tr>";
+    }).join("");
+    UI.downloadDocument("JC-statement-" + s.ref + ".html", {
+      kicker: "Account statement",
+      title: s.ref,
+      meta: s.period + " · " + profile().fullName,
+      body: '<dl class="kv"><dt>Client</dt><dd>' + esc(profile().fullName) + "</dd>" +
+        "<dt>Account</dt><dd>" + esc(profile().accountNumber) + "</dd>" +
+        "<dt>Opening balance</dt><dd>" + mwk(s.opening) + "</dd>" +
+        "<dt>Closing balance</dt><dd>" + mwk(s.closing) + "</dd>" +
+        "<dt>Currency</dt><dd>MWK</dd></dl>" +
+        "<h2>Transactions</h2><table><thead><tr><th>Date</th><th>Description</th><th>Type</th>" +
+        '<th class="num">Amount</th><th>Status</th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="5">No entries in this period.</td></tr>') + "</tbody></table>",
+      note: "System-generated statement — quote " + s.ref + " in any query."
+    });
     UI.toast({ title: "Statement downloaded", message: s.ref, type: "success" });
   }
 
   function printSchedule(l) {
     var html = '<h2>' + esc(l.product) + " — repayment schedule</h2>" +
-      '<p class="muted">' + esc(l.id) + " · " + l.rate + "% p.a. · " + (l.method === "flat" ? "Flat rate" : "Reducing balance") + " · " + l.frequency + "</p>" +
+      '<p class="muted">' + esc(l.id) + " · " + esc(rateLabel(l)) + " · " + (l.method === "flat" ? "Flat rate" : "Reducing balance") + " · " + l.frequency + "</p>" +
       "<table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th><th>Principal</th><th>Interest</th><th>Balance</th><th>Status</th></tr></thead><tbody>" +
       l.rows.map(function (r) {
         return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + "</td><td>" + mwk(r.payment) + "</td><td>" + mwk(r.principal) + "</td><td>" + mwk(r.interest) + "</td><td>" + mwk(r.closing) + "</td><td>" + r.status + "</td></tr>";
@@ -2313,6 +2667,7 @@
       '<p class="totals">Total repayment: ' + mwk(l.totalRepayment) + " · Total interest: " + mwk(l.totalRepayment - l.principal) + "</p>";
     var holder = document.createElement("div");
     holder.id = "print-holder";
+    holder.setAttribute("data-doc-title", l.product + " — repayment schedule");
     holder.innerHTML = html;
     holder.style.display = "none";
     document.body.appendChild(holder);
@@ -2323,25 +2678,34 @@
   function downloadAgreement(loanId) {
     var l = DATA.findLoan(loanId);
     if (!l) return;
-    var text = [
-      "JAY C O B FINANCIAL SERVICES — LOAN AGREEMENT",
-      "Loan ID," + l.id,
-      "Borrower," + profile().fullName,
-      "Client reference," + profile().accountNumber,
-      "Product," + l.product,
-      "Principal (MWK)," + l.principal,
-      "Interest rate," + l.rate + "% per annum",
-      "Interest method," + (l.method === "flat" ? "Flat rate" : "Reducing balance"),
-      "Term," + (l.rows.length) + " instalments (" + l.frequency + ")",
-      "Total amount payable (MWK)," + l.totalRepayment,
-      "Disbursement date," + dt(l.startDate),
-      "Maturity date," + dt(l.maturity),
-      "Guarantor," + (l.guarantor ? l.guarantor.name : "Not required"),
-      "",
-      "This extract is generated from the loan record. The signed agreement held on file is the binding document.",
-      "Read with the Terms and Conditions, Fees and Charges Disclosure and Responsible Lending Policy."
-    ].join("\n");
-    UI.downloadCSV("JC-loan-agreement-" + l.id + ".txt", text);
+    var rateLine = (l.rateBasis === "monthly")
+      ? l.rate + "% per month (" + (Math.round((l.rate * 12) * 100) / 100) + "% p.a. equivalent)"
+      : l.rate + "% per annum";
+    var rows = [
+      ["Loan ID", l.id], ["Borrower", profile().fullName], ["Client reference", profile().accountNumber],
+      ["Product", l.product], ["Principal", mwk(l.principal)], ["Interest rate", rateLine],
+      ["Interest method", l.method === "flat" ? "Flat rate" : "Reducing balance"],
+      ["Term", l.rows.length + " instalments (" + l.frequency + ")"],
+      ["Total amount payable", mwk(l.totalRepayment)],
+      ["Disbursement date", dt(l.startDate)], ["Maturity date", dt(l.maturity)],
+      ["Guarantor", l.guarantor ? l.guarantor.name : "Not required"]
+    ];
+    UI.downloadDocument("JC-loan-agreement-" + l.id + ".html", {
+      kicker: "Loan agreement",
+      title: l.product + " — " + l.id,
+      meta: profile().fullName + " · " + dt(l.startDate),
+      body: '<dl class="kv">' + rows.map(function (r) {
+        return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>";
+      }).join("") + "</dl><h2>Schedule</h2><table><thead><tr><th>#</th><th>Due date</th><th>Instalment</th>" +
+        "<th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody>" +
+        (l.rows || []).map(function (r) {
+          return "<tr><td>" + r.n + "</td><td>" + dt(r.date) + '</td><td class="num">' + mwk(r.payment) +
+            '</td><td class="num">' + mwk(r.principal) + '</td><td class="num">' + mwk(r.interest) +
+            '</td><td class="num">' + mwk(r.closing) + "</td></tr>";
+        }).join("") + "</tbody></table>",
+      note: "This extract is generated from the loan record. The signed agreement held on file is the binding document. " +
+        "Read with the Terms and Conditions, Fees and Charges Disclosure and Responsible Lending Policy."
+    });
     UI.toast({ title: "Agreement downloaded", message: l.id + " loan agreement.", type: "success" });
   }
 

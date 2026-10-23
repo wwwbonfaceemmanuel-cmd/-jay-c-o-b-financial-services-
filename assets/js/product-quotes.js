@@ -34,7 +34,7 @@
   /* Seeded catalogue — mirrors assets/js/site-store.js so the page still
      quotes correctly on a cold start. The live store always wins. */
   var FALLBACK = [
-    { id: "personal", name: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    { id: "personal", name: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2 },
     { id: "business", name: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
     { id: "emergency", name: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, maxTerm: 12, fee: 2 },
     { id: "salary", name: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, maxTerm: 36, fee: 2 },
@@ -93,8 +93,12 @@
     return Math.min(Math.max(rounded, p.min), Math.min(p.max, 10000000));
   }
 
+  /* A product can publish the term its example should open on. The personal
+     loan is quoted monthly and opens on one month, so the card shows a
+     one-month cost as the default reading. */
   function exampleTerm(p) {
-    return Math.min(Math.max(12, p.minTerm), p.maxTerm);
+    var want = Number(p.defaultTerm) > 0 ? Number(p.defaultTerm) : 12;
+    return Math.min(Math.max(want, p.minTerm), p.maxTerm);
   }
 
   function quote(p, amount, termMonths) {
@@ -294,9 +298,15 @@
   } else {
     init();
   }
-  /* the catalogue may arrive from Supabase after first paint */
+  /* the catalogue may arrive from Supabase after first paint — and it may
+     arrive after this script has already run, so subscribe as well as
+     listen for the event */
   document.addEventListener("jcob:site-updated", init);
   document.addEventListener("jcob:products-updated", init);
+  if (window.JCOB_SITE) {
+    if (window.JCOB_SITE.subscribe) window.JCOB_SITE.subscribe(init);
+    if (window.JCOB_SITE.ready && window.JCOB_SITE.ready.then) window.JCOB_SITE.ready.then(init).catch(function () {});
+  }
 
   window.JCOB_PRODUCT_QUOTES = {
     catalogue: catalogue,

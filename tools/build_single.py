@@ -37,7 +37,7 @@ NAV = [
 FOOTER_EXTRA = ["apply", "login", "register", "privacy", "terms", "complaints", "licensing"]
 
 JS_ORDER = [
-    "config.js", "cloud.js", "site-store.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
+    "config.js", "cloud.js", "site-store.js", "theme.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
     "auth.js", "apply.js", "calculator.js", "quickcalc.js", "eligibility.js",
     "rates.js", "support.js", "dashboard.js", "site-content.js", "product-quotes.js",
 ]

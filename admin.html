@@ -333,6 +333,15 @@ body.locked { overflow: hidden; }
 #admin-gate [hidden] { display: none !important; }
 #admin-gate .gate-note { margin-top: 2px; margin-bottom: 12px; }
 #gate-status.err { color: var(--bad); }
+
+/* theme generator preview cards */
+.theme-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.theme-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg3)}
+.theme-card.on{border-color:var(--gold-500);box-shadow:0 0 0 2px rgba(201,162,39,.18)}
+.theme-card b{display:block;font-size:12.5px;color:var(--ink)}
+.theme-card span{display:block;font-size:11px;color:var(--muted);line-height:1.5}
+.theme-dots{display:flex;gap:4px;margin-bottom:8px}
+.theme-dots i{width:18px;height:18px;border-radius:6px;display:block;border:1px solid rgba(0,0,0,.08)}
 </style>
 </head>
 <body class="no-live-toast">
@@ -422,6 +431,7 @@ body.locked { overflow: hidden; }
 <script src="assets/js/config.js"></script>
 <script src="assets/js/cloud.js"></script>
 <script src="assets/js/site-store.js"></script>
+<script src="assets/js/theme.js" defer></script>
 <script src="assets/js/live.js"></script>
 
 <script>
@@ -468,7 +478,7 @@ function configDb(){
     auditL:[], sessions:[], savings:[], fees:[], ledger:[], recon:[],
     statements:[], officers:[], investors:[], agents:[], payroll:[],
     legal:[], fraud:[], backups:[], tasks:[], activities:[], ptps:[],
-    documents:[], exceptions:[], staffAlerts:[],
+    documents:[], exceptions:[], staffAlerts:[], changeRequests:[],
     roles:[
       {name:'Super Admin',perms:{customers:1,kyc:1,loanApprove:1,disburse:1,repayments:1,reverse:1,fees:1,reports:1,admins:1,roles:1,settings:1,writeoff:1}},
       {name:'Loan Officer',perms:{customers:1,kyc:1,loanApprove:1,disburse:0,repayments:1,reverse:0,fees:1,reports:1,admins:0,roles:0,settings:0,writeoff:0}},
@@ -749,7 +759,7 @@ const ICONS={
  db:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>'};
 const NAV=[
  {g:'MAIN',items:[['dashboard','Main Dashboard','dash'],['calculator','Loan Calculator','calc']]},
- {g:'CUSTOMERS',items:[['customers','Customer Management','users'],['kyc','KYC & Verification','id']]},
+ {g:'CUSTOMERS',items:[['customers','Customer Management','users'],['kyc','KYC & Verification','id'],['changeRequests','Detail Change Requests','lock']]},
  {g:'LOANS',items:[['loanApps','Loan Applications','doc'],['loanProducts','Loan Products','box'],['credit','Credit Assessment','shield'],['activeLoans','Active Loans','bank'],['disbursement','Loan Disbursement','send'],['guarantors','Guarantors & Collateral','money'],['repayments','Loan Repayments','cal'],['schedules','Repayment Schedules','cal'],['collections','Collections & Delinquency','alert']]},
  {g:'FINANCE',items:[['deposits','Deposits','down'],['withdrawals','Withdrawals','up'],['transfers','Transfers','swap'],['savings','Savings Management','piggy'],['fees','Fees & Charges','pct'],['interest','Interest Management','cal'],['ledger','Transaction Ledger','book'],['recon','Bank & Mobile Money Recon','link'],['statements','Financial Statements','file']]},
  {g:'SERVICE',items:[['support','Customer Support','chat'],['messaging','Notifications & Messaging','bell']]},
@@ -758,6 +768,7 @@ const NAV=[
  {g:'ADVANCED',items:[['branches','Branch Management','building'],['loanOfficers','Loan Officers','brief'],['payroll','Payroll Integration','userc'],['accounting','Accounting & General Ledger','book'],['investors','Investor Management','money'],['partners','Partner & Agent Mgmt','link'],['legal','Legal & Recovery','scale'],['api','API & Integrations','gear'],['fraud','Fraud Monitoring','alert'],['templates','Document Templates','file']]}];
 function badgeCounts(){return{loanApps:db.applications.filter(a=>a.status==='Pending').length,
  kyc:db.kycDocs.filter(k=>k.status==='Pending_review').length,
+ changeRequests:(db.changeRequests||[]).filter(c=>c.status==='Pending review').length,
  withdrawals:db.withdrawals.filter(w=>w.status==='Pending').length,
  workflows:db.workflows.filter(w=>!w.stage.startsWith('Completed')).length,
  collections:overdueLoans().length,disbursement:db.applications.filter(a=>a.status==='Approved').length,
@@ -1221,7 +1232,46 @@ function vCompliance(){const items=[['Customer due diligence (CDD) complete',96]
   <button class="btn" style="margin-top:12px" data-act="compEscalate">Escalate suspicious activity</button></div></div></div>
  <div class="panel"><div class="ph"><h3>Compliance reviews log</h3></div><div class="lst flush">
   ${[['Q3 portfolio compliance review','Completed 02 Oct 2026','No adverse findings'],['Interest disclosure audit','Completed 14 Sep 2026','3 contracts re-papered'],['KYC file sampling (40 files)','Completed 28 Aug 2026','2 files re-requested']].map(([a,b,c])=>`<div class="li"><span class="ic" style="background:rgba(15,122,92,.12)">✔</span><div><b>${a}</b><small>${b} · ${c}</small></div></div>`).join('')}</div></div>`}
-function vSettings(){const s=db.settings;
+/* ---------------------------------------------------------------------
+   Detail change requests — a customer cannot edit a protected detail.
+   They file a request with a reason; this module approves or declines it
+   and, on approval, writes the new value into the customer's document.
+   --------------------------------------------------------------------- */
+function vChangeRequests(){
+ const all=(db.changeRequests||[]);
+ const pending=all.filter(c=>c.status==='Pending review');
+ const decided=all.filter(c=>c.status!=='Pending review');
+ window._tblCfg.changeRequests={rows:()=>(db.changeRequests||[]).filter(c=>!ui.crShow||ui.crShow==='pending'?c.status==='Pending review':true),per:8,
+  cols:[{t:'Reference',k:'id',f:r=>`<span class="tid">${esc(r.id)}</span><div class="tsub">${dFmt(r.createdAt)}</div>`},
+   {t:'Customer',k:'cust',f:r=>`<b>${esc(r.cust||'—')}</b><div class="tsub">${esc(r.siteUid?('WEB-'+String(r.siteUid).slice(0,4).toUpperCase()):'—')}</div>`,raw:r=>r.cust},
+   {t:'Detail',k:'label'},{t:'Current',k:'current'},{t:'Requested',f:r=>`<b>${esc(r.requested)}</b>`},
+   {t:'Reason',f:r=>`<span class="tsub">${esc(r.category||'')}</span><div class="tsub">${esc((r.reason||'').slice(0,90))}</div>`,raw:r=>r.reason||''},
+   {t:'Status',f:r=>badge(r.status==='Pending review'?'Pending':r.status),raw:r=>r.status}],
+  filters:[{k:'status',label:'All statuses'}],
+  actions:r=>r.status==='Pending review'
+   ?`<button class="btn sm ok" data-act="crApprove" data-id="${r.id}">Approve</button> <button class="btn sm warn" data-act="crDecline" data-id="${r.id}">Decline</button>`
+   :`<button class="btn sm ghost" data-act="crView" data-id="${r.id}">View</button>`};
+ return pageHead('Detail Change Requests','Protected customer details — legal name, date of birth, national ID, phone and email — change only through a request with a stated reason. Approving a request writes the new value into the customer’s record and notifies them.')
+  +`<div class="stats">${miniStat('Awaiting review',pending.length,'Requests filed by customers','rgba(138,106,18,.14)')}
+   ${miniStat('Approved',all.filter(c=>c.status==='Approved').length,'Applied to the customer record','rgba(15,122,92,.14)')}
+   ${miniStat('Declined',all.filter(c=>c.status==='Declined').length,'Reason sent back to the customer','rgba(168,59,52,.14)')}
+   ${miniStat('Protected details',5,'Name · DOB · NID · phone · email','rgba(31,131,201,.14)')}</div>
+  <div class="panel flush">${T('changeRequests',window._tblCfg.changeRequests)}</div>`
+  +`<div class="panel"><div class="ph"><h3>Policy</h3></div><div class="pb"><ol style="padding-left:20px;font-size:13px;line-height:2;color:var(--muted)">
+   <li>A customer can never overwrite a protected detail from their dashboard — they can only file a request with a reason of at least 20 characters.</li>
+   <li>Approving here writes the new value into the customer's Supabase document and notifies them in the dashboard.</li>
+   <li>Declining requires a reason; the customer sees it and can file again with better evidence.</li>
+   <li>Every decision is audit-logged with the officer's name and the request reference.</li></ol></div></div>`}
+function themeOptions(){
+ const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold'}];
+ return list.map(t=>({v:t.id,t:t.name}));
+}
+function themeName(id){
+ const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold'}];
+ const hit=list.filter(t=>t.id===id)[0];
+ return hit?hit.name:'Emerald & liquid gold';
+}
+function vSettings(){const s=db.settings;const TH=(window.JCOB_SITE&&window.JCOB_SITE.settings&&window.JCOB_SITE.settings.theme)||{};
  return pageHead('System Settings','Business profile, currency, timezone, loan rules and document configuration. Changes persist and are audit-logged.')
  +`<div class="grid2"><div class="panel"><div class="ph"><h3>Business details</h3></div><div class="pb">
   ${fld('Business name',inp('stBiz',s.biz))}
@@ -1234,7 +1284,20 @@ function vSettings(){const s=db.settings;
   <p class="hint">Rules apply to new assessments immediately. Existing schedules are never rewritten silently.</p></div></div>
  <div class="panel"><div class="ph"><h3>Document settings</h3></div><div class="lst flush">
   ${['National ID mandatory at onboarding','Proof of address required for loans > MWK 500,000','Business license required for business loans','Customer selfie required for digital onboarding'].map(x=>`<div class="li"><span class="ic" style="background:rgba(31,131,201,.1)">📄</span><div>${x}</div><span class="bdg g" style="margin-left:auto">Enforced</span></div>`).join('')}</div></div></div></div>
- <button class="btn primary" data-act="settingsSave">Save settings</button>`}
+ <div style="margin-top:4px"><button class="btn primary" data-act="settingsSave">Save settings</button></div>
+ <div class="panel" style="margin-top:16px"><div class="ph"><h3>Theme generator</h3><span class="bdg b">Website &amp; dashboards</span></div><div class="pb">
+  <p class="tsub" style="margin:0 0 12px;line-height:1.7;color:var(--muted)">Choose a palette from the library and publish it to the public website, the customer dashboard and this console. The choice is stored in Supabase (<code>site_docs → settings → theme</code>), so every visitor, every receipt band and every dashboard follows it.</p>
+  <div class="frow">${fld('Website theme', sel('thSite', themeOptions(), TH.site||'emerald'), 'Public pages, receipts and downloaded documents.')}
+   ${fld('Dashboards &amp; console', sel('thDash', themeOptions(), TH.dashboard||'emerald'), 'Customer dashboard, app bars and this console.')}</div>
+  <div class="theme-strip">${(window.JCOB_THEME?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold',note:'House style',swatch:['#06302c','#0a3f6b','#f2e3b6']}]).map(t=>`<div class="theme-card ${(TH.site||'emerald')===t.id?'on':''}">
+    <div class="theme-dots">${t.swatch.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+    <b>${esc(t.name)}</b><span>${esc(t.note)}</span></div>`).join('')}</div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+   <button class="btn primary" data-act="themeApply">Apply theme</button>
+   <button class="btn ghost" data-act="themeReset">Restore house theme</button>
+   <a class="btn ghost" href="index.html" target="_blank" rel="noopener">Preview website ↗</a></div>
+  <p class="hint" style="margin-top:10px">Published theme: <b>${esc(themeName(TH.site||'emerald'))}</b> on the website · <b>${esc(themeName(TH.dashboard||'emerald'))}</b> in dashboards.${TH.updated?' Last published '+dFmt(TH.updated)+'.':''}</p>
+ </div></div>`}
 function vBackups(){window._tblCfg.bkp={rows:()=>db.backups,cols:[{t:'Backup',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Date',f:r=>dtFmt(r.date)},{t:'Type',k:'type'},{t:'Size',k:'size'},{t:'Status',f:r=>badge(r.status.startsWith('Verified')?'Verified':'Failed')},{t:'Note',k:'note',f:r=>`<span class="tsub">${esc(r.note||'—')}</span>`}],
   actions:r=>`<button class="btn sm ghost" data-act="bkpVerify" data-id="${r.id}">Verify</button>`};
  return pageHead('Backup & Data Management','Backup monitoring, recovery procedures, data retention and controlled exports.',`<button class="btn warn" data-act="bkpExport">Download full data export (JSON)</button><button class="btn primary" data-act="bkpRun">Run backup now</button>`)
@@ -1273,7 +1336,21 @@ function runReport(id,asPdf){const r=REPORTS.find(x=>x.id===id);
  openModal({title:'Report — '+r.t,size:'xl',body:html,
   foot:`<button class="btn ghost" data-mclose>Close</button><button class="btn" data-mact="csv">Download CSV</button><button class="btn ok" data-mact="pdf">Export PDF (print)</button>`});
  modalActs.csv=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([head+'\n'+body.join('\n')],{type:'text/csv'}));a.download=r.id+'_report.csv';a.click();toast('ok','Report exported',r.t+' (CSV)')};
- modalActs.pdf=()=>{const w=window.open('','_blank');w.document.write('<html><head><title>'+r.t+'</title><style>body{font-family:Arial;padding:30px;color:#111}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #999;padding:6px 8px;text-align:left}th{background:#eee}h1{font-size:18px}</style></head><body><h1>JAY C O B — '+r.t+'</h1>'+html.replace(/class="kv"|class="[^"]*"/g,'')+'</body></html>');w.document.close();w.print()};
+ modalActs.pdf=()=>{const w=window.open('','_blank');w.document.write('<html><head><title>'+r.t+'</title><style>@page{margin:14mm}body{font-family:Arial;padding:0;margin:0;color:#111}'+
+  '.band{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 22px;'+
+  'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),'+
+  'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+  '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;'+
+  'background:linear-gradient(90deg,transparent,#c9a227 30%,#f6ecc4 50%,#c9a227 70%,transparent)}'+
+  '.band .txt{margin-left:auto;text-align:right}.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700}'+
+  '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#f4fbf8;margin-top:3px}'+
+  '.band small{color:#b9d3ca;font-size:11px}.wrap{padding:20px 22px}'+
+  'table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #dbe6ef;padding:6px 8px;text-align:left}th{background:#f4f8fc}h1{font-size:18px}'+
+  '.kv{display:block;margin:0 0 10px;font-size:12px}.kv b{display:inline-block;min-width:90px;color:#5c7383;font-weight:600}'+
+  '.muted{color:#5c7383;font-size:11px}</style></head><body>'+
+  '<div class="band"><img src="'+(location.origin+location.pathname.replace(/[^/]*$/,''))+'assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" style="height:44px;width:auto"><div class="txt"><span class="kicker">JAY C O B FINANCIAL SERVICES</span>'+
+  '<strong>'+r.t+'</strong><small>Generated '+new Date().toLocaleString('en-GB')+'</small></div></div>'+
+  '<div class="wrap">'+html.replace(/class="kv"|class="[^"]*"/g,'')+'</div></body></html>');w.document.close();w.print()};
  audit('Administrator','Generated report: '+r.t,'Reports')}
 function reportRows(id){const L=db.loans,R=db.repayments.filter(r=>r.status==='Completed');
  const maps={
@@ -1415,6 +1492,7 @@ function runAfford(){const I=+val('affI')||0,E=+val('affE')||0,D=+val('affD')||0
 const VIEWS={
  dashboard:{t:'Main Dashboard',r:vDashboard,after:dashboardCharts},
  customers:{t:'Customer Management',r:vCustomers},kyc:{t:'KYC & Verification',r:vKyc},
+ changeRequests:{t:'Detail Change Requests',r:vChangeRequests},
  loanApps:{t:'Loan Applications',r:vLoanApps},loanProducts:{t:'Loan Products',r:vProducts},
  credit:{t:'Credit Assessment',r:vCredit},activeLoans:{t:'Active Loans',r:vActiveLoans},
  disbursement:{t:'Loan Disbursement',r:vDisbursement},guarantors:{t:'Guarantors & Collateral',r:vGuarantors},

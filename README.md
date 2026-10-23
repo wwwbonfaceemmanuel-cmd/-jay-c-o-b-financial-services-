@@ -113,6 +113,16 @@ Notifications (13 types, read/unread, preferences), Support tickets, Profile, Ac
 (password, MFA, sessions, login activity, sign out others, suspicious activity, closure) and
 Settings (language, channels, marketing consent, privacy, accessibility, download/delete data).
 
+**Protected details are a request, not an edit.** The legal name, date of birth, national ID,
+registered phone, registered email, employer and monthly income are fixed against system policy:
+the dashboard shows them read-only (ID numbers masked) with a *Request a change* action. A request
+carries the field, the value asked for, a category and a written reason (at least 20 characters)
+and is stored in the customer's Supabase document as `Pending review`. Nothing moves until staff
+approve it in the console; approval applies the value, writes the decision back and notifies the
+customer. Every ordinary profile edit asks for a reason first, and the reason is kept in the
+document's audit trail with the old and new value. There is no path in the dashboard that writes a
+protected field, and no reason means no request: the dialog refuses it and stores nothing.
+
 ---
 
 ## Empty by default — no sample data
@@ -180,6 +190,8 @@ investors, partners, legal, API integrations, fraud, templates and the calculato
 | **Live Feed** | Publish, edit, pin, unpublish or delete animated updates; choose type (announcement / card / photo / blog), section placement and one of seven motions; upload or link an image. | Home strips, live desk, ticker |
 | **Site Catalogue** | The eleven lending products: annual rate, processing fee, amount limits, term range, summary, active state. | Calculator presets, application limits, product pages, rates tables |
 | **Website Settings** | Brand, tagline, registration, licence, phones, emergency line, emails, address, hours, social links, calculator defaults, published lending policy. | Header, footer, contact blocks, support and legal pages, calculator defaults |
+| **Theme generator** (in Website Settings) | Five published themes — Emerald & liquid gold (house style), Royal blue & crystal, Midnight & champagne, Copper & ivory, Forest & brass — each applied to the **website** or to the **dashboards and console**, the two scopes chosen separately. Saved as `settings.theme = {site, dashboard, updated, updatedBy}`. | Site header, page bands, receipts and downloads; dashboard app bars and console chrome |
+| **Detail Change Requests** | Every protected-detail request: customer, field, current and requested value, category, reason, status. Approve (after confirmation) or decline with a note; the decision is written to the customer's document and a notification is raised. | Nothing directly — it decides what the customer asked for |
 
 ### How the connection works
 
@@ -251,14 +263,19 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 479 assertions
+npm test        # starts the Supabase stand-in + server, runs 607 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
-single-file bundle, an empty dashboard that ignores a stale browser copy), the product quotes (the
-flat-monthly rule, clamping, and every page against the engine), the signature pad (trace fidelity,
-curve rendering, undo/clear), the header chrome (the bar and the footer share one emerald
-token, every control restated on that ground, contrast maths, print), cloud mode (hydration,
+single-file bundle — including its copy of the theme engine — and an empty dashboard that ignores a
+stale browser copy), the product quotes (the flat-monthly rule, clamping, and every page against the
+engine), the signature pad (trace fidelity, curve rendering, undo/clear), the header chrome (the bar
+and the footer share one emerald token, every control restated on that ground, contrast maths,
+print), the theme generator (the registry, the house theme writing nothing, website and dashboard
+scopes staying apart, AA contrast on every theme, and a console round-trip that saves the choice to
+`site_docs` and proves `index.html` opens in it), the protected-detail flow (a reasonless request is
+refused and stores nothing, a reasoned one is stored pending, approval writes the value and a
+notification back), cloud mode (hydration,
 catalogue, live feed, staff gate, role refusal, console persistence, decision round-trip,
 registration, sign-in, recovery, enquiries, dashboard guard) and the diagnostic page. The cloud
 suite also proves the browser holds no records: a change written in the dashboard lands in
@@ -378,6 +395,12 @@ root as-is — there is no build step at runtime.
   edge and light `--chrome-text` type restated for every control on that ground. The customer
   dashboard's app bar and the admin console's top bar use the same bar, so site and tools read as
   one product.
+- **The page band (v8/v9):** every content page opens on the same emerald — the inner-page hero,
+  the auth card's lockup band, receipts and statements on screen, and the insight article's header
+  (full-bleed past the reading column), each with the light lockup and the gold rail. Every
+  downloaded document (`JC-receipt-*`, `JC-statement-*`, `JC-transfer-receipt-*`,
+  `JC-loan-agreement-*`, `JC-schedule-*`, `JC-application-*`) carries the same band, the inline
+  platform lockup and `print-color-adjust: exact`, so paper and screen agree.
 - **Golden edges (v5):** a fine gold frame around the viewport, a gold rail under the header and above
   the footer, gold hairline borders and a 3px gold top rail on every card, gold-edged panels, tables,
   legal documents and dashboard modules, plus gold figures, focus rings and separators. Gold is trim

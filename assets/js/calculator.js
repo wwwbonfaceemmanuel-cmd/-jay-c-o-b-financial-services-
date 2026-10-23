@@ -17,7 +17,7 @@
   /* Every product in the catalogue, so a loan quoted on the products page
      can be opened here and recomputed with the same arithmetic. */
   var PRESETS = {
-    personal: { label: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    personal: { label: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, term: 1, defaultTerm: 1, maxTerm: 48, fee: 2 },
     business: { label: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, term: 36, maxTerm: 60, fee: 2.5 },
     emergency: { label: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, term: 6, maxTerm: 12, fee: 2 },
     salary: { label: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 18, maxTerm: 36, fee: 2 },
@@ -59,6 +59,7 @@
       if (isFinite(p.max) && p.max > 0) preset.max = Number(p.max);
       if (isFinite(p.fee) && p.fee >= 0) preset.fee = Number(p.fee);
       if (isFinite(p.minTerm) && p.minTerm > 0) preset.minTerm = Number(p.minTerm);
+      if (isFinite(p.defaultTerm) && p.defaultTerm > 0) preset.defaultTerm = Number(p.defaultTerm);
       if (isFinite(p.maxTerm) && p.maxTerm > 0) preset.maxTerm = Number(p.maxTerm);
       if (!preset.rateBasis) preset.rateBasis = "annual";
       if (!preset.method) preset.method = "reducing";
@@ -367,6 +368,18 @@
     $("calc-rate").value = state.rate;
     $("calc-fee").value = state.fee;
     syncTermField(true);
+    /* The product's own opening term (the personal loan opens on one month)
+       wins when the customer picks the chip. */
+    var openTerm = Number(p.defaultTerm || p.term) || 0;
+    var termEl = $("calc-term");
+    if (openTerm > 0 && termEl && state.basis === "monthly") {
+      var lo = Number(termEl.min) || 1;
+      var hi = Number(termEl.max) || 84;
+      termEl.value = String(Math.min(Math.max(openTerm, lo), hi));
+      state.term = Math.round(Number(termEl.value) || 1);
+      var hint = $("calc-term-hint");
+      if (hint) hint.textContent = state.term + (state.term === 1 ? " monthly instalment" : " monthly instalments");
+    }
     state.termMonths = termMonths();
     render();
     syncRateField();
