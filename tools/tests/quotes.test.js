@@ -233,6 +233,32 @@ const F = engine();
     w.close();
   }
 
+  /* the rates page: schedule written from the catalogue, examples computed */
+  {
+    const { dom, errors } = makeDom("interest-rates-fees.html", { local: true });
+    await ready(dom, 900);
+    const w = dom.window;
+    const d = w.document;
+    const rows = [...d.querySelectorAll("[data-rate-table] tbody tr")];
+    t.eq("the published rate table lists every product", rows.length, 11);
+    const drift = rows.filter((row) => {
+      const name = row.querySelector("th").textContent.trim().toLowerCase();
+      const p = w.JCOB_SITE.products.filter((x) => x.name.toLowerCase().indexOf(name) === 0)[0];
+      return !p || row.children[1].textContent.trim() !== String(p.rate) + "%";
+    }).map((r) => r.querySelector("th").textContent.trim());
+    t.eq("every published rate is the catalogue rate", drift.join(", "), "");
+
+    const examples = [...d.querySelectorAll("#rate-examples .card")];
+    t.eq("three worked examples render", examples.length, 3);
+    const secured = examples[2];
+    const p = w.JCOB_SITE.products.filter((x) => x.id === "secured")[0];
+    const c = w.JCOB_FINANCE.productQuote(p, { amount: 25000000, termMonths: 60 });
+    t.ok("the example instalment is the engine's instalment",
+      secured.textContent.indexOf(w.JCOB_FINANCE.formatMWK(c.payment)) > -1, secured.textContent.slice(0, 120));
+    t.eq("no script errors on the rates page", errors.length, 0, errors.slice(0, 2).join(" | "));
+    w.close();
+  }
+
   /* the application flow quotes with the product's own basis and method —
      no hard-coded "reducing" left in the path */
   {

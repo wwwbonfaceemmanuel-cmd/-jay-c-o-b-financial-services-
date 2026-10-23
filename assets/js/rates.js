@@ -59,6 +59,27 @@
     return p || FALLBACK[id];
   }
 
+  /* The published rate schedule is written from the same catalogue: the
+     "rate from", the interest method and the term range. The upper "rate up
+     to" and the APR band stay policy figures, which the engine cannot derive
+     from a single product record. */
+  var table = document.querySelector("[data-rate-table]");
+  if (table) {
+    [].slice.call(table.querySelectorAll("tbody tr")).forEach(function (row) {
+      var name = row.querySelector("th").textContent.trim();
+      var key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      var p = productFor(key) || (catalogue() || []).filter(function (x) {
+        return String(x.name).toLowerCase().indexOf(name.toLowerCase()) === 0;
+      })[0];
+      if (!p) return;
+      var cells = row.querySelectorAll("td");
+      if (cells.length < 6) return;
+      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%";
+      cells[3].textContent = p.method === "flat" ? "Flat rate" : "Reducing balance";
+      cells[4].textContent = p.minTerm + "–" + p.maxTerm + " months";
+    });
+  }
+
   if (examples) {
     examples.innerHTML = CASES.map(function (k) {
       var p = productFor(k.id);

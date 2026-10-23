@@ -60,7 +60,7 @@ calls it, so no two pages can quote different numbers for the same loan:
 | `loan-products.html` comparison table | rate, limits, term and fee written from the catalogue |
 | `calculator.html` | the eleven catalogue presets, each loading its own rate, basis, method and fee |
 | `apply.html` and the dashboard's apply flow | the summary, the review step and affordability, in the product's own unit |
-| `interest-rates-fees.html` | the three worked examples, read from the catalogue |
+| `interest-rates-fees.html` | the published rate schedule and the three worked examples, read from the catalogue |
 
 A product card links into the calculator with its figures attached
 (`calculator.html?product=…&amount=…&term=…&fee=…`), and the calculator recomputes the same answer.
@@ -251,7 +251,7 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 431 assertions
+npm test        # starts the Supabase stand-in + server, runs 436 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
