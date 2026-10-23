@@ -70,6 +70,20 @@ select t.table_name,
 
 
 -- ---------------------------------------------------------------------
+-- 1b. STORAGE — did the old scaffold leave buckets behind?
+--     Our two are site-media (public) and kyc-documents (private).
+--     Anything else belongs to the old build; check the file counts
+--     before removing it.
+-- ---------------------------------------------------------------------
+select b.id,
+       b.public,
+       (select count(*) from storage.objects o where o.bucket_id = b.id) as files,
+       case when b.id in ('site-media', 'kyc-documents') then 'ours' else 'legacy?' end as owner
+  from storage.buckets b
+ order by b.id;
+
+
+-- ---------------------------------------------------------------------
 -- 2. LOCK THEM DOWN (safe, reversible, deletes nothing)
 --    Cut API access to the old scaffold while you decide what to do with
 --    the data. RLS with no policy means "no rows visible" even if a
