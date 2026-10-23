@@ -249,7 +249,7 @@
     });
   });
 
-  /* ---------- Enquiry note (cloud vs demo wording) ---------- */
+  /* ---------- Enquiry note ---------- */
   (function () {
     var note = document.querySelector("[data-enquiry-note]");
     if (!note) return;

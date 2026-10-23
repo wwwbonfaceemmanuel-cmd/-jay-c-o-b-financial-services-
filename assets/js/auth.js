@@ -2,7 +2,10 @@
    Customer authentication
    Register · login (email or phone) · OTP verification · password reset
    · lockout protection · session expiry · MFA bridge
-   Demo credentials: demo@jaycobfinancial.mw / +265 999 123 456 / demo1234
+
+   Every credential is checked by Supabase Auth: passwords, one-time codes
+   and recovery links. There is no demonstration account, no fixed code and
+   no browser-side password store in this build.
    ===================================================================== */
 (function () {
   "use strict";
@@ -11,9 +14,7 @@
   var DATA = window.JCOB_DATA;
   var F = window.JCOB_FINANCE;
   var CLOUD = window.JCOB_CLOUD;
-  var ACCOUNT_KEY = "jcob_account_v1";
   var PENDING_KEY = "jcob_pending_verify";
-  var DEMO_CODE = "123456";
 
   function $(id) { return document.getElementById(id); }
   function page() {
@@ -21,26 +22,11 @@
   }
 
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
-  function demoBypass(identifier, password) { return demoMatch(identifier) && password === "demo1234"; }
-
-  function readAccount() {
-    try { return JSON.parse(localStorage.getItem(ACCOUNT_KEY) || "null"); } catch (e) { return null; }
-  }
-  function saveAccount(acc) {
-    try { localStorage.setItem(ACCOUNT_KEY, JSON.stringify(acc)); } catch (e) {}
-  }
 
   function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
   function digits(v) { return String(v || "").replace(/[^\d]/g, ""); }
   function isPhone(v) { var d = digits(v); return d.length >= 9 && d.length <= 15; }
   function isIdentifier(v) { return isEmail(v) || isPhone(v); }
-
-  function demoMatch(v) {
-    var s = String(v || "").trim().toLowerCase();
-    if (s === "demo@jaycobfinancial.mw") return true;
-    var d = digits(s);
-    return d === "265999123456" || d === "0999123456" || d === "999123456";
-  }
 
   function passwordScore(pw) {
     var score = 0;
@@ -118,12 +104,19 @@
       var account = {
         firstName: first, lastName: last, fullName: first + " " + last,
         dob: dob, gender: gender, nid: nid, phone: phone, email: email,
-        password: pw, createdAt: new Date().toISOString(),
         marketing: $("reg-marketing").checked
       };
-      saveAccount(account);
 
-      if (cloudOn()) {
+      if (!cloudOn()) {
+        var offline = $("register-status");
+        if (offline) {
+          offline.className = "form-status is-visible form-status--error";
+          offline.textContent = "Account creation is unavailable right now — the registration service cannot be reached. Please call +265 999 123 456 or try again later.";
+        }
+        return;
+      }
+
+      {
         var status = $("register-status");
         if (status) {
           status.className = "form-status is-visible";
@@ -154,14 +147,6 @@
         });
         return;
       }
-
-      try {
-        sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-          mode: "register", identifier: email, phone: phone,
-          name: account.fullName, code: DEMO_CODE
-        }));
-      } catch (err) {}
-      window.location.href = "verify.html";
     });
   }
 
@@ -212,16 +197,37 @@
       }
     }, 1000);
 
-    if (resendBtn) {
-      resendBtn.addEventListener("click", function () {
-        UI.toast({ title: "New code sent", message: "A fresh 6-digit code was sent. Demo code: " + DEMO_CODE, type: "info" });
-        seconds = 45;
-        resendBtn.disabled = true;
-      });
+    function codeTarget() {
+      return pending && pending.identifier && isEmail(pending.identifier) ? pending.identifier : "";
     }
 
-    var demoHint = $("demo-code");
-    if (demoHint) demoHint.textContent = DEMO_CODE;
+    function requestCode(silent) {
+      var target = codeTarget();
+      if (!cloudOn()) {
+        UI.toast({ title: "Unavailable", message: "Verification codes are sent by the account service, which cannot be reached right now.", type: "danger" });
+        return;
+      }
+      if (!target) {
+        UI.toast({ title: "Email needed", message: "Sign in with your email address first, then request a code.", type: "danger" });
+        return;
+      }
+      CLOUD.auth.sendOtp(target).then(function () {
+        UI.toast({ title: "Code sent", message: "A fresh 6-digit code is on its way to " + target + ".", type: "info" });
+      }).catch(function (err) {
+        UI.toast({ title: "Could not send a code", message: String((err && err.message) || "Please try again."), type: "danger" });
+      });
+      if (!silent) {
+        seconds = 45;
+        if (resendBtn) resendBtn.disabled = true;
+      }
+    }
+
+    if (resendBtn) {
+      resendBtn.addEventListener("click", function () { requestCode(false); });
+    }
+
+    /* First arrival: ask for a code if the page was opened without one. */
+    if (pending && pending.identifier && cloudOn()) requestCode(true);
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -231,28 +237,47 @@
         status.textContent = "Enter all six digits of your verification code.";
         return;
       }
-      if (code !== DEMO_CODE) {
+      if (!cloudOn()) {
         status.className = "form-status is-visible form-status--error";
-        status.textContent = "That code is incorrect or has expired. Request a new code.";
-        inputs.forEach(function (i) { i.value = ""; });
-        inputs[0].focus();
+        status.textContent = "Verification is unavailable — this deployment is not connected to the account service. Please call +265 999 123 456.";
+        return;
+      }
+      if (!codeTarget()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "We do not know which account to verify. Sign in again with your email address.";
         return;
       }
 
-      var account = readAccount();
-      var session = UI.setSession({
-        authenticated: true,
-        name: pending && pending.name ? pending.name : (account ? account.fullName : "Memory Tembo"),
-        identifier: pending && pending.identifier ? pending.identifier : (account ? account.email : "demo@jaycobfinancial.mw"),
-        email: account ? account.email : "demo@jaycobfinancial.mw",
-        mode: pending ? pending.mode : "login"
-      }, true);
-
-      try { sessionStorage.removeItem(PENDING_KEY); } catch (err) {}
-      DATA.notify("Account verification", "Account verified", "Your email and phone number are now verified. Welcome to JAY C O B Financial Services.", "In-app + Email");
       status.className = "form-status is-visible";
-      status.textContent = "Verified. Redirecting to your dashboard…";
-      setTimeout(function () { window.location.href = "dashboard.html"; }, 700);
+      status.textContent = "Checking your code…";
+
+      CLOUD.auth.verifyOtp(codeTarget(), code).then(function (res) {
+        var profile = (res && res.profile) || (CLOUD.auth.profile && CLOUD.auth.profile()) || {};
+        var name = profile.full_name || (pending && pending.name) || "";
+        var email = profile.email || codeTarget();
+        UI.setSession({
+          authenticated: true,
+          name: name,
+          identifier: email,
+          email: email,
+          account: profile.account_no || "",
+          cloud: true
+        }, true);
+
+        try { sessionStorage.removeItem(PENDING_KEY); } catch (err) {}
+        DATA.notify("Account verification", "Account verified",
+          "Your email address is verified. Welcome to JAY C O B Financial Services.", "In-app + Email");
+        status.className = "form-status is-visible";
+        status.textContent = "Verified. Redirecting to your dashboard…";
+        setTimeout(function () { window.location.href = "dashboard.html"; }, 700);
+      }).catch(function (err) {
+        var message = String((err && err.message) || "");
+        if (/expired|invalid|incorrect/i.test(message)) message = "That code is incorrect or has expired. Request a new one.";
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = message || "We could not verify that code. Request a new one.";
+        inputs.forEach(function (i) { i.value = ""; });
+        if (inputs[0]) inputs[0].focus();
+      });
     });
   }
 
@@ -302,107 +327,58 @@
       if (!password) { fieldError(pwInput, "Enter your password."); ok = false; }
       if (!ok) return;
 
-      /* Cloud mode: real authentication against Supabase. The published
-         demo login still works so the site can be reviewed without an
-         account. */
-      if (cloudOn() && isEmail(identifier) && !demoBypass(identifier, password)) {
-        status.className = "form-status is-visible";
-        status.textContent = "Signing you in…";
-        CLOUD.auth.signIn(identifier, password).then(function (res) {
-          UI.clearTryCount();
-          var name = (res.profile && res.profile.full_name) || identifier;
-          var remember = $("login-remember") && $("login-remember").checked;
-          UI.setSession({
-            authenticated: true,
-            name: name,
-            identifier: identifier,
-            email: identifier,
-            account: (res.profile && res.profile.account_no) || "",
-            cloud: true
-          }, remember);
-          status.textContent = "Signed in. Opening your dashboard…";
-          var next = new URLSearchParams(location.search).get("next");
-          setTimeout(function () {
-            ToastOnLogin(name);
-            window.location.href = next && next.indexOf("dashboard") >= 0 ? next : "dashboard.html";
-          }, 350);
-        }).catch(function (err) {
-          var message = String((err && err.message) || "");
-          if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an account.";
-          else if (/confirm/i.test(message)) message = "Please confirm your email address before signing in.";
-          var tries = UI.tryCount();
-          tries.count = (tries.count || 0) + 1;
-          if (tries.count >= 5) {
-            tries.lockedUntil = Date.now() + 5 * 60 * 1000;
-            UI.setTryCount(tries);
-            lockOut(new Date(tries.lockedUntil));
-            return;
-          }
-          UI.setTryCount(tries);
-          status.className = "form-status is-visible form-status--error";
-          status.textContent = message + " " + (5 - tries.count) + " attempt(s) remaining before a temporary lock.";
-        });
+      /* Supabase Auth is the only authority: the password, the lockout
+         and the session all come from the account service. */
+      if (!cloudOn()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Sign-in is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
         return;
       }
 
-      var account = readAccount();
-      var registered = account && (
-        account.email.toLowerCase() === identifier.toLowerCase() ||
-        digits(account.phone) === digits(identifier)
-      ) && account.password === password;
-      var accepted = (demoMatch(identifier) && password === "demo1234") || registered;
+      if (!isEmail(identifier)) {
+        fieldError(idInput, "Use the email address on your account. Phone sign-in is enabled once SMS is configured.");
+        return;
+      }
 
-      if (!accepted) {
+      status.className = "form-status is-visible";
+      status.textContent = "Signing you in…";
+
+      CLOUD.auth.signIn(identifier, password).then(function (res) {
+        UI.clearTryCount();
+        var profile = (res && res.profile) || {};
+        var name = profile.full_name || identifier;
+        var remember = $("login-remember") && $("login-remember").checked;
+        UI.setSession({
+          authenticated: true,
+          name: name,
+          identifier: identifier,
+          email: identifier,
+          account: profile.account_no || "",
+          cloud: true
+        }, remember);
+        status.textContent = "Signed in. Opening your dashboard…";
+        var next = new URLSearchParams(location.search).get("next");
+        setTimeout(function () {
+          ToastOnLogin(name);
+          window.location.href = next && next.indexOf("dashboard") >= 0 ? next : "dashboard.html";
+        }, 350);
+      }).catch(function (err) {
+        var message = String((err && err.message) || "");
+        if (/invalid|credentials|grant/i.test(message)) message = "That email and password do not match an account.";
+        else if (/confirm/i.test(message)) message = "Please confirm your email address before signing in.";
         var tries = UI.tryCount();
         tries.count = (tries.count || 0) + 1;
         if (tries.count >= 5) {
           tries.lockedUntil = Date.now() + 5 * 60 * 1000;
           UI.setTryCount(tries);
-          lockOut(new Date(tries.lockedUntil));
           UI.toast({ title: "Account locked", message: "Five failed attempts. Locked for 5 minutes.", type: "danger" });
+          lockOut(new Date(tries.lockedUntil));
           return;
         }
         UI.setTryCount(tries);
         status.className = "form-status is-visible form-status--error";
-        status.textContent = "We could not match those details. " + (5 - tries.count) + " attempt(s) remaining before a temporary lock.";
-        return;
-      }
-
-      UI.clearTryCount();
-      status.className = "form-status is-visible";
-      status.textContent = "Signing you in…";
-
-      var mfa = DATA.get().security.mfa;
-      var pendingSession = {
-        authenticated: !mfa,
-        name: registered ? account.fullName : "Memory Tembo",
-        identifier: identifier,
-        email: registered ? account.email : "demo@jaycobfinancial.mw",
-        remember: $("login-remember").checked
-      };
-
-      if (mfa) {
-        try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "mfa", identifier: identifier, name: pendingSession.name, code: DEMO_CODE }));
-        } catch (err) {}
-        setTimeout(function () { window.location.href = "verify.html"; }, 400);
-        return;
-      }
-
-      UI.setSession(pendingSession, $("login-remember").checked);
-      DATA.get().security.lastLogin = new Date().toISOString();
-      DATA.get().security.failedAttempts = 0;
-      DATA.get().logins.unshift({
-        date: new Date().toISOString(), device: navigator.userAgent.indexOf("Mobile") >= 0 ? "Mobile browser" : "Desktop browser",
-        location: "Lilongwe, MW", status: "Success"
+        status.textContent = message + " " + (5 - tries.count) + " attempt(s) remaining before a temporary lock.";
       });
-      DATA.save();
-
-      setTimeout(function () {
-        ToastOnLogin(pendingSession.name);
-        var next = new URLSearchParams(location.search).get("next");
-        window.location.href = next && next.indexOf("dashboard") >= 0 ? next : "dashboard.html";
-      }, 450);
     });
 
     function ToastOnLogin(name) {
@@ -418,10 +394,22 @@
           fieldError(idInput, "Enter your email or phone number first.");
           return;
         }
+        if (!cloudOn()) {
+          fieldError(idInput, "One-time codes need the account service. Please call +265 999 123 456.");
+          return;
+        }
+        if (!isEmail(identifier)) {
+          fieldError(idInput, "Use the email address on your account to receive a code.");
+          return;
+        }
         try {
-          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier, name: "Memory Tembo", code: DEMO_CODE }));
+          sessionStorage.setItem(PENDING_KEY, JSON.stringify({ mode: "login", identifier: identifier }));
         } catch (err) {}
-        window.location.href = "verify.html";
+        CLOUD.auth.sendOtp(identifier).then(function () {
+          window.location.href = "verify.html";
+        }).catch(function (err) {
+          fieldError(idInput, String((err && err.message) || "We could not send a code to that address."));
+        });
       });
     }
   }
@@ -453,13 +441,8 @@
         return;
       }
 
-      setTimeout(function () {
-        status.className = "form-status is-visible";
-        status.innerHTML = 'If an account matches <strong>' + input.value.trim() +
-          '</strong>, a reset link has been sent by email or SMS and expires in 30 minutes. ' +
-          '<a href="reset-password.html">Continue to reset password (demo)</a>';
-        DATA.notify("Security", "Password reset requested", "A password reset was requested for " + input.value.trim() + ". If this was not you, contact support.", "In-app + Email");
-      }, 700);
+      status.className = "form-status is-visible form-status--error";
+      status.textContent = "Password recovery is unavailable — this deployment is not connected to the authentication service. Please call +265 999 123 456.";
     });
   }
 
@@ -479,15 +462,26 @@
       if (pw !== pw2) { fieldError($("reset-confirm"), "Passwords do not match."); ok = false; }
       if (!ok) return;
 
-      var account = readAccount();
-      if (account) { account.password = pw; saveAccount(account); }
-      DATA.get().security.passwordChanged = new Date().toISOString();
-      DATA.save();
-      UI.clearTryCount();
+      if (!cloudOn() || !CLOUD.auth.adoptedLink()) {
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = "Open the reset link we emailed you, then choose your new password. The link expires after 30 minutes.";
+        return;
+      }
+
       status.className = "form-status is-visible";
-      status.textContent = "Password updated. Redirecting to sign in…";
-      DATA.notify("Security", "Password changed", "Your password was changed successfully.", "In-app + Email");
-      setTimeout(function () { window.location.href = "login.html?reset=1"; }, 900);
+      status.textContent = "Saving your new password…";
+
+      CLOUD.auth.updatePassword(pw).then(function () {
+        UI.clearTryCount();
+        status.className = "form-status is-visible";
+        status.textContent = "Password updated. Redirecting to sign in…";
+        setTimeout(function () { window.location.href = "login.html?reset=1"; }, 900);
+      }).catch(function (err) {
+        var message = String((err && err.message) || "");
+        if (/expired|invalid|token/i.test(message)) message = "That reset link has expired. Request a new one.";
+        status.className = "form-status is-visible form-status--error";
+        status.textContent = message || "We could not save that password. Request a new reset link.";
+      });
     });
   }
 

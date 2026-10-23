@@ -3,10 +3,10 @@
    ---------------------------------------------------------------------
    The site runs in two modes, chosen automatically:
 
-   • DEMO MODE (no keys)
-     The live feed, catalogue, admin console and customer dashboard all
-     read and write browser localStorage, so the whole system can be
-     reviewed without a backend.
+   • NO BACKEND (no keys)
+     The marketing pages still draw from the catalogue compiled into
+     site-store.js. Accounts, the dashboard and the console are unavailable:
+     nothing is stored in the browser.
 
    • CLOUD MODE (Supabase) — configured below
      Everything persists in Postgres behind Row Level Security.
@@ -24,14 +24,13 @@ window.JCOB_CONFIG = {
   currency: "MWK",
   locale: "en-MW",
 
-  /* Cloud (Supabase) — project: cybaejegytnvtitznofp */
-  supabaseUrl: "https://cybaejegytnvtitznofp.supabase.co",
-  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5YmFlamVneXRudnRpdHpub2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2OTc2MDQsImV4cCI6MjEwODI3MzYwNH0.GFtYtTLnN31Sts4FjbUEuDqiN3ukQtIuT6e52UN5H34",
+  /* Cloud (Supabase) — project: lgftgochlcbakovdhmhb */
+  supabaseUrl: "https://lgftgochlcbakovdhmhb.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnZnRnb2NobGNiYWtvdmRobWhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMzQzMzUsImV4cCI6MjEwNjcxMDMzNX0.rjBFbcv3OFv_34dMZaCxlqWPxSmjiPAGYv6V-28IoYk",
 
   /* "auto" → cloud as soon as a URL and key are present.
-     Set to false to stay on localStorage even with keys configured. */
+     Set to false to run without the account service even when keys exist. */
   useSupabase: "auto",
-  demoMode: false,
 
   /* Table map — matches supabase/schema.sql. */
   tables: {

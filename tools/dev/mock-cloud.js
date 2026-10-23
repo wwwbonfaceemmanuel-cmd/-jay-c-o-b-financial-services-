@@ -28,7 +28,7 @@ const nextId = (prefix) => prefix + "-" + (++seq).toString(36).padStart(4, "0");
 
 const users = [
   { id: "11111111-1111-4111-8111-111111111111", email: "admin@jaycob.mw", password: "Admin123!", role: "admin", meta: { full_name: "Aubrey Chirwa" } },
-  { id: "22222222-2222-4222-8222-222222222222", email: "customer@jaycob.mw", password: "Customer123!", role: "customer", meta: { full_name: "Memory Tembo", phone: "+265 999 123 456" } }
+  { id: "22222222-2222-4222-8222-222222222222", email: "customer@jaycob.mw", password: "Customer123!", role: "customer", meta: { full_name: "Mock Cloud Customer", phone: "+265 999 123 456" } }
 ];
 
 const tables = {
@@ -44,7 +44,7 @@ const tables = {
     {
       owner: users[1].id,
       data: {
-        profile: { fullName: "Memory Tembo", email: "customer@jaycob.mw", phone: "+265 999 123 456", accountNumber: "JC-ACC-100412", kyc: "Verified", district: "Lilongwe" },
+        profile: { fullName: "Mock Cloud Customer", email: "customer@jaycob.mw", phone: "+265 999 123 456", accountNumber: "JC-ACC-100412", kyc: "Verified", district: "Lilongwe" },
         applications: [{ ref: "APP-CLOUD-001", product: "Personal Loan", amount: 1000000, term: 12, purpose: "Cloud test", submitted: new Date().toISOString(), status: "pending", stage: 1, documents: [] }],
         tickets: [], notifications: [], loans: [], transactions: [], documents: [], statements: [], drafts: []
       },

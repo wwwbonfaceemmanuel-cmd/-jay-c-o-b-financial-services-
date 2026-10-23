@@ -116,5 +116,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log("JAY C O B site listening on http://" + HOST + ":" + PORT);
-  console.log("Supabase: " + (process.env.SUPABASE_URL ? "configured" : "not configured (demo mode)"));
+  console.log("Supabase: " + (process.env.SUPABASE_URL ? "configured" : "not configured (offline mode)"));
 });

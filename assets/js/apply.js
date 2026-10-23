@@ -163,7 +163,7 @@
       "<h3>Business & payment details</h3><p class=\"step-intro\">Business information applies to business applicants. Bank or mobile money details are used for disbursement and repayments.</p>" +
       '<div class="fieldset-title">Business information</div>' +
       '<div class="form-grid">' +
-        '<div class="field"><label for="ap-biz-name">Registered business name</label><input id="ap-biz-name" placeholder="Tembo Traders"></div>' +
+        '<div class="field"><label for="ap-biz-name">Registered business name</label><input id="ap-biz-name" placeholder="Registered business name"></div>' +
         '<div class="field"><label for="ap-biz-reg">Business registration number</label><input id="ap-biz-reg" placeholder="MW-2019-44821"></div>' +
         '<div class="field"><label for="ap-biz-tin">Tax identification number (TIN)</label><input id="ap-biz-tin" placeholder="12345678"></div>' +
         '<div class="field"><label for="ap-biz-years">Years in operation</label><input id="ap-biz-years" type="number" min="0" value="7"></div>' +
@@ -180,7 +180,7 @@
       "</div>" +
       '<div class="fieldset-title">Guarantor (if required)</div>' +
       '<div class="form-grid">' +
-        '<div class="field"><label for="ap-g-name">Guarantor name</label><input id="ap-g-name" value="Grace Tembo"></div>' +
+        '<div class="field"><label for="ap-g-name">Guarantor name</label><input id="ap-g-name" placeholder="Full name of the guarantor"></div>' +
         '<div class="field"><label for="ap-g-phone">Guarantor phone</label><input id="ap-g-phone" value="+265 888 456 789"></div>' +
         '<div class="field"><label for="ap-g-rel">Relationship</label><input id="ap-g-rel" value="Sister"></div>' +
         '<div class="field"><label for="ap-g-id">Guarantor ID number</label><input id="ap-g-id" class="masked" value="MWI-••••-2210"></div>' +
@@ -456,6 +456,17 @@
   function submitApplication() {
     if (!validateStep(5)) {
       UI.toast({ title: "Consent required", message: "Accept all three declarations before submitting.", type: "danger" });
+      return;
+    }
+    /* An application has to reach the database. Without a signed-in account
+       the page says so instead of showing a reference that exists nowhere. */
+    if (!DATA.canWrite || !DATA.canWrite()) {
+      var state5 = document.getElementById("ap-status");
+      if (state5) {
+        state5.className = "form-status is-visible form-status--error";
+        state5.textContent = "Please sign in (or create an account) so your application can be saved to your file. Your answers on this screen are kept while you sign in.";
+      }
+      UI.toast({ title: "Sign in to submit", message: "Applications are stored in your account — sign in and send it again.", type: "danger" });
       return;
     }
     var draft = collect();

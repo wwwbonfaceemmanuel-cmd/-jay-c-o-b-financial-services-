@@ -22,7 +22,7 @@ const SITE_PORT = Number(process.env.TEST_SITE_PORT || 8099);
 const MOCK_PORT = Number(process.env.TEST_MOCK_PORT || 54399);
 const ANON = "dev-anon";
 
-const SUITES = ["demo.test.js", "cloud.test.js", "check.test.js"];
+const SUITES = ["production.test.js", "local.test.js", "cloud.test.js", "check.test.js"];
 
 function waitForPort(port, timeoutMs) {
   const deadline = Date.now() + (timeoutMs || 20000);

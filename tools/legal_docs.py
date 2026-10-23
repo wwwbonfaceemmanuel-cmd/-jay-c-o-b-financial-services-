@@ -1,7 +1,7 @@
 """Legal and policy content for JAY C O B FINANCIAL SERVICES (v3).
 
 Each entry renders as its own page through tools/build.py. Wording is written
-for a Malawian money-lending context and for this demonstration environment.
+for a Malawian money-lending context.
 """
 
 VERSION = "3.0"
@@ -61,7 +61,6 @@ LEGAL_DOCS = [
         [
             ("1. Acceptance", [
                 "By using this website or the customer dashboard you agree to these terms, our Privacy Policy and any product-specific terms presented during an application. If you do not agree, please do not use the service.",
-                "This is a demonstration environment. No real credit is advanced, no money is moved and all figures, decisions and reference numbers are illustrative.",
             ]),
             ("2. Eligibility and accounts", [
                 "You must be at least 18 years old, resident in Malawi and legally able to enter into a credit agreement. You must provide accurate, current information and keep it up to date.",
@@ -118,12 +117,12 @@ LEGAL_DOCS = [
         "The cookies and local storage we use, what each one does, and how to control them.",
         [
             ("1. What we use", [
-                "Strictly necessary cookies and browser storage keep you signed in, remember your security preferences and protect forms against cross-site request forgery. The site does not work without these.",
+                "A strictly necessary session token in browser storage keeps you signed in between pages and protects forms against cross-site request forgery. Nothing else about you is kept on the device, and the site does not work without this token.",
                 "Analytics storage helps us understand which pages are used so we can improve them. Marketing storage is used only where you opt in.",
             ]),
-            ("2. Local storage in this demonstration", [
-                "Because this is a static demonstration, account data, applications, notifications and preferences are stored in your browser\u2019s local storage under keys beginning with jcob_. Nothing is transmitted to a server.",
-                "Clearing site data removes your demo account and loan records. You can reset the demonstration data at any time from Settings.",
+            ("2. Where your account data lives", [
+                "Your account details, applications, loans, repayments, documents and notifications are stored in our secured database and are visible only to you and to authorised staff.",
+                "Your browser keeps only a session token, so that moving between pages does not sign you out. No account record, balance or document is stored on your device. Signing out removes the token; the record in our database remains and is available when you sign in again.",
             ]),
             ("3. Third parties", [
                 "Fonts are loaded from Google Fonts, which receives your IP address as part of the request. Payment, SMS and analytics providers may set their own cookies when those integrations are enabled.",
@@ -362,7 +361,7 @@ LEGAL_DOCS = [
             ]),
             ("2. Licence and supervision", [
                 "We operate as a licensed money lender under the laws of Malawi and are subject to supervision by the Reserve Bank of Malawi. Licence details, scope and any conditions are available on request and are displayed in our offices.",
-                "We are not a bank. Deposits are not taken and balances shown in this demonstration are not deposit accounts. Credit is provided from our own funds.",
+                "We are not a bank. Deposits are not taken and balances shown in your account are not deposit accounts. Credit is provided from our own funds.",
             ]),
             ("3. Consumer protection", [
                 "We follow responsible lending, fair treatment, transparent pricing and complaints-handling standards. These are summarised in our Responsible Lending Policy, Fee Disclosure Statement and Customer Rights statement.",
@@ -372,9 +371,6 @@ LEGAL_DOCS = [
             ]),
             ("5. Anti-fraud warning", [
                 "We never ask for an up-front payment to release a loan, never request your password or one-time code, and never ask you to pay a fee to a personal mobile money number. Report anything suspicious to support@jaycobfinancial.mw immediately.",
-            ]),
-            ("6. Demonstration notice", [
-                "This website is a demonstration build. Company details, licence references, rates and product terms are illustrative, and no real credit, payment or personal data transmission takes place.",
             ]),
         ]),
 ]

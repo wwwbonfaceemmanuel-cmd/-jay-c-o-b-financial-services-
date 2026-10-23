@@ -6,7 +6,7 @@ three values and running one SQL file.
 
 **Status: the project is already configured.**
 `assets/js/config.js` carries the public URL and anon key for
-`cybaejegytnvtitznofp.supabase.co`, so the site is in cloud mode as soon as
+`lgftgochlcbakovdhmhb.supabase.co`, so the site is in cloud mode as soon as
 it is served. Two things remain, and both need your Supabase login:
 
 1. **Run `supabase/install.sql`** in the SQL editor — one paste that
@@ -62,8 +62,8 @@ Visitor / customer            Admin console (admin.html)
 
 ## Phase 1 — Supabase (about 10 minutes)
 
-1. The project already exists: **`cybaejegytnvtitznofp`**
-   (`https://cybaejegytnvtitznofp.supabase.co`). If you rebuild it from
+1. The project already exists: **`lgftgochlcbakovdhmhb`**
+   (`https://lgftgochlcbakovdhmhb.supabase.co`). If you rebuild it from
    scratch, create a new project and paste the new URL + anon key into
    `assets/js/config.js` (or into the Railway variables in Phase 2).
    Keep the **service-role** key to yourself — it must never be in the
@@ -119,8 +119,16 @@ Visitor / customer            Admin console (admin.html)
 6. Create the customer you will use for testing (either register through
    the website, or **Add user** the same way).
 
+7. If this project was set up with an earlier build, run
+   [`supabase/remove-demo-data.sql`](supabase/remove-demo-data.sql) — the
+   console used to publish its demonstration book the first time an
+   administrator signed in, and that book lives in `portal_docs → main`.
+   The script names what it finds, deletes it and prints a verification
+   table. The current build starts empty, so this is a one-off.
+
 **Check:** in **Table Editor** the tables `profiles`, `site_docs`,
-`portal_docs`, `customer_docs`, `enquiries` and `audit_log` all exist.
+`portal_docs`, `customer_docs`, `enquiries` and `audit_log` all exist, and
+`portal_docs` is empty until the console is opened for the first time.
 
 ---
 
@@ -254,19 +262,22 @@ SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=dev-anon PORT=8000 node se
 Staff sign-in: `admin@jaycob.mw / Admin123!`; customer:
 `customer@jaycob.mw / Customer123!`.
 
-**Demo mode** — browser storage only, useful for reviewing the design
-without touching any database:
+**Without a backend** — the marketing pages and calculator draw from the
+catalogue compiled into `assets/js/site-store.js`. There is no browser
+database: the dashboard shows an empty account and a banner saying it is
+not connected, and the console stays locked.
 
 ```bash
 python3 -m http.server 8000
 ```
 
-then open any page with `?local=1` (e.g.
-<http://localhost:8000/admin.html?local=1>), or run
-`localStorage.jcob_mode = "local"` in the console. The admin password in
-this mode is `admin2026`.
+**Clearing an old installation.** Earlier builds wrote a demonstration
+book into `portal_docs/main`. Run `supabase/remove-demo-data.sql` once in
+the SQL Editor after deploying: it names what it finds, deletes the old
+console document, any demonstration customer documents and the
+demonstration login, then prints a verification table.
 
-**Automated checks** (94 browser assertions):
+**Automated checks** (125 browser assertions):
 
 ```bash
 npm install
@@ -293,7 +304,7 @@ npm test
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Site stays in demo mode | `/env.js` empty | Railway variables missing; redeploy |
+| Site never reaches Supabase | `/env.js` empty | Railway variables missing; redeploy |
 | `new row violates row-level security` | account has no staff role | run `promote_staff` |
 | Admin gate says *administrator access* | signed in as a customer | use the promoted account |
 | Console data resets | remote write failing | check `/healthz`, then RLS policies |

@@ -86,18 +86,14 @@
   var CLOUD = window.JCOB_CLOUD;
   function cloudOn() { return !!(CLOUD && CLOUD.enabled); }
 
-  function siteData() {
-    try { return JSON.parse(window.localStorage.getItem(SITE_KEY) || "null"); } catch (e) { return null; }
-  }
-
-  /* In cloud mode every customer document in Supabase is a website record;
-     in demo mode there is a single local document. */
+  /* Every customer document in Supabase is a website record. There is no
+     browser-side copy: the console reads the database and writes back to it. */
   var siteDocs = null;
   var docsAt = 0;
   var loading = false;
 
   function loadSiteDocs(force) {
-    if (!cloudOn()) return Promise.resolve([{ owner: null, data: siteData() }].filter(function (d) { return d.data; }));
+    if (!cloudOn()) return Promise.resolve([]);
     if (loading) return Promise.resolve(siteDocs || []);
     if (!force && siteDocs && Date.now() - docsAt < 8000) return Promise.resolve(siteDocs);
     loading = true;
@@ -251,8 +247,6 @@
         if (!doc.owner) return;
         CLOUD.customer.saveFor(doc.owner, doc.data);
       });
-    } else {
-      try { window.localStorage.setItem(SITE_KEY, JSON.stringify(dirty[0].data)); } catch (e) {}
     }
   }
 
@@ -469,7 +463,7 @@
       "The animated updates shown on the home page, the live desk and the section strips. Slides, cards, photo posts and announcements.",
       '<a class="btn ghost" href="live.html" target="_blank" rel="noopener">View live desk ↗</a>' +
       '<button class="btn ghost" data-act="liveAbout">+ About Us cards</button>' +
-      '<button class="btn ghost" data-act="liveRestore">Restore demo posts</button>' +
+      '<button class="btn ghost" data-act="liveRestore">Restore default feed</button>' +
       '<button class="btn primary" data-act="liveNew">+ New update</button>'
     );
     html += '<div class="stats">' +
@@ -763,10 +757,10 @@
       }, "danger");
     },
     liveRestore: function () {
-      confirmAct("Restore demo posts", "Replace the current feed with the demo set? Anything you published yourself is removed.", "Restore", function () {
+      confirmAct("Restore default feed", "Replace the current feed with the default set? Anything you published yourself is removed.", "Restore", function () {
         L.savePosts(L.DEFAULTS.slice());
         render(false);
-        toast("ok", "Feed restored", "The demo updates are back.");
+        toast("ok", "Feed restored", "The default updates are back.");
       }, "warn");
     },
     liveAbout: function () {
@@ -847,7 +841,7 @@
       var cloudState = (window.JCOB_PORTAL && window.JCOB_PORTAL.cloud) || { on: false, state: "local" };
       var cloudLabel = cloudState.on
         ? (cloudState.state === "error" ? "Cloud error" : cloudState.state === "saving" ? "Saving to cloud…" : "Supabase connected")
-        : "Local demo data";
+        : "This device only";
       var cloudTone = cloudState.on ? (cloudState.state === "error" ? "r" : "g") : "n";
       var panel = '<div class="panel"><div class="ph"><h3>Website connection</h3><span class="bdg ' + cloudTone + '">' + cloudLabel + '</span></div><div class="pb">' +
         '<p class="tsub" style="margin:0 0 12px;line-height:1.7">Brand, contact details, hours, socials, calculator defaults and lending policy are published to the public website from <b>Website Settings</b>. Page text, cards and section visibility live under <b>Website Pages</b>. ' +

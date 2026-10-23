@@ -2,8 +2,8 @@
    JAY C O B FINANCIAL SERVICES — Supabase client (no dependencies)
    ---------------------------------------------------------------------
    One small client used by every module on the site. Nothing else in the
-   project talks to the network directly, so switching between demo mode
-   (browser localStorage) and the live cloud (Supabase behind Railway)
+   project talks to the network directly, so switching between offline
+   and the live cloud (Supabase behind Railway)
    happens here and nowhere else.
 
    CONFIGURATION
@@ -12,7 +12,8 @@
      window.JCOB_CONFIG       (assets/js/config.js — paste keys for static
                                hosting such as GitHub Pages)
    Cloud mode is on as soon as both values exist and useSupabase is not
-   false. With no keys the whole site keeps working from localStorage.
+   false. With no keys the marketing pages still work; nothing is stored in
+   the browser.
 
    DATA MODEL (see supabase/schema.sql)
      site_docs      id → jsonb    public read, staff write
@@ -50,9 +51,11 @@
   var key = String(pick(ENV.supabaseAnonKey, CFG.supabaseAnonKey) || "");
   var wanted = pick(ENV.useSupabase, CFG.useSupabase);
 
-  /* Escape hatch: ?local=1 (or localStorage jcob_mode = "local") keeps the
+  /* Test escape hatch: ?local=1 (or localStorage jcob_mode = "local") forces
+     the site to behave as if the account service were unreachable, so the
+     fail-closed paths can be exercised. It never stores records.
      site on browser storage even when keys are configured. Useful for
-     previewing the demo data and for automated tests. */
+     previewing the layout and for automated tests. */
   var forcedLocal = false;
   try {
     forcedLocal = window.localStorage.getItem("jcob_mode") === "local";
@@ -90,6 +93,34 @@
   var session = readSession();
   var profile = null;
   var listeners = [];
+
+  /* A confirmation or recovery email lands back on the site with the
+     session in the URL fragment. Take it, store it, and tidy the address
+     bar so the tokens are not left on screen or in history. */
+  function adoptRecoveryLink() {
+    var hash = String((window.location && window.location.hash) || "").replace(/^#/, "");
+    if (!hash || hash.indexOf("access_token=") < 0) return false;
+    var params;
+    try { params = new URLSearchParams(hash); } catch (e) { return false; }
+    var type = params.get("type") || "";
+    if (type !== "recovery" && type !== "signup" && type !== "magiclink" && type !== "invite") return false;
+    var access = params.get("access_token");
+    if (!access) return false;
+    session = {
+      access_token: access,
+      refresh_token: params.get("refresh_token") || "",
+      expires_at: Date.now() + (Number(params.get("expires_in")) || 3600) * 1000 - 5000,
+      token_type: "bearer",
+      user: null
+    };
+    writeSession(session);
+    try {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    } catch (e) {}
+    return true;
+  }
+
+  var adoptedLink = adoptRecoveryLink();
 
   /* Pages guard on JCOB_UI.getSession(), which lives in localStorage.
      When a cloud session is already stored, seed that guard immediately so
@@ -338,12 +369,40 @@
     }).catch(function () { return false; });
   }
 
+  /* The cached customer document is a convenience copy of the real row in
+     customer_docs. It is removed on sign-out so a shared phone does not
+     keep the last customer's loans and identity details readable. */
+  function clearCustomerCache() {
+    try {
+      var id = session && session.user && session.user.id;
+      if (id) window.localStorage.removeItem("jcob_app_v2:" + id);
+      window.localStorage.removeItem("jcob_app_v2");
+    } catch (e) {}
+  }
+
   function signOutLocal() {
+    clearCustomerCache();
     session = null;
     profile = null;
     writeSession(null);
     try { if (window.JCOB_UI && window.JCOB_UI.clearSession) window.JCOB_UI.clearSession(); } catch (e) {}
     emit();
+  }
+
+  /* The person behind the current token, straight from the auth service. */
+  function loadUser() {
+    if (!session || !session.access_token) return Promise.resolve(null);
+    return window.fetch(url + "/auth/v1/user", {
+      headers: { apikey: key, Authorization: authHeader() },
+      cache: "no-store"
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        if (!res.ok) throw parseError(res.status, text);
+        var user = text ? JSON.parse(text) : null;
+        if (user && session) { session.user = user; writeSession(session); }
+        return user;
+      });
+    });
   }
 
   function loadProfile() {
@@ -444,6 +503,47 @@
     return authCall("recover", { email: email });
   }
 
+  /* Set a new password from a recovery link. Supabase checks the token. */
+  function updatePassword(password) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    if (!session || !session.access_token) return Promise.reject(new Error("Open the reset link from your email first."));
+    return window.fetch(url + "/auth/v1/user", {
+      method: "PUT",
+      headers: { apikey: key, Authorization: authHeader(), "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password }),
+      cache: "no-store"
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        if (!res.ok) throw parseError(res.status, text);
+        return text ? JSON.parse(text) : true;
+      });
+    });
+  }
+
+  /* A one-time code sent to the address on the account. Supabase issues,
+     stores and expires it; nothing is validated in the browser. */
+  function sendOtp(email) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("otp", { email: email, create_user: false });
+  }
+
+  /* Exchange the emailed code for a session. */
+  function verifyOtp(email, token) {
+    if (!enabled) return Promise.reject(new Error("Cloud is not configured"));
+    return authCall("verify", { type: "email", email: email, token: token })
+      .then(function (payload) {
+        var next = normaliseAuth(payload);
+        if (!next) throw new Error("That code is incorrect or has expired.");
+        session = next;
+        writeSession(session);
+        return loadProfile().then(function (p) {
+          bridgeUiSession();
+          emit();
+          return { session: session, profile: p };
+        });
+      });
+  }
+
   function isStaff(p) {
     var role = String((p || profile || {}).role || "").toLowerCase();
     return ROLE_STAFF.indexOf(role) >= 0;
@@ -495,7 +595,10 @@
     var boot = expired(session, 0) ? refresh() : Promise.resolve(true);
     return boot.then(function () {
       if (!session) return null;
-      return loadProfile().then(function (p) {
+      var who = session.user ? Promise.resolve(session.user) : loadUser().catch(function () { return null; });
+      return who.then(function () {
+        return loadProfile();
+      }).then(function (p) {
         if (session && session.access_token) bridgeUiSession();
         emit();
         return p;
@@ -504,7 +607,7 @@
   })();
 
   function status() {
-    if (!enabled) return "Local demo data";
+    if (!enabled) return "This device only";
     if (!session) return "Cloud · signed out";
     return "Cloud · " + (profile ? (profile.role === "customer" ? "customer" : profile.role) : "signed in");
   }
@@ -526,6 +629,10 @@
       signIn: signIn,
       signUp: signUp,
       recover: recover,
+      updatePassword: updatePassword,
+      adoptedLink: adoptedLink,
+      sendOtp: sendOtp,
+      verifyOtp: verifyOtp,
       signOut: signOut,
       ensureProfile: ensureProfile,
       refresh: refresh,

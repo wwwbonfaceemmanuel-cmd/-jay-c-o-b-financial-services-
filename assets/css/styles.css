@@ -3174,6 +3174,28 @@ h1 em, .gold-text {
 .app-search svg { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); }
 .app-top-actions { margin-left: auto; display: flex; align-items: center; gap: .45rem; }
 
+/* Honest save status: the dashboard never claims a record is stored when
+   the write to Supabase has not succeeded. */
+.app-sync {
+  font-size: .72rem; font-weight: 600; letter-spacing: .01em;
+  padding: .3rem .6rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted); background: #fff;
+  white-space: nowrap;
+}
+.app-sync.is-ok { color: #1c6b45; border-color: #b7e0cb; background: #f0faf5; }
+.app-sync.is-warn { color: #7a5a12; border-color: #f0dfae; background: #fdf7e6; }
+.app-sync.is-error { color: #9b2c2c; border-color: #f2c2c2; background: #fdf1f1; }
+.app-sync[hidden] { display: none; }
+
+.app-alert {
+  margin: 0 0 0 0; padding: .85rem 1.15rem;
+  border-left: 4px solid #b45309; background: #fdf7e6; color: #6b4a09;
+  font-size: .86rem; line-height: 1.5;
+}
+.app-alert.is-error { border-left-color: #b91c1c; background: #fdf1f1; color: #7f1d1d; }
+.app-alert[hidden] { display: none; }
+@media (max-width: 720px) { .app-sync { display: none; } }
+
 .bell-wrap { position: relative; }
 .icon-btn-lg {
   position: relative;

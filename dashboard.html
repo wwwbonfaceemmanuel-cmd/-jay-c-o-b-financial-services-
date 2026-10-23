@@ -47,6 +47,7 @@
         </div>
 
         <div class="app-top-actions">
+          <span class="app-sync" data-sync hidden></span>
           <div class="bell-wrap">
             <button class="icon-btn-lg" type="button" data-bell aria-label="Notifications" aria-expanded="false" aria-controls="bell-panel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -67,8 +68,8 @@
 
           <div class="profile-menu">
             <button class="profile-btn" type="button" data-profile-btn aria-label="Account menu" aria-expanded="false" aria-controls="profile-panel">
-              <span class="avatar" data-profile-avatar>MT</span>
-              <span class="profile-name"><span data-profile-name>Memory Tembo</span><small data-profile-email>demo@jaycobfinancial.mw</small></span>
+              <span class="avatar" data-profile-avatar aria-hidden="true"></span>
+              <span class="profile-name"><span data-profile-name>Your account</span><small data-profile-email></small></span>
             </button>
             <div class="profile-panel" id="profile-panel">
               <a href="#profile" data-route="profile">My profile</a>
@@ -82,6 +83,8 @@
           </div>
         </div>
       </div>
+
+      <div class="app-alert" data-data-alert hidden role="alert"></div>
 
       <main class="app-content" id="app-content" tabindex="-1">
         <div class="app-page-head"><div><h1>Loading your dashboard…</h1><p>Preparing balances, loans and notifications.</p></div></div>

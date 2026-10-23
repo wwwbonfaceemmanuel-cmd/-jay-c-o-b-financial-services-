@@ -38,6 +38,17 @@ create table if not exists public.profiles (
   updated_at  timestamptz not null default now()
 );
 
+-- A project whose profiles table was created by an earlier version keeps
+-- its rows; the columns the current code needs are added if missing.
+alter table public.profiles add column if not exists full_name  text not null default '';
+alter table public.profiles add column if not exists email      text;
+alter table public.profiles add column if not exists phone      text;
+alter table public.profiles add column if not exists account_no text;
+alter table public.profiles add column if not exists role       text not null default 'customer';
+alter table public.profiles add column if not exists status     text not null default 'active';
+alter table public.profiles add column if not exists created_at timestamptz not null default now();
+alter table public.profiles add column if not exists updated_at timestamptz not null default now();
+
 create unique index if not exists profiles_account_no_idx
   on public.profiles (account_no) where account_no is not null;
 
