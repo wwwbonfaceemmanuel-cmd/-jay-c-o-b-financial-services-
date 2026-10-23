@@ -617,9 +617,17 @@ select id,
 --    Every row should look healthy: the six tables present, both buckets
 --    listed, the five website documents published, RLS on every table.
 -- ---------------------------------------------------------------------
-select 'tables' as check_name,
+select 'our tables' as check_name,
        (select count(*) from information_schema.tables
-         where table_schema = 'public' and table_type = 'BASE TABLE')::text || ' (profiles, site_docs, portal_docs, customer_docs, enquiries, audit_log)' as value
+         where table_schema = 'public' and table_type = 'BASE TABLE'
+           and table_name in ('profiles', 'site_docs', 'portal_docs', 'customer_docs', 'enquiries', 'audit_log'))::text || ' / 6' as value
+union all
+select 'other tables in public',
+       coalesce((select string_agg(table_name, ', ' order by table_name)
+                   from information_schema.tables
+                  where table_schema = 'public' and table_type = 'BASE TABLE'
+                    and table_name not in ('profiles', 'site_docs', 'portal_docs', 'customer_docs', 'enquiries', 'audit_log')),
+                '(none)')
 union all
 select 'row level security on',
        (select count(*) from pg_class c

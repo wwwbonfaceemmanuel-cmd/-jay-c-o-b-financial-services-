@@ -147,5 +147,22 @@ check("rebuild.sql order: schema → backfill → content → verify",
 check("rebuild.sql hard reset is commented out",
   !/^drop table if exists public\.profiles/m.test(rebuild));
 
+/* retire-legacy-tables.sql: the guarded cleanup of a foreign scaffold. */
+const retire = fs.readFileSync(path.join(ROOT, "supabase", "retire-legacy-tables.sql"), "utf8");
+const LEGACY = ["announcements", "app_settings", "audit_logs", "business_details",
+  "chat_messages", "chats", "contact_enquiries", "employment_details", "followups",
+  "guarantors", "kyc_documents", "loan_applications", "loan_products",
+  "loan_schedules", "loans", "notifications", "properties", "repayments", "transactions"];
+check("retire script lists all 19 legacy tables",
+  LEGACY.every((t) => retire.includes("'" + t + "'")), LEGACY.filter((t) => !retire.includes("'" + t + "'")).join(","));
+check("retire script defaults to keeping data", /allow_data_loss boolean := false;/.test(retire));
+check("retire script deletes only what it counted",
+  /select count\(\*\) from public\.%I/.test(retire) &&
+  /raise exception 'Stopped: these legacy tables still hold data/.test(retire));
+check("retire script never names our tables as targets",
+  !/drop table if exists public\.(profiles|site_docs|portal_docs|customer_docs|enquiries|audit_log)\b/.test(retire));
+check("retire script locks API access without deleting",
+  /revoke all on public\.%I from anon, authenticated/.test(retire));
+
 console.log("\nRESULT " + pass + "/" + (pass + fail));
 process.exit(fail ? 1 : 0);
