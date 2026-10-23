@@ -43,8 +43,20 @@ select t.table_name,
                    from information_schema.role_table_grants g
                   where g.table_schema = 'public'
                     and g.table_name = t.table_name
-                    and g.grantee in ('anon', 'authenticated')), '(no API grants)') as api_grants
+                    and g.grantee in ('anon', 'authenticated')), '(no API grants)') as api_grants,
+       c.relrowsecurity as rls_on,
+       (select count(*) from pg_policies pp
+         where pp.schemaname = 'public' and pp.tablename = t.table_name) as policies,
+       case when c.relrowsecurity and not exists (
+              select 1 from pg_policies pp
+               where pp.schemaname = 'public' and pp.tablename = t.table_name
+                 and pp.cmd in ('SELECT', 'ALL'))
+            then 'closed to readers'
+            else 'CHECK'
+       end as reader_state
   from information_schema.tables t
+  join pg_class c on c.relname = t.table_name
+  join pg_namespace n on n.oid = c.relnamespace and n.nspname = 'public'
  where t.table_schema = 'public'
    and t.table_type = 'BASE TABLE'
    and t.table_name in (
@@ -174,4 +186,12 @@ select 'staff_accounts',
        (select count(*) from public.profiles where role in ('admin', 'staff', 'officer', 'credit'))::text
 union all
 select 'storage_buckets',
-       (select count(*) from storage.buckets where id in ('site-media', 'kyc-documents'))::text || ' / 2';
+       (select count(*) from storage.buckets where id in ('site-media', 'kyc-documents'))::text || ' / 2'
+union all
+select 'public_anon_grants_on_app_tables',
+       coalesce((select string_agg(distinct g.table_name || ':' || g.privilege_type, ', ')
+                   from information_schema.role_table_grants g
+                  where g.table_schema = 'public'
+                    and g.grantee = 'anon'
+                    and g.table_name in ('profiles', 'portal_docs', 'customer_docs', 'enquiries', 'audit_log')),
+                '(none — correct)');
