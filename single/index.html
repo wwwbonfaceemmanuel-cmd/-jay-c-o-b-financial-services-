@@ -5049,7 +5049,14 @@ summary:focus-visible {
   pointer-events: none;
 }
 .sigpad-empty.is-error { font-family: inherit; font-style: normal; font-size: .78rem; color: var(--danger); padding: 1rem; text-align: center; }
-.sigpad-foot { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-top: .45rem; }
+.sigpad-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: .6rem; margin-top: .45rem; flex-wrap: wrap;
+}
+.sigpad-actions { display: inline-flex; gap: .35rem; margin-left: auto; }
+/* the ink is drawn by assets/js/onboard.js; none of this may eat a pointer */
+.sigpad canvas { touch-action: none; -webkit-user-select: none; user-select: none; }
+.sigpad.has-ink .sigpad-baseline { opacity: .45; }
 
 @media (max-width: 780px) {
   .onb-fields { grid-template-columns: 1fr; }
@@ -5092,6 +5099,109 @@ summary:focus-visible {
 .auth-recover a:hover { border-color: var(--line-strong); background: var(--cream); }
 .auth-recover strong { display: block; font-size: .8rem; color: var(--navy-800); }
 .auth-recover span { display: block; font-size: .74rem; color: var(--muted); margin-top: .12rem; }
+
+/* =====================================================================
+   PRODUCT QUOTES — the worked example on every loan product
+   ---------------------------------------------------------------------
+   Rendered by assets/js/product-quotes.js with the shared finance engine.
+   Sits inside a product card on the pearl surface: a quiet gold-framed
+   inset, so it reads as a sheet of figures rather than a second card.
+   ===================================================================== */
+.pq {
+  margin-top: 1.15rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border-radius: 13px;
+  border: 1px solid rgba(166, 124, 26, 0.26);
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.92), rgba(246, 251, 254, 0.88)),
+    radial-gradient(420px 160px at 92% -30%, rgba(31, 131, 201, 0.10), transparent 70%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+.pq-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: .4rem .8rem; margin-bottom: .75rem;
+}
+.pq-tag {
+  font-family: var(--font-sans); font-size: .66rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--gold-700);
+}
+.pq-quote { font-size: .76rem; font-weight: 600; color: var(--navy-700); }
+.pq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.pq-f { display: grid; gap: .25rem; }
+.pq-f span {
+  font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.pq-f input {
+  width: 100%; padding: .5rem .6rem; border-radius: 9px;
+  border: 1px solid rgba(166, 124, 26, 0.24);
+  background: #fff; color: var(--ink); font-family: var(--font-sans);
+  font-size: .86rem; font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 2px rgba(4, 23, 26, 0.05);
+}
+.pq-f input:focus {
+  outline: none; border-color: var(--gold-500);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+.pq-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 1rem; align-items: center; margin-top: .85rem;
+}
+.pq-figure { display: grid; gap: .1rem; }
+.pq-label {
+  font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.pq-figure strong {
+  font-family: var(--font-serif); font-size: 1.5rem; line-height: 1.15;
+  color: var(--navy-800); font-variant-numeric: tabular-nums;
+}
+.pq-figure small { font-size: .7rem; color: var(--muted); }
+.pq-rows { display: grid; gap: .3rem; margin: 0; }
+.pq-rows div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: .6rem;
+  padding-bottom: .3rem; border-bottom: 1px solid rgba(166, 124, 26, 0.14);
+}
+.pq-rows div:last-child { border-bottom: 0; padding-bottom: 0; }
+.pq-rows dt { font-size: .74rem; color: var(--muted); }
+.pq-rows dd {
+  margin: 0; font-size: .78rem; font-weight: 700; color: var(--navy-800);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.pq-formula {
+  margin-top: .8rem; padding-top: .65rem;
+  border-top: 1px dashed rgba(166, 124, 26, 0.3);
+  font-size: .72rem; line-height: 1.5; color: var(--muted);
+}
+.pq-links { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.pq-link {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .74rem; font-weight: 700; text-decoration: none;
+  padding: .4rem .7rem; border-radius: 8px;
+  border: 1px solid rgba(166, 124, 26, 0.32); color: var(--navy-700);
+  background: rgba(255, 255, 255, 0.7);
+}
+.pq-link:hover { border-color: var(--gold-500); color: var(--navy-800); }
+.pq-link--solid {
+  background: linear-gradient(135deg, var(--navy-700), var(--navy-900));
+  border-color: transparent; color: #eaf6f1;
+  box-shadow: inset 0 -2px 0 rgba(201, 162, 39, 0.85);
+}
+.pq-link--solid:hover { color: #fff; }
+
+/* Compact example line on the home page cards */
+.pq-mini {
+  margin-top: .55rem; font-size: .74rem; line-height: 1.5;
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.pq-mini b { color: var(--navy-800); font-weight: 700; }
+.product-card--featured .pq-mini { color: #a9c6bc; }
+.product-card--featured .pq-mini b { color: #f2e3b6; }
+
+@media (max-width: 720px) {
+  .pq-body { grid-template-columns: 1fr; gap: .75rem; }
+  .pq-fields { grid-template-columns: 1fr; }
+}
 
 /* =====================================================================
    THEME v6 — PREMIUM SURFACES
@@ -5492,62 +5602,62 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </div>
 
       <div class="product-grid product-grid--5 mt-3 reveal">
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="personal" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <h3>Personal loan</h3>
           <p>For school fees, medical costs, home improvements or consolidation, repaid from salary.</p>
-          <p class="product-rate">24% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>24% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 100,000 – 15,000,000</b></span>
-            <span>6 – 48 months · monthly</span>
+            <span><b data-pq-limits>MWK 100,000 – 15,000,000</b></span>
+            <span data-pq-term>6 – 48 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="#/apply">Apply now</a>
         </article>
 
-        <article class="product-card product-card--featured">
+        <article data-product-quote data-product-mini data-product="business" class="product-card product-card--featured">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>
           <h3>Business loan</h3>
           <p>Working capital, stock, equipment or expansion for registered Malawian businesses.</p>
-          <p class="product-rate">22% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>22% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 500,000 – 50,000,000</b></span>
-            <span>12 – 60 months · monthly</span>
+            <span><b data-pq-limits>MWK 500,000 – 50,000,000</b></span>
+            <span data-pq-term>12 – 60 months · monthly</span>
           </div>
           <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="emergency" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
           <h3>Emergency loan</h3>
           <p>Fast, smaller facility for urgent costs, usually assessed and disbursed within a day.</p>
-          <p class="product-rate">28% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>28% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 50,000 – 2,000,000</b></span>
-            <span>3 – 12 months · monthly</span>
+            <span><b data-pq-limits>MWK 50,000 – 2,000,000</b></span>
+            <span data-pq-term>3 – 12 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="#/apply">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="short-term" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
           <h3>Short-term loan</h3>
           <p>One to six months of breathing room for a temporary cash-flow gap.</p>
-          <p class="product-rate">29% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>29% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 50,000 – 3,000,000</b></span>
+            <span><b data-pq-limits>MWK 50,000 – 3,000,000</b></span>
             <span>1 – 6 months · fortnightly option</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="#/apply">Apply now</a>
         </article>
 
-        <article class="product-card">
+        <article data-product-quote data-product-mini data-product="long-term" class="product-card">
           <span class="product-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>
           <h3>Long-term loan</h3>
           <p>Bigger projects spread over five to seven years at our lowest unsecured pricing.</p>
-          <p class="product-rate">21% <small>p.a. reducing</small></p>
+          <p class="product-rate" data-pq-rate>21% <small>p.a. reducing</small></p>
           <div class="product-meta">
-            <span><b>MWK 1,000,000 – 60,000,000</b></span>
-            <span>24 – 84 months · monthly</span>
+            <span><b data-pq-limits>MWK 1,000,000 – 60,000,000</b></span>
+            <span data-pq-term>24 – 84 months · monthly</span>
           </div>
           <a class="btn btn--ghost btn--sm" href="#/apply">Apply now</a>
         </article>
@@ -6250,7 +6360,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
     <div class="container">
 
       <!-- PERSONAL -->
-      <article class="card" id="personal" style="padding:clamp(1.2rem,3vw,2rem);">
+      <article class="card" id="personal" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Personal</p>
@@ -6258,14 +6368,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">A flexible facility for school fees, medical costs, home improvements, travel or consolidating expensive debt. Repaid monthly from salary or regular income.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">24% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">24% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 100,000 – 15,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 48 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 100,000 – 15,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 48 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly · optional fortnightly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6281,7 +6391,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- BUSINESS -->
-      <article class="card" id="business" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="business" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Business</p>
@@ -6289,14 +6399,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">Working capital, stock, equipment or expansion finance for registered businesses, partnerships and cooperatives with a trading record.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">22% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">22% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 500,000 – 50,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>12 – 60 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.5% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 500,000 – 50,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>12 – 60 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.5% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly, aligned to cash flow</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6306,7 +6416,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- EMERGENCY -->
-      <article class="card" id="emergency" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="emergency" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Emergency</p>
@@ -6314,14 +6424,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">A smaller, fast facility for urgent medical, funeral, transport or security costs. Applications received before 11:00 are usually assessed the same day.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">28% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">28% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 50,000 – 2,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>3 – 12 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 50,000 – 2,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>3 – 12 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly or fortnightly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6331,7 +6441,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- SALARY -->
-      <article class="card" id="salary" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="salary" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Salary-based</p>
@@ -6339,14 +6449,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">For employees of registered employers, with repayment by payroll deduction or standing order. Pricing benefits from the predictable repayment source.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">23% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">23% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 100,000 – 10,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 36 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 100,000 – 10,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 36 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly payroll deduction</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6356,7 +6466,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- EMPLOYEE -->
-      <article class="card" id="employee" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="employee" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Employee</p>
@@ -6364,14 +6474,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">A payroll-linked facility for staff of partner employers, with preferential pricing and a streamlined application because employment and salary are already verified.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">21% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">21% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 100,000 – 8,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 36 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>1.5% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 100,000 – 8,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 36 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>1.5% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly payroll deduction</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6381,7 +6491,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- SMALL BUSINESS -->
-      <article class="card" id="small-business" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="small-business" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Small business</p>
@@ -6389,14 +6499,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">For market traders, shops, salons, workshops and other micro and small enterprises that keep simple records and need stock or equipment finance.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">23% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">23% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 250,000 – 20,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 48 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 250,000 – 20,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 48 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly or fortnightly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6406,7 +6516,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- AGRICULTURAL -->
-      <article class="card" id="agricultural" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="agricultural" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Agricultural</p>
@@ -6414,14 +6524,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">Seasonal finance for seed, fertiliser, labour, irrigation and equipment, with repayment aligned to harvest and market cycles.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">20% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">20% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 200,000 – 25,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 36 months · seasonal</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 200,000 – 25,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 36 months · seasonal</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly, quarterly or harvest-aligned</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6431,7 +6541,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- SHORT TERM -->
-      <article class="card" id="short-term" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="short-term" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Short-term</p>
@@ -6439,14 +6549,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">One to six months of cover for a temporary cash-flow gap — a delayed contract payment, a bulk purchase, or a one-off expense.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">29% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">29% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 50,000 – 3,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>1 – 6 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>3.0% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 50,000 – 3,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>1 – 6 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>3.0% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Fortnightly or monthly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6456,7 +6566,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- LONG TERM -->
-      <article class="card" id="long-term" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="long-term" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Long-term</p>
@@ -6464,14 +6574,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">Larger investments repaid over five to seven years: property improvements, vehicles, machinery, solar systems or long-cycle business expansion.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">21% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">21% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 1,000,000 – 60,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>24 – 84 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.5% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 1,000,000 – 60,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>24 – 84 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.5% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6481,7 +6591,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- SECURED -->
-      <article class="card" id="secured" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="secured" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Secured</p>
@@ -6489,14 +6599,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">Our lowest rate, secured against a vehicle, property, equipment or a cash deposit. Larger amounts are available because the risk is reduced.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">18% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">18% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 500,000 – 80,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>12 – 84 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>1.5% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 500,000 – 80,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>12 – 84 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>1.5% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6507,7 +6617,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </article>
 
       <!-- UNSECURED -->
-      <article class="card" id="unsecured" style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
+      <article class="card" id="unsecured" data-product-quote style="padding:clamp(1.2rem,3vw,2rem);margin-top:1.2rem;">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div style="max-width:44rem;">
             <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Unsecured</p>
@@ -6515,14 +6625,14 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p class="lead" style="margin-top:.6rem;">No collateral required. Approved on income, credit conduct and affordability, often with a guarantor for larger amounts.</p>
           </div>
           <div style="text-align:right;">
-            <p class="product-rate" style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">26% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
+            <p class="product-rate" data-pq-rate style="font-family:var(--font-serif);font-size:1.7rem;color:var(--navy-800);">26% <small style="font-size:.75rem;color:var(--muted);">p.a. reducing</small></p>
             <a class="btn btn--gold btn--sm" href="#/apply">Apply now</a>
           </div>
         </div>
         <div class="grid-4" style="margin-top:1.2rem;">
-          <div class="review-item"><dt>Amount</dt><dd>MWK 100,000 – 10,000,000</dd></div>
-          <div class="review-item"><dt>Term</dt><dd>6 – 36 months</dd></div>
-          <div class="review-item"><dt>Processing fee</dt><dd>2.5% of principal</dd></div>
+          <div class="review-item"><dt>Amount</dt><dd data-pq-limits>MWK 100,000 – 10,000,000</dd></div>
+          <div class="review-item"><dt>Term</dt><dd data-pq-term>6 – 36 months</dd></div>
+          <div class="review-item"><dt>Processing fee</dt><dd data-pq-fee>2.5% of principal</dd></div>
           <div class="review-item"><dt>Repayment</dt><dd>Monthly or fortnightly</dd></div>
         </div>
         <div class="grid-2" style="margin-top:1rem;">
@@ -6544,7 +6654,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </div>
 
       <div class="table-wrap" style="margin-top:1.4rem;">
-        <table class="data compare-table">
+        <table class="data compare-table" data-pq-table>
           <caption class="sr-only">Comparison of loan products, limits, terms and rates</caption>
           <thead>
             <tr><th scope="col">Product</th><th scope="col">Amount (MWK)</th><th scope="col">Term</th><th scope="col">Rate from</th><th scope="col">Fee</th><th scope="col">Security</th><th scope="col">Best for</th></tr>
@@ -6612,13 +6722,20 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
           <fieldset style="border:0;padding:0;margin:1.2rem 0 0;">
             <legend class="fieldset-title" style="margin-bottom:.5rem;">Loan type</legend>
-            <div class="calc-products">
+            <!-- One chip per product in the catalogue; calculator.js fills this
+                 from Supabase so every loan product can be quoted here. -->
+            <div class="calc-products" id="calc-presets">
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-personal" value="personal" checked><label for="preset-personal">Personal</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-business" value="business"><label for="preset-business">Business</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-emergency" value="emergency"><label for="preset-emergency">Emergency</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-salary" value="salary"><label for="preset-salary">Salary-based</label></span>
-              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short" value="short"><label for="preset-short">Short-term</label></span>
-              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long" value="long"><label for="preset-long">Long-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-employee" value="employee"><label for="preset-employee">Employee</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-small-business" value="small-business"><label for="preset-small-business">Small business</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-agricultural" value="agricultural"><label for="preset-agricultural">Agricultural</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short-term" value="short-term"><label for="preset-short-term">Short-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long-term" value="long-term"><label for="preset-long-term">Long-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-secured" value="secured"><label for="preset-secured">Secured</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-unsecured" value="unsecured"><label for="preset-unsecured">Unsecured</label></span>
             </div>
           </fieldset>
 
@@ -7183,7 +7300,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </div>
 
       <div class="table-wrap" style="margin-top:1.4rem;">
-        <table class="data">
+        <table class="data" data-rate-table>
           <caption class="sr-only">Interest rates and indicative APR by loan product</caption>
           <thead>
             <tr><th scope="col">Product</th><th scope="col">Rate from</th><th scope="col">Rate up to</th><th scope="col">Indicative APR*</th><th scope="col">Interest method</th><th scope="col">Term</th></tr>
@@ -11457,6 +11574,104 @@ window.JCOB_CONFIG = {
     };
   }
 
+  /* ------------------------------------------------------------------
+     productTerms() / productQuote()
+     ------------------------------------------------------------------
+     Every surface that quotes a loan product goes through here: the
+     product pages, the application flow, the calculator presets and the
+     rates page. One resolver, one arithmetic, so two pages can never
+     disagree about what a product costs.
+
+     The catalogue stores the quote as it is published:
+       rate      the figure the customer is shown
+       rateBasis 'annual' (p.a.) or 'monthly' (% per month)
+       method    'reducing' or 'flat'
+
+     The rate is applied in the unit the product is quoted in. Nothing is
+     silently re-quoted: a product quoting 24% p.a. is charged 2% a month
+     on the falling balance; a product quoting 5% a month flat is charged
+     principal × 5% × months, exactly as the calculator does it.
+     ------------------------------------------------------------------ */
+  function num(value, fallback) {
+    var n = Number(value);
+    return isFinite(n) ? n : fallback;
+  }
+
+  function productTerms(product, opts) {
+    opts = opts || {};
+    var p = product || {};
+    var legacyTerm = Array.isArray(p.term) ? p.term : null;
+    var minTerm = Math.max(Math.round(num(opts.minTerm, num(p.minTerm, legacyTerm ? legacyTerm[0] : 1))), 1);
+    var maxTerm = Math.max(Math.round(num(opts.maxTerm, num(p.maxTerm, legacyTerm ? legacyTerm[1] : 84))), minTerm);
+    var min = Math.max(num(opts.min, num(p.min, 0)), 0);
+    var max = Math.max(num(opts.max, num(p.max, 0)), min);
+    var basis = opts.rateBasis || p.rateBasis;
+    var method = opts.method || p.method;
+
+    var amount = num(opts.amount, num(opts.principal, (min + max) / 2));
+    if (min > 0) amount = Math.max(amount, min);
+    if (max > 0) amount = Math.min(amount, max);
+
+    var termMonths = Math.round(num(opts.termMonths, num(opts.term, minTerm)));
+    termMonths = Math.min(Math.max(termMonths, minTerm), maxTerm);
+
+    return {
+      id: p.id || "",
+      name: p.name || opts.name || "Loan",
+      rate: Math.max(num(p.rate, num(opts.rate, 0)), 0),
+      rateBasis: basis === "monthly" ? "monthly" : "annual",
+      method: method === "flat" ? "flat" : "reducing",
+      fee: Math.max(num(opts.fee, num(p.fee, 0)), 0),
+      min: min,
+      max: max,
+      minTerm: minTerm,
+      maxTerm: maxTerm,
+      amount: amount,
+      termMonths: termMonths,
+      frequency: opts.frequency === "fortnightly" ? "fortnightly" : "monthly",
+      startDate: opts.startDate || null
+    };
+  }
+
+  function productQuote(product, opts) {
+    var t = productTerms(product, opts);
+    var c = amortize({
+      principal: t.amount, rate: t.rate, rateBasis: t.rateBasis,
+      termMonths: t.termMonths, method: t.method, frequency: t.frequency,
+      processingFeePct: t.fee, adminFee: opts && opts.adminFee,
+      startDate: t.startDate
+    });
+    c.terms = t;
+    return c;
+  }
+
+  /* How the rate is spoken about on screen — "24% p.a. reducing balance",
+     "25% per month flat rate". Used by the product pages, the application
+     flow and the calculator so the wording matches the arithmetic. */
+  function ratePhrase(terms) {
+    if (!terms) return "";
+    var r = Number(terms.rate) || 0;
+    var figure = String(Math.round(r * 100) / 100) + "%";
+    if (terms.rateBasis === "monthly") {
+      return figure + " per month " + (terms.method === "flat" ? "flat rate" : "on the falling balance");
+    }
+    return figure + " p.a. " + (terms.method === "flat" ? "flat rate" : "reducing");
+  }
+
+  /* The arithmetic, written out — the same sentence the calculator prints. */
+  function formulaPhrase(c) {
+    if (!c) return "";
+    var mwk = formatMWK;
+    if (c.method === "flat") {
+      var perMonth = c.rateBasis === "monthly" ? c.rateInput : c.monthlyRate;
+      return mwk(c.principal) + " × " + (Math.round(perMonth * 100) / 100) + "% per month × " +
+        c.termMonths + (c.termMonths === 1 ? " month" : " months") + " = " + mwk(c.totalInterest) + " interest";
+    }
+    return (Math.round(c.ratePerPeriod * 100) / 100) + "% per " +
+      (c.frequency === "fortnightly" ? "fortnight" : "month") + " on the falling balance over " +
+      c.periods + (c.periods === 1 ? " instalment" : " instalments") + " = " + mwk(c.totalInterest) + " interest";
+  }
+
   /* Indicative APR: the annual rate that discounts the scheduled payments
      back to the net amount advanced (principal less up-front fees).
      Solved by bisection, so it reflects both interest and fees. */
@@ -11511,6 +11726,10 @@ window.JCOB_CONFIG = {
     addFortnights: addFortnights,
     shortDate: shortDate,
     amortize: amortize,
+    productTerms: productTerms,
+    productQuote: productQuote,
+    ratePhrase: ratePhrase,
+    formulaPhrase: formulaPhrase,
     aprEstimate: aprEstimate,
     eligibilityAffordability: eligibilityAffordability,
     mask: mask
@@ -14127,17 +14346,17 @@ window.JCOB_CONFIG = {
   if (!UI || !DATA || !F) return;
 
   var PRODUCTS = {
-    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2 },
-    "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5 },
-    "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2 },
-    "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2 },
-    "Employee Loan": { min: 100000, max: 8000000, rate: 21, term: [6, 36], fee: 1.5 },
-    "Small-business Loan": { min: 250000, max: 20000000, rate: 23, term: [6, 48], fee: 2 },
-    "Agricultural Loan": { min: 200000, max: 25000000, rate: 20, term: [6, 36], fee: 2 },
-    "Short-term Loan": { min: 50000, max: 3000000, rate: 29, term: [1, 6], fee: 3 },
-    "Long-term Loan": { min: 1000000, max: 60000000, rate: 21, term: [24, 84], fee: 2.5 },
-    "Secured Loan": { min: 500000, max: 80000000, rate: 18, term: [12, 84], fee: 1.5 },
-    "Unsecured Loan": { min: 100000, max: 10000000, rate: 26, term: [6, 36], fee: 2.5 }
+    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5, rateBasis: "annual", method: "reducing" },
+    "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Employee Loan": { min: 100000, max: 8000000, rate: 21, term: [6, 36], fee: 1.5, rateBasis: "annual", method: "reducing" },
+    "Small-business Loan": { min: 250000, max: 20000000, rate: 23, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Agricultural Loan": { min: 200000, max: 25000000, rate: 20, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Short-term Loan": { min: 50000, max: 3000000, rate: 29, term: [1, 6], fee: 3, rateBasis: "annual", method: "reducing" },
+    "Long-term Loan": { min: 1000000, max: 60000000, rate: 21, term: [24, 84], fee: 2.5, rateBasis: "annual", method: "reducing" },
+    "Secured Loan": { min: 500000, max: 80000000, rate: 18, term: [12, 84], fee: 1.5, rateBasis: "annual", method: "reducing" },
+    "Unsecured Loan": { min: 100000, max: 10000000, rate: 26, term: [6, 36], fee: 2.5, rateBasis: "annual", method: "reducing" }
   };
 
   /* Follow the catalogue published in the admin console. */
@@ -14152,6 +14371,8 @@ window.JCOB_CONFIG = {
       if (isFinite(p.max) && p.max > 0) PRODUCTS[name].max = Number(p.max);
       if (isFinite(p.fee) && p.fee >= 0) PRODUCTS[name].fee = Number(p.fee);
       if (isFinite(p.minTerm) && isFinite(p.maxTerm)) PRODUCTS[name].term = [Number(p.minTerm), Number(p.maxTerm)];
+      if (p.rateBasis === "monthly" || p.rateBasis === "annual") PRODUCTS[name].rateBasis = p.rateBasis;
+      if (p.method === "flat" || p.method === "reducing") PRODUCTS[name].method = p.method;
     });
   }
   syncCatalogue();
@@ -14183,6 +14404,18 @@ window.JCOB_CONFIG = {
   function mwk(v) { return F.formatMWK(v); }
   function profile() { return DATA.get().profile; }
 
+  /* Every figure in this flow comes from the shared engine, with the
+     product's own rate, basis, method and fee — the same call the product
+     pages and the calculator make. */
+  function quoteFor(productName, amount, termMonths) {
+    var p = PRODUCTS[productName] || PRODUCTS["Personal Loan"];
+    return F.productQuote(p, { amount: amount, termMonths: termMonths, name: productName });
+  }
+  function rateWords(productName) {
+    var p = PRODUCTS[productName] || PRODUCTS["Personal Loan"];
+    return F.ratePhrase(F.productTerms(p, {}));
+  }
+
   /* ---------------- Markup ---------------- */
   function stepper() {
     var labels = ["Loan", "Personal", "Business & bank", "Documents", "Review"];
@@ -14193,18 +14426,14 @@ window.JCOB_CONFIG = {
   }
 
   function summaryBox() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({
-      principal: state.amount, rate: p.rate, termMonths: state.term,
-      method: "reducing", frequency: "monthly", processingFeePct: p.fee
-    });
+    var calc = quoteFor(state.product, state.amount, state.term);
     return '<div class="calc-result" style="margin-top:1rem;">' +
       '<p class="hero-label">Estimated monthly instalment</p>' +
       '<p class="hero-figure">' + mwk(calc.payment) + "</p>" +
       '<div class="row"><span>Product</span><strong>' + esc(state.product) + "</strong></div>" +
       '<div class="row"><span>Amount requested</span><strong>' + mwk(state.amount) + "</strong></div>" +
       '<div class="row"><span>Term</span><strong>' + state.term + " months</strong></div>" +
-      '<div class="row"><span>Indicative rate</span><strong>' + p.rate + "% p.a. (reducing)</strong></div>" +
+      '<div class="row"><span>Indicative rate</span><strong>' + esc(rateWords(state.product)) + "</strong></div>" +
       '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
       '<div class="row"><span>Total repayment</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
       '<p class="result-note" style="font-size:.7rem;color:#9bb5b0;margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
@@ -14219,7 +14448,7 @@ window.JCOB_CONFIG = {
           Object.keys(PRODUCTS).map(function (k) { return '<option' + (k === state.product ? " selected" : "") + ">" + k + "</option>"; }).join("") +
         "</select></div>" +
         '<div class="field"><label for="ap-amount">Requested amount (MWK)</label><input id="ap-amount" type="number" min="' + p.min + '" max="' + p.max + '" step="50000" value="' + state.amount + '">' +
-          '<span class="hint" id="ap-limits">Limits ' + mwk(p.min) + " – " + mwk(p.max) + " · rate from " + p.rate + "% p.a.</span></div>" +
+          '<span class="hint" id="ap-limits">Limits ' + mwk(p.min) + " – " + mwk(p.max) + " · " + esc(rateWords(state.product)) + "</span></div>" +
         '<div class="field"><label for="ap-term">Repayment period (months)</label><input id="ap-term" type="number" min="' + p.term[0] + '" max="' + p.term[1] + '" value="' + state.term + '">' +
           '<span class="hint">Allowed: ' + p.term[0] + "–" + p.term[1] + " months</span></div>" +
         '<div class="field field--full"><label for="ap-purpose">Loan purpose</label><select id="ap-purpose">' +
@@ -14321,8 +14550,7 @@ window.JCOB_CONFIG = {
   }
 
   function stepFive() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({ principal: state.amount, rate: p.rate, termMonths: state.term, method: "reducing", frequency: "monthly", processingFeePct: p.fee });
+    var calc = quoteFor(state.product, state.amount, state.term);
     function v(id, fallback) {
       var el = $(id);
       return el ? el.value : fallback;
@@ -14345,7 +14573,7 @@ window.JCOB_CONFIG = {
       "</div>" +
       '<div class="calc-result" style="margin-top:1rem;">' +
         '<div class="row"><span>Estimated instalment</span><strong>' + mwk(calc.payment) + "</strong></div>" +
-        '<div class="row"><span>Indicative rate</span><strong>' + p.rate + "% p.a. reducing balance</strong></div>" +
+        '<div class="row"><span>Indicative rate</span><strong>' + esc(rateWords(state.product)) + "</strong></div>" +
         '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
         '<div class="row"><span>Total cost of credit</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
       "</div>" +
@@ -14452,8 +14680,7 @@ window.JCOB_CONFIG = {
   }
 
   function affordabilityBlock() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({ principal: state.amount, rate: p.rate, termMonths: state.term, method: "reducing", frequency: "monthly", processingFeePct: p.fee });
+    var calc = quoteFor(state.product, state.amount, state.term);
     var pr = profile();
     var a = F.eligibilityAffordability(pr.monthlyIncome, pr.monthlyExpenses, 265000, calc.payment);
     var tone = a.verdict === "strong" ? "ok" : a.verdict === "fair" ? "warn" : "danger";
@@ -14675,7 +14902,7 @@ window.JCOB_CONFIG = {
       $("ap-term").value = state.term;
       $("ap-term").min = p.term[0];
       $("ap-term").max = p.term[1];
-      $("ap-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · rate from " + p.rate + "% p.a.";
+      $("ap-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · " + rateWords(state.product);
       refreshSummary();
     });
     $("ap-amount").addEventListener("input", function () {
@@ -14833,28 +15060,77 @@ window.JCOB_CONFIG = {
   var DATA = window.JCOB_DATA;
   var F = window.JCOB_FINANCE;
 
+  /* Every product in the catalogue, so a loan quoted on the products page
+     can be opened here and recomputed with the same arithmetic. */
   var PRESETS = {
-    personal: { label: "Personal Loan", rate: 24, min: 100000, max: 15000000, term: 12, maxTerm: 48, fee: 2 },
-    business: { label: "Business Loan", rate: 22, min: 500000, max: 50000000, term: 36, maxTerm: 60, fee: 2.5 },
-    emergency: { label: "Emergency Loan", rate: 28, min: 50000, max: 2000000, term: 6, maxTerm: 12, fee: 2 },
-    salary: { label: "Salary-based Loan", rate: 23, min: 100000, max: 10000000, term: 18, maxTerm: 36, fee: 2 },
-    short: { label: "Short-term Loan", rate: 29, min: 50000, max: 3000000, term: 3, maxTerm: 6, fee: 3 },
-    long: { label: "Long-term Loan", rate: 21, min: 1000000, max: 60000000, term: 60, maxTerm: 84, fee: 2.5 }
+    personal: { label: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    business: { label: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, term: 36, maxTerm: 60, fee: 2.5 },
+    emergency: { label: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, term: 6, maxTerm: 12, fee: 2 },
+    salary: { label: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 18, maxTerm: 36, fee: 2 },
+    employee: { label: "Employee Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 100000, max: 8000000, minTerm: 6, term: 12, maxTerm: 36, fee: 1.5 },
+    "small-business": { label: "Small-business Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 250000, max: 20000000, minTerm: 6, term: 12, maxTerm: 48, fee: 2 },
+    agricultural: { label: "Agricultural Loan", rate: 20, rateBasis: "annual", method: "reducing", min: 200000, max: 25000000, minTerm: 6, term: 12, maxTerm: 36, fee: 2 },
+    "short-term": { label: "Short-term Loan", rate: 29, rateBasis: "annual", method: "reducing", min: 50000, max: 3000000, minTerm: 1, term: 3, maxTerm: 6, fee: 3 },
+    "long-term": { label: "Long-term Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 1000000, max: 60000000, minTerm: 24, term: 60, maxTerm: 84, fee: 2.5 },
+    secured: { label: "Secured Loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, term: 24, maxTerm: 84, fee: 1.5 },
+    unsecured: { label: "Unsecured Loan", rate: 26, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, term: 12, maxTerm: 36, fee: 2.5 }
   };
 
-  /* The admin console publishes the catalogue (rate, limits, fee, terms).
-     Re-point the presets at it so the calculator always quotes the site. */
+  var ORDER = Object.keys(PRESETS);
+
+  function shortLabel(name) {
+    return String(name || "")
+      .replace(/ Loan$/i, "")
+      .replace(/^Salary-based$/, "Salary")
+      .replace(/^Small-business$/, "Small business")
+      .replace(/^Short-term$/, "Short-term")
+      .replace(/^Long-term$/, "Long-term");
+  }
+
+  /* The admin console publishes the catalogue (rate, basis, method, limits,
+     fee, terms). Re-point every preset at it, add products the page does not
+     know about yet, and redraw the chips. */
   function syncCatalogue() {
     var store = window.JCOB_SITE;
     if (!store || !store.products) return;
-    Object.keys(PRESETS).forEach(function (key) {
-      var p = store.product(PRESETS[key].label);
-      if (!p) return;
-      if (isFinite(p.rate) && p.rate > 0) PRESETS[key].rate = Number(p.rate);
-      if (isFinite(p.min) && p.min > 0) PRESETS[key].min = Number(p.min);
-      if (isFinite(p.max) && p.max > 0) PRESETS[key].max = Number(p.max);
-      if (isFinite(p.fee) && p.fee >= 0) PRESETS[key].fee = Number(p.fee);
-      if (isFinite(p.maxTerm) && p.maxTerm > 0) PRESETS[key].maxTerm = Number(p.maxTerm);
+    store.products.forEach(function (p) {
+      if (!p || p.active === false || !p.name) return;
+      var key = p.id || String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      var preset = PRESETS[key] || { label: p.name, minTerm: 1, term: 12 };
+      preset.label = p.name;
+      if (isFinite(p.rate) && p.rate > 0) preset.rate = Number(p.rate);
+      if (p.rateBasis === "monthly" || p.rateBasis === "annual") preset.rateBasis = p.rateBasis;
+      if (p.method === "flat" || p.method === "reducing") preset.method = p.method;
+      if (isFinite(p.min) && p.min > 0) preset.min = Number(p.min);
+      if (isFinite(p.max) && p.max > 0) preset.max = Number(p.max);
+      if (isFinite(p.fee) && p.fee >= 0) preset.fee = Number(p.fee);
+      if (isFinite(p.minTerm) && p.minTerm > 0) preset.minTerm = Number(p.minTerm);
+      if (isFinite(p.maxTerm) && p.maxTerm > 0) preset.maxTerm = Number(p.maxTerm);
+      if (!preset.rateBasis) preset.rateBasis = "annual";
+      if (!preset.method) preset.method = "reducing";
+      if (!PRESETS[key]) { PRESETS[key] = preset; ORDER.push(key); }
+    });
+    renderPresetChips();
+  }
+
+  /* Chips are generated from the catalogue so every product is quotable. */
+  function renderPresetChips() {
+    var host = $("calc-presets");
+    if (!host) return;
+    host.innerHTML = ORDER.map(function (key, i) {
+      var p = PRESETS[key];
+      return '<span class="chip-radio"><input type="radio" name="calc-preset" id="preset-' + key + '" value="' + key + '"' +
+        (key === state.preset || (!state.preset && i === 0) ? " checked" : "") + ">" +
+        '<label for="preset-' + key + '">' + shortLabel(p.label) + "</label></span>";
+    }).join("");
+    bindPresetChips();
+  }
+
+  function bindPresetChips() {
+    document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
+      if (radio.dataset.bound) return;
+      radio.dataset.bound = "1";
+      radio.addEventListener("change", function () { applyPreset(radio.value); });
     });
   }
 
@@ -14917,20 +15193,21 @@ window.JCOB_CONFIG = {
     var hint = $("calc-term-hint");
     var basisHint = $("calc-basis-hint");
     if (!termEl) return;
+    var minMonths = Math.max(Math.round(Number(p.minTerm) || 1), 1);
     if (state.basis === "annual") {
       if (label) label.textContent = "Repayment period (years)";
-      termEl.min = "1";
+      termEl.min = String(Math.max(1, Math.ceil(minMonths / 12)));
       termEl.max = String(Math.max(1, Math.ceil(p.maxTerm / 12)));
       termEl.step = "1";
-      if (!keepValue) termEl.value = "1";
-      if (basisHint) basisHint.textContent = "Annual quotation: 1 year to start (12 instalments)";
+      if (!keepValue) termEl.value = String(Math.max(1, Math.ceil(minMonths / 12)));
+      if (basisHint) basisHint.textContent = "Annual quotation: " + termEl.value + " year" + (termEl.value === "1" ? "" : "s") + " to start";
     } else {
       if (label) label.textContent = "Repayment period (months)";
-      termEl.min = "1";
+      termEl.min = String(minMonths);
       termEl.max = String(p.maxTerm);
       termEl.step = "1";
-      if (!keepValue) termEl.value = "1";
-      if (basisHint) basisHint.textContent = "Monthly quotation: 1 month to start";
+      if (!keepValue) termEl.value = String(minMonths);
+      if (basisHint) basisHint.textContent = "Monthly quotation: " + minMonths + (minMonths === 1 ? " month" : " months") + " to start";
     }
     if (keepValue) {
       var current = Math.max(Math.round(Number(termEl.value) || 1), 1);
@@ -15113,21 +15390,32 @@ window.JCOB_CONFIG = {
   }
 
   function applyPreset(key) {
-    var p = PRESETS[key];
-    state.preset = key;
-    state.rate = p.rate;
-    state.fee = p.fee;
+    var p = PRESETS[key] || PRESETS[ORDER[0]];
+    if (!p) return;
+    state.preset = key in PRESETS ? key : ORDER[0];
+    /* keep the chip row in step, including when the product came in on a
+       link from the products page */
+    var chip = document.querySelector('input[name="calc-preset"][value="' + state.preset + '"]');
+    if (chip) chip.checked = true;
+    /* The rate is quoted in the unit the product publishes, and the fields
+       say so: a 24% p.a. product fills 24 with an annual basis; a product
+       quoting 5% a month fills 5 with a monthly basis. */
+    state.rateBasis = p.rateBasis === "monthly" ? "monthly" : "annual";
+    if ($("calc-rate-basis")) $("calc-rate-basis").value = state.rateBasis;
+    state.method = p.method === "flat" ? "flat" : "reducing";
+    setMethod(state.method);
+    state.rate = Number(p.rate) || 0;
+    state.fee = Number(p.fee) || 0;
     state.amount = Math.min(Math.max(state.amount, p.min), p.max);
     $("calc-amount").value = state.amount;
     $("calc-amount").min = p.min;
     $("calc-amount").max = p.max;
-    var shownRate = rateForBasis(p.rate);
-    state.rate = shownRate;
-    $("calc-rate").value = shownRate;
-    $("calc-fee").value = p.fee;
+    $("calc-rate").value = state.rate;
+    $("calc-fee").value = state.fee;
     syncTermField(true);
     state.termMonths = termMonths();
     render();
+    syncRateField();
   }
 
   function exportCSV() {
@@ -15194,9 +15482,8 @@ window.JCOB_CONFIG = {
     /* catalogue rate first, then the admin's default size / term / fee */
     applyPreset(state.preset);
     applyAdminDefaults();
-    document.querySelectorAll('input[name="calc-preset"]').forEach(function (radio) {
-      radio.addEventListener("change", function () { applyPreset(radio.value); });
-    });
+    renderPresetChips();
+    bindPresetChips();
     ["calc-amount", "calc-rate", "calc-term", "calc-frequency", "calc-fee", "calc-admin", "calc-start"].forEach(function (id) {
       var el = $(id);
       if (!el) return;
@@ -15584,30 +15871,74 @@ window.JCOB_CONFIG = {
     }).join("");
   }
 
+  /* Worked examples come from the published catalogue, computed by the same
+     engine as the calculator, so a rate change in the console moves these
+     figures too. */
+  var CASES = [
+    { id: "personal", amount: 2000000, term: 12, note: "School fees, repaid over one year" },
+    { id: "business", amount: 8000000, term: 36, note: "Working capital for a retail business" },
+    { id: "secured", amount: 25000000, term: 60, note: "Vehicle finance with collateral" }
+  ];
+
+  function catalogue() {
+    var store = window.JCOB_SITE;
+    return store && store.products && store.products.length ? store.products : null;
+  }
+
+  /* Seeded figures — used until the store answers, then replaced. */
+  var FALLBACK = {
+    personal: { name: "Personal loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    business: { name: "Business loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
+    secured: { name: "Secured loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, maxTerm: 84, fee: 1.5 }
+  };
+
+  function productFor(id) {
+    var list = catalogue();
+    var p = list && list.filter(function (x) { return x.id === id; })[0];
+    return p || FALLBACK[id];
+  }
+
+  /* The published rate schedule is written from the same catalogue: the
+     "rate from", the interest method and the term range. The upper "rate up
+     to" and the APR band stay policy figures, which the engine cannot derive
+     from a single product record. */
+  var table = document.querySelector("[data-rate-table]");
+  if (table) {
+    [].slice.call(table.querySelectorAll("tbody tr")).forEach(function (row) {
+      var name = row.querySelector("th").textContent.trim();
+      var key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      var p = productFor(key) || (catalogue() || []).filter(function (x) {
+        return String(x.name).toLowerCase().indexOf(name.toLowerCase()) === 0;
+      })[0];
+      if (!p) return;
+      var cells = row.querySelectorAll("td");
+      if (cells.length < 6) return;
+      cells[0].textContent = (Math.round(Number(p.rate) * 100) / 100) + "%";
+      cells[3].textContent = p.method === "flat" ? "Flat rate" : "Reducing balance";
+      cells[4].textContent = p.minTerm + "–" + p.maxTerm + " months";
+    });
+  }
+
   if (examples) {
-    var cases = [
-      { label: "Personal loan", rate: 24, amount: 2000000, term: 12, note: "School fees, repaid over one year" },
-      { label: "Business loan", rate: 22, amount: 8000000, term: 36, note: "Working capital for a retail business" },
-      { label: "Secured loan", rate: 18, amount: 25000000, term: 60, note: "Vehicle finance with collateral" }
-    ];
-    examples.innerHTML = cases.map(function (k) {
-      var c = F.amortize({
-        principal: k.amount, rate: k.rate, termMonths: k.term,
-        method: "reducing", frequency: "monthly", processingFeePct: 2
-      });
+    examples.innerHTML = CASES.map(function (k) {
+      var p = productFor(k.id);
+      var c = F.productQuote(p, { amount: k.amount, termMonths: k.term });
+      var t = c.terms;
       return '<div class="card">' +
-        "<h3>" + k.label + "</h3>" +
+        "<h3>" + p.name + "</h3>" +
         '<p class="text-tiny text-muted">' + k.note + "</p>" +
         '<div class="review-grid" style="margin-top:.9rem;grid-template-columns:1fr;">' +
-        '<div class="review-item"><dt>Amount · term</dt><dd>' + mwk(k.amount) + " · " + k.term + " months</dd></div>" +
-        '<div class="review-item"><dt>Rate</dt><dd>' + k.rate + "% p.a. reducing</dd></div>" +
+        '<div class="review-item"><dt>Amount · term</dt><dd>' + mwk(t.amount) + " · " + t.termMonths + " months</dd></div>" +
+        '<div class="review-item"><dt>Rate</dt><dd>' + F.ratePhrase(t) + "</dd></div>" +
         '<div class="review-item"><dt>Monthly instalment</dt><dd>' + mwk(c.payment) + "</dd></div>" +
         '<div class="review-item"><dt>Total interest</dt><dd>' + mwk(c.totalInterest) + "</dd></div>" +
         '<div class="review-item"><dt>Processing fee</dt><dd>' + mwk(c.processingFee) + "</dd></div>" +
         '<div class="review-item"><dt>Total repayment</dt><dd>' + mwk(c.totalCost) + "</dd></div>" +
         '<div class="review-item"><dt>Indicative APR</dt><dd>' + c.apr.toFixed(1) + "%</dd></div>" +
         "</div>" +
-        '<a class="btn btn--ghost btn--sm" style="margin-top:.8rem;" href="apply.html?amount=' + k.amount + "&term=" + k.term + '">Apply for this loan</a>' +
+        '<p class="text-tiny text-muted" style="margin-top:.6rem;">' + F.formulaPhrase(c) + ".</p>" +
+        '<a class="btn btn--ghost btn--sm" style="margin-top:.8rem;" href="apply.html?product=' +
+          encodeURIComponent(p.name) + "&amount=" + Math.round(t.amount) + "&term=" + t.termMonths + '">Apply for this loan</a>' +
         "</div>";
     }).join("");
   }
@@ -18396,6 +18727,317 @@ try {
   /* Cloud mode fills the store a moment after first paint — re-apply the
      published content as soon as it lands. */
   try { S.subscribe(function () { run(); }); } catch (e) {}
+})();
+
+
+/* ==== product-quotes.js ==== */
+/* =====================================================================
+   JAY C O B FINANCIAL SERVICES — loan product quotes
+   ---------------------------------------------------------------------
+   Every loan product on the site is quoted here, by the same engine the
+   calculator uses (JCOB_FINANCE.amortize). No figure on a product card is
+   hand-written any more.
+
+   The rate is applied in the unit the product is published in:
+     annual  → the figure is per year; 24% p.a. is 2% a month on the
+               falling balance
+     monthly → the figure is per month, used exactly as published
+     flat    → principal × rate × months, exactly as published
+
+   The card's rate line, limits, term, processing fee and the worked
+   example all come from the catalogue (Supabase site_docs → JCOB_SITE),
+   so the products page, the application flow and the calculator cannot
+   quote different numbers for the same product.
+
+   Markup hooks
+     [data-product-quote]      a card that gets the full worked example
+     [data-product]            the catalogue id, if it differs from the id
+     [data-pq]                 where to mount the example (optional)
+     [data-pq-rate]            the rate headline, filled from the catalogue
+     [data-pq-limits]          amount range
+     [data-pq-term]            term range
+     [data-pq-fee]             processing fee
+   ===================================================================== */
+(function () {
+  "use strict";
+
+  var F = window.JCOB_FINANCE;
+  if (!F) return;
+
+  /* Seeded catalogue — mirrors assets/js/site-store.js so the page still
+     quotes correctly on a cold start. The live store always wins. */
+  var FALLBACK = [
+    { id: "personal", name: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    { id: "business", name: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5 },
+    { id: "emergency", name: "Emergency Loan", rate: 28, rateBasis: "annual", method: "reducing", min: 50000, max: 2000000, minTerm: 3, maxTerm: 12, fee: 2 },
+    { id: "salary", name: "Salary-based Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, maxTerm: 36, fee: 2 },
+    { id: "employee", name: "Employee Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 100000, max: 8000000, minTerm: 6, maxTerm: 36, fee: 1.5 },
+    { id: "small-business", name: "Small-business Loan", rate: 23, rateBasis: "annual", method: "reducing", min: 250000, max: 20000000, minTerm: 6, maxTerm: 48, fee: 2 },
+    { id: "agricultural", name: "Agricultural Loan", rate: 20, rateBasis: "annual", method: "reducing", min: 200000, max: 25000000, minTerm: 6, maxTerm: 36, fee: 2 },
+    { id: "short-term", name: "Short-term Loan", rate: 29, rateBasis: "annual", method: "reducing", min: 50000, max: 3000000, minTerm: 1, maxTerm: 6, fee: 3 },
+    { id: "long-term", name: "Long-term Loan", rate: 21, rateBasis: "annual", method: "reducing", min: 1000000, max: 60000000, minTerm: 24, maxTerm: 84, fee: 2.5 },
+    { id: "secured", name: "Secured Loan", rate: 18, rateBasis: "annual", method: "reducing", min: 500000, max: 80000000, minTerm: 12, maxTerm: 84, fee: 1.5 },
+    { id: "unsecured", name: "Unsecured Loan", rate: 26, rateBasis: "annual", method: "reducing", min: 100000, max: 10000000, minTerm: 6, maxTerm: 36, fee: 2.5 }
+  ];
+
+  function catalogue() {
+    var store = window.JCOB_SITE;
+    var list = store && store.products && store.products.length ? store.products : FALLBACK;
+    return list.filter(function (p) { return p && p.active !== false; });
+  }
+
+  function slug(value) {
+    return String(value == null ? "" : value)
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+
+  function findProduct(box) {
+    var list = catalogue();
+    var key = box.getAttribute("data-product") || box.id || "";
+    var want = slug(key);
+    var hit = null;
+    if (want) {
+      hit = list.filter(function (p) {
+        return slug(p.id) === want || slug(p.name) === want;
+      })[0] || null;
+    }
+    if (hit) return hit;
+    var heading = box.querySelector("h2, h3");
+    var name = slug(heading ? heading.textContent : "");
+    if (!name) return null;
+    return list.filter(function (p) { return slug(p.name) === name; })[0] || null;
+  }
+
+  function mwk(v) { return F.formatMWK(v); }
+  function trim(n) {
+    var s = (Number(n) || 0).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    return s;
+  }
+
+  /* A round, sensible example amount: about eight minimum loans, capped at
+     MWK 10,000,000 so the example stays readable for the large products. */
+  function exampleAmount(p) {
+    var target = Math.max(p.min * 8, p.min);
+    var step = target >= 10000000 ? 1000000 : target >= 1000000 ? 500000 : target >= 100000 ? 50000 : 10000;
+    var rounded = Math.round(target / step) * step;
+    return Math.min(Math.max(rounded, p.min), Math.min(p.max, 10000000));
+  }
+
+  function exampleTerm(p) {
+    return Math.min(Math.max(12, p.minTerm), p.maxTerm);
+  }
+
+  function quote(p, amount, termMonths) {
+    return F.productQuote(p, { amount: amount, termMonths: termMonths });
+  }
+
+  function fillStatic(box, p, c) {
+    var rate = box.querySelector("[data-pq-rate]");
+    if (rate) {
+      rate.innerHTML = trim(c.rateInput) + "% <small>" +
+        (c.rateBasis === "monthly" ? "per month" : "p.a.") + " " +
+        (c.method === "flat" ? "flat" : "reducing") + "</small>";
+    }
+    var limits = box.querySelector("[data-pq-limits]");
+    if (limits) limits.textContent = mwk(p.min) + " – " + mwk(p.max).replace(/^MWK\s/, "");
+    var term = box.querySelector("[data-pq-term]");
+    if (term) term.textContent = p.minTerm + " – " + p.maxTerm + " months · monthly";
+    var fee = box.querySelector("[data-pq-fee]");
+    if (fee) fee.textContent = trim(p.fee) + "% of principal";
+  }
+
+  /* The comparison table is a summary of the same catalogue: its limits,
+     term, rate and fee are written from the catalogue, never typed in. */
+  function compact(v) {
+    if (v >= 1000000) {
+      var m = v / 1000000;
+      return (Math.round(m * 10) / 10).toString().replace(/\.0$/, "") + "m";
+    }
+    if (v >= 1000) return Math.round(v / 1000) + "k";
+    return String(v);
+  }
+
+  function fillTable() {
+    var table = document.querySelector("[data-pq-table]") ||
+      document.querySelector(".compare-table");
+    if (!table) return;
+    [].slice.call(table.querySelectorAll("tbody tr")).forEach(function (row) {
+      var link = row.querySelector("th a[href^='#']");
+      if (!link) return;
+      var id = link.getAttribute("href").slice(1);
+      var p = catalogue().filter(function (x) { return slug(x.id) === slug(id); })[0];
+      if (!p) return;
+      var cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
+      cells[0].textContent = compact(p.min) + " – " + compact(p.max);
+      cells[1].textContent = p.minTerm + "–" + p.maxTerm + " mo";
+      cells[2].textContent = trim(p.rate) + "% " + (p.rateBasis === "monthly" ? "/mo" : "p.a.");
+      cells[3].textContent = trim(p.fee) + "%";
+    });
+  }
+
+  function widgetHTML() {
+    return '<div class="pq">' +
+        '<div class="pq-head">' +
+          '<span class="pq-tag">Worked example</span>' +
+          '<span class="pq-quote" data-pq-quote></span>' +
+        '</div>' +
+        '<div class="pq-fields">' +
+          '<label class="pq-f"><span>Amount (MWK)</span>' +
+            '<input type="number" data-pq-amount inputmode="numeric" min="0" step="1000" aria-label="Example loan amount in MWK"></label>' +
+          '<label class="pq-f"><span>Term (months)</span>' +
+            '<input type="number" data-pq-term-input inputmode="numeric" min="1" step="1" aria-label="Example term in months"></label>' +
+        '</div>' +
+        '<div class="pq-body">' +
+          '<div class="pq-figure">' +
+            '<span class="pq-label">Instalment</span>' +
+            '<strong data-pq-payment></strong>' +
+            '<small data-pq-per></small>' +
+          '</div>' +
+          '<dl class="pq-rows">' +
+            '<div><dt>Total interest</dt><dd data-pq-interest></dd></div>' +
+            '<div><dt>Processing fee</dt><dd data-pq-fee-out></dd></div>' +
+            '<div><dt>Total repayment</dt><dd data-pq-total></dd></div>' +
+            '<div><dt>Total including fees</dt><dd data-pq-cost></dd></div>' +
+            '<div><dt>Indicative APR</dt><dd data-pq-apr></dd></div>' +
+          '</dl>' +
+        '</div>' +
+        '<p class="pq-formula" data-pq-formula></p>' +
+        '<p class="pq-links">' +
+          '<a class="pq-link pq-link--solid" data-pq-apply>Apply with these figures</a>' +
+          '<a class="pq-link" data-pq-calc>Open in the calculator</a>' +
+        '</p>' +
+      '</div>';
+  }
+
+  function wire(box, p) {
+    var mount = box.querySelector("[data-pq]");
+    if (!mount) {
+      mount = document.createElement("div");
+      mount.setAttribute("data-pq", "");
+      box.appendChild(mount);
+    }
+    mount.innerHTML = widgetHTML();
+
+    var amountEl = mount.querySelector("[data-pq-amount]");
+    var termEl = mount.querySelector("[data-pq-term-input]");
+    var start = { amount: exampleAmount(p), term: exampleTerm(p) };
+    amountEl.value = String(start.amount);
+    termEl.value = String(start.term);
+    amountEl.min = String(p.min);
+    amountEl.max = String(p.max);
+    termEl.min = String(p.minTerm);
+    termEl.max = String(p.maxTerm);
+
+    function update() {
+      var c = quote(p, Number(amountEl.value) || start.amount, Number(termEl.value) || start.term);
+      var t = c.terms;
+      /* keep the fields honest: show the clamped figures the engine used */
+      start.amount = t.amount;
+      start.term = t.termMonths;
+
+      var payment = mount.querySelector("[data-pq-payment]");
+      payment.textContent = mwk(c.payment);
+      var per = mount.querySelector("[data-pq-per]");
+      per.textContent = "per " + (c.frequency === "fortnightly" ? "fortnight" : "month") +
+        " · " + c.periods + (c.periods === 1 ? " instalment" : " instalments") +
+        " · " + (t.method === "flat" ? "flat rate" : "reducing balance");
+      mount.querySelector("[data-pq-interest]").textContent = mwk(c.totalInterest);
+      mount.querySelector("[data-pq-fee-out]").textContent = mwk(c.processingFee);
+      mount.querySelector("[data-pq-total]").textContent = mwk(c.totalRepayment);
+      mount.querySelector("[data-pq-cost]").textContent = mwk(c.totalCost);
+      mount.querySelector("[data-pq-apr]").textContent = c.apr.toFixed(1) + "%";
+      mount.querySelector("[data-pq-quote]").textContent = t.rateBasis === "monthly"
+        ? "= " + trim(c.rate) + "% p.a. equivalent"
+        : "= " + trim(c.monthlyRate) + "% per month";
+      mount.querySelector("[data-pq-formula]").textContent = F.formulaPhrase(c);
+
+      var applyLink = mount.querySelector("[data-pq-apply]");
+      applyLink.href = "#/apply" + encodeURIComponent(p.name) +
+        "&amount=" + Math.round(t.amount) + "&term=" + t.termMonths;
+      var calcLink = mount.querySelector("[data-pq-calc]");
+      calcLink.href = "#/calculator" + encodeURIComponent(p.name) +
+        "&amount=" + Math.round(t.amount) + "&term=" + t.termMonths +
+        "&fee=" + encodeURIComponent(t.fee);
+    }
+
+    function commit() {
+      var c = quote(p, Number(amountEl.value) || start.amount, Number(termEl.value) || start.term);
+      amountEl.value = String(c.terms.amount);
+      termEl.value = String(c.terms.termMonths);
+      update();
+    }
+
+    ["input", "change"].forEach(function (ev) {
+      amountEl.addEventListener(ev, update);
+      termEl.addEventListener(ev, update);
+    });
+    amountEl.addEventListener("blur", commit);
+    termEl.addEventListener("blur", commit);
+
+    update();
+    return mount;
+  }
+
+  function mini(p) {
+    var c = quote(p, exampleAmount(p), exampleTerm(p));
+    var t = c.terms;
+    return '<p class="pq-mini">Example: ' + mwk(t.amount) + " over " + t.termMonths +
+      " months → <b>" + mwk(c.payment) + "</b> a month</p>";
+  }
+
+  /* A card is rebuilt only when its catalogue terms actually change, so a
+     late catalogue load (Supabase answering after first paint) never wipes
+     figures the customer is already adjusting. */
+  function termsKey(p) {
+    return [p.id, p.rate, p.rateBasis, p.method, p.min, p.max, p.minTerm, p.maxTerm, p.fee].join("|");
+  }
+
+  function init() {
+    fillTable();
+    var cards = [].slice.call(document.querySelectorAll("[data-product-quote]"));
+    cards.forEach(function (box) {
+      var p = findProduct(box);
+      if (!p) return;
+      var key = termsKey(p);
+      if (box.getAttribute("data-pq-built") === key) return;
+      box.setAttribute("data-pq-built", key);
+      var c = quote(p, exampleAmount(p), exampleTerm(p));
+      fillStatic(box, p, c);
+      if (box.hasAttribute("data-product-mini")) {
+        var existing = box.querySelector(".pq-mini");
+        if (existing) {
+          existing.outerHTML = mini(p);
+        } else {
+          var line = document.createElement("div");
+          line.innerHTML = mini(p);
+          if (line.firstChild) box.appendChild(line.firstChild);
+        }
+        return;
+      }
+      wire(box, p);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  /* the catalogue may arrive from Supabase after first paint */
+  document.addEventListener("jcob:site-updated", init);
+  document.addEventListener("jcob:products-updated", init);
+
+  window.JCOB_PRODUCT_QUOTES = {
+    catalogue: catalogue,
+    quote: quote,
+    exampleAmount: exampleAmount,
+    exampleTerm: exampleTerm,
+    refresh: init
+  };
 })();
 
 /* =====================================================================

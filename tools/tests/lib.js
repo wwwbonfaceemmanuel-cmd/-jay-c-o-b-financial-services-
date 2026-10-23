@@ -48,7 +48,7 @@ function makeDom(file, options) {
 
   const hash = options.hash || "";
   const dom = new JSDOM(fs.readFileSync(path.join(ROOT, file), "utf8"), {
-    url: BASE + file + hash,
+    url: BASE + file + (options.query || "") + hash,
     runScripts: "dangerously",
     resources: "usable",
     pretendToBeVisual: true,

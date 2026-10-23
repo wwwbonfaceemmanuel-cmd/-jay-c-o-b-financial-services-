@@ -575,8 +575,11 @@
           '<span class="sigpad-empty" id="onb-sig-empty">Sign here</span>' +
         "</div>" +
         '<div class="sigpad-foot">' +
-          '<span class="hint" id="onb-sig-hint">Draw with a finger, stylus or mouse.</span>' +
-          '<button class="btn btn--ghost btn--sm" type="button" id="onb-sig-clear">Clear</button>' +
+          '<span class="hint" id="onb-sig-hint">Draw freely — cursive, print, loops, any shape. The line follows your finger, stylus or mouse exactly.</span>' +
+          '<span class="sigpad-actions">' +
+            '<button class="btn btn--ghost btn--sm" type="button" id="onb-sig-undo">Undo</button>' +
+            '<button class="btn btn--ghost btn--sm" type="button" id="onb-sig-clear">Clear</button>' +
+          "</span>" +
         "</div>" +
         '<span class="error-msg">Draw your signature in the box</span>' +
       "</div>" +
@@ -599,10 +602,105 @@
     );
   }
 
-  function drawSignature(pad, signature, ghost) {
-    if (!pad) return;
+  /* ===================================================================
+     Signature pad
+     -------------------------------------------------------------------
+     The ink follows the pointer exactly. Every sampled point becomes a
+     knot of an interpolating spline (Catmull-Rom, converted to cubic
+     Béziers), so the line passes through the trace itself instead of
+     joining samples with straight segments — any shape, any handwriting,
+     cursive or print, curves or loops, comes out as drawn.
+
+     Fidelity comes from three things:
+       • pointer events, with the capture held so a stroke that leaves the
+         box is still recorded (and pointercancel ends it cleanly)
+       • getCoalescedEvents(), which returns the points the browser batched
+         between frames — a fast flick is no longer a few long chords
+       • a backing store sized for the device pixel ratio, so a thin line
+         stays thin and does not snap to a soft, jagged grid
+
+     The stored shape is unchanged: signature.strokes is a list of strokes,
+     each a list of {x, y} in CSS pixels, with signature.w / h recording the
+     surface it was drawn on.
+     =================================================================== */
+
+  /* One stroke, drawn through every point it was recorded with. */
+  function traceStroke(ctx, pts) {
+    if (!pts || !pts.length) return;
+    if (pts.length === 1) {
+      /* a tap leaves a dot */
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, Math.max(ctx.lineWidth / 2, 0.8), 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    if (pts.length === 2) {
+      ctx.lineTo(pts[1].x, pts[1].y);
+    } else {
+      for (var i = 0; i < pts.length - 1; i += 1) {
+        var p0 = pts[i - 1] || pts[0];
+        var p1 = pts[i];
+        var p2 = pts[i + 1];
+        var p3 = pts[i + 2] || p2;
+        /* Catmull-Rom → Bézier: the curve passes through p1 and p2 */
+        var c1x = p1.x + (p2.x - p0.x) / 6;
+        var c1y = p1.y + (p2.y - p0.y) / 6;
+        var c2x = p2.x - (p3.x - p1.x) / 6;
+        var c2y = p2.y - (p3.y - p1.y) / 6;
+        ctx.bezierCurveTo(c1x, c1y, c2x, c2y, p2.x, p2.y);
+      }
+    }
+    ctx.stroke();
+  }
+
+  function padContext(pad) {
+    if (!pad) return null;
     var ctx = null;
     try { ctx = pad.getContext("2d"); } catch (e) { ctx = null; }
+    return ctx || null;
+  }
+
+  function deviceScale() {
+    var dpr = Number(window.devicePixelRatio) || 1;
+    return Math.min(Math.max(dpr, 1), 3);
+  }
+
+  /* Size the backing store for the screen, and keep existing strokes in
+     step if the box changed (rotation, a wider window, a printed sheet).
+     Called when the pad is wired, when a stroke starts and when the window
+     resizes — never per frame, because measuring forces a layout. */
+  function fitPad(pad) {
+    var rect = pad.getBoundingClientRect ? pad.getBoundingClientRect() : { width: 0, height: 0 };
+    var nextW = Math.round(rect.width) || state.signature.w;
+    var nextH = Math.round(rect.height) || state.signature.h;
+    var prevW = state.signature.w || nextW;
+    var prevH = state.signature.h || nextH;
+    var dpr = deviceScale();
+
+    pad.width = Math.max(Math.round(nextW * dpr), 1);
+    pad.height = Math.max(Math.round(nextH * dpr), 1);
+
+    if (nextW !== prevW || nextH !== prevH) {
+      var sx = nextW / (prevW || nextW);
+      var sy = nextH / (prevH || nextH);
+      state.signature.strokes.forEach(function (stroke) {
+        stroke.forEach(function (pt) {
+          pt.x = Math.round(pt.x * sx * 10) / 10;
+          pt.y = Math.round(pt.y * sy * 10) / 10;
+        });
+      });
+    }
+    state.signature.w = nextW;
+    state.signature.h = nextH;
+    pad.__jcobDpr = dpr;
+    return dpr;
+  }
+
+  function drawSignature(pad, signature, ghost) {
+    if (!pad) return;
+    var ctx = padContext(pad);
     if (!ctx) {
       var empty = $("onb-sig-empty");
       if (empty) {
@@ -611,103 +709,211 @@
       }
       return;
     }
-    var w = pad.width, h = pad.height;
+    if (!pad.width || !pad.height) fitPad(pad);
+    var dpr = pad.__jcobDpr || deviceScale();
+    var w = state.signature.w;
+    var h = state.signature.h;
+    if (ctx.setTransform) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    ctx.lineWidth = ghost ? 2 : 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.strokeStyle = ghost ? "#0f3d34" : "#081521";
+    ctx.fillStyle = ctx.strokeStyle;
     (signature.strokes || []).forEach(function (stroke) {
-      if (!stroke.length) return;
-      ctx.beginPath();
-      ctx.moveTo(stroke[0].x, stroke[0].y);
-      for (var i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
-      if (stroke.length === 1) ctx.lineTo(stroke[0].x + 0.4, stroke[0].y + 0.4);
-      ctx.stroke();
+      ctx.lineWidth = ghost ? 2 : 2.6;
+      traceStroke(ctx, stroke);
     });
   }
 
   function wirePad() {
     var pad = $("onb-sig");
     var clear = $("onb-sig-clear");
+    var undo = $("onb-sig-undo");
     if (!pad) return;
+    /* The frame is styled, not the canvas: keep the state classes there so
+       the dashed border turns solid while a stroke is in progress. */
+    var wrap = $("onb-sigpad") || pad;
 
-    /* Match the drawing surface to the box on screen. */
-    var rect = pad.getBoundingClientRect ? pad.getBoundingClientRect() : { width: 0, height: 0 };
-    if (rect.width) pad.width = Math.round(rect.width);
-    if (rect.height) pad.height = Math.round(rect.height);
-    if (!pad.width) pad.width = state.signature.w;
-    if (!pad.height) pad.height = state.signature.h;
-    state.signature.w = pad.width;
-    state.signature.h = pad.height;
+    /* Match the drawing surface to the box on screen (device-pixel crisp). */
+    fitPad(pad);
+    drawSignature(pad, state.signature, false);
 
     var drawing = false;
     var stroke = null;
+    var rect = null;
+    var frame = null;
+    var lastPoint = null;
 
-    function point(e) {
-      var r = pad.getBoundingClientRect ? pad.getBoundingClientRect() : { left: 0, top: 0, width: pad.width, height: pad.height };
-      var sx = pad.width / (r.width || pad.width);
-      var sy = pad.height / (r.height || pad.height);
-      var cx = (e.clientX || 0) - (r.left || 0);
-      var cy = (e.clientY || 0) - (r.top || 0);
-      return { x: Math.round(cx * sx * 10) / 10, y: Math.round(cy * sy * 10) / 10 };
+    function schedule() {
+      if (frame) return;
+      var run = function () {
+        frame = null;
+        drawSignature(pad, state.signature, false);
+      };
+      if (typeof window.requestAnimationFrame === "function") frame = window.requestAnimationFrame(run);
+      else frame = window.setTimeout(run, 16);
     }
 
-    function start(e) {
-      if (e.button != null && e.button !== 0) return;
-      drawing = true;
-      stroke = [point(e)];
-      state.signature.strokes.push(stroke);
+    function localPoint(e) {
+      var box = rect || (pad.getBoundingClientRect ? pad.getBoundingClientRect() : null) ||
+        { left: 0, top: 0, width: state.signature.w, height: state.signature.h };
+      var clientX = e.clientX;
+      var clientY = e.clientY;
+      if (clientX == null && e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+      var w = state.signature.w || box.width || 1;
+      var h = state.signature.h || box.height || 1;
+      var sx = box.width ? w / box.width : 1;
+      var sy = box.height ? h / box.height : 1;
+      var x = ((clientX || 0) - (box.left || 0)) * sx;
+      var y = ((clientY || 0) - (box.top || 0)) * sy;
+      return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+    }
+
+    function isEmptyScreen() {
       var empty = $("onb-sig-empty");
       if (empty) empty.hidden = true;
-      pad.classList.add("is-signing");
-      drawSignature(pad, state.signature, false);
+      wrap.classList.add("has-ink");
+    }
+
+    function begin(e) {
+      if (e.button != null && e.button > 0) return;
+      if (e.isPrimary === false) return;
+      /* cheap once per stroke: the box may have changed since the last one */
+      fitPad(pad);
+      drawing = true;
+      rect = pad.getBoundingClientRect ? pad.getBoundingClientRect() : null;
+      stroke = [];
+      state.signature.strokes.push(stroke);
+      wrap.classList.add("is-signing");
+      if (e.pointerId != null && typeof pad.setPointerCapture === "function") {
+        try { pad.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      }
+      var pt = localPoint(e);
+      stroke.push(pt);
+      lastPoint = pt;
+      isEmptyScreen();
+      schedule();
       if (e.preventDefault) e.preventDefault();
     }
-    function move(e) {
+
+    /* Every point the browser batched since the last frame, in order. */
+    function extend(e) {
       if (!drawing || !stroke) return;
-      stroke.push(point(e));
-      drawSignature(pad, state.signature, false);
+      var events = [e];
+      if (typeof e.getCoalescedEvents === "function") {
+        try {
+          var batch = e.getCoalescedEvents();
+          if (batch && batch.length) events = batch;
+        } catch (err) { events = [e]; }
+      }
+      for (var i = 0; i < events.length; i += 1) {
+        var pt = localPoint(events[i]);
+        if (lastPoint && Math.abs(pt.x - lastPoint.x) < 0.2 && Math.abs(pt.y - lastPoint.y) < 0.2) continue;
+        stroke.push(pt);
+        lastPoint = pt;
+      }
+      schedule();
       if (e.preventDefault) e.preventDefault();
     }
-    function end() {
+
+    function finish(e) {
+      if (!drawing) return;
       drawing = false;
       stroke = null;
-      pad.classList.remove("is-signing");
+      lastPoint = null;
+      rect = null;
+      wrap.classList.remove("is-signing");
+      if (frame) {
+        if (typeof window.cancelAnimationFrame === "function") window.cancelAnimationFrame(frame);
+        frame = null;
+      }
+      drawSignature(pad, state.signature, false);
       pointCount();
+      if (e && e.pointerId != null && typeof pad.releasePointerCapture === "function") {
+        try { pad.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      }
     }
 
     function pointCount() {
-      return state.signature.strokes.reduce(function (n, s) { return n + s.length; }, 0);
+      return state.signature.strokes.reduce(function (n, strokePts) { return n + strokePts.length; }, 0);
     }
 
-    pad.addEventListener("pointerdown", start);
-    pad.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", end);
-    pad.addEventListener("mousedown", start);
-    pad.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
-    pad.addEventListener("touchstart", function (e) {
-      start(e.touches[0]);
-    }, { passive: false });
-    pad.addEventListener("touchmove", function (e) {
-      move(e.touches[0]);
-    }, { passive: false });
-    pad.addEventListener("touchend", end);
+    /* Pointer events where the browser supports them (touch, pen and mouse
+       in one pipeline, with pressure-free but exact geometry). Set
+       pointer capture is the mark of a browser that has them; jsdom and
+       very old browsers fall back to the mouse and touch paths below. */
+    var usePointer = typeof window.PointerEvent === "function" && typeof pad.setPointerCapture === "function";
 
-    clear.addEventListener("click", function () {
-      state.signature.strokes = [];
+    if (usePointer) {
+      pad.addEventListener("pointerdown", begin);
+      pad.addEventListener("pointermove", extend);
+      pad.addEventListener("pointerup", finish);
+      pad.addEventListener("pointercancel", finish);
+      window.addEventListener("pointerup", finish);
+    } else {
+      pad.addEventListener("mousedown", begin);
+      pad.addEventListener("mousemove", extend);
+      window.addEventListener("mouseup", finish);
+      pad.addEventListener("touchstart", function (e) {
+        if (e.touches && e.touches.length > 1) return;
+        begin(e.touches && e.touches[0] ? e.touches[0] : e);
+      }, { passive: false });
+      pad.addEventListener("touchmove", function (e) {
+        extend(e.touches && e.touches[0] ? e.touches[0] : e);
+      }, { passive: false });
+      pad.addEventListener("touchend", finish);
+      pad.addEventListener("touchcancel", finish);
+    }
+
+    /* A pointer that leaves the page (alt-tab, a native dialog) must not
+       leave the pad stuck mid-stroke. */
+    window.addEventListener("blur", finish);
+
+    /* Rotation or a wider window: re-fit, then repaint the ink to scale. */
+    var refit = function () {
+      if (drawing) return;
+      fitPad(pad);
       drawSignature(pad, state.signature, false);
-      var empty = $("onb-sig-empty");
-      if (empty) empty.hidden = false;
-      pad.classList.remove("has-ink");
+    };
+    window.addEventListener("resize", refit);
+    window.addEventListener("orientationchange", refit);
+
+    if (clear) {
+      clear.addEventListener("click", function () {
+        state.signature.strokes = [];
+        stroke = null;
+        lastPoint = null;
+        drawSignature(pad, state.signature, false);
+        var empty = $("onb-sig-empty");
+        if (empty) { empty.hidden = false; empty.classList.remove("is-error"); }
+        wrap.classList.remove("has-ink");
+      });
+    }
+
+    if (undo) {
+      undo.addEventListener("click", function () {
+        state.signature.strokes.pop();
+        drawSignature(pad, state.signature, false);
+        var empty = $("onb-sig-empty");
+        if (empty) empty.hidden = state.signature.strokes.length > 0;
+        if (!state.signature.strokes.length) wrap.classList.remove("has-ink");
+      });
+    }
+
+    /* Keyboard: space or enter clears a stray mark, backspace undoes. */
+    pad.addEventListener("keydown", function (e) {
+      if (e.key === "Backspace" && undo) { e.preventDefault(); undo.click(); }
     });
 
     state.signature.points = pointCount;
 
     var next = $("onb-id-next");
     if (!next) return;
-    $("onb-id-back").addEventListener("click", function () { go(signedIn() ? "agree" : "account"); });
+    var back = $("onb-id-back");
+    if (back) back.addEventListener("click", function () { go(signedIn() ? "agree" : "account"); });
 
     next.addEventListener("click", function () {
       var err = $("onb-id-error");

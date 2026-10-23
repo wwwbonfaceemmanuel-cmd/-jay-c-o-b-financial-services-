@@ -5035,7 +5035,14 @@ summary:focus-visible {
   pointer-events: none;
 }
 .sigpad-empty.is-error { font-family: inherit; font-style: normal; font-size: .78rem; color: var(--danger); padding: 1rem; text-align: center; }
-.sigpad-foot { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-top: .45rem; }
+.sigpad-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: .6rem; margin-top: .45rem; flex-wrap: wrap;
+}
+.sigpad-actions { display: inline-flex; gap: .35rem; margin-left: auto; }
+/* the ink is drawn by assets/js/onboard.js; none of this may eat a pointer */
+.sigpad canvas { touch-action: none; -webkit-user-select: none; user-select: none; }
+.sigpad.has-ink .sigpad-baseline { opacity: .45; }
 
 @media (max-width: 780px) {
   .onb-fields { grid-template-columns: 1fr; }
@@ -5078,6 +5085,109 @@ summary:focus-visible {
 .auth-recover a:hover { border-color: var(--line-strong); background: var(--cream); }
 .auth-recover strong { display: block; font-size: .8rem; color: var(--navy-800); }
 .auth-recover span { display: block; font-size: .74rem; color: var(--muted); margin-top: .12rem; }
+
+/* =====================================================================
+   PRODUCT QUOTES — the worked example on every loan product
+   ---------------------------------------------------------------------
+   Rendered by assets/js/product-quotes.js with the shared finance engine.
+   Sits inside a product card on the pearl surface: a quiet gold-framed
+   inset, so it reads as a sheet of figures rather than a second card.
+   ===================================================================== */
+.pq {
+  margin-top: 1.15rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border-radius: 13px;
+  border: 1px solid rgba(166, 124, 26, 0.26);
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.92), rgba(246, 251, 254, 0.88)),
+    radial-gradient(420px 160px at 92% -30%, rgba(31, 131, 201, 0.10), transparent 70%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+.pq-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: .4rem .8rem; margin-bottom: .75rem;
+}
+.pq-tag {
+  font-family: var(--font-sans); font-size: .66rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--gold-700);
+}
+.pq-quote { font-size: .76rem; font-weight: 600; color: var(--navy-700); }
+.pq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.pq-f { display: grid; gap: .25rem; }
+.pq-f span {
+  font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.pq-f input {
+  width: 100%; padding: .5rem .6rem; border-radius: 9px;
+  border: 1px solid rgba(166, 124, 26, 0.24);
+  background: #fff; color: var(--ink); font-family: var(--font-sans);
+  font-size: .86rem; font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 2px rgba(4, 23, 26, 0.05);
+}
+.pq-f input:focus {
+  outline: none; border-color: var(--gold-500);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+.pq-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 1rem; align-items: center; margin-top: .85rem;
+}
+.pq-figure { display: grid; gap: .1rem; }
+.pq-label {
+  font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.pq-figure strong {
+  font-family: var(--font-serif); font-size: 1.5rem; line-height: 1.15;
+  color: var(--navy-800); font-variant-numeric: tabular-nums;
+}
+.pq-figure small { font-size: .7rem; color: var(--muted); }
+.pq-rows { display: grid; gap: .3rem; margin: 0; }
+.pq-rows div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: .6rem;
+  padding-bottom: .3rem; border-bottom: 1px solid rgba(166, 124, 26, 0.14);
+}
+.pq-rows div:last-child { border-bottom: 0; padding-bottom: 0; }
+.pq-rows dt { font-size: .74rem; color: var(--muted); }
+.pq-rows dd {
+  margin: 0; font-size: .78rem; font-weight: 700; color: var(--navy-800);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.pq-formula {
+  margin-top: .8rem; padding-top: .65rem;
+  border-top: 1px dashed rgba(166, 124, 26, 0.3);
+  font-size: .72rem; line-height: 1.5; color: var(--muted);
+}
+.pq-links { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.pq-link {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .74rem; font-weight: 700; text-decoration: none;
+  padding: .4rem .7rem; border-radius: 8px;
+  border: 1px solid rgba(166, 124, 26, 0.32); color: var(--navy-700);
+  background: rgba(255, 255, 255, 0.7);
+}
+.pq-link:hover { border-color: var(--gold-500); color: var(--navy-800); }
+.pq-link--solid {
+  background: linear-gradient(135deg, var(--navy-700), var(--navy-900));
+  border-color: transparent; color: #eaf6f1;
+  box-shadow: inset 0 -2px 0 rgba(201, 162, 39, 0.85);
+}
+.pq-link--solid:hover { color: #fff; }
+
+/* Compact example line on the home page cards */
+.pq-mini {
+  margin-top: .55rem; font-size: .74rem; line-height: 1.5;
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.pq-mini b { color: var(--navy-800); font-weight: 700; }
+.product-card--featured .pq-mini { color: #a9c6bc; }
+.product-card--featured .pq-mini b { color: #f2e3b6; }
+
+@media (max-width: 720px) {
+  .pq-body { grid-template-columns: 1fr; gap: .75rem; }
+  .pq-fields { grid-template-columns: 1fr; }
+}
 
 /* =====================================================================
    THEME v6 — PREMIUM SURFACES

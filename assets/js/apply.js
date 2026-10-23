@@ -12,17 +12,17 @@
   if (!UI || !DATA || !F) return;
 
   var PRODUCTS = {
-    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2 },
-    "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5 },
-    "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2 },
-    "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2 },
-    "Employee Loan": { min: 100000, max: 8000000, rate: 21, term: [6, 36], fee: 1.5 },
-    "Small-business Loan": { min: 250000, max: 20000000, rate: 23, term: [6, 48], fee: 2 },
-    "Agricultural Loan": { min: 200000, max: 25000000, rate: 20, term: [6, 36], fee: 2 },
-    "Short-term Loan": { min: 50000, max: 3000000, rate: 29, term: [1, 6], fee: 3 },
-    "Long-term Loan": { min: 1000000, max: 60000000, rate: 21, term: [24, 84], fee: 2.5 },
-    "Secured Loan": { min: 500000, max: 80000000, rate: 18, term: [12, 84], fee: 1.5 },
-    "Unsecured Loan": { min: 100000, max: 10000000, rate: 26, term: [6, 36], fee: 2.5 }
+    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5, rateBasis: "annual", method: "reducing" },
+    "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Employee Loan": { min: 100000, max: 8000000, rate: 21, term: [6, 36], fee: 1.5, rateBasis: "annual", method: "reducing" },
+    "Small-business Loan": { min: 250000, max: 20000000, rate: 23, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Agricultural Loan": { min: 200000, max: 25000000, rate: 20, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Short-term Loan": { min: 50000, max: 3000000, rate: 29, term: [1, 6], fee: 3, rateBasis: "annual", method: "reducing" },
+    "Long-term Loan": { min: 1000000, max: 60000000, rate: 21, term: [24, 84], fee: 2.5, rateBasis: "annual", method: "reducing" },
+    "Secured Loan": { min: 500000, max: 80000000, rate: 18, term: [12, 84], fee: 1.5, rateBasis: "annual", method: "reducing" },
+    "Unsecured Loan": { min: 100000, max: 10000000, rate: 26, term: [6, 36], fee: 2.5, rateBasis: "annual", method: "reducing" }
   };
 
   /* Follow the catalogue published in the admin console. */
@@ -37,6 +37,8 @@
       if (isFinite(p.max) && p.max > 0) PRODUCTS[name].max = Number(p.max);
       if (isFinite(p.fee) && p.fee >= 0) PRODUCTS[name].fee = Number(p.fee);
       if (isFinite(p.minTerm) && isFinite(p.maxTerm)) PRODUCTS[name].term = [Number(p.minTerm), Number(p.maxTerm)];
+      if (p.rateBasis === "monthly" || p.rateBasis === "annual") PRODUCTS[name].rateBasis = p.rateBasis;
+      if (p.method === "flat" || p.method === "reducing") PRODUCTS[name].method = p.method;
     });
   }
   syncCatalogue();
@@ -68,6 +70,18 @@
   function mwk(v) { return F.formatMWK(v); }
   function profile() { return DATA.get().profile; }
 
+  /* Every figure in this flow comes from the shared engine, with the
+     product's own rate, basis, method and fee — the same call the product
+     pages and the calculator make. */
+  function quoteFor(productName, amount, termMonths) {
+    var p = PRODUCTS[productName] || PRODUCTS["Personal Loan"];
+    return F.productQuote(p, { amount: amount, termMonths: termMonths, name: productName });
+  }
+  function rateWords(productName) {
+    var p = PRODUCTS[productName] || PRODUCTS["Personal Loan"];
+    return F.ratePhrase(F.productTerms(p, {}));
+  }
+
   /* ---------------- Markup ---------------- */
   function stepper() {
     var labels = ["Loan", "Personal", "Business & bank", "Documents", "Review"];
@@ -78,18 +92,14 @@
   }
 
   function summaryBox() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({
-      principal: state.amount, rate: p.rate, termMonths: state.term,
-      method: "reducing", frequency: "monthly", processingFeePct: p.fee
-    });
+    var calc = quoteFor(state.product, state.amount, state.term);
     return '<div class="calc-result" style="margin-top:1rem;">' +
       '<p class="hero-label">Estimated monthly instalment</p>' +
       '<p class="hero-figure">' + mwk(calc.payment) + "</p>" +
       '<div class="row"><span>Product</span><strong>' + esc(state.product) + "</strong></div>" +
       '<div class="row"><span>Amount requested</span><strong>' + mwk(state.amount) + "</strong></div>" +
       '<div class="row"><span>Term</span><strong>' + state.term + " months</strong></div>" +
-      '<div class="row"><span>Indicative rate</span><strong>' + p.rate + "% p.a. (reducing)</strong></div>" +
+      '<div class="row"><span>Indicative rate</span><strong>' + esc(rateWords(state.product)) + "</strong></div>" +
       '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
       '<div class="row"><span>Total repayment</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
       '<p class="result-note" style="font-size:.7rem;color:#9bb5b0;margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
@@ -104,7 +114,7 @@
           Object.keys(PRODUCTS).map(function (k) { return '<option' + (k === state.product ? " selected" : "") + ">" + k + "</option>"; }).join("") +
         "</select></div>" +
         '<div class="field"><label for="ap-amount">Requested amount (MWK)</label><input id="ap-amount" type="number" min="' + p.min + '" max="' + p.max + '" step="50000" value="' + state.amount + '">' +
-          '<span class="hint" id="ap-limits">Limits ' + mwk(p.min) + " – " + mwk(p.max) + " · rate from " + p.rate + "% p.a.</span></div>" +
+          '<span class="hint" id="ap-limits">Limits ' + mwk(p.min) + " – " + mwk(p.max) + " · " + esc(rateWords(state.product)) + "</span></div>" +
         '<div class="field"><label for="ap-term">Repayment period (months)</label><input id="ap-term" type="number" min="' + p.term[0] + '" max="' + p.term[1] + '" value="' + state.term + '">' +
           '<span class="hint">Allowed: ' + p.term[0] + "–" + p.term[1] + " months</span></div>" +
         '<div class="field field--full"><label for="ap-purpose">Loan purpose</label><select id="ap-purpose">' +
@@ -206,8 +216,7 @@
   }
 
   function stepFive() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({ principal: state.amount, rate: p.rate, termMonths: state.term, method: "reducing", frequency: "monthly", processingFeePct: p.fee });
+    var calc = quoteFor(state.product, state.amount, state.term);
     function v(id, fallback) {
       var el = $(id);
       return el ? el.value : fallback;
@@ -230,7 +239,7 @@
       "</div>" +
       '<div class="calc-result" style="margin-top:1rem;">' +
         '<div class="row"><span>Estimated instalment</span><strong>' + mwk(calc.payment) + "</strong></div>" +
-        '<div class="row"><span>Indicative rate</span><strong>' + p.rate + "% p.a. reducing balance</strong></div>" +
+        '<div class="row"><span>Indicative rate</span><strong>' + esc(rateWords(state.product)) + "</strong></div>" +
         '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
         '<div class="row"><span>Total cost of credit</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
       "</div>" +
@@ -337,8 +346,7 @@
   }
 
   function affordabilityBlock() {
-    var p = PRODUCTS[state.product];
-    var calc = F.amortize({ principal: state.amount, rate: p.rate, termMonths: state.term, method: "reducing", frequency: "monthly", processingFeePct: p.fee });
+    var calc = quoteFor(state.product, state.amount, state.term);
     var pr = profile();
     var a = F.eligibilityAffordability(pr.monthlyIncome, pr.monthlyExpenses, 265000, calc.payment);
     var tone = a.verdict === "strong" ? "ok" : a.verdict === "fair" ? "warn" : "danger";
@@ -560,7 +568,7 @@
       $("ap-term").value = state.term;
       $("ap-term").min = p.term[0];
       $("ap-term").max = p.term[1];
-      $("ap-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · rate from " + p.rate + "% p.a.";
+      $("ap-limits").textContent = "Limits " + mwk(p.min) + " – " + mwk(p.max) + " · " + rateWords(state.product);
       refreshSummary();
     });
     $("ap-amount").addEventListener("input", function () {

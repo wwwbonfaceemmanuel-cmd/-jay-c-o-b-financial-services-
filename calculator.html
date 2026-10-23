@@ -99,13 +99,20 @@
 
           <fieldset style="border:0;padding:0;margin:1.2rem 0 0;">
             <legend class="fieldset-title" style="margin-bottom:.5rem;">Loan type</legend>
-            <div class="calc-products">
+            <!-- One chip per product in the catalogue; calculator.js fills this
+                 from Supabase so every loan product can be quoted here. -->
+            <div class="calc-products" id="calc-presets">
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-personal" value="personal" checked><label for="preset-personal">Personal</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-business" value="business"><label for="preset-business">Business</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-emergency" value="emergency"><label for="preset-emergency">Emergency</label></span>
               <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-salary" value="salary"><label for="preset-salary">Salary-based</label></span>
-              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short" value="short"><label for="preset-short">Short-term</label></span>
-              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long" value="long"><label for="preset-long">Long-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-employee" value="employee"><label for="preset-employee">Employee</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-small-business" value="small-business"><label for="preset-small-business">Small business</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-agricultural" value="agricultural"><label for="preset-agricultural">Agricultural</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-short-term" value="short-term"><label for="preset-short-term">Short-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-long-term" value="long-term"><label for="preset-long-term">Long-term</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-secured" value="secured"><label for="preset-secured">Secured</label></span>
+              <span class="chip-radio"><input type="radio" name="calc-preset" id="preset-unsecured" value="unsecured"><label for="preset-unsecured">Unsecured</label></span>
             </div>
           </fieldset>
 
