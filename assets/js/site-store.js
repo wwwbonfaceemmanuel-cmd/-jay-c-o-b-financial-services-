@@ -60,6 +60,14 @@
       whatsapp: "https://wa.me/265999123456",
       x: "https://x.com/jaycobfinancial"
     },
+    /* Which theme the administrator has published. See assets/js/theme.js
+       for the registry; "emerald" is the house style and writes nothing. */
+    theme: {
+      site: "emerald",
+      dashboard: "emerald",
+      updated: null,
+      updatedBy: ""
+    },
     calc: {
       amount: 5000000,
       rate: 24,
@@ -82,7 +90,7 @@
   };
 
   var PRODUCTS = [
-    { id: "personal", name: "Personal Loan", rate: 24, rateBasis: "annual", method: "reducing", min: 100000, max: 15000000, minTerm: 6, maxTerm: 48, fee: 2, active: true,
+    { id: "personal", name: "Personal Loan", rate: 2, rateBasis: "monthly", method: "reducing", min: 100000, max: 15000000, minTerm: 1, maxTerm: 48, defaultTerm: 1, fee: 2, active: true,
       summary: "Unsecured cash for school fees, home improvement and personal plans.",
       eligibility: ["Age 18+ with a valid national ID", "Resident in Malawi", "Net income from MWK 120,000 per month", "No current arrears with other lenders"] },
     { id: "business", name: "Business Loan", rate: 22, rateBasis: "annual", method: "reducing", min: 500000, max: 50000000, minTerm: 12, maxTerm: 60, fee: 2.5, active: true,
@@ -413,6 +421,7 @@
     out.social = Object.assign(clone(SETTINGS).social, (saved || {}).social || {});
     out.calc = Object.assign(clone(SETTINGS).calc, (saved || {}).calc || {});
     out.policy = Object.assign(clone(SETTINGS).policy, (saved || {}).policy || {});
+    out.theme = Object.assign(clone(SETTINGS).theme, (saved || {}).theme || {});
     return out;
   }
 

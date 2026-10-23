@@ -69,7 +69,7 @@
     ["5. Credit and affordability assessment",
       "We check affordability, existing debt and repayment history before approving any loan. We may verify your details with a credit reference bureau, your employer or your bank, and we may ask for further documents."],
     ["6. Pricing",
-      "The interest rate, processing fee, insurance and any other charge that applies to your loan are shown to you before you sign. Rates are quoted per annum and are fixed for the term of the agreement unless the agreement says otherwise. Fees are disclosed in the Fees and Charges statement."],
+      "The interest rate, processing fee, insurance and any other charge that applies to your loan are shown to you before you sign. Rates are quoted per annum, or per month where a product is published monthly (the personal loan is quoted at 2% per month and opens on a one-month term). The rate is fixed for the term of the agreement unless the agreement says otherwise. Fees are disclosed in the Fees and Charges statement."],
     ["7. Repayments",
       "Repayments are made monthly on the dates shown in your repayment schedule, by Airtel Money, TNM Mpamba, bank transfer or at a branch. Late payments attract the charges set out in your agreement, and persistent non-payment is reported and may lead to recovery action."],
     ["8. Early settlement",

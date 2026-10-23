@@ -12,7 +12,7 @@
   if (!UI || !DATA || !F) return;
 
   var PRODUCTS = {
-    "Personal Loan": { min: 100000, max: 15000000, rate: 24, term: [6, 48], fee: 2, rateBasis: "annual", method: "reducing" },
+    "Personal Loan": { min: 100000, max: 15000000, rate: 2, term: [1, 48], fee: 2, rateBasis: "monthly", method: "reducing", defaultTerm: 1 },
     "Business Loan": { min: 500000, max: 50000000, rate: 22, term: [12, 60], fee: 2.5, rateBasis: "annual", method: "reducing" },
     "Emergency Loan": { min: 50000, max: 2000000, rate: 28, term: [3, 12], fee: 2, rateBasis: "annual", method: "reducing" },
     "Salary-based Loan": { min: 100000, max: 10000000, rate: 23, term: [6, 36], fee: 2, rateBasis: "annual", method: "reducing" },
@@ -56,7 +56,7 @@
     step: 1,
     product: "Personal Loan",
     amount: 5000000,
-    term: 24,
+    term: 1,
     docs: {},
     draftId: null,
     submitted: null,

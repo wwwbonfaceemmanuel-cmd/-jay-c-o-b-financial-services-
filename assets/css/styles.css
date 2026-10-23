@@ -5649,9 +5649,245 @@ body {
 .header-nav a:focus-visible { outline: 2px solid var(--gold-400); outline-offset: 2px; }
 @media (max-width: 640px) { .header-nav { width: 100%; margin-left: 0; } }
 
+
+/* =====================================================================
+   THEME v8 — THE PAGE'S OWN HEADER BAND WEARS THE SAME EMERALD
+   ---------------------------------------------------------------------
+   The site header is emerald; the band that opens every inner page (the
+   calculator, the products, the application, the forms, the legal pages)
+   now wears the same ground, so a page opens on the same colour it
+   closes on. Receipts, statements and every downloaded document carry the
+   same band with the light lockup, so paper and screen agree too.
+   ===================================================================== */
+
+/* ---- 1. the page header band (was cream) ---- */
+.page-hero {
+  background: var(--emerald-chrome);
+  color: var(--chrome-text);
+  border-bottom: 0;
+  box-shadow: inset 0 6px 22px -18px rgba(201, 162, 39, 0.75);
+}
+.page-hero::before {
+  background: radial-gradient(circle, rgba(31, 131, 201, 0.26), transparent 62%);
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.18) 8%,
+    rgba(201, 162, 39, 0.88) 30%, rgba(246, 236, 196, 0.98) 50%,
+    rgba(201, 162, 39, 0.88) 70%, rgba(201, 162, 39, 0.18) 92%, transparent 100%);
+  pointer-events: none;
+}
+.page-hero h1,
+.page-hero h2 { color: var(--chrome-text-strong); }
+.page-hero .lead,
+.page-hero p { color: var(--chrome-text); }
+.page-hero .eyebrow { color: var(--gold-200); }
+.page-hero .eyebrow::before { background: var(--gold-edge); opacity: 1; }
+.page-hero .breadcrumb,
+.page-hero .breadcrumb a { color: var(--chrome-muted-text); }
+.page-hero .breadcrumb a:hover { color: var(--gold-200); }
+.page-hero .breadcrumb .sep { color: var(--chrome-muted-text); }
+.page-hero .btn--ghost,
+.page-hero .btn--line-gold {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(246, 236, 196, 0.34);
+  color: var(--chrome-text-strong);
+}
+.page-hero .btn--ghost:hover,
+.page-hero .btn--line-gold:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--gold-400);
+  color: var(--gold-200);
+}
+.page-hero .btn--gold { color: #12251f; }
+.page-hero .chip,
+.page-hero .pill {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(246, 236, 196, 0.3);
+  color: var(--chrome-text);
+}
+.page-hero .stat-strip,
+.page-hero .hero-facts { border-color: rgba(246, 236, 196, 0.22); }
+.page-hero .muted,
+.page-hero .text-muted,
+.page-hero .text-small { color: var(--chrome-muted-text); }
+
+/* ---- 2. the document header — receipts, statements, auth, print ---- */
+.doc-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.05rem 1.25rem;
+  background: var(--emerald-chrome);
+  color: var(--chrome-text);
+  border: 1px solid rgba(246, 236, 196, 0.26);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.doc-head::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.35) 20%,
+    rgba(246, 236, 196, 0.95) 50%, rgba(201, 162, 39, 0.35) 80%, transparent 100%);
+  pointer-events: none;
+}
+.doc-head__logo { height: 40px; width: auto; flex: none; }
+.doc-head__text { margin-left: auto; text-align: right; min-width: 0; }
+.doc-head__kicker {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-200);
+}
+.doc-head h1,
+.doc-head h2,
+.doc-head__title {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: var(--chrome-text-strong);
+}
+.doc-head p,
+.doc-head__meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--chrome-muted-text);
+}
+.doc-head a { color: var(--gold-200); }
+
+/* the document body that sits under the band */
+.doc-sheet {
+  border: 1px solid rgba(246, 236, 196, 0.26);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--paper);
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+/* ---- 3. auth pages: the lockup and the page title sit on the band ---- */
+.doc-head--compact { padding: 1rem 1.2rem; }
+.doc-head--compact .auth-logo { margin: 0; justify-content: flex-start; }
+.doc-head--compact .auth-logo img { height: 42px; }
+.doc-head--compact .doc-head__text { text-align: right; }
+.doc-head--compact h1 { font-size: 1.28rem; }
+.doc-head + .auth-card {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+  background: rgba(255, 255, 255, 0.96);
+}
+@media (max-width: 520px) {
+  .doc-head__text,
+  .doc-head--compact .doc-head__text { margin-left: 0; text-align: left; }
+  .doc-head__logo { height: 34px; }
+}
+
+/* ---- 4. print: the band stays coloured, everything else is paper ---- */
+@media print {
+  .page-hero,
+  .doc-head {
+    background: var(--emerald-chrome) !important;
+    color: var(--chrome-text) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page-hero h1, .page-hero .lead,
+  .doc-head h1, .doc-head p { color: #fff !important; }
+}
+
 /* print: no chrome */
 @media print {
   .site-header, .app-topbar { background: #fff !important; }
   .site-header::before, .app-topbar::after { display: none !important; }
   .nav-link, .header-topline, .header-topline a { color: #000 !important; }
+}
+
+/* =====================================================================
+   THEME v9 — THE INSIGHT ARTICLE OPENS ON THE SAME BAND
+   ---------------------------------------------------------------------
+   The reading pages were the last public surface opening on paper. Their
+   header now wears the emerald ground the site header and footer share,
+   full-bleed past the reading column, with the gold rail at its foot.
+   ===================================================================== */
+.article-hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(1.8rem, 3.4vw, 2.8rem) 0;
+  color: var(--chrome-text);
+  background: transparent;
+}
+/* the colour runs the full window width, not just the reading column */
+.article-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--emerald-chrome);
+  z-index: -1;
+  pointer-events: none;
+}
+/* the gold rail the header, page bands and receipts all carry */
+.article-hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(201, 162, 39, 0.18) 8%,
+    rgba(201, 162, 39, 0.88) 30%, rgba(246, 236, 196, 0.98) 50%,
+    rgba(201, 162, 39, 0.88) 70%, rgba(201, 162, 39, 0.18) 92%, transparent 100%);
+  pointer-events: none;
+}
+.article-hero .breadcrumb,
+.article-hero .breadcrumb a { color: var(--chrome-muted-text); }
+.article-hero .breadcrumb a:hover { color: var(--gold-200); }
+.article-hero .breadcrumb .sep { color: var(--chrome-muted-text); opacity: 1; }
+.article-hero h1 { color: var(--chrome-text-strong); }
+.article-hero .article-dek { color: var(--chrome-text); }
+.article-hero .article-byline { color: var(--chrome-muted-text); }
+.article-hero .article-byline strong { color: var(--chrome-text-strong); }
+.article-hero .post-meta { color: var(--chrome-muted-text); }
+.article-hero .post-meta .tag {
+  background: rgba(246, 236, 196, 0.12);
+  border: 1px solid rgba(246, 236, 196, 0.34);
+  color: var(--gold-200);
+}
+.article-hero .post-meta .sep { background: rgba(246, 236, 196, 0.45); }
+.article-hero .article-byline .sep { background: rgba(246, 236, 196, 0.45); }
+.article-hero .avatar {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(246, 236, 196, 0.4);
+  color: var(--gold-200);
+}
+.article-hero .article-header { border-bottom-color: var(--chrome-rule); }
+.article-hero .article-wrap > .breadcrumb { margin-bottom: 0.5rem; }
+
+@media (max-width: 640px) {
+  .article-hero { padding-block: 1.4rem 0; }
+  .article-hero h1 { font-size: clamp(1.6rem, 7vw, 2.1rem); }
+}
+
+@media print {
+  .article-hero::before { display: none; }
+  .article-hero, .article-hero h1, .article-hero .article-dek { color: #000 !important; }
 }

@@ -299,6 +299,110 @@
     return lines.join("\n");
   }
 
+  /* ---------------- Document headers ----------------
+     Every receipt, statement and downloaded document opens on the same
+     emerald band the site header uses, with the light platform lockup.
+     The markup is shared so paper, download and screen cannot drift. */
+
+  var DOC_ACCENT = "#c9a227";
+  var DOC_EMERALD = "#06302c";
+
+  function assetBase() {
+    return location.origin + location.pathname.replace(/[^/]*$/, "");
+  }
+
+  /* Inline SVG lockup — used inside downloaded documents, where an
+     external image path would break the moment the file is moved. */
+  function inlineLockup(height) {
+    var h = height || 40;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" ' +
+      'aria-label="JAY C O B Financial Services" style="height:' + h + 'px;width:auto;display:block">' +
+      '<defs><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#0d4a4a"/><stop offset=".52" stop-color="#0a3f6b"/>' +
+      '<stop offset="1" stop-color="#04171a"/></linearGradient>' +
+      '<linearGradient id="lw" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c4e2fb"/></linearGradient></defs>' +
+      '<rect width="64" height="64" rx="16" fill="url(#lc)"/>' +
+      '<rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#a8d8fb" stroke-opacity=".6"/>' +
+      '<text x="32" y="43" text-anchor="middle" font-family="Georgia, \'Times New Roman\', serif" ' +
+      'font-size="27" font-weight="600" fill="#eaf6ff" letter-spacing="-1">JC</text>' +
+      '<text x="80" y="32" font-family="Georgia, \'Times New Roman\', serif" font-size="23" ' +
+      'font-weight="600" fill="url(#lw)" letter-spacing="-.4">JAY C O B</text>' +
+      '<text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" ' +
+      'font-weight="600" fill="#b8d4e6" letter-spacing="2.3">FINANCIAL SERVICES</text></svg>';
+  }
+
+  /* A document header for a dashboard dialog. */
+  function docHead(o) {
+    o = o || {};
+    var logo = o.inline
+      ? inlineLockup(o.logoHeight || 40)
+      : '<img class="doc-head__logo" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">';
+    return '<div class="doc-head' + (o.compact ? " doc-head--compact" : "") + '">' + logo +
+      '<div class="doc-head__text">' +
+        '<span class="doc-head__kicker">' + (o.kicker || "JAY C O B FINANCIAL SERVICES") + '</span>' +
+        '<span class="doc-head__title">' + (o.title || "") + '</span>' +
+        (o.meta ? '<p class="doc-head__meta">' + o.meta + '</p>' : "") +
+      '</div></div>';
+  }
+
+  /* A complete, self-contained HTML document: emerald band, gold rail,
+     logo, table styles. Used by every download so the file itself is
+     branded, not just the screen it came from. */
+  function documentHTML(o) {
+    o = o || {};
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>' + (o.title || "JAY C O B document") + '</title><style>' +
+      'body{margin:0;background:#eef4fa;color:#0b201c;font:13px/1.6 Inter,Arial,sans-serif;padding:28px;}' +
+      '.sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;' +
+      'box-shadow:0 24px 60px -40px rgba(6,48,44,.55);border:1px solid rgba(4,23,22,.12);}' +
+      '.band{position:relative;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 24px;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
+      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      '.band .txt{margin-left:auto;text-align:right;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
+      '.band h1{margin:4px 0 0;font:600 17px/1.2 Georgia,serif;color:#f4fbf8;}' +
+      '.band p{margin:4px 0 0;font-size:11px;color:#b9d3ca;}' +
+      '.body{padding:22px 24px 26px;}' +
+      '.body h2{font:600 14px Georgia,serif;margin:0 0 10px;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}' +
+      'th,td{border-bottom:1px solid #dbe6ef;padding:8px 10px;text-align:left;vertical-align:top;}' +
+      'th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#4a6373;background:#f4f8fc;}' +
+      'td.num{text-align:right;font-variant-numeric:tabular-nums;}' +
+      '.muted{color:#5c7383;font-size:11px;}' +
+      '.kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:0;}' +
+      '.kv dt{color:#5c7383;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}' +
+      '.kv dd{margin:0;font-weight:600;}' +
+      '.foot{margin-top:18px;padding-top:12px;border-top:1px dashed #dbe6ef;color:#5c7383;font-size:10.5px;}' +
+      '@media print{body{background:#fff;padding:0}.sheet{border:0;box-shadow:none}}' +
+      '</style></head><body><div class="sheet">' +
+      '<div class="band">' + inlineLockup(44) +
+      '<div class="txt"><span class="kicker">' + (o.kicker || "JAY C O B FINANCIAL SERVICES") + '</span>' +
+      '<h1>' + (o.title || "") + '</h1>' + (o.meta ? '<p>' + o.meta + '</p>' : '') + '</div></div>' +
+      '<div class="body">' + (o.body || "") +
+      '<p class="foot">JAY C O B FINANCIAL SERVICES · Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi · ' +
+      'hello@jaycobfinancial.mw · +265 999 123 456<br>All amounts in Malawian Kwacha (MWK). ' +
+      (o.note || "") + '</p></div></div></body></html>';
+  }
+
+  /* Download the branded HTML document built above. */
+  function downloadDocument(filename, o) {
+    var content = documentHTML(o);
+    var blob = new Blob(["\ufeff", content], { type: "text/html;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1200);
+  }
+
   function printElement(id) {
     var el = document.getElementById(id);
     if (!el) { window.print(); return; }
@@ -308,14 +412,27 @@
     var doc = frame.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head><title>JAY C O B Financial Services</title>' +
-      '<style>body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:24px;font-size:12px;}' +
-      'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;} table{width:100%;border-collapse:collapse;margin-top:12px;}' +
-      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;} th{font-size:10px;text-transform:uppercase;color:#658982;}' +
-      '.muted{color:#658982;font-size:11px;} .brand{display:flex;gap:12px;align-items:center;margin-bottom:14px;}' +
-      '.brand img{height:40px;} .totals{margin-top:12px;font-weight:700;}</style></head><body>' +
-      '<div class="brand"><img src="' + location.origin + location.pathname.replace(/[^/]*$/, "") + 'assets/img/logo-full.svg" alt="JAY C O B Financial Services">' +
-      "<div><strong>JAY C O B FINANCIAL SERVICES</strong><div class=\"muted\">Plot 47/3, Area 47, Sector 3, Lilongwe · MWK</div></div></div>" +
-      el.innerHTML + "</body></html>");
+      '<style>@page{margin:14mm}body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:0;font-size:12px;margin:0;}' +
+      'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;}' +
+      '.band{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 20px;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
+      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      '.band .txt{margin-left:auto;text-align:right;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
+      '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#f4fbf8;margin-top:3px;}' +
+      '.band .muted{color:#b9d3ca;font-size:11px;}' +
+      '.wrap{padding:18px 4px 0;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:12px;}' +
+      'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;}th{font-size:10px;text-transform:uppercase;color:#658982;}' +
+      '.muted{color:#658982;font-size:11px;} .totals{margin-top:12px;font-weight:700;}</style></head><body>' +
+      '<div class="band">' + inlineLockup(44) +
+      '<div class="txt"><span class="kicker">JAY C O B FINANCIAL SERVICES</span>' +
+      '<strong>' + (el.getAttribute("data-doc-title") || "Document") + '</strong>' +
+      '<span class="muted">Plot 47/3, Area 47, Sector 3, Lilongwe · MWK</span></div></div>' +
+      '<div class="wrap">' + el.innerHTML + '</div></body></html>');
     doc.close();
     frame.contentWindow.focus();
     setTimeout(function () {
@@ -448,6 +565,10 @@
     downloadCSV: downloadCSV,
     tableCSV: tableCSV,
     printElement: printElement,
+    docHead: docHead,
+    documentHTML: documentHTML,
+    downloadDocument: downloadDocument,
+    inlineLockup: inlineLockup,
     paginate: paginate,
     pagerHTML: pagerHTML,
     statusPill: statusPill,
