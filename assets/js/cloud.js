@@ -312,22 +312,27 @@
   function uid() { return (session && session.user && session.user.id) || null; }
 
   var customer = {
+    /* A read that fails must not look like an empty account: the caller
+       would create a blank document and write it over the real one, taking
+       the signature with it. So errors are passed on, and only a genuinely
+       missing row comes back as null. */
     load: function () {
       if (!enabled || !uid()) return Promise.resolve(null);
       return from(TABLES.customer).select("data,updated_at").eq("owner", uid()).limit(1).run()
         .then(function (rows) {
           var row = Array.isArray(rows) ? rows[0] : rows;
           return row ? { data: row.data, updated_at: row.updated_at } : null;
-        })
-        .catch(function () { return null; });
+        });
     },
+    /* Same rule on the way out: a refused write has to reach the caller, so
+       nothing on screen claims a signature or a record was saved when the
+       database did not take it. */
     save: function (data) {
       if (!enabled || !uid()) return Promise.resolve(null);
       return from(TABLES.customer)
         .upsert({ owner: uid(), data: data, updated_at: new Date().toISOString() }, "owner")
         .run()
-        .then(function (rows) { return Array.isArray(rows) ? rows[0] : rows; })
-        .catch(function () { return null; });
+        .then(function (rows) { return Array.isArray(rows) ? rows[0] : rows; });
     },
     /* Staff write: update one customer document (admin console bridge). */
     saveFor: function (owner, data) {

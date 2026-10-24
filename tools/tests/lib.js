@@ -57,6 +57,9 @@ function makeDom(file, options) {
       /* jsdom has no fetch of its own — route it through node, so the page
          reaches the same origin the browser would. */
       window.fetch = (input, init) => fetch(new URL(input, window.location.href), init);
+      /* A suite can stand in front of the network, to prove what the page
+         does when a write is refused. */
+      if (options.fetch) window.fetch = options.fetch(window.fetch);
       if (options.local) window.localStorage.setItem("jcob_mode", "local");
       Object.keys(options.seed || {}).forEach((key) => {
         try { window.localStorage.setItem(key, options.seed[key]); } catch (e) {}

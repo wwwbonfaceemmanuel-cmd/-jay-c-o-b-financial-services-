@@ -315,6 +315,107 @@ async function signInGate(w, creds) {
     w2.close();
   }
 
+  console.log("\n[cloud mode — the signature is really stored, and a refusal is reported]");
+  {
+    /* The signature lives in the customer's own document in customer_docs,
+       at data.profile.signature. Two things have to be true: it is written
+       there, and a database that refuses the write is never reported as a
+       save — otherwise the screen says "saved" while nothing was kept. */
+    const auth = await token(CUSTOMER);
+    const session = {
+      access_token: auth.access_token, refresh_token: auth.refresh_token,
+      expires_at: Date.now() + 3600 * 1000, token_type: "bearer", user: auth.user
+    };
+    const uid = auth.user.id;
+    const read = async () => (await rest("customer_docs?owner=eq." + uid + "&select=data,updated_at"))[0];
+
+    const signature = {
+      version: 1, w: 640, h: 190, signedAt: new Date().toISOString(), signerName: "Mock Cloud Customer",
+      strokes: [[{ x: 12, y: 90 }, { x: 88, y: 34 }, { x: 160, y: 96 }]]
+    };
+
+    const { dom } = makeDom("dashboard.html", {
+      hash: "#applications",
+      seed: { jcob_cloud_session_v1: JSON.stringify(session) }
+    });
+    await ready(dom, 1500);
+    const w = dom.window;
+    w.JCOB_DATA.get().profile.signature = signature;
+    await w.JCOB_DATA.saveNow();
+    await sleep(600);
+
+    const landed = (await read()).data.profile.signature;
+    t.eq("the signature has a home in customer_docs", w.JCOB_DATA.remote.state, "synced");
+    t.eq("the person who signed is recorded", landed && landed.signerName, "Mock Cloud Customer");
+    t.eq("the moment of signing is recorded", !!(landed && landed.signedAt), true);
+    t.eq("the strokes are recorded", landed && landed.strokes.length, 1);
+    t.eq("the pad size is recorded", landed && landed.w + "x" + landed.h, "640x190");
+
+    /* Now refuse the write the way a revoked key or a dropped policy would. */
+    const before = (await read()).data.profile.fullName;
+    w.fetch = (input, init) => {
+      const method = String((init && init.method) || "GET").toUpperCase();
+      if (/customer_docs/.test(String(input)) && method !== "GET" && method !== "HEAD") {
+        return Promise.resolve({
+          status: 403, ok: false,
+          text: () => Promise.resolve('{"message":"permission denied for table customer_docs"}')
+        });
+      }
+      return fetch(new URL(input, w.location.href), init);
+    };
+    w.JCOB_DATA.get().profile.fullName = "Written While Refused";
+    await w.JCOB_DATA.saveNow();
+    await sleep(400);
+
+    t.eq("a refused write is reported as an error", w.JCOB_DATA.remote.state, "error");
+    t.eq("the refusal is explained", /permission denied/i.test(String(w.JCOB_DATA.remote.error)), true);
+    const after = (await read()).data.profile.fullName;
+    t.eq("nothing was written", after, before);
+    t.eq("the stored signature is untouched", (await read()).data.profile.signature.signerName, "Mock Cloud Customer");
+    const chip = w.document.querySelector("[data-sync]");
+    t.ok("the dashboard says it was not saved", !!chip && /not saved/i.test(chip.textContent),
+      chip ? chip.textContent : "no sync chip");
+    w.close();
+  }
+
+  console.log("\n[cloud mode — a read that fails never becomes a blank account]");
+  {
+    /* The old failure mode: a refused read looked like "no document", so the
+       page created an empty one and wrote it over the customer's file — the
+       signature included. A failed read must stop everything, not reset it. */
+    const auth = await token(CUSTOMER);
+    const session = {
+      access_token: auth.access_token, refresh_token: auth.refresh_token,
+      expires_at: Date.now() + 3600 * 1000, token_type: "bearer", user: auth.user
+    };
+    const uid = auth.user.id;
+    const before = (await rest("customer_docs?owner=eq." + uid + "&select=data"))[0].data;
+
+    const { dom } = makeDom("dashboard.html", {
+      hash: "#applications",
+      seed: { jcob_cloud_session_v1: JSON.stringify(session) },
+      fetch: (base) => (input, init) => {
+        const method = String((init && init.method) || "GET").toUpperCase();
+        if (/customer_docs/.test(String(input)) && (method === "GET" || method === "HEAD")) {
+          return Promise.resolve({
+            status: 503, ok: false, text: () => Promise.resolve('{"message":"service unavailable"}')
+          });
+        }
+        return base(input, init);
+      }
+    });
+    await ready(dom, 1500);
+    const w = dom.window;
+    await sleep(600);
+
+    const after = (await rest("customer_docs?owner=eq." + uid + "&select=data"))[0].data;
+    t.eq("the read failure is reported", w.JCOB_DATA.remote.state, "error");
+    t.eq("the account was not blanked", after.profile.fullName, before.profile.fullName);
+    t.eq("the signature is still on file", after.profile.signature.signerName, before.profile.signature.signerName);
+    t.eq("the application history is intact", after.applications.length, before.applications.length);
+    w.close();
+  }
+
   console.log("\n[cloud mode — auth flows]");
   {
     const { dom, errors } = makeDom("login.html");

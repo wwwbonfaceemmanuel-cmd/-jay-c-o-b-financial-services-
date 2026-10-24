@@ -149,6 +149,7 @@ memory while it is open, reads it from `customer_docs` on load and writes every 
 | What | Table | Who can read it |
 | --- | --- | --- |
 | Customer document (profile, loans, repayments, KYC, tickets) | `customer_docs` | the owner, and staff |
+| The signature — `data.profile.signature` inside the customer document: `{version, w, h, strokes, signedAt, signerName}` | `customer_docs` (`data`, jsonb) | the owner, and staff |
 | Console book (customers, applications, ledger, staff) | `portal_docs` | staff only |
 | Website content (settings, catalogue, page text, live posts) | `site_docs` | everyone |
 | Enquiries | `enquiries` | staff, plus insert for a visitor |
@@ -264,7 +265,7 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 656 assertions
+npm test        # starts the Supabase stand-in + server, runs 670 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
