@@ -72,8 +72,10 @@ t.eq("the house theme is the default", T.DEFAULT, "emerald");
 const list = T.list();
 t.eq("five themes are published", list.length, 5);
 t.eq("the house theme leads the list", list[0].id, "emerald");
-t.eq("the dashboard option is named for the brief",
-  list.filter((x) => x.id === "royal")[0].name, "Royal blue & crystal");
+t.eq("the second theme is named for its palette",
+  list.filter((x) => x.id === "royal")[0].name, "Navy & sapphire");
+t.eq("the house theme carries the brief's palette",
+  list.filter((x) => x.id === "emerald")[0].name, "Midnight navy & gold");
 list.forEach((x) => {
   t.ok(x.id + " has a name, a note and a swatch",
     !!x.name && !!x.note && Array.isArray(x.swatch) && x.swatch.length === 3, JSON.stringify(x));
@@ -94,18 +96,19 @@ t.eq("but it still marks the surface", $root(w).getAttribute("data-theme"), "eme
 T.apply("site", "royal");
 t.eq("the website surface is marked", $root(w).getAttribute("data-theme"), "royal");
 t.eq("the website choice is recorded", $root(w).getAttribute("data-theme-site"), "royal");
-t.eq("the chrome became royal blue", prop(w, "--navy-700"), "#0b2b4d");
+t.eq("the chrome became the theme's card navy", prop(w, "--navy-700"), "#0a2246");
+t.eq("and the surfaces followed", prop(w, "--ng-card"), "#0a2246");
 t.ok("the header band follows the chrome token",
-  /#0b2b4d/.test(prop(w, "--emerald-chrome")), prop(w, "--emerald-chrome"));
+  /#061631/.test(prop(w, "--emerald-chrome")), prop(w, "--emerald-chrome"));
 t.eq("the browser chrome colour follows the swatch",
-  w.document.querySelector('meta[name="theme-color"]').getAttribute("content"), "#0b2b4d");
+  w.document.querySelector('meta[name="theme-color"]').getAttribute("content"), "#020b1c");
 
 /* a dashboard choice made while a website is open must not repaint it */
 T.apply("dashboard", "copper");
 t.eq("a dashboard choice leaves the website alone", $root(w).getAttribute("data-theme"), "royal");
 t.eq("the dashboard choice is recorded separately", $root(w).getAttribute("data-theme-dashboard"), "copper");
 t.ok("a dashboard theme drives the console's own --chrome",
-  /#3a2118/.test(prop(w, "--chrome")), prop(w, "--chrome"));
+  /#06182c/.test(prop(w, "--chrome")), prop(w, "--chrome"));
 
 T.apply("dashboard", "emberald"); /* unknown → house theme */
 t.eq("on the house theme the console aliases are left to the stylesheet",
@@ -114,7 +117,7 @@ t.eq("and its text colour too", prop(w, "--chrome-txt"), "");
 
 T.apply("dashboard", "midnight");
 t.ok("a second console theme repaints the alias",
-  /#1b2028/.test(prop(w, "--chrome")), prop(w, "--chrome"));
+  /#14161b/.test(prop(w, "--chrome")), prop(w, "--chrome"));
 
 /* back to the house theme: every inline token is taken away again */
 T.apply("site", "emerald");
@@ -133,7 +136,7 @@ dashW.JCOB_SITE = { settings: { theme: { site: "royal", dashboard: "copper" } },
 dashW.JCOB_THEME.paint();
 t.eq("the dashboard opens in its own theme", $root(dashW).getAttribute("data-theme"), "copper");
 t.ok("it paints the dashboard chrome, not the website's",
-  /#3a2118/.test(prop(dashW, "--emerald-chrome")), prop(dashW, "--emerald-chrome"));
+  /#06182c/.test(prop(dashW, "--emerald-chrome")), prop(dashW, "--emerald-chrome"));
 t.eq("the website theme is only recorded, not painted",
   $root(dashW).getAttribute("data-theme-site"), null);
 

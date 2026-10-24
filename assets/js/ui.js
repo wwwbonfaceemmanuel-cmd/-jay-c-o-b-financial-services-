@@ -304,8 +304,13 @@
      emerald band the site header uses, with the light platform lockup.
      The markup is shared so paper, download and screen cannot drift. */
 
-  var DOC_ACCENT = "#c9a227";
-  var DOC_EMERALD = "#06302c";
+  var DOC_ACCENT = "#d4a63a";
+  var DOC_BRIGHT = "#ffd166";
+  var DOC_NAVY = "#020817";
+  var DOC_PANEL = "#08172d";
+  var DOC_INK = "#ffffff";
+  var DOC_BODY = "#cbd5e1";
+  var DOC_MUTED = "#94a3b8";
 
   function assetBase() {
     return location.origin + location.pathname.replace(/[^/]*$/, "");
@@ -318,18 +323,18 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" ' +
       'aria-label="JAY C O B Financial Services" style="height:' + h + 'px;width:auto;display:block">' +
       '<defs><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#0d4a4a"/><stop offset=".52" stop-color="#0a3f6b"/>' +
-      '<stop offset="1" stop-color="#04171a"/></linearGradient>' +
+      '<stop offset="0" stop-color="#0b1d35"/><stop offset=".55" stop-color="#061329"/>' +
+      '<stop offset="1" stop-color="#020817"/></linearGradient>' +
       '<linearGradient id="lw" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c4e2fb"/></linearGradient></defs>' +
+      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe7a8"/></linearGradient></defs>' +
       '<rect width="64" height="64" rx="16" fill="url(#lc)"/>' +
-      '<rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#a8d8fb" stroke-opacity=".6"/>' +
+      '<rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#d4a63a" stroke-opacity=".85"/>' +
       '<text x="32" y="43" text-anchor="middle" font-family="Georgia, \'Times New Roman\', serif" ' +
-      'font-size="27" font-weight="600" fill="#eaf6ff" letter-spacing="-1">JC</text>' +
+      'font-size="27" font-weight="600" fill="#ffd166" letter-spacing="-1">JC</text>' +
       '<text x="80" y="32" font-family="Georgia, \'Times New Roman\', serif" font-size="23" ' +
       'font-weight="600" fill="url(#lw)" letter-spacing="-.4">JAY C O B</text>' +
       '<text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" ' +
-      'font-weight="600" fill="#b8d4e6" letter-spacing="2.3">FINANCIAL SERVICES</text></svg>';
+      'font-weight="600" fill="#94a3b8" letter-spacing="2.3">FINANCIAL SERVICES</text></svg>';
   }
 
   /* A document header for a dashboard dialog. */
@@ -354,31 +359,37 @@
     return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<title>' + (o.title || "JAY C O B document") + '</title><style>' +
-      'body{margin:0;background:#eef4fa;color:#0b201c;font:13px/1.6 Inter,Arial,sans-serif;padding:28px;}' +
-      '.sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;' +
-      'box-shadow:0 24px 60px -40px rgba(6,48,44,.55);border:1px solid rgba(4,23,22,.12);}' +
+      'body{margin:0;background:#020817;color:#cbd5e1;font:13px/1.6 Inter,Arial,sans-serif;padding:28px;' +
+      'background-image:radial-gradient(900px 420px at 88% -20%,rgba(212,166,58,.10),transparent 62%);' +
+      'background-attachment:fixed;}' +
+      '.sheet{max-width:820px;margin:0 auto;background:#08172d;border-radius:16px;overflow:hidden;' +
+      'box-shadow:0 24px 60px -40px rgba(0,0,0,.9);border:1px solid rgba(184,138,43,.38);}' +
       '.band{position:relative;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 24px;' +
-      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
-      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(212,166,58,.16),transparent 62%),' +
+      'linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);color:#cbd5e1;' +
       '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
-      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#ffd166 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
       '.band .txt{margin-left:auto;text-align:right;}' +
-      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
-      '.band h1{margin:4px 0 0;font:600 17px/1.2 Georgia,serif;color:#f4fbf8;}' +
-      '.band p{margin:4px 0 0;font-size:11px;color:#b9d3ca;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#ffd166;font-weight:700;}' +
+      '.band h1{margin:4px 0 0;font:600 17px/1.2 Georgia,serif;color:#ffffff;}' +
+      '.band p{margin:4px 0 0;font-size:11px;color:#94a3b8;}' +
       '.body{padding:22px 24px 26px;}' +
-      '.body h2{font:600 14px Georgia,serif;margin:0 0 10px;}' +
+      '.body h2{font:600 14px Georgia,serif;margin:0 0 10px;color:#e7c36b;}' +
       'table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}' +
-      'th,td{border-bottom:1px solid #dbe6ef;padding:8px 10px;text-align:left;vertical-align:top;}' +
-      'th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#4a6373;background:#f4f8fc;}' +
-      'td.num{text-align:right;font-variant-numeric:tabular-nums;}' +
-      '.muted{color:#5c7383;font-size:11px;}' +
+      'th,td{border-bottom:1px solid rgba(148,163,184,.16);padding:8px 10px;text-align:left;vertical-align:top;}' +
+      'td{color:#cbd5e1;}' +
+      'th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#e7c36b;background:#01060f;}' +
+      'td.num{text-align:right;font-variant-numeric:tabular-nums;color:#ffffff;}' +
+      '.muted{color:#94a3b8;font-size:11px;}' +
       '.kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:0;}' +
-      '.kv dt{color:#5c7383;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}' +
-      '.kv dd{margin:0;font-weight:600;}' +
-      '.foot{margin-top:18px;padding-top:12px;border-top:1px dashed #dbe6ef;color:#5c7383;font-size:10.5px;}' +
-      '@media print{body{background:#fff;padding:0}.sheet{border:0;box-shadow:none}}' +
+      '.kv dt{color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.8px;}' +
+      '.kv dd{margin:0;font-weight:600;color:#ffffff;}' +
+      '.foot{margin-top:18px;padding-top:12px;border-top:1px dashed rgba(184,138,43,.38);color:#94a3b8;font-size:10.5px;}' +
+      '@media print{body{background:#fff;color:#111;padding:0}' +
+      '.sheet{background:#fff;border:0;box-shadow:none}' +
+      '.body h2,.kv dd,td,td.num{color:#111}.muted,.kv dt,.foot{color:#555}' +
+      'th{color:#333;background:#f2f2f2}}' +
       '</style></head><body><div class="sheet">' +
       '<div class="band">' + inlineLockup(44) +
       '<div class="txt"><span class="kicker">' + (o.kicker || "JAY C O B FINANCIAL SERVICES") + '</span>' +
@@ -415,15 +426,15 @@
       '<style>@page{margin:14mm}body{font-family:Inter,Arial,sans-serif;color:#0b201c;padding:0;font-size:12px;margin:0;}' +
       'h1,h2,h3{font-family:Georgia,serif;margin:0 0 6px;}' +
       '.band{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 20px;' +
-      'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),' +
-      'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;' +
+      'background:radial-gradient(900px 420px at 88% -20%,rgba(212,166,58,.16),transparent 62%),' +
+      'linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);color:#cbd5e1;' +
       '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;' +
-      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#f6ecc4 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
+      'background:linear-gradient(90deg,transparent,' + DOC_ACCENT + ' 30%,#ffd166 50%,' + DOC_ACCENT + ' 70%,transparent);}' +
       '.band .txt{margin-left:auto;text-align:right;}' +
-      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700;}' +
-      '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#f4fbf8;margin-top:3px;}' +
-      '.band .muted{color:#b9d3ca;font-size:11px;}' +
+      '.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#ffd166;font-weight:700;}' +
+      '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#fff;margin-top:3px;}' +
+      '.band .muted{color:#94a3b8;font-size:11px;}' +
       '.wrap{padding:18px 4px 0;}' +
       'table{width:100%;border-collapse:collapse;margin-top:12px;}' +
       'th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;}th{font-size:10px;text-transform:uppercase;color:#658982;}' +

@@ -102,7 +102,7 @@
       '<div class="row"><span>Indicative rate</span><strong>' + esc(rateWords(state.product)) + "</strong></div>" +
       '<div class="row"><span>Processing fee</span><strong>' + mwk(calc.processingFee) + "</strong></div>" +
       '<div class="row"><span>Total repayment</span><strong>' + mwk(calc.totalCost) + "</strong></div>" +
-      '<p class="result-note" style="font-size:.7rem;color:#9bb5b0;margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
+      '<p class="result-note" style="font-size:.7rem;color:var(--ng-muted);margin-top:.8rem;">Estimates only. Final terms are confirmed after credit and affordability assessment.</p></div>';
   }
 
   function stepOne() {
@@ -327,7 +327,7 @@
       '<div class="head-actions"><a class="btn btn--ghost btn--sm" href="#applications">My applications</a></div></div>' +
       needSignature +
       '<div class="dash-grid" style="grid-template-columns:1.55fr 1fr;align-items:start;">' +
-        '<div class="calc-panel" style="background:#fff;">' + stepper() +
+        '<div class="calc-panel">' + stepper() +
           '<form id="apply-form" novalidate>' + stepOne() + stepTwo() + stepThree() + stepFour() + stepFive() +
             '<div class="flex flex-wrap items-center gap-1" style="margin-top:1.2rem;">' +
               '<button class="btn btn--ghost" type="button" data-step-prev hidden>← Back</button>' +

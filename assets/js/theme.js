@@ -9,9 +9,10 @@
      theme.dashboard  → the customer dashboard and the admin console
 
    A theme is a set of CSS custom properties written onto <html>, so every
-   page, receipt band and console panel changes together. The emerald
-   theme is the published default and writes nothing, which keeps the
-   stylesheet's own values authoritative for the untouched design.
+   page, receipt band and console panel changes together. The house theme
+   (id "emerald", the midnight navy and gold palette) is the published
+   default and writes nothing, which keeps the stylesheet's own values
+   authoritative for the untouched design.
 
    PUBLIC API (window.JCOB_THEME)
      list()                 → [{ id, name, note, swatch }]
@@ -25,133 +26,169 @@
 
   var DEFAULT = "emerald";
 
-  /* Each entry paints: the chrome (header, footer, page bands, receipts),
-     its type, the app surfaces and the accent ramp. Grounds stay light so
-     body text keeps its contrast. */
+  /* ---------------------------------------------------------------------
+     Every published theme is a navy-or-black bank with a metal accent:
+     the grounds stay dark so white type keeps its contrast, and the
+     accent only ever touches trim, figures and the active state. The
+     house theme is the stylesheet's own palette, so it writes nothing.
+
+     Each theme paints:
+       --emerald-chrome  the header, footer, page bands and receipt bands
+       --ng-*            the surfaces, text and accent the v10 layer uses
+       --navy-*          the legacy names the older rules still speak
+       --gold-*          the trim ramp (lintels, focus rings, figures)
+     --------------------------------------------------------------------- */
   var THEMES = {
     emerald: {
-      name: "Emerald & liquid gold",
-      note: "The published house style — deep emerald chrome with gold trim.",
-      swatch: ["#06302c", "#0a3f6b", "#f2e3b6"],
+      name: "Midnight navy & gold",
+      note: "The published house style — #020817 navy, metallic gold trim, white type.",
+      swatch: ["#020817", "#0b1d35", "#ffd166"],
       tokens: {}
     },
+
     royal: {
-      name: "Royal blue & crystal",
-      note: "Royal-blue chrome, ice-crystal accents, cooler grounds.",
-      swatch: ["#0b2b4d", "#1f83c9", "#c4e2fb"],
+      name: "Navy & sapphire",
+      note: "Navy grounds with a sapphire accent and pale-gold trim.",
+      swatch: ["#020b1c", "#0a2246", "#ffd166"],
       tokens: {
-        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(168, 216, 251, 0.26), transparent 62%), linear-gradient(165deg, #0b2b4d 0%, #081f39 62%, #061527 100%)",
-        "--chrome-text": "#dbe9f7",
-        "--chrome-text-strong": "#f6fbff",
-        "--chrome-muted-text": "#b3c8dd",
-        "--chrome-rule": "rgba(196, 226, 251, 0.24)",
-        "--emerald-liquid": "linear-gradient(150deg, #0b2b4d 0%, #081f39 55%, #061527 100%)",
-        "--emerald-blue": "linear-gradient(135deg, #081f39 0%, #0d3f66 45%, #12588a 100%)",
-        "--navy-900": "#061527",
-        "--navy-800": "#081f39",
-        "--navy-700": "#0b2b4d",
-        "--navy-600": "#114272",
-        "--navy-500": "#155289",
-        "--crystal-900": "#0a3f6b",
-        "--crystal-700": "#0d5c96",
-        "--crystal-500": "#1f83c9",
-        "--crystal-300": "#7bb8e8",
-        "--crystal-200": "#a8d8fb",
-        "--crystal-100": "#dff1ff",
-        "--cream": "#edf2fa",
-        "--cream-dark": "#dbe6f4",
-        "--gold-liquid": "linear-gradient(115deg, #a8d8fb 0%, #dff1ff 22%, #8ec7f0 46%, #c8e8ff 62%, #7bb8e8 82%, #e8f6ff 100%)"
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(56, 132, 255, 0.18), transparent 62%), linear-gradient(165deg, #061631 0%, #030c1e 62%, #01060f 100%)",
+        "--chrome-text": "#cbd5e1",
+        "--chrome-text-strong": "#ffffff",
+        "--chrome-muted-text": "#94a3b8",
+        "--chrome-rule": "rgba(184, 138, 43, 0.28)",
+        "--ng-bg": "#020b1c",
+        "--ng-bg-2": "#061631",
+        "--ng-sidebar": "#030d20",
+        "--ng-card": "#0a2246",
+        "--ng-panel": "#0d2a52",
+        "--ng-raise": "#12325e",
+        "--ng-sunken": "#01081a",
+        "--ng-gold-text": "#e7c36b",
+        "--navy-900": "#020b1c",
+        "--navy-800": "#061631",
+        "--navy-700": "#0a2246",
+        "--navy-600": "#0d2a52",
+        "--navy-500": "#12325e",
+        "--crystal-900": "#0b3c6d",
+        "--crystal-700": "#1a63b8",
+        "--crystal-500": "#3884ff",
+        "--crystal-300": "#7fb0ff",
+        "--crystal-200": "#b9d4ff",
+        "--crystal-100": "#e2eeff",
+        "--emerald-liquid": "linear-gradient(150deg, #0a2246 0%, #061631 55%, #020b1c 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #030c1e 0%, #0a2246 45%, #12325e 100%)"
       }
     },
+
     midnight: {
-      name: "Midnight & champagne",
-      note: "Near-black chrome with champagne trim and a neutral ground.",
-      swatch: ["#181c22", "#101318", "#e8d59c"],
+      name: "Black & champagne",
+      note: "Near-black grounds with champagne-gold trim — the quietest of the five.",
+      swatch: ["#050608", "#14161b", "#e8d59c"],
       tokens: {
-        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(232, 213, 156, 0.16), transparent 62%), linear-gradient(165deg, #1b2028 0%, #101318 62%, #080a0d 100%)",
-        "--chrome-text": "#e6e2d8",
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(232, 213, 156, 0.14), transparent 62%), linear-gradient(165deg, #14161b 0%, #0a0b0e 62%, #050608 100%)",
+        "--chrome-text": "#cbd5e1",
         "--chrome-text-strong": "#fbf8f1",
-        "--chrome-muted-text": "#bdb8ab",
-        "--chrome-rule": "rgba(232, 213, 156, 0.22)",
-        "--emerald-liquid": "linear-gradient(150deg, #1b2028 0%, #101318 55%, #080a0d 100%)",
-        "--emerald-blue": "linear-gradient(135deg, #101318 0%, #1b2028 55%, #262c35 100%)",
-        "--navy-900": "#080a0d",
-        "--navy-800": "#101318",
-        "--navy-700": "#1b2028",
-        "--navy-600": "#262c35",
-        "--navy-500": "#343b46",
-        "--cream": "#f1f2f4",
-        "--cream-dark": "#e2e4e8",
-        "--gold-700": "#7d5f0e",
-        "--gold-500": "#c9a227",
-        "--gold-400": "#dcbb5a",
-        "--gold-200": "#f2e3b6",
-        "--gold-100": "#fbf3dc",
-        "--gold-edge": "linear-gradient(135deg, #7d5f0e 0%, #d8b554 26%, #f6ecc4 48%, #c9a227 70%, #7d5f0e 100%)"
+        "--chrome-muted-text": "#94a3b8",
+        "--chrome-rule": "rgba(232, 213, 156, 0.24)",
+        "--ng-bg": "#050608",
+        "--ng-bg-2": "#0c0d11",
+        "--ng-sidebar": "#040507",
+        "--ng-card": "#14161b",
+        "--ng-panel": "#1a1d23",
+        "--ng-raise": "#22262d",
+        "--ng-sunken": "#030406",
+        "--ng-gold": "#d9bd72",
+        "--ng-gold-bright": "#f0e0ac",
+        "--ng-gold-deep": "#a98d45",
+        "--ng-gold-text": "#e8d59c",
+        "--ng-gold-line": "rgba(217, 189, 114, 0.36)",
+        "--ng-gold-line-soft": "rgba(217, 189, 114, 0.2)",
+        "--navy-900": "#050608",
+        "--navy-800": "#0c0d11",
+        "--navy-700": "#14161b",
+        "--navy-600": "#1a1d23",
+        "--navy-500": "#22262d",
+        "--gold-500": "#d9bd72",
+        "--gold-400": "#f0e0ac",
+        "--gold-200": "#f6ecd2",
+        "--gold-100": "#fbf5e6",
+        "--gold-edge": "linear-gradient(135deg, #a98d45 0%, #d9bd72 26%, #f6ecd2 48%, #d9bd72 70%, #a98d45 100%)",
+        "--gold-liquid": "linear-gradient(115deg, #a98d45 0%, #f0e0ac 22%, #d9bd72 46%, #fbf5e6 62%, #c2a558 82%, #f0e0ac 100%)",
+        "--emerald-liquid": "linear-gradient(150deg, #14161b 0%, #0c0d11 55%, #050608 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #0c0d11 0%, #14161b 55%, #22262d 100%)"
       }
     },
+
     copper: {
-      name: "Copper & ivory",
-      note: "Espresso chrome, copper accents, warm ivory grounds.",
-      swatch: ["#3a2118", "#8a5322", "#f0d6bb"],
+      name: "Navy & copper",
+      note: "Navy grounds with a burnished copper accent and warm trim.",
+      swatch: ["#04101f", "#12304f", "#d59a63"],
       tokens: {
-        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(214, 140, 80, 0.24), transparent 62%), linear-gradient(165deg, #3a2118 0%, #271610 62%, #180d09 100%)",
-        "--chrome-text": "#f1dfd1",
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(214, 140, 80, 0.18), transparent 62%), linear-gradient(165deg, #06182c 0%, #030d1c 62%, #01060f 100%)",
+        "--chrome-text": "#e2e8f0",
         "--chrome-text-strong": "#fdf3ea",
-        "--chrome-muted-text": "#d3b9a6",
-        "--chrome-rule": "rgba(240, 214, 187, 0.24)",
-        "--emerald-liquid": "linear-gradient(150deg, #3a2118 0%, #271610 55%, #180d09 100%)",
-        "--emerald-blue": "linear-gradient(135deg, #271610 0%, #4a2c1c 55%, #6b3f22 100%)",
-        "--navy-900": "#180d09",
-        "--navy-800": "#271610",
-        "--navy-700": "#3a2118",
-        "--navy-600": "#4a2c1c",
-        "--navy-500": "#5c3a24",
-        "--cream": "#f7f1ec",
-        "--cream-dark": "#efe3d9",
-        "--gold-900": "#4a2a10",
+        "--chrome-muted-text": "#a8b6c6",
+        "--chrome-rule": "rgba(213, 154, 99, 0.26)",
+        "--ng-bg": "#04101f",
+        "--ng-bg-2": "#071a2e",
+        "--ng-sidebar": "#030b17",
+        "--ng-card": "#0b2138",
+        "--ng-panel": "#102a45",
+        "--ng-raise": "#15334f",
+        "--ng-sunken": "#020a14",
+        "--ng-gold": "#d59a63",
+        "--ng-gold-bright": "#f0c295",
+        "--ng-gold-deep": "#a2622a",
+        "--ng-gold-text": "#e9b98a",
+        "--ng-gold-line": "rgba(213, 154, 99, 0.36)",
+        "--ng-gold-line-soft": "rgba(213, 154, 99, 0.2)",
+        "--navy-900": "#04101f",
+        "--navy-800": "#071a2e",
+        "--navy-700": "#0b2138",
+        "--navy-600": "#102a45",
+        "--navy-500": "#15334f",
         "--gold-700": "#8a5322",
-        "--gold-600": "#a2622a",
-        "--gold-500": "#b87333",
-        "--gold-400": "#d59a63",
-        "--gold-200": "#f0d6bb",
-        "--gold-100": "#f8ebdd",
+        "--gold-600": "#b87333",
+        "--gold-500": "#d59a63",
+        "--gold-400": "#f0c295",
+        "--gold-200": "#f8e6d5",
+        "--gold-100": "#fdf2e8",
         "--gold-edge": "linear-gradient(135deg, #8a5322 0%, #d59a63 26%, #f6e2c8 48%, #b87333 70%, #8a5322 100%)",
-        "--gold-edge-soft": "rgba(138, 83, 34, 0.34)",
-        "--gold-edge-strong": "rgba(138, 83, 34, 0.62)",
-        "--gold-liquid": "linear-gradient(115deg, #d59a63 0%, #f8ebdd 22%, #e2b48a 46%, #f6e2c8 62%, #cf9a6a 82%, #fbf0e4 100%)"
+        "--gold-liquid": "linear-gradient(115deg, #a2622a 0%, #f0c295 22%, #d59a63 46%, #fdf2e8 62%, #c07f45 82%, #f0c295 100%)",
+        "--emerald-liquid": "linear-gradient(150deg, #0b2138 0%, #071a2e 55%, #04101f 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #030b17 0%, #0b2138 45%, #15334f 100%)"
       }
     },
+
     forest: {
-      name: "Forest & brass",
-      note: "Deep forest chrome, brass trim, moss-tinted grounds.",
-      swatch: ["#0d3324", "#b08d57", "#dfeae3"],
+      name: "Navy & emerald",
+      note: "Navy grounds with an emerald accent — the brand's green, kept as trim.",
+      swatch: ["#020d18", "#0a2334", "#4ade80"],
       tokens: {
-        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(120, 200, 150, 0.2), transparent 62%), linear-gradient(165deg, #0d3324 0%, #082418 62%, #051510 100%)",
-        "--chrome-text": "#d8e8dd",
-        "--chrome-text-strong": "#f4fbf6",
-        "--chrome-muted-text": "#b5cdbd",
-        "--chrome-rule": "rgba(213, 232, 220, 0.22)",
-        "--emerald-liquid": "linear-gradient(150deg, #0d3324 0%, #082418 55%, #051510 100%)",
-        "--emerald-blue": "linear-gradient(135deg, #082418 0%, #124a30 55%, #1a5c3c 100%)",
-        "--navy-900": "#051510",
-        "--navy-800": "#082418",
-        "--navy-700": "#0d3324",
-        "--navy-600": "#124a30",
-        "--navy-500": "#1a5c3c",
-        "--cream": "#eef4f0",
-        "--cream-dark": "#dfeae3",
-        "--gold-900": "#3f3218",
-        "--gold-700": "#6d5a2c",
-        "--gold-600": "#8a7038",
-        "--gold-500": "#b08d57",
-        "--gold-400": "#c8a877",
-        "--gold-200": "#eadcc2",
-        "--gold-100": "#f5eedd",
-        "--gold-edge": "linear-gradient(135deg, #6d5a2c 0%, #c8a877 26%, #f2e6cd 48%, #b08d57 70%, #6d5a2c 100%)",
-        "--gold-edge-soft": "rgba(109, 90, 44, 0.34)",
-        "--gold-edge-strong": "rgba(109, 90, 44, 0.62)",
-        "--gold-liquid": "linear-gradient(115deg, #c8a877 0%, #f5eedd 22%, #dcc9a3 46%, #f2e6cd 62%, #c0a377 82%, #f8f2e6 100%)"
+        "--emerald-chrome": "radial-gradient(900px 420px at 88% -20%, rgba(74, 222, 128, 0.12), transparent 62%), linear-gradient(165deg, #061a24 0%, #030f18 62%, #01070c 100%)",
+        "--chrome-text": "#d3e7e1",
+        "--chrome-text-strong": "#ffffff",
+        "--chrome-muted-text": "#9fbcb4",
+        "--chrome-rule": "rgba(184, 138, 43, 0.26)",
+        "--ng-bg": "#020d18",
+        "--ng-bg-2": "#061a24",
+        "--ng-sidebar": "#02101a",
+        "--ng-card": "#0a2334",
+        "--ng-panel": "#0d2c40",
+        "--ng-raise": "#12364d",
+        "--ng-sunken": "#01080f",
+        "--ng-gold-text": "#e7c36b",
+        "--navy-900": "#020d18",
+        "--navy-800": "#061a24",
+        "--navy-700": "#0a2334",
+        "--navy-600": "#0d2c40",
+        "--navy-500": "#12364d",
+        "--gold-500": "#d4a63a",
+        "--gold-400": "#ffd166",
+        "--gold-200": "#ffe7a8",
+        "--gold-100": "#fff3d0",
+        "--emerald-liquid": "linear-gradient(150deg, #0a2334 0%, #061a24 55%, #020d18 100%)",
+        "--emerald-blue": "linear-gradient(135deg, #02101a 0%, #0a2334 45%, #12364d 100%)"
       }
     }
   };
@@ -210,13 +247,13 @@
     if (kind === websiteKind()) root.setAttribute("data-theme", target);
 
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", (swatchOf(target)[0] || "#06262a"));
+    if (meta) meta.setAttribute("content", (swatchOf(target)[0] || "#020817"));
     return target;
   }
 
   function swatchOf(id) {
     var t = THEMES[themeId(id)];
-    return (t && t.swatch) || ["#06262a"];
+    return (t && t.swatch) || ["#020817"];
   }
 
   function savedTheme() {
