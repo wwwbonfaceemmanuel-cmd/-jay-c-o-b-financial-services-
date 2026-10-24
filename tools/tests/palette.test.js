@@ -300,6 +300,18 @@ t.ok("the console's primary button is the same gradient",
 t.ok("the secondary button is gold-bordered",
   /\.btn--ghost,\s*\.btn--line-gold\s*\{[^}]*border:\s*1px solid var\(--ng-gold-line\)/i.test(site));
 
+/* the ground: emerald and liquid crystal in the background only */
+t.ok("the emerald and the crystal are declared",
+  /--liquid-emerald:\s*#07332f/.test(site) && /--liquid-crystal:\s*#0a3f6b/.test(site));
+t.ok("the page ground starts in emerald",
+  /linear-gradient\(166deg,\s*#073430 0%,\s*#062b31 30%,\s*#04212f 56%,\s*#03182a 80%,\s*#020817 100%\)/.test(site));
+t.ok("the ground is warmed by an emerald glow and cooled by a crystal one",
+  /rgba\(16, 185, 129, 0\.20\)/.test(site) && /rgba\(56, 189, 248, 0\.16\)/.test(site));
+t.ok("the section bands carry it too",
+  /\.section--paper\s*\{[^}]*#07332f/.test(site) && /\.section--cream-dark\s*\{[^}]*#04283b/.test(site));
+t.ok("the cards above it are still navy",
+  /\.card,[\s\S]{0,600}var\(--premium-surface\)/.test(site));
+
 /* type: one family, asked for once */
 t.ok("the site asks for Inter", /family=Inter:wght@400;500;600;700;800/.test(page));
 t.eq("the site no longer downloads a second family", /family=Fraunces/.test(page), false);

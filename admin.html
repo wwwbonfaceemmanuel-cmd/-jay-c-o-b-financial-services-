@@ -44,7 +44,9 @@
   --gold-edge:linear-gradient(135deg,#8a6516 0%,#d4a63a 26%,#ffe7a8 48%,#d4a63a 70%,#8a6516 100%);
   --gold-liquid:linear-gradient(115deg,#a87919 0%,#ffd166 22%,#d4a63a 46%,#ffe7a8 62%,#b88a2b 82%,#ffd166 100%);
   /* the bar the site's header uses */
-  --chrome:linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);
+  --liquid-emerald:#07332f; --liquid-crystal:#0a3f6b;
+  --ground-liquid:radial-gradient(1200px 620px at 86% -14%,rgba(56,189,248,.16),transparent 62%),radial-gradient(1000px 560px at 2% -4%,rgba(16,185,129,.20),transparent 60%),linear-gradient(166deg,#073430 0%,#062b31 30%,#04212f 56%,#03182a 80%,#020817 100%);
+  --chrome:radial-gradient(820px 400px at 6% -18%,rgba(16,185,129,.16),transparent 64%),radial-gradient(760px 380px at 58% 132%,rgba(10,63,107,.34),transparent 68%),linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);
 
   /* console aliases */
   --bg0:var(--ng-bg); --bg1:var(--ng-bg2); --bg2:var(--ng-card); --bg3:var(--ng-panel);
@@ -366,9 +368,9 @@ body.locked { overflow: hidden; }
    Nothing here changes behaviour — the same elements, the same handlers.
    ===================================================================== */
 body{background:
-  radial-gradient(1200px 600px at 88% -10%,rgba(212,166,58,.10),transparent 62%),
-  radial-gradient(1000px 560px at -4% 0%,rgba(56,189,248,.06),transparent 60%),
-  linear-gradient(163deg,var(--ng-bg) 0%,#04101f 46%,var(--ng-bg) 100%);
+  radial-gradient(1200px 620px at 86% -14%,rgba(56,189,248,.16),transparent 62%),
+  radial-gradient(1000px 560px at 2% -4%,rgba(16,185,129,.20),transparent 60%),
+  linear-gradient(166deg,#073430 0%,#062b31 30%,#04212f 56%,#03182a 80%,#020817 100%);
   background-attachment:fixed;color:var(--ng-text2)}
 ::-webkit-scrollbar-thumb{background:rgba(184,138,43,.5)}
 h1,h2,h3,h4{color:var(--ng-text)}
