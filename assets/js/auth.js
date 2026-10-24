@@ -16,6 +16,10 @@
   var CLOUD = window.JCOB_CLOUD;
   var PENDING_KEY = "jcob_pending_verify";
 
+  /* The brand loading animation. Every sign-in, sign-out and form submit
+     shows it, so nobody is left looking at a page that appears frozen. */
+  function LOAD() { return window.JCOB_LOADER || { show: function () {}, hide: function () {}, message: function () {} }; }
+
   function $(id) { return document.getElementById(id); }
   function page() {
     return document.body.getAttribute("data-auth-page") || "";
@@ -356,6 +360,7 @@
 
       status.className = "form-status is-visible";
       status.textContent = "Signing you in…";
+      LOAD().show("Signing you in securely…");
 
       CLOUD.auth.signIn(identifier, password).then(function (res) {
         UI.clearTryCount();
@@ -371,12 +376,14 @@
           cloud: true
         }, remember);
         status.textContent = "Signed in. Opening your dashboard…";
+        LOAD().message("Signed in — opening your dashboard…");
         var next = new URLSearchParams(location.search).get("next");
         setTimeout(function () {
           ToastOnLogin(name);
           window.location.href = next && next.indexOf("dashboard") >= 0 ? next : "dashboard.html";
         }, 350);
       }).catch(function (err) {
+        LOAD().hide();
         var message = String((err && err.message) || "");
         if (/invalid|credentials|grant/i.test(message)) message = "That " + (isEmail(identifier) ? "email address" : "phone number") + " and password do not match an account.";
         else if (/confirm/i.test(message)) message = "Please confirm your " + (isEmail(identifier) ? "email address" : "phone number") + " before signing in.";
@@ -558,6 +565,7 @@
     document.querySelectorAll("[data-logout]").forEach(function (el) {
       el.addEventListener("click", function (e) {
         e.preventDefault();
+        LOAD().show("Signing you out…", { watchdog: false });
         if (cloudOn()) CLOUD.auth.signOut();
         UI.clearSession();
         UI.toast({ title: "Signed out", message: "You have been signed out securely.", type: "success" });

@@ -290,11 +290,48 @@
     }
   }
 
+  /* Push a repayment reminder into the customer's own dashboard document,
+     so the reminder the console raises is the one the customer sees. The
+     key makes it once-only: the same instalment is never announced twice. */
+  window.JCOB_PUSH_CUSTOMER_REMINDER = function (reminder) {
+    if (!cloudOn() || !reminder) return Promise.resolve(false);
+    var loan = (db.loans || []).filter(function (l) { return l.id === reminder.loan; })[0] || {};
+    var docs = allDocs();
+    if (!docs.length) return Promise.resolve(false);
+    var wanted = String(reminder.cust || loan.cust || "").toLowerCase();
+    var owner = loan.siteUid || null;
+    var target = docs.filter(function (d) {
+      if (owner && d.owner === owner) return true;
+      var full = String(((d.data || {}).profile || {}).fullName || "").toLowerCase();
+      return full && full === wanted;
+    })[0];
+    if (!target || !target.owner) return Promise.resolve(false);
+    var site = target.data || {};
+    site.notifications = site.notifications || [];
+    var key = "reminder:" + (reminder.key || reminder.id);
+    if (site.notifications.some(function (n) { return n.key === key; })) return Promise.resolve(false);
+    site.notifications.unshift({
+      id: "N-REM" + Date.now().toString(36).toUpperCase(),
+      key: key,
+      type: "Repayment reminder",
+      title: reminder.days === 0 ? "Instalment due today"
+        : reminder.days === 1 ? "Instalment due tomorrow"
+        : "Instalment due in " + reminder.days + " days",
+      body: reminder.body,
+      date: new Date().toISOString(),
+      read: false,
+      channel: "In-app + SMS + Email"
+    });
+    return CLOUD.customer.saveFor(target.owner, site).then(function () { return true; }).catch(function () { return false; });
+  };
+
   /* Pull customer documents once the console signs in, then bridge them. */
   function refreshCloud() {
     if (!cloudOn()) return Promise.resolve(false);
     return loadSiteDocs(true).then(function (docs) {
       importSiteData();
+      /* New loans or new customers mean new reminders to queue. */
+      try { if (typeof window.JCOB_RUN_REMINDERS === "function") window.JCOB_RUN_REMINDERS(); } catch (e) {}
       if (typeof window.render === "function") window.render(false);
       return docs.length > 0;
     }).catch(function () { return false; });

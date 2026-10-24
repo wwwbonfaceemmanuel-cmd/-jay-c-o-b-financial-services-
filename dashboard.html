@@ -14,7 +14,8 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body class="app-body" data-page="dashboard">
-  <a class="skip-link" href="#app-content">Skip to dashboard content</a>
+  <script src="assets/js/loader.js"></script>
+<a class="skip-link" href="#app-content">Skip to dashboard content</a>
 
   <div class="app-shell">
     <aside class="app-sidebar" id="app-sidebar" aria-label="Account navigation">
@@ -48,6 +49,9 @@
 
         <div class="app-top-actions">
           <span class="app-sync" data-sync hidden></span>
+          <button class="icon-btn-lg" type="button" data-refresh aria-label="Refresh this dashboard" title="Refresh this dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 3.5V9h-5.4"/></svg>
+          </button>
           <div class="bell-wrap">
             <button class="icon-btn-lg" type="button" data-bell aria-label="Notifications" aria-expanded="false" aria-controls="bell-panel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>

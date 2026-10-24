@@ -160,7 +160,7 @@ function winner(el, rules, prop) {
 }
 
 /* ---------------- the pages ---------------- */
-const PAGES = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && f !== "portal.html" && f !== "products.html");
+const PAGES = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"));
 
 const siteRules = [];
 parseRules(read("assets/css/styles.css"), siteRules);

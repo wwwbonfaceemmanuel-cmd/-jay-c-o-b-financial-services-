@@ -318,25 +318,22 @@
     return location.origin + location.pathname.replace(/[^/]*$/, "");
   }
 
-  /* Inline SVG lockup — used inside downloaded documents, where an
-     external image path would break the moment the file is moved. */
+  /* Absolute address of a bundled asset, so an inlined copy of the site
+     (or a downloaded document opened from disk) still finds the brand. */
+  function assetUrl(name) {
+    var inlined = (window.JCOB_INLINE_LOGOS || {})[name];
+    if (inlined) return inlined;
+    try { return new URL("assets/img/" + name, location.href).href; }
+    catch (e) { return "assets/img/" + name; }
+  }
+
+  /* The brand lockup used inside downloaded documents: the emblem plus the
+     gold wordmark. The image is absolute, so the file still shows the
+     logo when it is opened from a phone's downloads folder. */
   function inlineLockup(height) {
     var h = height || 40;
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" ' +
-      'aria-label="JAY C O B Financial Services" style="height:' + h + 'px;width:auto;display:block">' +
-      '<defs><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#0b1d35"/><stop offset=".55" stop-color="#061329"/>' +
-      '<stop offset="1" stop-color="#020817"/></linearGradient>' +
-      '<linearGradient id="lw" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe7a8"/></linearGradient></defs>' +
-      '<rect width="64" height="64" rx="16" fill="url(#lc)"/>' +
-      '<rect x="3.5" y="3.5" width="57" height="57" rx="13" fill="none" stroke="#d4a63a" stroke-opacity=".85"/>' +
-      '<text x="32" y="43" text-anchor="middle" font-family="Georgia, \'Times New Roman\', serif" ' +
-      'font-size="27" font-weight="600" fill="#ffd166" letter-spacing="-1">JC</text>' +
-      '<text x="80" y="32" font-family="Georgia, \'Times New Roman\', serif" font-size="23" ' +
-      'font-weight="600" fill="url(#lw)" letter-spacing="-.4">JAY C O B</text>' +
-      '<text x="80.5" y="48" font-family="Helvetica, Arial, sans-serif" font-size="8.4" ' +
-      'font-weight="600" fill="#94a3b8" letter-spacing="2.3">FINANCIAL SERVICES</text></svg>';
+    return '<img src="' + assetUrl("logo-full-light.svg") + '" alt="JAY C O B FINANCIAL SERVICES" ' +
+      'width="268" height="64" style="height:' + h + 'px;width:auto;display:block">';
   }
 
   /* A document header for a dashboard dialog. */

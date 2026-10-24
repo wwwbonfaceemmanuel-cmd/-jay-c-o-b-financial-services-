@@ -8,6 +8,7 @@ images are inlined so the file works offline with no assets folder.
     python3 tools/build_single.py --check    # build + structural checks, non-zero exit on failure
 """
 import base64
+import json
 import mimetypes
 import re
 import shutil
@@ -37,7 +38,7 @@ NAV = [
 FOOTER_EXTRA = ["apply", "login", "register", "privacy", "terms", "complaints", "licensing"]
 
 JS_ORDER = [
-    "config.js", "cloud.js", "site-store.js", "theme.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
+    "loader.js", "config.js", "cloud.js", "site-store.js", "theme.js", "finance.js", "app-data.js", "ui.js", "live.js", "main.js",
     "auth.js", "apply.js", "calculator.js", "quickcalc.js", "eligibility.js",
     "rates.js", "support.js", "dashboard.js", "site-content.js", "product-quotes.js",
 ]
@@ -412,6 +413,11 @@ try {
 } catch (err) {}
 """
     js = STORAGE_SHIM + "\n\n" + "\n\n".join(js_parts)
+    logos = {name: images[name] for name in ("logo-mark.svg", "logo-full.svg",
+                                             "logo-full-light.svg", "favicon.svg") if name in images}
+    js = ("window.JCOB_INLINE_LOGOS = " + json.dumps(logos) + ";\n") + js
+    for name, uri in logos.items():
+        js = js.replace('"assets/img/%s"' % name, json.dumps(uri))
     js = js.replace("/* ==== ui.js ==== */", "/* ==== ui.js ==== */", 1)
     marker = "/* ==== dashboard.js ==== */"
     js = js.replace(marker, bootstrap + "\n" + shim_js + "\n" + marker, 1) + ROUTER

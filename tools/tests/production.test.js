@@ -82,7 +82,11 @@ const session = () => JSON.stringify({
     t.eq("no applications", db.applications.length, 0);
     t.eq("no staff accounts", db.admins.length, 0);
     t.eq("no repayments", db.repayments.length, 0);
-    t.eq("roles kept as configuration", db.roles.length, 5);
+    /* The role catalogue is configuration, not data: the shipped build
+       carries the full officer list (cashiers, tellers, collections,
+       credit, audit, management) and no officers at all. */
+    t.ok("roles kept as configuration", db.roles.length >= 5 && db.roles.some((r) => r.name === "Cashier"),
+      db.roles.length + " roles");
     t.eq("settings kept as configuration", db.settings.currency, "MWK");
     t.eq("no script errors", errors.length, 0, errors.slice(0, 2).join(" | "));
     w.close();
