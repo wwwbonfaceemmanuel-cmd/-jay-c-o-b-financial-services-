@@ -272,7 +272,7 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 670 assertions
+npm test        # starts the Supabase stand-in + server, runs 702 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
@@ -411,6 +411,16 @@ root as-is — there is no build step at runtime.
   table, modal and bar above that ground stays midnight navy with gold edges — `--liquid-emerald`,
   `--liquid-crystal` and `--ground-liquid` are the tokens.
 - **One family:** Inter (400–800) with the system UI stack behind it, for headings, body and figures.
+- **The footer's customer care band:** the phone, email, address and opening hours are no longer the
+  fifth column of the footer grid — on a phone that column was squeezed past the right edge and made
+  the page wider than the screen. They are a band of their own inside the footer, under the four link
+  columns, with the two call-to-action buttons; long emails wrap, and at 720px the footer becomes two
+  columns (one at 480px) so nothing overflows and the page never scrolls sideways.
+- **Drawer buttons:** 52px on the website header, 50px on the dashboard app bar and 48px in the
+  console, with 2.4px bright-gold bars, a gold border and an announced `aria-expanded` state.
+- **The live blog on more pages:** about, services, how it works, support, contact and rates & fees now
+  carry a topic strip (customer stories, why choose us, eligibility, security, notices, products); the
+  home page feed runs to six posts and the insights feed to six.
 - **The card surface:** every module — panel, stat card, loan/doc/summary card, table, live strip,
   quick action, schedule, nav item, modal, toast, segmented control — paints one navy surface with a
   1px gold hairline, 12–18 px radius and 18–24 px padding, lifting on hover with a soft gold glow.

@@ -471,6 +471,22 @@ tbody td b{color:var(--ng-text)}
 #admin-gate .gate-foot{color:var(--ng-muted)}
 #admin-gate .gate-foot a{color:var(--ng-gold-text)}
 #gate-status.err{color:#fca5a5}
+/* the drawer button: 48px, gold, hard to miss */
+#menuBtn{
+  width:48px;height:48px;border-radius:13px;
+  border:1px solid var(--ng-gold-line);
+  background:rgba(212,166,58,.12);
+  color:var(--ng-gold-bright);
+  font-size:21px;line-height:1;font-weight:700;
+  align-items:center;justify-content:center;
+}
+#menuBtn:hover,#menuBtn[aria-expanded="true"]{
+  border-color:var(--ng-gold);
+  background:rgba(212,166,58,.22);
+  box-shadow:0 0 0 3px var(--ng-glow);
+}
+@media(max-width:1060px){#menuBtn{display:grid}}
+
 @media print{.panel,.stat,.rpt-card{background:#fff!important;color:#111!important}}
 
 </style>
@@ -495,7 +511,7 @@ tbody td b{color:var(--ng-text)}
 
 <!-- ===================== TOP BAR ===================== -->
 <header class="topbar">
-  <button class="icon-btn" id="menuBtn" aria-label="menu">☰</button>
+  <button class="icon-btn" id="menuBtn" aria-label="Open the console menu" aria-controls="sidebar" aria-expanded="false">☰</button>
   <a class="brand" href="index.html" target="_blank" rel="noopener" aria-label="JAY C O B FINANCIAL SERVICES — open the website">
     <img class="brand-logo" src="assets/img/logo-full-light.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
     <span class="brand-chip">ADMIN PORTAL</span>
@@ -2115,7 +2131,7 @@ $('#notifBtn').addEventListener('click',e=>{e.stopPropagation();$('#notifDrop').
 $('#userBtn').addEventListener('click',e=>{if(e.target.closest('.drop'))return;$('#userDrop').classList.toggle('open');$('#notifDrop').classList.remove('open')});
 document.addEventListener('click',e=>{if(!e.target.closest('#userBtn'))$('#userDrop').classList.remove('open');if(!e.target.closest('#notifBtn')&&!e.target.closest('#notifDrop'))$('#notifDrop').classList.remove('open')});
 $('#signOut').addEventListener('click',()=>confirmAct('Sign out','End this admin session? You will need your email and password to sign in again.','Sign out',()=>{if(window.JCOB_CLOUD&&window.JCOB_CLOUD.auth)window.JCOB_CLOUD.auth.signOut();try{sessionStorage.removeItem('jcob_admin_ok')}catch(e){}toast('info','Session ended','Signed out — reload to sign back in')},'warn'));
-$('#menuBtn').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));
+$('#menuBtn').addEventListener('click',()=>{const open=$('.sidebar').classList.toggle('open');$('#menuBtn').setAttribute('aria-expanded',open?'true':'false')});
 // global search
 $('#globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();const box=$('#searchResults');
  if(q.length<2){box.style.display='none';return}

@@ -6557,6 +6557,137 @@ table.data .num, .table-wrap .num { color: var(--ng-text); font-variant-numeric:
 .auth-recover a { background: var(--ng-raise); color: var(--ng-text-2); border: 1px solid var(--ng-gold-line-soft); }
 .auth-recover a:hover { border-color: var(--ng-gold); color: var(--ng-gold-bright); }
 
+/* =====================================================================
+   17. THE FOOTER'S CUSTOMER CARE BAND
+   ---------------------------------------------------------------------
+   Customer care used to be the fifth column of .footer-top. On a phone
+   that column was squeezed to a sliver at the right edge and pushed the
+   page wider than the screen. It is now a band of its own, inside the
+   footer container, under the four link columns - so it can never sit
+   outside the footer, and the page never scrolls sideways.
+   ===================================================================== */
+.footer-top {
+  grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.footer-top > * { min-width: 0; }
+/* the older three-column footer keeps its own shape */
+.footer-top--three { grid-template-columns: minmax(0, 1.7fr) repeat(2, minmax(0, 1fr)); }
+
+.footer-care {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr) minmax(0, auto);
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 2.2rem);
+  margin: 0 0 2.2rem;
+  padding: clamp(1.05rem, 2vw, 1.5rem) clamp(1.05rem, 2.2vw, 1.7rem);
+  border: 1px solid var(--ng-gold-line-soft);
+  border-radius: 16px;
+  background:
+    radial-gradient(620px 260px at 0% 0%, rgba(212, 166, 58, 0.10), transparent 62%),
+    linear-gradient(180deg, rgba(11, 29, 53, 0.92), rgba(8, 23, 45, 0.72));
+}
+.footer-care h4 { margin-bottom: 0.4rem; }
+.footer-care p {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--ng-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.footer-care .footer-contact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 1.6rem;
+  margin: 0;
+}
+.footer-care .footer-contact li { min-width: 0; font-size: 0.86rem; }
+.footer-care .footer-contact a,
+.footer-care .footer-contact span { overflow-wrap: anywhere; }
+.footer-care-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.footer-care-actions .btn { margin: 0 !important; white-space: nowrap; }
+/* the older footer's band keeps room for the newsletter */
+.footer-care--contact { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1.15fr); }
+/* the newsletter that used to live in the contact column */
+.footer-care .newsletter { margin: 0; min-width: 0; }
+.footer-care .newsletter-note { font-size: 0.72rem; }
+.footer-care .newsletter-row { min-width: 0; }
+.footer-care .newsletter input { min-width: 0; }
+.footer-care .btn { max-width: 100%; }
+
+@media (max-width: 1080px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-about { grid-column: 1 / -1; }
+  .footer-care { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .footer-care-actions,
+  .footer-care .newsletter { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; }
+  .footer-about { grid-column: 1 / -1; }
+  .footer-care { grid-template-columns: 1fr; gap: 1.1rem; }
+  .footer-care--contact { grid-template-columns: 1fr; }
+  .footer-care-actions { width: 100%; }
+}
+@media (max-width: 480px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: 1fr; }
+  .footer-care .footer-contact { grid-template-columns: 1fr; }
+  .footer-care-actions { flex-direction: column; }
+  .footer-care-actions .btn { width: 100%; }
+}
+
+/* =====================================================================
+   18. THE MENU BUTTONS
+   ---------------------------------------------------------------------
+   The buttons that open the navigation drawer were 38-44px with 1.6px
+   bars: hard to see, and under the 48px touch target. They are now 52px
+   with 2.4px bars in bright gold, a gold border and a filled seat.
+   ===================================================================== */
+.nav-toggle {
+  width: 52px;
+  height: 52px;
+  gap: 5.5px;
+  border-radius: 14px;
+  border: 1px solid var(--ng-gold-line);
+  background: rgba(212, 166, 58, 0.10);
+}
+.nav-toggle span {
+  width: 23px;
+  height: 2.4px;
+  border-radius: 2px;
+  background: var(--ng-gold-bright);
+}
+.nav-toggle:hover {
+  border-color: var(--ng-gold);
+  background: rgba(212, 166, 58, 0.2);
+  box-shadow: 0 0 0 3px var(--ng-glow);
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7.9px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7.9px) rotate(-45deg); }
+
+.app-menu-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  gap: 5px;
+  border: 1px solid var(--ng-gold-line);
+}
+.app-menu-btn span { width: 22px; height: 2.4px; border-radius: 2px; }
+.app-menu-btn:hover,
+.app-menu-btn[aria-expanded="true"] {
+  border-color: var(--ng-gold);
+  box-shadow: 0 0 0 3px var(--ng-glow);
+}
+
+@media (max-width: 480px) {
+  .nav-toggle { width: 48px; height: 48px; }
+  .header-inner { min-height: 68px; }
+  .nav { inset-block-start: 68px; max-height: calc(100dvh - 68px); }
+}
+
 /* ---------- 16. print stays on paper ---------- */
 @media print {
   body, .app-body { background: #fff !important; color: #111 !important; }

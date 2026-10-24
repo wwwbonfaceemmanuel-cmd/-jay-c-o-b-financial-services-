@@ -267,7 +267,9 @@
     toggle.addEventListener("click", function () {
       var open = sidebar.classList.toggle("is-open");
       if (scrim) scrim.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    toggle.setAttribute("aria-expanded", sidebar.classList.contains("is-open") ? "true" : "false");
     if (scrim) scrim.addEventListener("click", close);
     sidebar.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { if (window.innerWidth <= 1024) close(); });

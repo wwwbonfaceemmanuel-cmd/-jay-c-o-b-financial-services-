@@ -141,11 +141,20 @@ t.ok("the Apply menu carries the gold edge", /var\(--gold-edge\) border-box/.tes
 t.ok("the Apply menu's links are light", /color:\s*var\(--chrome-text\)/.test(lastBody(siteRules, ".nav-dd-menu a")));
 
 /* the controls on the bar */
-[".site-header .btn--ghost", ".site-header .btn--line-gold", ".nav-toggle", ".nav-toggle span", ".header-nav a"]
+[".site-header .btn--ghost", ".site-header .btn--line-gold", ".header-nav a"]
   .forEach((sel) => {
     const body = lastBody(siteRules, sel);
     t.ok(sel + " is restated for the dark bar", !!body && /255, 255, 255|chrome|246, 236, 196/.test(body), body.slice(0, 60));
   });
+
+/* The drawer button is deliberately gold on the navy — a 52px target with
+   2.4px bright-gold bars, not a faint hairline that disappears. */
+const toggleBody = lastBody(siteRules, ".nav-toggle");
+const toggleBar = lastBody(siteRules, ".nav-toggle span");
+t.ok(".nav-toggle is restated for the dark bar",
+  !!toggleBody && /var\(--ng-gold-line\)/.test(toggleBody), toggleBody.slice(0, 70));
+t.ok(".nav-toggle span is restated for the dark bar",
+  !!toggleBar && /var\(--ng-gold-bright\)/.test(toggleBar), toggleBar.slice(0, 70));
 
 /* the mobile drawer continues the same colour */
 t.ok("the mobile drawer uses the chrome token", /@media \(max-width: 960px\)[\s\S]{0,400}background:\s*var\(--emerald-chrome\)/.test(site));
