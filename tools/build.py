@@ -30,7 +30,7 @@ EMAIL = "hello@jaycobfinancial.mw"
 SUPPORT_EMAIL = "support@jaycobfinancial.mw"
 ADDRESS = "Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi"
 
-BASE_SCRIPTS = ["env.js", "assets/js/config.js", "assets/js/cloud.js",
+BASE_SCRIPTS = ["assets/js/loader.js", "env.js", "assets/js/config.js", "assets/js/cloud.js",
                 "assets/js/site-store.js", "assets/js/finance.js",
                 "assets/js/app-data.js", "assets/js/ui.js", "assets/js/main.js",
                 "assets/js/live.js", "assets/js/site-content.js"]
@@ -435,51 +435,6 @@ def build_dashboard() -> None:
     (ROOT / "dashboard.html").write_text(page, encoding="utf-8")
 
 
-# --------------------------------------------------------------------------
-# Legacy aliases (old inbound links keep working)
-# --------------------------------------------------------------------------
-ALIASES = {
-    "products": ("loan-products.html", "Loan products", "Our product range has moved to a dedicated loan products page with limits, terms, rates and required documents."),
-    "portal": ("login.html?next=dashboard.html", "Customer portal", "The customer portal is now the secure customer dashboard. Sign in to continue."),
-}
-
-
-def build_aliases() -> int:
-    for slug, (target, label, blurb) in ALIASES.items():
-        body = """    <main id="main">
-    <section class="section">
-      <div class="container" style="max-width:40rem;">
-        <div class="card" style="text-align:center;padding:clamp(1.6rem,4vw,2.6rem);">
-          <p class="brand-chip" style="justify-content:center;"><img src="assets/img/logo-mark.svg" alt="" width="22" height="22"> %(brand)s</p>
-          <h1 style="font-size:clamp(1.5rem,3vw,2rem);">%(label)s</h1>
-          <p style="margin-top:.7rem;">%(blurb)s</p>
-          <p style="margin-top:1.2rem;"><a class="btn btn--gold" href="%(target)s">Continue to %(label_lower)s</a></p>
-          <p class="text-tiny text-muted" style="margin-top:.8rem;">If you are not redirected automatically, use the button above.</p>
-        </div>
-      </div>
-    </section>
-    </main>
-    <script>window.location.replace("%(target)s");</script>
-""" % {"brand": BRAND, "label": label, "label_lower": label.lower(), "blurb": blurb, "target": target}
-
-        page = HEAD % {
-            "title": "%s — JAY C O B FINANCIAL SERVICES" % label,
-            "desc": esc(blurb),
-            "slug": slug,
-            "extra_css": '  <meta http-equiv="refresh" content="0; url=%s">\n' % target,
-            "body_attrs": "",
-            "header": header_html(""),
-            "body": body,
-            "footer": footer_html(),
-            "scripts": scripts_html([]),
-        }
-        (ROOT / ("%s.html" % slug)).write_text(page, encoding="utf-8")
-    return len(ALIASES)
-
-
-# --------------------------------------------------------------------------
-# Main
-# --------------------------------------------------------------------------
 def main() -> int:
     built = 0
     for slug, meta in PAGES.items():

@@ -162,7 +162,7 @@ t.ok("the mobile drawer uses the chrome token", /@media \(max-width: 960px\)[\s\
 /* ---- 4. the lockup on every page ---- */
 const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"));
 const withHeader = pages.filter((f) => /<header class="site-header">/.test(read(f)));
-t.ok("every page with a site header was found", withHeader.length >= 38, withHeader.length + " pages");
+t.ok("every page with a site header was found", withHeader.length >= 36, withHeader.length + " pages");
 
 const darkLogo = withHeader.filter((f) => {
   const s = read(f);
@@ -262,8 +262,8 @@ t.ok("the article standfirst reads on the band",
 /* Every page opens on a coloured band. The exceptions are the surfaces that
    are not pages in that sense: the home hero (its own composition), the two
    dashboards, the two redirect stubs, the diagnostic page and the 404. */
-const NO_BAND = ["index.html", "admin.html", "dashboard.html", "portal.html",
-  "products.html", "system-check.html", "404.html"];
+const NO_BAND = ["index.html", "admin.html", "dashboard.html",
+  "system-check.html", "404.html"];
 const noBand = allPages.filter((f) => {
   if (NO_BAND.indexOf(f) > -1) return false;
   const body = read(f);

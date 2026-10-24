@@ -31,7 +31,18 @@ any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
 | `live.html` | Live desk: animated feed widget, endless headline ticker, and the full live-blog stream |
 | `admin.html` | Administrator console: publish / edit / delete announcements, cards, photo posts and blog posts, upload or link an image, choose one of seven motions, pin, unpublish |
 | `services.html`, `insights.html`, `insight-*.html`, `contact.html`, `404.html` | Retained pages, re-skinned with the current header, footer and brand |
-| `products.html`, `portal.html` | Aliases that forward old links to the loan products page and the dashboard login |
+
+### Brand, loading and refresh (this release)
+
+| Item | How it works |
+| --- | --- |
+| **Logo** | `assets/img/logo-mark.svg`, `logo-full.svg`, `logo-full-light.svg`, `favicon.svg` and `logo-mark.png` are the supplied artwork: gold J·C emblem on a navy tile, with the JAY C O B wordmark. They render in the site header and footer, the auth cards, the admin gate, the console header and footer, receipts (`ui.js → docHead`), and every downloaded statement or receipt (`ui.js → documentHTML`). `logo-social.jpg` is the 1200×630 share card. |
+| **Loading animation** | `assets/js/loader.js` paints the brand splash (emblem, gold ring, progress rail, caption) while a page loads or is refreshed, while a form is submitted, and while the console opens a module. Buttons carry a spinner via `.is-busy`. Sign-in and sign-out are covered in `auth.js`, `dashboard.js` and the admin gate. Respects `prefers-reduced-motion`. |
+| **Refresh** | Every dashboard has a refresh control: the icon in the console top bar, the **↻ Refresh** button on every console module, the icon in the customer top bar and the **Refresh** button on every customer page. One path (`adminRefresh` / `JCOB_DASH_REFRESH`) re-reads the book, re-runs the reminder engine and repaints. |
+| **Modules open their contents** | `Customers` lists **every** registered account: rows from the console book, the website's `customer_docs`, and the `profiles` table — including accounts that have never opened the dashboard. Every table has **Show all**, CSV export, filters and a useful empty state. |
+| **Roles & officers** | Sixteen roles ship as configuration: Super Admin, General Manager, Operations Manager, Branch Manager, Loan Officer, Credit Analyst, Finance Officer, **Cashier**, **Teller**, **Collections Officer**, Compliance Officer, Support Agent, Auditor, Systems Administrator, Payroll Officer and Records Officer. A `MODULE_PERM` map turns a permission into the modules it opens; the sidebar, footer shortcuts and the session menu only draw what the signed-in officer holds, and reaching another module by address shows a short refusal instead of the module. Roles and Permissions is visible and editable only to a Super Admin or a General Manager, who cannot edit the Super Admin's own card. |
+| **No duplicate pages** | The `products.html` and `portal.html` redirect stubs were removed; `loan-products.html` and `login.html` are the single destinations. |
+| **Repayment reminders** | Three days before an instalment is due (configurable in **System settings → Repayment reminder lead time**, and in the **Repayment Reminders** module) the console raises one reminder per loan and instalment, writes the SMS/email record in Messaging and pushes it into the customer's own dashboard document, so the customer sees it in their bell. Keys make each reminder once-only; the customer dashboard's own engine covers the same three-day window. |
 
 ### Loan maths and rate quoting
 
@@ -177,10 +188,12 @@ against Supabase and requires a staff role (`admin`, `staff`, `officer` or `cred
 `profiles` row; anyone else is refused. There is no bypass password, and without a reachable
 Supabase project the console stays locked.
 
-The portal ships with the complete back office: dashboard, customers, KYC, loan applications,
+The portal is multi-officer: a role (cashier, teller, collections, credit, finance, audit,
+management …) decides which modules an officer can open, and only a Super Admin or a General Manager
+can assign or revoke a permission. It ships with the complete back office: dashboard, customers, KYC, loan applications,
 products, credit assessment, active loans, disbursement, guarantors and collateral, repayments,
 schedules, collections, deposits, withdrawals, transfers, savings, fees, interest, ledger,
-reconciliation, statements, support, messaging, admin users, roles, workflows, audit logs, security,
+reconciliation, statements, support, messaging, repayment reminders, officers and staff, roles, workflows, audit logs, security,
 compliance, system settings, backups, reports, risk, branches, officers, payroll, accounting,
 investors, partners, legal, API integrations, fraud, templates and the calculator.
 

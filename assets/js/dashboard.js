@@ -112,9 +112,18 @@
       '<path d="M15 18l-6-6 6-6"/></svg>Back</button>';
   }
 
+  var REFRESH_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.2-6.9"/>' +
+    '<path d="M21 3.5V9h-5.4"/></svg>';
+
+  function refreshButton(label) {
+    return '<button class="btn btn--ghost btn--sm" type="button" data-refresh-module aria-label="Refresh this page">' +
+      REFRESH_ICON + (label === false ? "" : " Refresh") + "</button>";
+  }
+
   function pageHead(title, sub, actions) {
     return backButton() + '<div class="app-page-head"><div><h1>' + title + "</h1>" + (sub ? "<p>" + sub + "</p>" : "") + "</div>" +
-      (actions ? '<div class="head-actions">' + actions + "</div>" : "") + "</div>";
+      '<div class="head-actions">' + (actions || "") + refreshButton() + "</div></div>";
   }
 
   function panel(title, sub, body, tools, flush) {
@@ -2782,22 +2791,84 @@
     });
   }
 
+  /* ---------------- Refresh ----------------
+     One refresh path for the whole dashboard: re-read the account document
+     from Supabase, re-run the reminder engine and paint every panel again.
+     The top bar's refresh button, the CTRL/⌘+R style shortcut and the
+     per-module buttons all call this. */
+  function refreshAll(options) {
+    options = options || {};
+    var LOAD = window.JCOB_LOADER;
+    if (LOAD && !options.quiet) LOAD.show("Refreshing your dashboard…");
+    var task;
+    if (window.JCOB_CLOUD && window.JCOB_CLOUD.enabled && window.JCOB_DATA && window.JCOB_DATA.hydrate) {
+      task = window.JCOB_DATA.hydrate();
+    } else {
+      task = Promise.resolve();
+    }
+    return Promise.resolve(task).catch(function () { return null; }).then(function () {
+      try {
+        if (window.JCOB_DATA && window.JCOB_DATA.runEngine) window.JCOB_DATA.runEngine();
+      } catch (e) {}
+      renderSidebar();
+      render();
+      UI.updateBell();
+      if (LOAD && !options.quiet) {
+        LOAD.message("Everything is up to date");
+        setTimeout(function () { LOAD.hide(); }, 320);
+      }
+      if (UI.toast && !options.quiet) {
+        UI.toast({ title: "Dashboard refreshed", message: "Balances, loans and reminders were re-read just now.", type: "success" });
+      }
+      return true;
+    });
+  }
+  window.JCOB_DASH_REFRESH = refreshAll;
+
+  function wireRefresh() {
+    var btn = document.querySelector("[data-refresh]");
+    if (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (btn.classList.contains("is-busy")) return;
+        btn.classList.add("is-busy");
+        refreshAll().then(function () { btn.classList.remove("is-busy"); });
+      });
+    }
+    document.addEventListener("click", function (e) {
+      var any = e.target.closest && e.target.closest("[data-refresh-module]");
+      if (!any) return;
+      e.preventDefault();
+      refreshAll({ quiet: !!any.dataset.refreshQuiet });
+    });
+  }
+
   /* ---------------- Boot ---------------- */
   function boot() {
+    wireRefresh();
     renderSidebar();
     initSearch();
     applyAccessibility();
     wireBack();
     render();
 
-    window.addEventListener("hashchange", function () { render(); });
+    window.addEventListener("hashchange", function () {
+      /* paint the brand loader for a beat, so switching module is
+         acknowledged before the new panel is drawn */
+      if (window.JCOB_LOADER && !window.JCOB_LOADER.visible) {
+        window.JCOB_LOADER.show("Opening…", { after: 2200 });
+        setTimeout(function () { window.JCOB_LOADER.hide(); }, 160);
+      }
+      render();
+    });
 
     document.querySelectorAll("[data-logout]").forEach(function (el) {
       el.addEventListener("click", function (e) {
         e.preventDefault();
+        if (window.JCOB_LOADER) window.JCOB_LOADER.show("Signing you out securely…", { watchdog: false });
         if (window.JCOB_CLOUD && window.JCOB_CLOUD.enabled) window.JCOB_CLOUD.auth.signOut();
         UI.clearSession();
-        window.location.href = "login.html";
+        setTimeout(function () { window.location.href = "login.html"; }, 420);
       });
     });
 

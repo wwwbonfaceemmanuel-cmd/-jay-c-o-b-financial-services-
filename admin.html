@@ -493,6 +493,7 @@ tbody td b{color:var(--ng-text)}
 </head>
 <body class="no-live-toast">
 
+<script src="assets/js/loader.js"></script>
 <div id="admin-gate">
   <form class="gate-card" id="admin-gate-form" novalidate>
     <img class="gate-mark" src="assets/img/logo-full.svg" alt="JAY C O B FINANCIAL SERVICES" width="268" height="64">
@@ -525,6 +526,9 @@ tbody td b{color:var(--ng-text)}
   <div class="top-actions">
     <a class="btn ghost sm" href="index.html" target="_blank" rel="noopener" style="text-decoration:none">View website ↗</a>
     <div class="chip-clock" id="clock">—</div>
+    <button class="icon-btn" id="refreshBtn" title="Refresh every module from the database" aria-label="Refresh this dashboard">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 3.5V9h-5.4"/></svg>
+    </button>
     <button class="icon-btn" id="notifBtn" title="Notifications">🔔<span class="dot" id="notifCount">0</span></button>
     <div class="userbox" id="userBtn">
       <div class="avatar">JC</div>
@@ -611,6 +615,64 @@ const paged=1;
    repayments and every other record arrive from the database — or from
    the database. Nothing is pre-filled with sample records.
    ------------------------------------------------------------------ */
+/* =====================================================================
+   ROLES & PERMISSIONS
+   ---------------------------------------------------------------------
+   Every permission in the platform, and the officers who hold them.
+   A permission is the unit of authority; a role is a named bundle of
+   permissions. Only a Super Admin or a General Manager may grant or
+   revoke one, and no officer — cashier, teller, collections, credit,
+   whoever — can see a module, a role card or a permission switch that
+   was not assigned to them.
+   ===================================================================== */
+const PERM_KEYS = ['customers','kyc','loans','credit','loanApprove','disburse','repayments',
+  'reverse','cashier','collections','fees','savings','reports','audit','admins','roles',
+  'settings','writeoff','payroll'];
+
+function blankPerms(){const o={};PERM_KEYS.forEach(k=>o[k]=0);return o;}
+function rolePerms(granted){const o=blankPerms();granted.forEach(k=>{if(o[k]!==undefined)o[k]=1});return o;}
+
+/* The house catalogue. Super Admin and General Manager can change any of
+   these; every other officer starts from what is set here. */
+function defaultRoles(){
+  return [
+    {name:'Super Admin',desc:'Full authority over the platform, including roles and settings.',perms:rolePerms(PERM_KEYS)},
+    {name:'General Manager',desc:'Runs the business. Assigns roles and permissions alongside the Super Admin.',perms:rolePerms(PERM_KEYS.filter(k=>k!=='settings'))},
+    {name:'Operations Manager',desc:'Day-to-day branch operations, staffing and approvals.',perms:rolePerms(['customers','kyc','loans','credit','loanApprove','disburse','repayments','collections','fees','reports','admins'])},
+    {name:'Branch Manager',desc:'Branch book, officers and collections in one district.',perms:rolePerms(['customers','kyc','loans','credit','loanApprove','repayments','collections','reports','admins'])},
+    {name:'Loan Officer',desc:'Assesses applications and manages a borrower portfolio.',perms:rolePerms(['customers','kyc','loans','credit','loanApprove','repayments','fees','collections','reports'])},
+    {name:'Credit Analyst',desc:'Credit assessment, scoring and committee recommendations.',perms:rolePerms(['customers','kyc','loans','credit','loanApprove','reports'])},
+    {name:'Finance Officer',desc:'Disbursements, repayments, reversals and reconciliation.',perms:rolePerms(['customers','loans','disburse','repayments','reverse','fees','savings','reports'])},
+    {name:'Cashier',desc:'Counter cash: deposits, withdrawals, receipts and repayments.',perms:rolePerms(['customers','cashier','repayments','fees','savings'])},
+    {name:'Teller',desc:'Cash desk support: customer deposits and payment receipts.',perms:rolePerms(['customers','cashier','repayments','savings'])},
+    {name:'Collections Officer',desc:'Arrears follow-up, promises to pay and restructuring requests.',perms:rolePerms(['customers','loans','repayments','collections'])},
+    {name:'Compliance Officer',desc:'KYC, AML, risk registers and write-off referrals.',perms:rolePerms(['customers','kyc','reports','audit','writeoff'])},
+    {name:'Support Agent',desc:'Customer service, tickets and messaging.',perms:rolePerms(['customers','kyc'])},
+    {name:'Auditor',desc:'Read-only assurance: audit trail and reports.',perms:rolePerms(['reports','audit'])},
+    {name:'Systems Administrator',desc:'Platform settings, backups and integrations.',perms:rolePerms(['customers','settings','reports','audit'])},
+    {name:'Payroll Officer',desc:'Employer payroll deductions and schedules.',perms:rolePerms(['customers','payroll','repayments','reports'])},
+    {name:'Records Officer',desc:'Customer files, KYC documents and data quality.',perms:rolePerms(['customers','kyc'])}
+  ];
+}
+
+/* Which permission opens which module. A module with no entry is open to
+   every signed-in officer (dashboards, the calculator). */
+const MODULE_PERM={dashboard:null,calculator:null,
+ customers:'customers',kyc:'kyc',changeRequests:'customers',
+ loanApps:'loans',loanProducts:'loans',credit:'credit',activeLoans:'loans',
+ disbursement:'disburse',guarantors:'loans',repayments:'repayments',
+ schedules:'loans',collections:'collections',
+ deposits:'cashier',withdrawals:'cashier',transfers:'cashier',savings:'savings',
+ fees:'fees',interest:'fees',ledger:'reports',recon:'reports',statements:'reports',
+ support:'customers',messaging:'customers',reminders:'customers',
+ adminUsers:'admins',roles:'roles',workflows:'loanApprove',audit:'audit',
+ security:'settings',compliance:'reports',settings:'settings',backups:'settings',
+ reports:'reports',risk:'reports',branches:'admins',loanOfficers:'admins',
+ payroll:'payroll',accounting:'reports',investors:'reports',partners:'admins',
+ legal:'collections',api:'settings',fraud:'reports',templates:'settings',
+ /* the website console (added by site-admin.js) follows the same rule */
+ website:'settings',liveFeed:'settings',catalogue:'settings',siteSettings:'settings'};
+
 function configDb(){
   const site = window.JCOB_SITE;
   const products = (site && site.products ? site.products : []).map(function (p, i) {
@@ -626,13 +688,7 @@ function configDb(){
     statements:[], officers:[], investors:[], agents:[], payroll:[],
     legal:[], fraud:[], backups:[], tasks:[], activities:[], ptps:[],
     documents:[], exceptions:[], staffAlerts:[], changeRequests:[],
-    roles:[
-      {name:'Super Admin',perms:{customers:1,kyc:1,loanApprove:1,disburse:1,repayments:1,reverse:1,fees:1,reports:1,admins:1,roles:1,settings:1,writeoff:1}},
-      {name:'Loan Officer',perms:{customers:1,kyc:1,loanApprove:1,disburse:0,repayments:1,reverse:0,fees:1,reports:1,admins:0,roles:0,settings:0,writeoff:0}},
-      {name:'Finance Officer',perms:{customers:1,kyc:0,loanApprove:0,disburse:1,repayments:1,reverse:1,fees:1,reports:1,admins:0,roles:0,settings:0,writeoff:0}},
-      {name:'Support Agent',perms:{customers:1,kyc:0,loanApprove:0,disburse:0,repayments:0,reverse:0,fees:0,reports:0,admins:0,roles:0,settings:0,writeoff:0}},
-      {name:'Compliance Officer',perms:{customers:1,kyc:1,loanApprove:0,disburse:0,repayments:0,reverse:0,fees:0,reports:1,admins:0,roles:0,settings:0,writeoff:1}}
-    ],
+    roles:defaultRoles(),
     branches:[
       {id:'BR-01',name:'Lilongwe Head Office',district:'Lilongwe',manager:'',cust:0,portfolio:0,cash:0},
       {id:'BR-02',name:'Blantyre Branch',district:'Blantyre',manager:'',cust:0,portfolio:0,cash:0},
@@ -674,6 +730,7 @@ function seed(){
   return configDb();
 }
 let db=seed();
+migrateRoles();
 
 /* ---------------- cloud persistence (Supabase) ----------------
    Supabase is the only store. portal_docs/main holds the console book;
@@ -723,6 +780,8 @@ async function cloudLoad(){
     if(row&&row.data&&row.data.customers){
       /* merge over a fresh seed so modules added later still have a shape */
       db=Object.assign(seed(),row.data);
+      db.roles=(row.data.roles&&row.data.roles.length)?row.data.roles:db.roles;
+      migrateRoles();invalidateOfficer();
       cloud.state='synced';cloud.at=row.updated_at;
       if(typeof render==='function')render(true);
       return true;
@@ -743,6 +802,86 @@ window.JCOB_PORTAL={
   push:cloudPush
 };
 
+/* =====================================================================
+   WHO IS SIGNED IN — and what they are allowed to open
+   ---------------------------------------------------------------------
+   The console is multi-officer: a Super Admin, a General Manager, a
+   cashier, a teller, a collections officer, a credit analyst and so on.
+   The role on the officer's staff record decides which modules appear in
+   the sidebar, which cards the Roles screen shows and whether a
+   permission switch can be touched at all. Nothing is drawn first and
+   hidden afterwards: the markup for a module the officer cannot open is
+   never produced.
+   ===================================================================== */
+let officerCache=null;
+
+function profileRole(){
+  const auth=window.JCOB_CLOUD&&window.JCOB_CLOUD.auth;
+  const p=(auth&&auth.profile&&auth.profile())||{};
+  return {name:p.full_name||'',email:(p.email||'').toLowerCase(),role:String(p.role||'').toLowerCase()};
+}
+
+/* The staff record that belongs to the signed-in account, matched on the
+   email address first and the name second. */
+function officerRecord(){
+  if(officerCache&&Date.now()-officerCache.at<4000)return officerCache.record;
+  const p=profileRole();
+  let record=null;
+  if(p.email)record=db.admins.find(a=>String(a.email||'').toLowerCase()===p.email)||null;
+  if(!record&&p.name)record=db.admins.find(a=>a.name&&a.name.toLowerCase()===p.name.toLowerCase())||null;
+  officerCache={record,at:Date.now()};
+  return record;
+}
+function invalidateOfficer(){officerCache=null;}
+
+/* The role name the console enforces. An account with no staff record of
+   its own falls back to the role on its Supabase profile. */
+function currentRole(){
+  const rec=officerRecord();
+  if(rec&&rec.role&&db.roles.some(r=>r.name===rec.role))return rec.role;
+  const p=profileRole();
+  const map={admin:'Super Admin',credit:'Credit Analyst',officer:'Loan Officer',staff:'Support Agent',customer:'Support Agent'};
+  const guess=map[p.role]||(db.roles[0]&&db.roles[0].name)||'Super Admin';
+  return db.roles.some(r=>r.name===guess)?guess:guess;
+}
+function roleDef(name){return db.roles.find(r=>r.name===name)||null}
+function rolePermsOf(name){const r=roleDef(name);return (r&&r.perms)||{}}
+function isSuper(){return currentRole()==='Super Admin'}
+/* Only these two roles may grant or revoke authority. */
+function canManageAccess(){const n=currentRole();return n==='Super Admin'||n==='General Manager'}
+function can(perm){
+  if(!perm)return true;
+  if(isSuper())return true;
+  return !!rolePermsOf(currentRole())[perm];
+}
+function canOpen(moduleId){return can(MODULE_PERM[moduleId]===undefined?null:MODULE_PERM[moduleId])}
+function openableRoles(){
+  /* what the signed-in officer is allowed to assign to somebody else */
+  if(isSuper())return db.roles;
+  if(currentRole()==='General Manager')return db.roles.filter(r=>r.name!=='Super Admin');
+  return [];
+}
+
+/* Keep a saved book working after this release: staff may have been
+   written with the older five-role catalogue, and older roles carry an
+   older permission set. Missing roles and missing keys are filled in, and
+   nothing that was granted is ever silently removed. */
+function migrateRoles(){
+  if(!Array.isArray(db.roles))db.roles=[];
+  defaultRoles().forEach(def=>{
+    const found=db.roles.find(r=>r.name===def.name);
+    if(!found){db.roles.push(def);return;}
+    found.perms=found.perms||{};
+    PERM_KEYS.forEach(k=>{if(found.perms[k]===undefined)found.perms[k]=def.perms[k]});
+    if(!found.desc)found.desc=def.desc;
+  });
+  /* the two protected roles always keep full authority */
+  const superRole=db.roles.find(r=>r.name==='Super Admin');
+  if(superRole)superRole.perms=rolePerms(PERM_KEYS);
+  db.settings=db.settings||{};
+  if(db.settings.reminderDays===undefined)db.settings.reminderDays=3;
+}
+
 /* ---------------- core helpers ---------------- */
 function toast(type,title,msg){const t=document.createElement('div');t.className='toast '+type;
  t.innerHTML=`<div class="ti">${type==='ok'?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>':type==='err'?'!':'i'}</div><div><b>${esc(title)}</b><span>${esc(msg)}</span></div>`;
@@ -757,11 +896,11 @@ function T(id,cfg){ui[id]=ui[id]||{};const t=ui[id];t.page=t.page||1;
  let rows=cfg.rows();
  if(t.q){const q=t.q.toLowerCase();rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q))}
  if(t.f&&t.f.v&&t.f.k)rows=rows.filter(r=>String(r[t.f.k])===t.f.v);
- const per=cfg.per||8,pages=Math.max(1,Math.ceil(rows.length/per));t.page=Math.min(t.page,pages);
+ const per=t.all?Math.max(1,rows.length):(cfg.per||8),pages=Math.max(1,Math.ceil(rows.length/per));t.page=Math.min(t.page,pages);
  const slice=rows.slice((t.page-1)*per,t.page*per);
  const ths=cfg.cols.map(c=>`<th>${c.t}</th>`).join('')+(cfg.actions?'<th style="text-align:right">Actions</th>':'');
  const body=slice.length?slice.map(r=>`<tr ${cfg.hl&&cfg.hl(r)?'class="hl"':''}>${cfg.cols.map(c=>`<td>${c.f?c.f(r):esc(r[c.k]??'')}</td>`).join('')}${cfg.actions?`<td style="text-align:right;white-space:nowrap">${cfg.actions(r)}</td>`:''}</tr>`).join('')
-  :`<tr><td colspan="${cfg.cols.length+1}" class="empty">No records match your current filters.</td></tr>`;
+  :`<tr><td colspan="${cfg.cols.length+1}" class="empty">${cfg.empty||'No records match your current filters.'}</td></tr>`;
  let pager='';if(pages>1){pager=`<div class="pgr"><button data-pt="${id}" data-p="${t.page-1}" ${t.page<=1?'disabled':''}>‹</button>`;
   for(let i=1;i<=pages;i++){if(pages>7&&Math.abs(i-t.page)>2&&i!==1&&i!==pages){if(!pager.endsWith('…'))pager+='<span>…</span>';continue}
    pager+=`<button class="${i===t.page?'cur':''}" data-pt="${id}" data-p="${i}">${i}</button>`}
@@ -772,6 +911,7 @@ function T(id,cfg){ui[id]=ui[id]||{};const t=ui[id];t.page=t.page||1;
    ${filters}
    <div class="tspace"></div>
    ${cfg.head||''}
+   <button class="btn ghost sm" data-all="${id}" title="Show every record in one list">${t.all?'Paginate':'Show all'}</button>
    <button class="btn ghost sm" data-csv="${id}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Export CSV</button>
    <span class="tcount">${rows.length} of ${cfg.rows().length} records</span>
   </div>
@@ -789,7 +929,8 @@ document.addEventListener('input',e=>{const q=e.target.dataset.qid;if(q){ui[q].q
  if(e.target.dataset.qid){const el=e.target;requestAnimationFrame(()=>{const n=document.querySelector(`[data-qid="${el.dataset.qid}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}})}});
 document.addEventListener('change',e=>{const f=e.target.dataset.fid;if(f){ui[f]=ui[f]||{};ui[f].f=e.target.value?{k:e.target.dataset.fk,v:e.target.value}:null;ui[f].page=1;render(false)}});
 document.addEventListener('click',e=>{const p=e.target.closest('[data-pt]');if(p){ui[p.dataset.pt].page=+p.dataset.p;render(false)}
- const c=e.target.closest('[data-csv]');if(c)csvOf(c.dataset.csv)});
+ const c=e.target.closest('[data-csv]');if(c)csvOf(c.dataset.csv)
+ const a=e.target.closest('[data-all]');if(a){const id=a.dataset.all;ui[id]=ui[id]||{};ui[id].all=!ui[id].all;ui[id].page=1;render(false)}});
 
 /* ---------------- modal ---------------- */
 let modalActs={};
@@ -909,7 +1050,7 @@ const NAV=[
  {g:'CUSTOMERS',items:[['customers','Customer Management','users'],['kyc','KYC & Verification','id'],['changeRequests','Detail Change Requests','lock']]},
  {g:'LOANS',items:[['loanApps','Loan Applications','doc'],['loanProducts','Loan Products','box'],['credit','Credit Assessment','shield'],['activeLoans','Active Loans','bank'],['disbursement','Loan Disbursement','send'],['guarantors','Guarantors & Collateral','money'],['repayments','Loan Repayments','cal'],['schedules','Repayment Schedules','cal'],['collections','Collections & Delinquency','alert']]},
  {g:'FINANCE',items:[['deposits','Deposits','down'],['withdrawals','Withdrawals','up'],['transfers','Transfers','swap'],['savings','Savings Management','piggy'],['fees','Fees & Charges','pct'],['interest','Interest Management','cal'],['ledger','Transaction Ledger','book'],['recon','Bank & Mobile Money Recon','link'],['statements','Financial Statements','file']]},
- {g:'SERVICE',items:[['support','Customer Support','chat'],['messaging','Notifications & Messaging','bell']]},
+ {g:'SERVICE',items:[['support','Customer Support','chat'],['messaging','Notifications & Messaging','bell'],['reminders','Repayment Reminders','cal']]},
  {g:'ADMIN',items:[['adminUsers','Admin Users & Staff','userc'],['roles','Roles & Permissions','key'],['workflows','Approval Workflows','flow'],['audit','Audit Logs','hist'],['security','Security & Sessions','lock'],['compliance','Compliance & Risk','check'],['settings','System Settings','gear'],['backups','Backup & Data','db']]},
  {g:'REPORTS',items:[['reports','Reports & Analytics','chart'],['risk','Risk & Portfolio Monitoring','radar']]},
  {g:'ADVANCED',items:[['branches','Branch Management','building'],['loanOfficers','Loan Officers','brief'],['payroll','Payroll Integration','userc'],['accounting','Accounting & General Ledger','book'],['investors','Investor Management','money'],['partners','Partner & Agent Mgmt','link'],['legal','Legal & Recovery','scale'],['api','API & Integrations','gear'],['fraud','Fraud Monitoring','alert'],['templates','Document Templates','file']]}];
@@ -919,13 +1060,15 @@ function badgeCounts(){return{loanApps:db.applications.filter(a=>a.status==='Pen
  withdrawals:db.withdrawals.filter(w=>w.status==='Pending').length,
  workflows:db.workflows.filter(w=>!w.stage.startsWith('Completed')).length,
  collections:overdueLoans().length,disbursement:db.applications.filter(a=>a.status==='Approved').length,
- support:db.tickets.filter(t=>t.status!=='Resolved').length,fraud:db.fraud.filter(f=>f.status!=='Resolved').length}}
+ support:db.tickets.filter(t=>t.status!=='Resolved').length,fraud:db.fraud.filter(f=>f.status!=='Resolved').length,
+ reminders:(db.reminders||[]).filter(r=>r.status==='Queued').length}}
 function buildNav(){const counts=badgeCounts();
- $('#sidebar').innerHTML=NAV.map(g=>{
+ const groups=NAV.map(g=>({g:g.g,items:g.items.filter(([id])=>canOpen(id))})).filter(g=>g.items.length);
+ $('#sidebar').innerHTML=groups.map(g=>{
   const items=g.items.map(([id,label,ic])=>`<button class="navlink ${route===id?'active':''}" data-nav="${id}">${ICONS[ic]}<span>${label}</span>${counts[id]?`<span class="cnt">${counts[id]}</span>`:''}</button>`).join('');
   const open=(ui.navClosed||[]).includes(g.g)?'closed':'';
   return `<div class="navgrp ${open}"><button class="gh" data-grp="${g.g}">${g.g}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="items">${items}</div></div>`}).join('')+
-  `<div class="syncbox"><b><span class="pulse"></span> ${cloud.on?'WEBSITE CONNECTED':'NOT CONNECTED'}</b><br>${cloudStateText()}</div>`}
+  `<div class="syncbox"><b><span class="pulse"></span> ${cloud.on?'WEBSITE CONNECTED':'NOT CONNECTED'}</b><br>${cloudStateText()}<br><span style="display:block;margin-top:8px;color:var(--dim)">Signed in as <b style="color:var(--gold-200)">${esc(currentRole())}</b></span></div>`}
 function cloudStateText(){
   if(!cloud.on)return 'Supabase is unreachable. The console will not accept changes until it is back.';
   if(cloud.state==='conflict')return 'Conflict: another session saved first. Reload before editing further.';
@@ -934,6 +1077,141 @@ function cloudStateText(){
   if(cloud.state==='synced'&&cloud.at)return 'Every record is stored in Supabase · last saved '+new Date(cloud.at).toLocaleTimeString('en-GB');
   return 'Every record is read from and written to Supabase.';
 }
+/* =====================================================================
+   REFRESH — one button, every module
+   ---------------------------------------------------------------------
+   Re-reads the portal book from Supabase, pulls every registered website
+   customer (including accounts that have never opened the dashboard),
+   re-runs the reminder engine and paints the console again.
+   ===================================================================== */
+function adminRefresh(opts){
+  opts=opts||{};
+  const L=window.JCOB_LOADER;
+  if(L&&!opts.quiet)L.show('Refreshing every module…');
+  const jobs=[];
+  if(cloud.on)jobs.push(Promise.resolve(cloudLoad()).catch(()=>null));
+  if(window.JCOB_ADMIN_SITE&&window.JCOB_ADMIN_SITE.refreshCloud)jobs.push(Promise.resolve(window.JCOB_ADMIN_SITE.refreshCloud()).catch(()=>null));
+  jobs.push(pullRegisteredCustomers());
+  return Promise.all(jobs).then(()=>{
+    invalidateOfficer();migrateRoles();
+    const made=runReminderEngine();
+    render(true);showDataMode();updateNotifCount();buildNav();
+    if(L){L.message(made?('Up to date · '+made+' reminder'+(made===1?'':'s')+' queued'):'Everything is up to date');setTimeout(()=>L.hide(),320)}
+    if(!opts.quiet)toast('ok','Refreshed','Every module was re-read from the database just now.');
+    return true;
+  }).catch(e=>{if(L)L.hide();toast('err','Refresh failed',String((e&&e.message)||e));return false});
+}
+
+/* Every account registered on the website is a customer of the business,
+   whether or not it has opened the dashboard yet. This reads the profiles
+   table so the customers module lists all of them. */
+function pullRegisteredCustomers(){
+  const api=cloud.api||window.JCOB_CLOUD;
+  if(!cloud.on||!api||!api.from)return Promise.resolve(0);
+  return api.from('profiles').select('id,full_name,email,phone,account_no,role,status,created_at').limit(1000).run()
+    .then(rows=>{
+      const list=Array.isArray(rows)?rows:[];
+      let added=0;
+      list.forEach(p=>{
+        if(String(p.role||'customer').toLowerCase()!=='customer')return;
+        const name=String(p.full_name||'').trim();
+        if(!name)return;
+        const email=String(p.email||'').toLowerCase();
+        const exists=db.customers.some(c=>c.siteUid===p.id||(email&&String(c.email||'').toLowerCase()===email));
+        if(exists)return;
+        db.customers.push({id:'CUS-'+(1000+db.customers.length+1),siteUid:p.id,name,
+          phone:p.phone||'—',email:p.email||'—',nid:'NID-PENDING',district:'—',
+          status:String(p.status||'active')==='active'?'Active':String(p.status||'')==='suspended'?'Suspended':'Inactive',
+          kyc:'Pending',balance:0,savings:0,employer:'—',occupation:'—',income:0,
+          kin:{name:'—',phone:'—',rel:'—'},joined:p.created_at||new Date().toISOString(),
+          origin:'website',account:p.account_no||''});
+        added++;
+      });
+      if(added)save();
+      return added;
+    }).catch(()=>0);
+}
+
+/* =====================================================================
+   REPAYMENT REMINDERS
+   ---------------------------------------------------------------------
+   The system warns every customer with an active loan three days before
+   the instalment falls due (the lead time is configurable, three by
+   default). Each reminder is keyed to the loan and the due date, so a
+   customer is reminded once — not every time the console is opened.
+   ===================================================================== */
+function nextInstalment(loan){
+  const open=(loan.schedule||[]).filter(x=>x.status!=='Paid')
+    .sort((a,b)=>new Date(a.due)-new Date(b.due));
+  return open[0]||null;
+}
+function reminderLeadDays(){
+  const n=Number(db.settings&&db.settings.reminderDays);
+  return Number.isFinite(n)&&n>0?Math.round(n):3;
+}
+function runReminderEngine(){
+  db.reminders=db.reminders||[];
+  const lead=reminderLeadDays();
+  const today=new Date();today.setHours(0,0,0,0);
+  let created=0;
+  (db.loans||[]).forEach(l=>{
+    if(l.status==='Closed'||l.status==='Cancelled'||l.status==='Written Off')return;
+    const next=nextInstalment(l);
+    const dueAt=next?next.due:(l.maturity||null);
+    if(!dueAt)return;
+    const due=new Date(dueAt);
+    if(isNaN(due.getTime()))return;
+    const days=Math.round((due-today)/86400000);
+    if(days<0||days>lead)return;
+    const amount=next?next.amt:(l.emis||0);
+    const key='REM|'+l.id+'|'+(next?next.n:'m')+'|'+due.toISOString().slice(0,10);
+    if(db.reminders.some(r=>r.key===key))return;
+    const when=days===0?'today':days===1?'tomorrow':'in '+days+' days';
+    const rem={id:uid('REM'),key,loan:l.id,cust:l.cust,amount,due:new Date(dueAt).toISOString(),days,
+      lead,channel:'SMS + Email + In-app',status:'Queued',at:new Date().toISOString(),
+      body:'Reminder: '+mwk(amount)+' for loan '+l.id+' is due '+when+' ('+dFmt(dueAt)+').'};
+    db.reminders.unshift(rem);
+    db.notifications.unshift({id:uid('MSG'),cust:l.cust,type:'Repayment reminder',
+      channel:'SMS + Email',date:new Date().toISOString(),status:'Sent',body:rem.body});
+    rem.status='Sent';rem.sentAt=new Date().toISOString();
+    try{
+      if(typeof window.JCOB_PUSH_CUSTOMER_REMINDER==='function')window.JCOB_PUSH_CUSTOMER_REMINDER(rem);
+    }catch(e){}
+    created++;
+  });
+  if(created){
+    db.reminders.sort((a,b)=>new Date(a.due)-new Date(b.due));
+    save();updateNotifCount();
+  }
+  return created;
+}
+window.JCOB_RUN_REMINDERS=runReminderEngine;
+
+function vReminders(){
+  db.reminders=db.reminders||[];
+  const lead=reminderLeadDays();
+  window._tblCfg.rem={rows:()=>db.reminders.slice().sort((a,b)=>new Date(a.due)-new Date(b.due)),
+   cols:[{t:'Reminder',k:'id',f:r=>`<span class="tid">${r.id}</span>`},
+    {t:'Customer',k:'cust'},
+    {t:'Loan',k:'loan',f:r=>`<span class="tid">${esc(r.loan)}</span>`},
+    {t:'Amount due',f:r=>`<span class="tamt">${mwk(r.amount)}</span>`,raw:r=>r.amount},
+    {t:'Due date',f:r=>`${dFmt(r.due)}<div class="tsub">${r.days===0?'due today':'in '+r.days+' day'+(r.days===1?'':'s')}</div>`,raw:r=>r.due},
+    {t:'Channel',k:'channel'},
+    {t:'Status',f:r=>badge(r.status)}],
+   actions:r=>`<button class="btn sm ghost" data-act="remSend" data-id="${r.id}">Send now</button>
+     <button class="btn sm warn" data-act="remCancel" data-id="${r.id}">Cancel</button>`};
+  return pageHead('Repayment Reminders',
+    `Every customer with an active loan is reminded <b>${lead} day${lead===1?'':'s'} before</b> the repayment date. Reminders are keyed to the loan and the due date, so nobody is messaged twice for the same instalment.`,
+    `<button class="btn primary" data-act="remRun">Run reminder check</button><button class="btn ghost" data-act="remSettings">Lead time</button>`)
+  +`<div class="stats">
+    ${miniStat('Queued & sent',db.reminders.length,'Last 90 days of reminders','rgba(31,131,201,.14)')}
+    ${miniStat('Due within '+lead+' days',db.reminders.filter(r=>r.days>=0&&r.days<=lead).length,'Active loans only','rgba(138,106,18,.14)')}
+    ${miniStat('Overdue follow-ups',(db.loans||[]).filter(l=>l.status==='Overdue').length,'Escalated to collections','rgba(168,59,52,.14)')}
+    ${miniStat('Lead time',lead+' days','Configurable in settings','rgba(15,122,92,.14)')}
+   </div>
+   <div class="panel flush">${T('rem',window._tblCfg.rem)}</div>`
+}
+
 let route=location.hash.replace('#/','')||'dashboard';
 window.addEventListener('hashchange',()=>{route=location.hash.replace('#/','')||'dashboard';render(true)});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-alert]');if(a){const it=(db.staffAlerts||[]).find(x=>x.id===a.dataset.alert);if(it&&!it.read){it.read=true;save();updateNotifCount()}}
@@ -954,7 +1232,7 @@ function vDashboard(){const c=db.customers,ap=db.applications,ln=db.loans;
  const stat=(lb,vl,sb,ic,glow,ibg,cls)=>`<div class="stat" style="--glow:${glow};--ibg:${ibg}"><div class="lb">${lb}</div><div class="vl">${vl}</div><div class="sb ${cls||''}">${sb}</div><div class="ico">${ic}</div></div>`;
  return`
  <div class="page-h"><div><h2>Dashboard Overview</h2><p>Live operational picture of JAY C O B FINANCIAL SERVICES — lending, repayments, deposits and risk at a glance.</p></div>
-  <div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn" data-act="openCalc">🧮 Loan Calculator</button><button class="btn primary" data-act="addCustomer">+ Register Customer</button></div></div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn ghost" data-act="refreshModule" title="Re-read every module from the database">↻ Refresh</button><button class="btn" data-act="openCalc">🧮 Loan Calculator</button><button class="btn primary" data-act="addCustomer">+ Register Customer</button></div></div>
  <div class="stats">
   ${stat('Total Customers',num(c.length),actBorrowers+' active borrowers','👥','rgba(31,131,201,.2)','rgba(31,131,201,.14)')}
   ${stat('Loan Applications',num(ap.length),ap.filter(a=>a.status==='Pending').length+' pending · '+ap.filter(a=>a.status==='Under Review').length+' in review','📄','rgba(107,79,168,.2)','rgba(107,79,168,.14)')}
@@ -1000,27 +1278,31 @@ window.addEventListener('resize',()=>{clearTimeout(window._rs);window._rs=setTim
    VIEW: CUSTOMERS
 ===================================================================== */
 function custRow(c){return `<span class="tid">${c.id}</span>`}
-function vCustomers(){window._tblCfg.customers={rows:()=>db.customers,per:9,
- cols:[{t:'Customer',k:'name',f:r=>`${avatar(r.name)}<div style="display:inline-block;vertical-align:middle"><b>${esc(r.name)}</b><div class="tsub">${esc(r.id)} · since ${dFmt(r.joined)}</div></div>`,raw:r=>r.id+' '+r.name},
+function vCustomers(){
+ window._tblCfg.customers={rows:()=>db.customers,per:12,
+ cols:[{t:'Customer',k:'name',f:r=>`${avatar(r.name)}<div style="display:inline-block;vertical-align:middle"><b>${esc(r.name)}</b><div class="tsub">${esc(r.id)} · since ${dFmt(r.joined)}${r.origin==='website'?' · registered online':''}</div></div>`,raw:r=>r.id+' '+r.name},
   {t:'Contact',f:r=>`${esc(r.phone)}<div class="tsub">${esc(r.email)}</div>`,raw:r=>r.phone+' '+r.email},
   {t:'National ID',k:'nid'},{t:'District',k:'district'},
   {t:'Balance',f:r=>`<span class="tamt ${r.balance<0?'neg':''}">${mwk(r.balance)}</span><div class="tsub">Savings ${mwk(r.savings)}</div>`,raw:r=>r.balance},
+  {t:'Loans',f:r=>{const ls=db.loans.filter(l=>l.cust===r.name);return ls.length?`<span class="bdg b">${ls.length}</span> <span class="tsub">${mwk(ls.reduce((a,l)=>a+l.balance,0))}</span>`:'<span class="tsub">None</span>'},raw:r=>db.loans.filter(l=>l.cust===r.name).length},
   {t:'KYC',f:r=>badge(r.kyc)},{t:'Status',f:r=>badge(r.status),raw:r=>r.status}],
- filters:[{k:'status',label:'All statuses'},{k:'kyc',label:'All KYC'}],
- actions:r=>`<button class="btn sm ghost" data-act="viewCustomer" data-id="${r.id}">View</button>
+ filters:[{k:'status',label:'All statuses'},{k:'kyc',label:'All KYC'},{k:'district',label:'All districts'}],
+ empty:'No customers yet. Every account registered on the website appears here automatically — press Refresh, or register the first customer.',
+ actions:r=>`<button class="btn sm ghost" data-act="viewCustomer" data-id="${r.id}">Open file</button>
   ${r.status==='Active'?`<button class="btn sm warn" data-act="custStatus" data-v="Suspended" data-id="${r.id}">Suspend</button>`:''}
   ${r.status!=='Blocked'?`<button class="btn sm danger" data-act="custStatus" data-v="Blocked" data-id="${r.id}">Block</button>`:''}
   ${r.status!=='Active'?`<button class="btn sm ok" data-act="custStatus" data-v="Active" data-id="${r.id}">Reactivate</button>`:''}`};
- return pageHead('Customer Management','Register, inspect and control every customer profile — balances, employment, next of kin, documents, transaction and loan history.',
-  `<button class="btn primary" data-act="addCustomer">+ Register Customer</button>`)
-  +`<div class="stats">${miniStat('Active customers',db.customers.filter(c=>c.status==='Active').length,'▼ '+(db.customers.length-db.customers.filter(c=>c.status==='Active').length)+' restricted','rgba(15,122,92,.14)')}
+ const online=db.customers.filter(c=>c.origin==='website').length;
+ return pageHead('Customer Management','Every registered customer — online sign-ups, branch accounts and their full file: balances, loans, KYC, next of kin and history.',
+  `<button class="btn ghost" data-act="syncCustomers">Sync website registrations</button><button class="btn primary" data-act="addCustomer">+ Register Customer</button>`)
+  +`<div class="stats">${miniStat('All customers',db.customers.length,online+' registered on the website','rgba(31,131,201,.14)')}
+   ${miniStat('Active customers',db.customers.filter(c=>c.status==='Active').length,'▼ '+(db.customers.length-db.customers.filter(c=>c.status==='Active').length)+' restricted','rgba(15,122,92,.14)')}
    ${miniStat('KYC verified',db.customers.filter(c=>c.kyc==='Verified').length,db.customers.filter(c=>c.kyc==='Pending').length+' awaiting review','rgba(31,131,201,.14)')}
-   ${miniStat('Combined balances',mwk(db.customers.reduce((a,c)=>a+Math.max(c.balance,0),0)),'Positive wallet balances','rgba(20,88,143,.14)')}
-   ${miniStat('Combined savings',mwk(db.customers.reduce((a,c)=>a+c.savings,0)),'Across '+db.savings.length+' savings accounts','rgba(107,79,168,.14)')}</div>
+   ${miniStat('Combined balances',mwk(db.customers.reduce((a,c)=>a+Math.max(c.balance,0),0)),'Savings '+mwk(db.customers.reduce((a,c)=>a+c.savings,0)),'rgba(20,88,143,.14)')}</div>
  <div class="panel flush">${T('customers',window._tblCfg.customers)}</div>`}
 /* Every module except the main dashboard carries a way back. */
 function pageHead(t,d,btns){return `${route==='dashboard'?'':'<button class="aback" type="button" data-back>← Back</button>'}
-<div class="page-h"><div><h2>${t}</h2><p>${d}</p></div><div style="display:flex;gap:9px;flex-wrap:wrap">${btns||''}</div></div>`}
+<div class="page-h"><div><h2>${t}</h2><p>${d}</p></div><div style="display:flex;gap:9px;flex-wrap:wrap">${btns||''}<button class="btn ghost" type="button" data-act="refreshModule" title="Re-read this module from the database"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 3.5V9h-5.4"/></svg> Refresh</button></div></div>`}
 function miniStat(lb,vl,sb,bg){return `<div class="stat" style="--glow:${bg};--ibg:${bg}"><div class="lb">${lb}</div><div class="vl" style="font-size:20px">${vl}</div><div class="sb">${sb}</div></div>`}
 let tabsModal={};
 function renderModalTab(){/* re-open customer profile with chosen tab */}
@@ -1172,7 +1454,7 @@ function vDisbursement(){const pend=db.applications.filter(a=>a.status==='Approv
  window._tblCfg.disbH={rows:()=>db.loans.map(l=>({...l})),per:9,
   cols:[{t:'Loan',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Amount',f:r=>`<span class="tamt">${mwk(r.principal)}</span>`,raw:r=>r.principal},{t:'Channel',k:'method',f:r=>esc(r.method)},{t:'Disbursed',f:r=>dFmt(r.start)},{t:'Maturity',f:r=>dFmt(r.maturity)},{t:'Status',f:r=>badge(r.status)}]};
  return pageHead('Loan Disbursement','Confirm payouts to bank and mobile money channels. References are captured against every disbursement.')
- +`<div class="stats">${miniStat('Awaiting disbursement',awaiting.length,mwk(awaiting.reduce((a,x)=>a+x.amount,0))+' queued','rgba(138,106,18,.14)')}${miniStat('Disbursed (lifetime)',num(db.loans.length),mwk(db.loans.reduce((a,l)=>a+l.principal,0)),'rgba(15,122,92,.14)')}${miniStat('Airtel Money book',mwk(db.loans.filter(l=>l.method.includes('Airtel')).reduce((a,l)=>a+l.balance,0)),'Mobile channel exposure','rgba(31,131,201,.14)')}${miniStat('Bank book',mwk(db.loans.filter(l=>l.method.includes('Bank')||l.method.includes('Payroll')).reduce((a,l)=>a+l.balance,0)),'Bank & payroll exposure','rgba(107,79,168,.14)')}</div>
+ +`<div class="stats">${miniStat('Awaiting disbursement',awaiting.length,mwk(awaiting.reduce((a,x)=>a+x.amount,0))+' queued','rgba(138,106,18,.14)')}${miniStat('Disbursed (lifetime)',num(db.loans.length),mwk(db.loans.reduce((a,l)=>a+l.principal,0)),'rgba(15,122,92,.14)')}${miniStat('Airtel Money book',mwk(db.loans.filter(l=>String(l.method||'').includes('Airtel')).reduce((a,l)=>a+l.balance,0)),'Mobile channel exposure','rgba(31,131,201,.14)')}${miniStat('Bank book',mwk(db.loans.filter(l=>String(l.method||'').includes('Bank')||String(l.method||'').includes('Payroll')).reduce((a,l)=>a+l.balance,0)),'Bank & payroll exposure','rgba(107,79,168,.14)')}</div>
  <div class="panel"><div class="ph"><h3>Approved — awaiting disbursement</h3></div>${T('disb',window._tblCfg.disb)}</div>
  <div class="panel"><div class="ph"><h3>Disbursement history & payment references</h3></div>${T('disbH',window._tblCfg.disbH)}</div>`}
 
@@ -1342,14 +1624,49 @@ function vMessaging(){window._tblCfg.msg={rows:()=>db.notifications.slice().sort
 ===================================================================== */
 function vAdminUsers(){window._tblCfg.adm={rows:()=>db.admins,
   cols:[{t:'Staff',k:'name',f:r=>`${avatar(r.name)}<b>${esc(r.name)}</b><div class="tsub">${esc(r.email)}</div>`},{t:'Role',k:'role',f:r=>badge(r.role==='Super Admin'?'p'.length?'Active':'' : 'Active'),raw:r=>r.role},{t:'Role name',k:'role',f:r=>esc(r.role)},{t:'Last login',f:r=>dtFmt(r.lastLogin)},{t:'Status',f:r=>badge(r.status)}].filter((c,i)=>i!==1),
-  actions:r=>r.role!=='Super Admin'?`<button class="btn sm ghost" data-act="admEdit" data-id="${r.id}">Edit</button><button class="btn sm ${r.status==='Active'?'danger':'ok'}" data-act="admToggle" data-id="${r.id}">${r.status==='Active'?'Deactivate':'Activate'}</button>`:'<span class="tsub">Protected</span>'};
- return pageHead('Admin Users & Staff','Create admin accounts, assign staff roles, manage profiles and deactivate access instantly.',`<button class="btn primary" data-act="admAdd">+ Create admin account</button>`)
- +`<div class="stats">${miniStat('Staff accounts',db.admins.length,db.admins.filter(a=>a.status==='Active').length+' active','rgba(31,131,201,.14)')}${miniStat('Loan officers',db.admins.filter(a=>a.role==='Loan Officer').length,'Portfolio assignments','rgba(15,122,92,.14)')}${miniStat('Finance officers',db.admins.filter(a=>a.role==='Finance Officer').length,'Approvals queue','rgba(107,79,168,.14)')}${miniStat('Deactivated',db.admins.filter(a=>a.status==='Inactive').length,'Access revoked','rgba(168,59,52,.14)')}</div>
+  actions:r=>{
+   if(r.role==='Super Admin'&&!isSuper())return '<span class="tsub">Protected</span>';
+   if(!canManageAccess())return '<span class="tsub">Read only</span>';
+   if(r.role==='Super Admin')return '<span class="tsub">Protected</span>';
+   return `<button class="btn sm ghost" data-act="admEdit" data-id="${r.id}">Edit role</button><button class="btn sm ${r.status==='Active'?'danger':'ok'}" data-act="admToggle" data-id="${r.id}">${r.status==='Active'?'Deactivate':'Activate'}</button>`},
+  empty:'No officer accounts yet. Create the first cashier, teller or loan officer — their role decides what they can open.'};
+ const cashiers=db.admins.filter(a=>['Cashier','Teller'].includes(a.role)).length;
+ return pageHead('Officers & Staff','Create officer accounts and assign their roles — cashiers, tellers, collections, credit, finance, compliance, audit and management. A role decides which modules the officer can open.',`<button class="btn primary" data-act="admAdd">+ Create officer account</button>`)
+ +`<div class="stats">${miniStat('Officer accounts',db.admins.length,db.admins.filter(a=>a.status==='Active').length+' active','rgba(31,131,201,.14)')}
+   ${miniStat('Cashiers & tellers',cashiers,'Cash desk','rgba(15,122,92,.14)')}
+   ${miniStat('Loan officers',db.admins.filter(a=>['Loan Officer','Credit Analyst','Collections Officer'].includes(a.role)).length,'Portfolio & collections','rgba(107,79,168,.14)')}
+   ${miniStat('Deactivated',db.admins.filter(a=>a.status==='Inactive').length,'Access revoked','rgba(168,59,52,.14)')}</div>
  <div class="panel flush">${T('adm',window._tblCfg.adm)}</div>`}
-const PERM_LABELS={customers:'View customers',kyc:'KYC verification',loanApprove:'Loan approval',disburse:'Disbursement',repayments:'Record repayments',reverse:'Transaction editing / reversal',fees:'Fees & waivers',reports:'Report access',admins:'Manage admin users',roles:'Manage roles',settings:'System settings',writeoff:'Write-off approvals'};
-function vRoles(){return pageHead('Roles & Permissions','Role-based access control (RBAC). Toggling a permission takes effect immediately and is audit-logged.')
- +`<div class="grid22">${db.roles.map((r,ri)=>`<div class="panel"><div class="ph"><h3>${r.name}</h3><span class="tcount">${Object.values(r.perms).filter(Boolean).length} permissions</span></div><div class="pb"><div class="perm-grid">
-  ${Object.keys(PERM_LABELS).map(k=>`<div class="perm"><span>${PERM_LABELS[k]}</span><button class="sw ${r.perms[k]?'on':''}" data-act="permToggle" data-ri="${ri}" data-k="${k}" ${r.name==='Super Admin'?'disabled':''}></button></div>`).join('')}</div></div></div>`).join('')}</div>`}
+const PERM_LABELS={customers:'View customer files',kyc:'KYC verification',loans:'Loan portfolio',credit:'Credit assessment',loanApprove:'Loan approval',disburse:'Disbursement',repayments:'Record repayments',reverse:'Reversal / edits',cashier:'Cashier desk (deposits, withdrawals)',collections:'Collections & delinquency',fees:'Fees & waivers',savings:'Savings management',reports:'Reports & ledger',audit:'Audit trail',admins:'Manage officers',roles:'Manage roles & permissions',settings:'System settings & backups',writeoff:'Write-off approvals',payroll:'Payroll deductions'};
+function vRoles(){
+ /* Only a Super Admin or a General Manager may see this screen. Every
+   other officer is shown a short, factual refusal — not the catalogue —
+   so the permissions they do not hold are never disclosed. */
+ if(!canManageAccess()){
+  return pageHead('Roles & Permissions','Access control is managed by the Super Admin and the General Manager.')
+   +`<div class="panel"><div class="pb" style="display:flex;gap:14px;align-items:flex-start">
+    <span style="font-size:26px">🔒</span>
+    <div><b>This screen is restricted</b>
+     <p class="tsub" style="margin-top:6px;line-height:1.7">You are signed in as <b>${esc(currentRole())}</b>. Roles and permissions are assigned only by a Super Admin or a General Manager. Your own access is limited to the modules in your sidebar.</p>
+    </div></div></div>`;
+ }
+ /* A Super Admin may edit every card. A General Manager may assign and
+    revoke every permission except on the Super Admin's own card (and on
+    another General Manager's), so authority cannot be escalated. */
+ const canEditCard=name=>isSuper()||(name!=='Super Admin'&&name!=='General Manager');
+ return pageHead('Roles & Permissions','Role-based access control for every officer — cashiers, tellers, collections, credit, finance, audit and management. Changes take effect immediately and are audit-logged.')
+ +`<div class="stats">
+    ${miniStat('Roles defined',db.roles.length,'Across the whole business','rgba(31,131,201,.14)')}
+    ${miniStat('Officers with roles',db.admins.length,db.admins.filter(a=>a.status==='Active').length+' active','rgba(15,122,92,.14)')}
+    ${miniStat('Permissions per role',PERM_KEYS.length,'Granted individually','rgba(107,79,168,.14)')}
+    ${miniStat('Your role',esc(currentRole()),isSuper()?'Full authority':'Assigned by Super Admin','rgba(138,106,18,.14)')}
+   </div>
+   <div class="grid22">${db.roles.map((r,ri)=>`<div class="panel"><div class="ph"><h3>${esc(r.name)}</h3><span class="tcount">${Object.keys(r.perms||{}).filter(k=>r.perms[k]).length} of ${PERM_KEYS.length} permissions</span></div><div class="pb">
+    ${r.desc?`<p class="tsub" style="margin:0 0 10px;line-height:1.6">${esc(r.desc)}</p>`:''}
+    <div class="perm-grid">
+    ${PERM_KEYS.map(k=>`<div class="perm"><span>${PERM_LABELS[k]||k}</span><button class="sw ${(r.perms||{})[k]?'on':''}" data-act="permToggle" data-ri="${ri}" data-k="${k}" aria-label="${esc(PERM_LABELS[k]||k)} for ${esc(r.name)}" ${canEditCard(r.name)?'':'disabled'}></button></div>`).join('')}</div>
+    <p class="hint" style="margin-top:10px">${r.name==='Super Admin'?'Super Admin always holds every permission — this card cannot be edited.':'Officers holding this role see only the modules these switches open.'}</p>
+    </div></div>`).join('')}</div>`}
 function vWorkflows(){const rows=()=>db.workflows.filter(w=>!(ui.tab.wf==='completed')?!w.stage.startsWith('Completed'):true);
  window._tblCfg.wf={rows,cols:[{t:'Workflow',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Type',k:'type'},{t:'Subject',k:'ref'},{t:'Requested by',k:'by'},{t:'Stage',k:'stage'},{t:'Raised',f:r=>dFmt(r.date)}],
   actions:r=>r.stage.startsWith('Completed')?'<span class="tsub">Closed</span>':`<button class="btn sm ok" data-act="wfApprove" data-id="${r.id}">Approve</button><button class="btn sm danger" data-act="wfReject" data-id="${r.id}">Reject</button>`};
@@ -1428,6 +1745,8 @@ function vSettings(){const s=db.settings;const TH=(window.JCOB_SITE&&window.JCOB
   </div></div>
  <div><div class="panel"><div class="ph"><h3>Loan rules & policies</h3></div><div class="pb">
   <div class="frow3">${fld('Grace days',inp('stGrace',s.graceDays,'type="number"'))}${fld('Penalty % /mo arrears',inp('stPen',s.penaltyRate,'type="number" step="0.1"'))}${fld('Max DTI %',inp('stDti',s.maxDTI,'type="number"'))}</div>
+  <div class="frow">${fld('Repayment reminder lead time (days)',inp('stReminder',s.reminderDays||3,'type="number" min="1" max="30"'),'Every customer with an active loan is reminded this many days before the repayment date. Three days by default.')}
+   ${fld('Your role in this console',`<input value="${esc(currentRole())}" disabled>`,'Assigned by a Super Admin or General Manager.')}</div>
   <p class="hint">Rules apply to new assessments immediately. Existing schedules are never rewritten silently.</p></div></div>
  <div class="panel"><div class="ph"><h3>Document settings</h3></div><div class="lst flush">
   ${['National ID mandatory at onboarding','Proof of address required for loans > MWK 500,000','Business license required for business loans','Customer selfie required for digital onboarding'].map(x=>`<div class="li"><span class="ic" style="background:rgba(31,131,201,.1)">📄</span><div>${x}</div><span class="bdg g" style="margin-left:auto">Enforced</span></div>`).join('')}</div></div></div></div>
@@ -1536,10 +1855,36 @@ function vBranches(){window._tblCfg.br={rows:()=>db.branches,cols:[{t:'Branch',k
  return pageHead('Branch Management','Multi-branch records, cash positions and branch performance reporting.',`<button class="btn primary" data-act="brAdd">+ Add branch</button>`)
  +`<div class="grid22">${db.branches.map(b=>`<div class="panel"><div class="ph"><h3>${b.name}</h3>${badge('Active')}</div><div class="pb"><div class="calc-res" style="grid-template-columns:repeat(3,1fr)"><div class="cr"><span>Customers</span><b>${num(b.cust)}</b></div><div class="cr"><span>Portfolio</span><b style="font-size:14px">${mwk(b.portfolio)}</b></div><div class="cr"><span>Cash</span><b style="font-size:14px">${mwk(b.cash)}</b></div></div><div class="tsub">Manager: ${b.manager} · Opened 2023</div></div></div>`).join('')}</div>
  <div class="panel flush">${T('br',window._tblCfg.br)}</div>`}
-function vOfficers(){window._tblCfg.lo={rows:()=>db.officers,cols:[{t:'Officer',k:'name',f:r=>`${avatar(r.name)}<b>${r.name}</b><div class="tsub">${r.branch} branch</div>`},{t:'Applications handled',k:'apps',raw:r=>r.apps},{t:'Borrower portfolio',f:r=>`<span class="tamt">${mwk(r.portfolio)}</span>`},{t:'Repayment rate',f:r=>`<span class="up">${r.repaidRate}%</span>`},{t:'DPD30 on book',k:'dpd30'},{t:'Assignments',f:r=>{const a=db.applications.filter(x=>x.officer===r.name&&['Pending','Under Review'].includes(x.status)).length;const b=overdueLoans().filter(l=>l.officer===r.name).length;return `<span class="bdg b">${a} apps</span> <span class="bdg y">${b} collections</span>`}}],
-  actions:r=>`<button class="btn sm ghost" data-act="loAssign" data-id="${r.id}">Assign work</button>`};
- return pageHead('Loan Officers','Profiles, application & collection assignments, borrower portfolios and performance tracking.',`<button class="btn primary" data-act="loAdd">+ Add officer</button>`)
- +`<div class="panel flush">${T('lo',window._tblCfg.lo)}</div>`}
+function officersRoster(){
+ /* Every officer of the business: the staff records first, then any loan
+    officer profile that was added in this module. */
+ const rows=(db.admins||[]).map(a=>({id:a.id,name:a.name,role:a.role||'Officer',branch:a.branch||'—',
+   email:a.email,status:a.status,source:'Staff account',
+   apps:db.applications.filter(x=>x.officer===a.name).length,
+   portfolio:db.loans.filter(l=>l.officer===a.name&&l.status!=='Closed').reduce((t,l)=>t+l.balance,0),
+   collections:overdueLoans().filter(l=>l.officer===a.name).length}));
+ (db.officers||[]).forEach(o=>{if(!rows.some(r=>r.name===o.name))rows.push(Object.assign({role:'Loan Officer',branch:o.branch,status:'Active',source:'Officer profile'},o))});
+ return rows;
+}
+function vOfficers(){
+ window._tblCfg.lo={rows:()=>officersRoster(),
+  cols:[{t:'Officer',k:'name',f:r=>`${avatar(r.name)}<b>${esc(r.name)}</b><div class="tsub">${esc(r.email||'')}${r.branch&&r.branch!=='—'?' · '+esc(r.branch)+' branch':''}</div>`},
+   {t:'Role',k:'role',f:r=>`<span class="bdg ${r.role==='Super Admin'?'p':r.role==='General Manager'?'b':/Cashier|Teller/.test(r.role)?'g':/Collections/.test(r.role)?'y':'n'}">${esc(r.role)}</span>`},
+   {t:'Modules',f:r=>{const perms=rolePermsOf(r.role);const mods=Object.keys(MODULE_PERM).filter(k=>MODULE_PERM[k]&&perms[MODULE_PERM[k]]);return `<span class="tsub">${mods.length?mods.slice(0,3).map(m=>(VIEWS[m]&&VIEWS[m].t)||m).join(', ')+(mods.length>3?' +'+(mods.length-3):''):'Dashboard only'}</span>`}},
+   {t:'Applications',f:r=>`<span class="bdg b">${r.apps||0}</span>`,raw:r=>r.apps||0},
+   {t:'Borrower portfolio',f:r=>`<span class="tamt">${mwk(r.portfolio||0)}</span>`,raw:r=>r.portfolio||0},
+   {t:'Collections',f:r=>`<span class="bdg ${r.collections?'y':'g'}">${r.collections||0}</span>`,raw:r=>r.collections||0},
+   {t:'Status',f:r=>badge(r.status||'Active')}],
+  empty:'No officers yet. Create a cashier, teller, collections officer or loan officer in Officers & Staff — each appears here with the modules their role opens.',
+  actions:r=>canManageAccess()?`<button class="btn sm ghost" data-act="admEdit" data-id="${r.id}">Change role</button>`:'<span class="tsub">Read only</span>'};
+ const byRole={};officersRoster().forEach(o=>{byRole[o.role]=(byRole[o.role]||0)+1});
+ return pageHead('Officers & Roles','Every officer of the business — cashiers, tellers, collections, credit, finance, compliance, audit and management — with the role that decides which modules each may open.',
+   `<button class="btn primary" data-act="loAdd">+ Add officer</button>`)
+ +`<div class="stats">${miniStat('Officers',officersRoster().length,'With accounts','rgba(31,131,201,.14)')}
+   ${miniStat('Cash desk',(byRole['Cashier']||0)+(byRole['Teller']||0),'Cashiers & tellers','rgba(15,122,92,.14)')}
+   ${miniStat('Collections',byRole['Collections Officer']||0,'Arrears follow-up','rgba(138,106,18,.14)')}
+   ${miniStat('Roles in use',Object.keys(byRole).length,'Of '+db.roles.length+' defined','rgba(107,79,168,.14)')}</div>
+ <div class="panel flush">${T('lo',window._tblCfg.lo)}</div>`}
 function vPayroll(){window._tblCfg.prl={rows:()=>db.payroll,cols:[{t:'Ref',k:'id',f:r=>`<span class="tid">${r.id}</span>`},{t:'Customer',k:'cust'},{t:'Employer',k:'employer'},{t:'Salary verified',f:r=>badge(r.verified?'Verified':'Pending')},{t:'Deduction /mo',f:r=>`<span class="tamt">${mwk(r.deduction)}</span>`},{t:'Last run',f:r=>dFmt(r.lastRun)},{t:'Status',f:r=>badge(r.status)}],
   actions:r=>`<button class="btn sm ghost" data-act="prlVerify" data-id="${r.id}">Verify with employer</button>`};
  return pageHead('Payroll Integration','Verify salaries with employers and process salary-linked loan deductions.')
@@ -1647,7 +1992,7 @@ const VIEWS={
  deposits:{t:'Deposits',r:vDeposits},withdrawals:{t:'Withdrawals',r:vWithdrawals},transfers:{t:'Transfers',r:vTransfers},
  savings:{t:'Savings Management',r:vSavings},fees:{t:'Fees & Charges',r:vFees},interest:{t:'Interest Management',r:vInterest},
  ledger:{t:'Transaction Ledger',r:vLedger},recon:{t:'Reconciliation',r:vRecon},statements:{t:'Financial Statements',r:vStatements},
- support:{t:'Customer Support',r:vSupport},messaging:{t:'Messaging',r:vMessaging},
+ support:{t:'Customer Support',r:vSupport},messaging:{t:'Messaging',r:vMessaging},reminders:{t:'Repayment Reminders',r:vReminders},
  adminUsers:{t:'Admin Users',r:vAdminUsers},roles:{t:'Roles & Permissions',r:vRoles},workflows:{t:'Approval Workflows',r:vWorkflows},
  audit:{t:'Audit Logs',r:vAudit},security:{t:'Security & Sessions',r:vSecurity},compliance:{t:'Compliance & Risk',r:vCompliance},
  settings:{t:'System Settings',r:vSettings},backups:{t:'Backups',r:vBackups},
@@ -1658,18 +2003,62 @@ const VIEWS={
  legal:{t:'Legal & Recovery',r:vLegal},api:{t:'API & Integrations',r:vApi},fraud:{t:'Fraud Monitoring',r:vFraud},templates:{t:'Templates',r:vTemplates},
  calculator:{t:'Loan Calculator',r:vCalculator,after:()=>{try{renderCalc()}catch(e){}}}};
 function render(full){const v=VIEWS[route]||VIEWS.dashboard;CHARTS.length=0;
- $('#content').innerHTML=v.r();buildNav();
+ /* A module the officer was not granted is never drawn — and never shows
+    a heading that hints at what is behind it. */
+ if(!canOpen(route)){
+  $('#content').innerHTML=deniedView(route);buildNav();
+  $('#crumbs').innerHTML='Home / <b>Not assigned</b>';
+  if(full)window.scrollTo({top:0});
+  updateNotifCount();
+  return;
+ }
+ $('#content').innerHTML=v.r();buildNav();applyAccessToChrome();
  $('#crumbs').innerHTML='Home / <b>'+v.t+'</b>';
  if(full)window.scrollTo({top:0});
  if(v.after)v.after();
  if(route==='schedules'){const o=$('#amortOut');if(o)o.innerHTML=amortHTML($('#amortSel').value)}
  updateNotifCount()}
+
+/* Footer shortcuts and the session menu obey the same rules as the
+   sidebar: a link to a module the officer cannot open is not offered. */
+function applyAccessToChrome(){
+ document.querySelectorAll('.foot [data-nav], #userDrop [data-nav]').forEach(el=>{
+  el.style.display=canOpen(el.dataset.nav)?'':'none';
+ });
+}
+
+/* Shown when an officer reaches a module by address rather than by the
+   sidebar. It names the officer's role and says who can grant access —
+   it does not describe the module's contents. */
+function deniedView(id){
+ return `<div class="page-h"><div><h2>Not assigned to your role</h2><p>This section is outside the permissions granted to <b>${esc(currentRole())}</b>. A Super Admin or a General Manager can assign it from Roles &amp; Permissions.</p></div></div>
+ <div class="panel"><div class="pb" style="display:flex;gap:14px;align-items:flex-start">
+  <span style="font-size:26px">🔒</span>
+  <div><b>Access denied</b><p class="tsub" style="margin-top:6px;line-height:1.7">Your account signed in successfully — it simply does not carry the <code>${esc(MODULE_PERM[id]||'module')}</code> permission. Nothing was exposed and nothing was changed.</p>
+  <div style="display:flex;gap:9px;margin-top:12px;flex-wrap:wrap"><button class="btn primary sm" data-nav="dashboard">Go to my dashboard</button><button class="btn ghost sm" data-act="refreshModule">Refresh</button></div></div>
+ </div></div>`}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t){ui.tab[t.dataset.tab]=t.dataset.v;render(false)}});
 
 /* =====================================================================
    ACTIONS
 ===================================================================== */
 const customActs={
+ refreshModule(){adminRefresh()},
+ syncCustomers(){const L=window.JCOB_LOADER;if(L)L.show('Reading website registrations…');
+  Promise.resolve(window.JCOB_ADMIN_SITE&&window.JCOB_ADMIN_SITE.refreshCloud?window.JCOB_ADMIN_SITE.refreshCloud():null)
+   .then(()=>pullRegisteredCustomers())
+   .then(n=>{render(false);if(L)L.hide();toast(n?'ok':'info',n?'Registrations imported':'Already up to date',n?n+' customer'+(n===1?'':'s')+' added from the website.':'Every registered account is already in the customer list.')})
+   .catch(()=>{if(L)L.hide();toast('err','Sync failed','The database could not be reached. Nothing was changed.')})},
+ remRun(){const n=runReminderEngine();render(false);toast(n?'ok':'info',n?'Reminder'+(n===1?'':'s')+' queued':'No reminders due','Every active loan was checked against the '+reminderLeadDays()+'-day reminder rule.')},
+ remSettings(){openModal({title:'Reminder lead time',foot:'<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="ok">Save</button>',
+  body:fld('Days before the repayment date',inp('remDays',reminderLeadDays(),'type="number" min="1" max="30"'),'Customers with an active loan are reminded this many days before each instalment falls due.')});
+  modalActs.ok=()=>{const n=Math.max(1,Math.min(30,+val('remDays')||3));db.settings.reminderDays=n;audit('Administrator','Reminder lead time set to '+n+' days','Repayment Reminders');save();closeModal();render(false);toast('ok','Saved','Reminders now go out '+n+' days before each due date.')}},
+ remSend(e){const r=(db.reminders||[]).find(x=>x.id===e.dataset.id);if(!r)return;
+  r.status='Sent';r.sentAt=new Date().toISOString();
+  db.notifications.unshift({id:uid('MSG'),cust:r.cust,type:'Repayment reminder',channel:'SMS + Email',date:new Date().toISOString(),status:'Sent',body:r.body});
+  try{if(typeof window.JCOB_PUSH_CUSTOMER_REMINDER==='function')window.JCOB_PUSH_CUSTOMER_REMINDER(r)}catch(err){}
+  audit('Administrator','Reminder sent to '+r.cust+' for '+r.loan,'Repayment Reminders');save();render(false);toast('ok','Reminder sent',r.cust+' · '+mwk(r.amount)+' due '+dFmt(r.due))},
+ remCancel(e){const r=(db.reminders||[]).find(x=>x.id===e.dataset.id);if(!r)return;r.status='Cancelled';save();render(false);toast('info','Reminder cancelled',r.id)},
  addCustomer(){openModal({title:'Register New Customer',size:'lg',foot:`<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="save">Register customer</button>`,
   body:`<div class="frow">${fld('Full name',inp('ncN'))}${fld('Phone (+265…)',inp('ncP'))}</div>
   <div class="frow">${fld('Email',inp('ncE'))}${fld('National ID',inp('ncId'))}</div>
@@ -1890,21 +2279,26 @@ const customActs={
    db.notifications.unshift({id:uid('MSG'),cust:'Segment: '+val('mcS'),type:'Broadcast',channel:val('mcCh'),date:new Date().toISOString(),status:'Sent',body:val('mcB').slice(0,140)});
    save();closeModal();render(false);toast('ok','Broadcast queued','Delivery reports in 10 minutes')}},
  // admin users / roles / workflows / security
- admAdd(){openModal({title:'Create admin account',foot:`<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="go">Create & invite</button>`,
-  body:`<div class="frow">${fld('Full name',inp('adN'))}${fld('Email',inp('adE'))}</div>${fld('Role',sel('adR',db.roles.map(r=>r.name).filter(x=>x!=='Super Admin'),undefined))}
+ admAdd(){if(!canManageAccess())return toast('err','Not permitted','Only a Super Admin or General Manager can create officer accounts.');
+  openModal({title:'Create officer account',foot:`<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="go">Create & invite</button>`,
+  body:`<div class="frow">${fld('Full name',inp('adN'))}${fld('Email',inp('adE'))}</div>${fld('Role',sel('adR',openableRoles().map(r=>r.name).filter(x=>x!=='Super Admin'),undefined),'The role decides every module this officer can open.')}
    <p class="hint">An invite email with a temporary password and 2FA enrolment link is sent automatically.</p>`});
   modalActs.go=()=>{db.admins.push({id:uid('ADM'),name:val('adN')||'New Staff',email:val('adE')||'staff@jaycobfinancial.mw',role:val('adR'),status:'Active',lastLogin:new Date().toISOString()});
    audit('Administrator','Created admin account for '+val('adN'),'Admin Users');save();closeModal();render(false);toast('ok','Account created','Invitation sent')}},
- admEdit(e){const a=db.admins.find(x=>x.id===e.dataset.id);if(!a)return;
+ admEdit(e){if(!canManageAccess())return toast('err','Not permitted','Only a Super Admin or General Manager can change an officer role.');
+  const a=db.admins.find(x=>x.id===e.dataset.id);if(!a)return;
   openModal({title:'Edit staff account — '+a.id,
-   body:`<div class="frow">${fld('Full name',inp('adEN',a.name))}${fld('Role',sel('adER',db.roles.map(r=>r.name),a.role))}</div>
+   body:`<div class="frow">${fld('Full name',inp('adEN',a.name))}${fld('Role',sel('adER',openableRoles().map(r=>r.name),a.role),'Changing the role re-scopes the officer immediately.')}</div>
     <div class="frow">${fld('Status',sel('adES',['Active','Inactive'],a.status))}${fld('Branch',sel('adEB',db.branches.map(b=>b.name),a.branch))}</div>`,
    foot:'<button class="btn ghost" data-mclose>Cancel</button><button class="btn primary" data-mact="ok">Save changes</button>'});
   modalActs.ok=()=>{a.name=val('adEN')||a.name;a.role=val('adER')||a.role;a.status=val('adES')||a.status;a.branch=val('adEB')||a.branch;
    audit('Administrator','Updated staff account '+a.id+' — '+a.role+' / '+a.status,'Admin Users');save();closeModal();render(false);
    toast('ok','Updated',a.name+' · '+a.role)}},
  admToggle(e){const a=db.admins.find(x=>x.id===e.dataset.id);a.status=a.status==='Active'?'Inactive':'Active';audit('Administrator',(a.status==='Active'?'Reactivated':'Deactivated')+' admin '+a.name,'Admin Users');save();render(false);toast('ok','Updated',a.name)},
- permToggle(e){const r=db.roles[+e.dataset.ri];if(r.name==='Super Admin')return;const k=e.dataset.k;r.perms[k]=r.perms[k]?0:1;e.classList.toggle('on');
+ permToggle(e){if(!canManageAccess())return toast('err','Not permitted','Only a Super Admin or General Manager can change permissions.');
+  const r=db.roles[+e.dataset.ri];if(!r)return;
+  if(r.name==='Super Admin'||(r.name==='General Manager'&&!isSuper()))return toast('err','Protected role','Authority over the Super Admin and General Manager cards belongs to the Super Admin alone.');const k=e.dataset.k;r.perms[k]=r.perms[k]?0:1;e.classList.toggle('on');
+  audit(currentRole(),(r.perms[k]?'Granted':'Revoked')+' "'+k+'" for role '+r.name,'Roles & Permissions');invalidateOfficer();buildNav();
   audit('Administrator','Permission '+(r.perms[k]?'granted':'revoked')+' — '+PERM_LABELS[k]+' on '+r.name,'Roles');save();toast('ok','RBAC updated',r.name+' · '+PERM_LABELS[k])},
  wfApprove(e){const w=db.workflows.find(x=>x.id===e.dataset.id);w.stage=w.stage.replace(/(\d+) of (\d+)/,(m,a,b)=>{a=+a+1;return +a>+b?'Completed':a+' of '+b});
   if(w.stage.includes('(Manager)')&&w.stage.startsWith('3'))w.stage='Completed';
@@ -1915,8 +2309,11 @@ const customActs={
  sesKill(e){const s=db.sessions.find(x=>x.id===e.dataset.id);s.status='Terminated';audit('Administrator','Force logout '+s.user+' ('+s.ip+')','Security');save();render(false);toast('warn','Session terminated',s.user+' signed out everywhere')},
  compReport(){db.auditL.unshift({id:uid('AUD'),user:'Administrator',action:'Compliance review logged',module:'Compliance',date:new Date().toISOString()});save();toast('ok','Logged','Q4 compliance review opened in register')},
  compEscalate(){db.fraud.unshift({id:uid('FRD'),title:'Manual SAR — suspicious activity escalation by compliance',sev:'High',status:'Open',date:new Date().toISOString()});audit('Administrator','Escalated suspicious activity (SAR)','Compliance');save();toast('warn','SAR filed','Case opened in Fraud Monitoring');updateNotifCount()},
- settingsSave(){db.settings={biz:val('stBiz')||db.settings.biz,reg:val('stReg'),currency:val('stCur'),tz:val('stTz'),hotline:val('stHot')||db.settings.hotline,graceDays:+val('stGrace'),penaltyRate:+val('stPen'),maxDTI:+val('stDti')};
-  audit('Administrator','System settings updated','Settings');save();toast('ok','Settings saved','Policies now apply to new activity')},
+ settingsSave(){db.settings=Object.assign({},db.settings,{biz:val('stBiz')||db.settings.biz,reg:val('stReg'),currency:val('stCur'),tz:val('stTz'),hotline:val('stHot')||db.settings.hotline,graceDays:+val('stGrace'),penaltyRate:+val('stPen'),maxDTI:+val('stDti'),
+   reminderDays:Math.max(1,Math.min(30,+val('stReminder')||db.settings.reminderDays||3))});
+  audit(currentRole(),'System settings updated — reminder lead time '+db.settings.reminderDays+' days','Settings');
+  const made=runReminderEngine();save();render(false);
+  toast('ok','Settings saved','Policies apply to new activity.'+(made?' '+made+' reminder'+(made===1?'':'s')+' queued.':''))},
  bkpRun(){db.backups.unshift({id:uid('BKP'),date:new Date().toISOString(),size:(400+Math.floor(Math.random()*30))+' MB',type:'Manual full',status:'Verified'});
   audit('Administrator','Manual backup executed','Backups');save();render(false);toast('ok','Backup complete','Integrity verified automatically')},
  bkpExport(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='emf_full_export_'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('ok','Export ready','Controlled export — audit-logged');audit('Administrator','Full data export downloaded','Backups');save()},
@@ -1937,17 +2334,21 @@ const customActs={
  brReport(e){const b=db.branches.find(x=>x.id===e.dataset.id);openModal({title:'Branch performance — '+b.name,size:'lg',
   body:`<div class="calc-res" style="grid-template-columns:repeat(3,1fr)"><div class="cr"><span>Customers</span><b>${num(b.cust)}</b></div><div class="cr"><span>Portfolio</span><b style="font-size:14px">${mwk(b.portfolio)}</b></div><div class="cr"><span>Cash cover</span><b>${pct(100*b.cash/b.portfolio)}</b></div>
   <div class="cr"><span>NPL (30d)</span><b>2.8%</b></div><div class="cr"><span>Growth QoQ</span><b class="up">+11%</b></div><div class="cr"><span>Staff</span><b>6 officers</b></div></div>`})},
- loAdd(){addForm('Add loan officer',[
+ loAdd(){if(!canManageAccess()&&!can('admins'))return toast('err','Not permitted','Only a Super Admin or General Manager can add officers.');
+  addForm('Add officer & assign a role',[
    ['Full name',inp('loName')],
+   ['Work email',inp('loEmail','','type="email" placeholder="name@jaycobfinancial.mw"')],
+   ['Role',sel('loRole',openableRoles().map(r=>r.name),'Cashier')],
    ['Branch',sel('loBr',db.branches.map(b=>b.name),db.branches[0]&&db.branches[0].name)],
-   ['Borrower portfolio (MWK)',inp('loPf','0','type="number" min="0"')],
-   ['Repayment rate (%)',inp('loRate','0','type="number" min="0" max="100"')]
+   ['Status',sel('loStatus',['Active','Inactive'],'Active')]
   ],()=>{
    const name=val('loName'); if(!name){toast('err','Name required','Enter the officer name first');return null;}
-   const id=nextId('OFF-',db.officers);
-   db.officers.push({id,name,branch:val('loBr')||'—',apps:0,portfolio:+val('loPf')||0,repaidRate:+val('loRate')||0,dpd30:0});
-   return name+' ('+id+')';
-  },'Loan Officers')},
+   const role=val('loRole')||'Cashier';
+   const id=nextId('OFF-',db.admins);
+   db.admins.push({id,name,email:val('loEmail')||(name.toLowerCase().replace(/\s+/g,'.')+'@jaycobfinancial.mw'),
+     role,branch:val('loBr')||'—',status:val('loStatus')||'Active',lastLogin:null,createdAt:new Date().toISOString()});
+   return name+' — '+role+' ('+id+')';
+  },'Officers')},
  loAssign(e){const o=db.officers.find(x=>x.id===e.dataset.id);toast('info','Worklist','Balancing queue for '+o.name+' — 2 reassignments proposed')},
  prlVerify(e){const p=db.payroll.find(x=>x.id===e.dataset.id);p.verified=true;audit('Administrator','Salary verified with '+p.employer,'Payroll');save();render(false);toast('ok','Verified',p.employer+' confirmed employment')},
  prlRun(){db.payroll.forEach(p=>{if(p.status==='Deducted'){const l=db.loans.find(x=>x.cust===p.cust&&x.status==='Active');if(l){l.paidTotal+=p.deduction;l.balance=Math.max(0,l.balance-p.deduction+Math.round(p.deduction*0.1))}}});
@@ -2111,7 +2512,7 @@ window.JCOB_STAFF_ALERT=staffAlert;
 
 function updateNotifCount(){const n=badgeCounts();
  const alerts=(db.staffAlerts||[]).filter(a=>!a.read);
- const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections+alerts.length;
+ const total=n.loanApps+n.kyc+n.withdrawals+n.workflows+n.collections+n.reminders+alerts.length;
  $('#notifCount').textContent=total;$('#notifCount').style.display=total?'grid':'none';
  const events=alerts.slice(0,4).map(a=>`<div class="it unread" data-alert="${a.id}" data-nav="${a.module||'dashboard'}"><span class="ic" style="background:rgba(15,122,92,.14)">🔔</span><div><b>${esc(a.title)}</b><small>${esc(a.body||'').slice(0,80)}</small></div></div>`).join('');
  const queues=[
@@ -2119,7 +2520,8 @@ function updateNotifCount(){const n=badgeCounts();
   ['🪪',n.kyc+' KYC submissions in queue','kyc',n.kyc],
   ['💸',n.withdrawals+' withdrawal requests pending','withdrawals',n.withdrawals],
   ['✅',n.workflows+' workflow steps awaiting you','workflows',n.workflows],
-  ['⚠️',n.collections+' overdue loans in collections','collections',n.collections]]
+  ['⚠️',n.collections+' overdue loans in collections','collections',n.collections],
+  ['⏰',n.reminders+' repayment reminder'+(n.reminders===1?'':'s')+' queued','reminders',n.reminders]]
   .filter(x=>x[3]>0).map(x=>`<div class="it unread" data-nav="${x[2]}"><span class="ic" style="background:rgba(31,131,201,.12)">${x[0]}</span><div><b>${x[1]}</b><small>Tap to open module</small></div></div>`).join('');
  const body=events+(queues?'<h4>Action required</h4>':'')+queues;
  $('#notifDrop').innerHTML='<h4>Notifications</h4>'+(body||'<div class="it"><div><small>All clear — nothing needs attention.</small></div></div>');
@@ -2154,8 +2556,13 @@ function showIdentity(){
   } catch(e){}
   const name = profile.full_name || (session && session.name) || 'Signed in';
   const email = profile.email || (session && (session.email || session.identifier)) || '';
-  const role = profile.role || '';
-  const label = role === 'admin' ? 'Super Admin' : (role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Staff');
+  /* The role shown is the one assigned on the staff record — a cashier
+     reads "Cashier", a general manager reads "General Manager". */
+  let label = 'Staff';
+  try { label = currentRole(); } catch (e) {
+    const role = profile.role || '';
+    label = role === 'admin' ? 'Super Admin' : (role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Staff');
+  }
   const avatar = name.split(' ').map(w => w.charAt(0)).join('').slice(0,2).toUpperCase() || 'JC';
   const box = document.querySelector('#userBtn .avatar');
   const nm = document.querySelector('#userBtn .nm');
@@ -2187,6 +2594,30 @@ if (window.JCOB_CLOUD && window.JCOB_CLOUD.auth && window.JCOB_CLOUD.auth.onChan
 render(true);
 updateNotifCount();
 toast('info','Welcome to the control center','JAY C O B management portal loaded');
+
+/* The refresh button in the top bar, and the one on every module head. */
+(function(){
+  const btn=document.getElementById('refreshBtn');
+  if(btn)btn.addEventListener('click',()=>{
+    if(btn.classList.contains('is-busy'))return;
+    btn.classList.add('is-busy');
+    adminRefresh({quiet:false}).then(()=>btn.classList.remove('is-busy'));
+  });
+})();
+
+/* Opening a module paints the brand loading animation, so a click is
+   always acknowledged before the next view is drawn. */
+window.addEventListener('hashchange',function(){
+  const L=window.JCOB_LOADER;
+  if(!L)return;
+  L.show('Opening module…',{after:2500});
+  setTimeout(()=>L.hide(),180);
+});
+
+/* Reminders are checked when the console opens, after every refresh and
+   once an hour while it stays open — three days before each due date. */
+setTimeout(()=>{try{runReminderEngine();render(false)}catch(e){}},1500);
+setInterval(()=>{try{runReminderEngine()}catch(e){}},60*60*1000);
 </script>
 
 <script src="assets/js/site-admin.js"></script>
@@ -2219,6 +2650,11 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
     if (!status) return;
     status.textContent = message || "";
     status.className = isError ? "err" : "";
+  }
+
+  /* the platform's loading animation, used for sign-in and sign-out */
+  function LOAD() {
+    return window.JCOB_LOADER || { show: function () {}, hide: function () {}, message: function () {} };
   }
 
   function unlock() {
@@ -2277,7 +2713,8 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
       return;
     }
 
-    if (submit) { submit.disabled = true; submit.textContent = "Signing in…"; }
+    if (submit) { submit.disabled = true; submit.textContent = "Signing in…"; submit.classList.add("is-busy"); }
+    LOAD().show("Signing you in…");
     CLOUD.auth.signIn(email, password).then(function (res) {
       var profile = (res && res.profile) || CLOUD.auth.profile();
       if (!CLOUD.auth.isStaff(profile)) {
@@ -2287,11 +2724,14 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
       }
       try { sessionStorage.setItem("jcob_admin_ok", "1"); } catch (err) {}
       input.value = "";
+      LOAD().message("Loading the control center…");
       return window.JCOB_PORTAL.load().then(function () {
         unlock();
         if (typeof window.render === "function") window.render(true);
+        if (typeof window.adminRefresh === "function") window.adminRefresh({ quiet: true });
       });
     }).catch(function (err) {
+      LOAD().hide();
       var message = String((err && err.message) || "Sign-in failed");
       var code = (err && err.status) || 0;
       var needsCheck = false;
@@ -2313,8 +2753,8 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
       if (needsCheck) showCheckLink();
       input.select();
     }).then(function () {
-      if (submit) { submit.disabled = false; submit.textContent = "Unlock console"; }
-    });
+      if (submit) { submit.disabled = false; submit.textContent = "Unlock console"; submit.classList.remove("is-busy"); }
+    }).then(function () { LOAD().hide(); });
   });
 
   function showCheckLink() {
@@ -2328,8 +2768,10 @@ toast('info','Welcome to the control center','JAY C O B management portal loaded
 
   var out = document.getElementById("signOut");
   if (out) out.addEventListener("click", function () {
+    LOAD().show("Signing you out…", { watchdog: false });
     try { sessionStorage.removeItem("jcob_admin_ok"); } catch (err) {}
     if (cloudOn) CLOUD.auth.signOut();
+    setTimeout(function () { LOAD().message("Signed out"); window.location.reload(); }, 900);
   });
 })();
 </script>
