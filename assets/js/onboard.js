@@ -124,7 +124,7 @@
   function shell(inner, aside) {
     return '<div class="container" style="max-width:78rem;">' +
       '<div class="dash-grid onb-grid">' +
-        '<div class="calc-panel" style="background:#fff;">' + stepsRail() + inner + "</div>" +
+        '<div class="calc-panel">' + stepsRail() + inner + "</div>" +
         '<aside class="onb-aside">' + (aside || "") + "</aside>" +
       "</div></div>";
   }

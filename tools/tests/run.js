@@ -25,7 +25,7 @@ const ANON = "dev-anon";
 /* requests.test.js rewrites records in the stand-in database (it approves a
    name change), so it runs last; theme-generator.test.js publishes and then
    resets the house theme, so it runs before the suites that read settings. */
-const SUITES = ["production.test.js", "local.test.js", "cloud.test.js", "apply.test.js", "quotes.test.js", "signature.test.js", "theme.test.js", "theme-generator.test.js", "premium.test.js", "header.test.js", "check.test.js", "requests.test.js"];
+const SUITES = ["production.test.js", "local.test.js", "cloud.test.js", "apply.test.js", "quotes.test.js", "signature.test.js", "theme.test.js", "theme-generator.test.js", "premium.test.js", "palette.test.js", "header.test.js", "check.test.js", "requests.test.js"];
 
 function waitForPort(port, timeoutMs) {
   const deadline = Date.now() + (timeoutMs || 20000);

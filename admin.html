@@ -6,44 +6,59 @@
 <title>JAY C O B FINANCIAL SERVICES · Admin System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#06262a">
+<meta name="theme-color" content="#020817">
 <style>
 /* =====================================================================
    JAY C O B FINANCIAL SERVICES — Admin console
-   The website's own palette: emerald green, liquid crystal blue, and
-   fine gold edges, with Fraunces for headings. Same tokens, same look.
+   The website's own palette: midnight navy, gold edges and Inter
+   throughout. Same tokens, same look as the public site.
    ===================================================================== */
 :root{
-  /* palette lifted from assets/css/styles.css */
-  --emerald-900:#04171a; --emerald-800:#06262a; --emerald-700:#0a373a; --emerald-600:#0d4a4b; --emerald-500:#10605c;
-  --crystal-700:#0d5c96; --crystal-500:#1f83c9; --crystal-300:#7bb8e8; --crystal-200:#a8d8fb; --crystal-100:#dff1ff;
-  --gold-700:#8a6a12; --gold-500:#c9a227; --gold-400:#dcbb5a; --gold-200:#f2e3b6;
-  --cream:#eef4fa; --cream-dark:#dee9f4; --paper:#fff;
-  --ink:#062430; --body-txt:#3b5666; --muted:#40596a; --dim:#4a6373;
-  /* the page ground: crystal blue bleeding into emerald */
-  --bg-blue:#d7e9f7; --bg-emerald:#d2e8e1; --bg-mist:#e2eef9; --bg-deep:#cddff0;
-  --line:rgba(10,55,58,.13); --line2:rgba(20,88,143,.30);
-  --ok:#0a6148; --warn:#755809; --bad:#a83b34; --purp:#6b4fa8; --teal:#0d6b5a;
-  --gold-edge:linear-gradient(135deg,#8a6a12 0%,#d8b554 26%,#f6ecc4 48%,#c9a227 70%,#8a6a12 100%);
-  --gold-liquid:linear-gradient(115deg,#a8d8fb 0%,#dff1ff 22%,#8ec7f0 46%,#c8e8ff 62%,#7bb8e8 82%,#e8f6ff 100%);
-  /* the site's own app-sidebar gradient */
-  --chrome:linear-gradient(185deg,#092f27 0%,#031613 68%);
+  /* =================================================================
+     THEME v10 — MIDNIGHT NAVY & GOLD, the console's half
+     Same palette as assets/css/styles.css. The names are kept so every
+     rule below follows without being rewritten.
+     ================================================================= */
+  --ng-bg:#020817; --ng-bg2:#061329; --ng-sidebar:#030d20;
+  --ng-card:#08172d; --ng-panel:#0b1d35; --ng-raise:#0e2340; --ng-sunken:#01060f;
+  --ng-gold:#d4a63a; --ng-gold-bright:#ffd166; --ng-gold-deep:#a87919; --ng-gold-text:#e7c36b;
+  --ng-gold-line:rgba(184,138,43,.38); --ng-gold-line-soft:rgba(184,138,43,.22);
+  --ng-glow:rgba(212,166,58,.20);
+  --ng-text:#ffffff; --ng-text2:#cbd5e1; --ng-text-2:#cbd5e1; --ng-muted:#94a3b8;
+  --ng-bg-2:#061329;
+  --ng-bad-text:#fca5a5;
+  --ng-ok:#22c55e; --ng-bad:#ef4444; --ng-info:#38bdf8;
+
+  /* the console's own ramps, re-pointed at the palette */
+  --emerald-900:#020817; --emerald-800:#08172d; --emerald-700:#0b1d35; --emerald-600:#0e2340; --emerald-500:#12304f;
+  --crystal-700:#e7c36b; --crystal-500:#d4a63a; --crystal-300:#a87919; --crystal-200:#ffd166; --crystal-100:#fff3d0;
+  --gold-700:#8a6516; --gold-500:#d4a63a; --gold-400:#ffd166; --gold-200:#ffe7a8;
+  --cream:#020817; --cream-dark:#061329; --paper:#08172d;
+  --ink:#ffffff; --body-txt:#cbd5e1; --muted:#94a3b8; --dim:#94a3b8;
+  /* the page ground */
+  --bg-blue:#04101f; --bg-emerald:#020817; --bg-mist:#061329; --bg-deep:#01060f;
+  --line:rgba(148,163,184,.16); --line2:rgba(184,138,43,.38);
+  --ok:#22c55e; --warn:#d4a63a; --bad:#ef4444; --purp:#a78bfa; --teal:#22c55e;
+  --gold-edge:linear-gradient(135deg,#8a6516 0%,#d4a63a 26%,#ffe7a8 48%,#d4a63a 70%,#8a6516 100%);
+  --gold-liquid:linear-gradient(115deg,#a87919 0%,#ffd166 22%,#d4a63a 46%,#ffe7a8 62%,#b88a2b 82%,#ffd166 100%);
+  /* the bar the site's header uses */
+  --chrome:linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);
 
   /* console aliases */
-  --bg0:var(--cream); --bg1:var(--cream-dark); --bg2:#ffffff; --bg3:#f7fafd;
-  --panel:rgba(255,255,255,.9); --panel2:rgba(255,255,255,.72); --panel-solid:#ffffff;
-  --txt:var(--ink); --acc:var(--crystal-700); --acc2:var(--teal); --acc3:var(--crystal-500);
-  --shadow:0 20px 44px -30px rgba(4,23,26,.5);
-  /* pearl surfaces — the console's match for the site's premium cards */
-  --premium-surface:linear-gradient(157deg,#ffffff 0%,#fdfeff 30%,#f8fbfe 64%,#f1f8fc 100%);
-  --premium-shadow:0 1px 2px rgba(4,23,26,.05),0 10px 26px -20px rgba(13,92,150,.28),0 34px 60px -42px rgba(4,23,26,.5);
-  --premium-shadow-hover:0 1px 2px rgba(4,23,26,.06),0 16px 34px -22px rgba(13,92,150,.36),0 44px 76px -40px rgba(4,23,26,.55);
-  --premium-inset:inset 0 1px 0 rgba(255,255,255,.98),inset 0 -1px 0 rgba(13,92,150,.05);
+  --bg0:var(--ng-bg); --bg1:var(--ng-bg2); --bg2:var(--ng-card); --bg3:var(--ng-panel);
+  --panel:rgba(8,23,45,.92); --panel2:rgba(11,29,53,.75); --panel-solid:#08172d;
+  --txt:#ffffff; --acc:var(--ng-gold-text); --acc2:var(--ng-info); --acc3:var(--ng-gold);
+  --shadow:0 20px 44px -30px rgba(0,0,0,.9);
+  /* the panel surface: navy, lit from the top-left by a whisper of gold */
+  --premium-surface:linear-gradient(157deg,#0b1d35 0%,#091a30 30%,#08172d 64%,#071528 100%);
+  --premium-shadow:0 1px 2px rgba(0,0,0,.5),0 14px 30px -22px rgba(0,0,0,.85),0 34px 60px -42px rgba(0,0,0,.9);
+  --premium-shadow-hover:0 2px 6px rgba(0,0,0,.55),0 20px 38px -22px rgba(0,0,0,.9),0 46px 80px -40px rgba(0,0,0,.95);
+  --premium-inset:inset 0 1px 0 rgba(255,243,208,.08),inset 0 -1px 0 rgba(0,0,0,.4);
   --rad:16px;
-  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
-  --chrome-txt:#e4f1ec; --chrome-muted:#a3c3ba; --chrome-line:rgba(168,216,251,.16);
+  --font-display:'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  --chrome-txt:#cbd5e1; --chrome-muted:#94a3b8; --chrome-line:rgba(184,138,43,.22);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-color:var(--crystal-300) var(--cream)}
@@ -59,7 +74,7 @@ a{color:var(--acc);text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--crystal-300);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
-h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-.02em}
 
 /* ---------- TOP BAR ---------- */
 .topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:18px;padding:12px 22px;
@@ -127,8 +142,8 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-.01e
 /* ---------- CONTENT ---------- */
 .content{flex:1;min-width:0;padding:24px 26px 40px;overflow-x:hidden}
 .page-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:18px}
-.aback{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.9);border:1px solid var(--line);color:var(--muted);font:600 11.5px/1 Inter,system-ui,sans-serif;padding:6px 11px;border-radius:8px;cursor:pointer;margin-bottom:11px;letter-spacing:.02em;transition:background .15s,color .15s,border-color .15s}
-.aback:hover{background:#fff;color:var(--teal);border-color:rgba(13,107,90,.35)}
+.aback{display:inline-flex;align-items:center;gap:6px;background:rgba(11,29,53,.85);border:1px solid var(--ng-gold-line-soft);color:var(--ng-muted);font:600 11.5px/1 Inter,system-ui,sans-serif;padding:6px 11px;border-radius:8px;cursor:pointer;margin-bottom:11px;letter-spacing:.02em;transition:background .15s,color .15s,border-color .15s}
+.aback:hover{background:rgba(212,166,58,.12);color:var(--ng-gold-bright);border-color:var(--ng-gold)}
 .aback:focus-visible{outline:2px solid var(--crystal-500);outline-offset:2px}
 .page-h h2{font-size:24px;font-weight:600;letter-spacing:-.015em;color:var(--emerald-800)}
 .page-h p{color:var(--muted);font-size:13px;margin-top:5px;max-width:720px;line-height:1.6}
@@ -172,9 +187,9 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-.01e
 
 /* table */
 .ttools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--line)}
-.ttools .srch{display:flex;align-items:center;gap:7px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(166,124,26,.22);border-radius:10px;padding:7px 11px;min-width:220px;flex:1;max-width:320px;box-shadow:inset 0 1px 2px rgba(4,23,26,.05),0 1px 0 rgba(255,255,255,.9)}
+.ttools .srch{display:flex;align-items:center;gap:7px;background:var(--ng-raise);border:1px solid var(--ng-gold-line);border-radius:10px;padding:7px 11px;min-width:220px;flex:1;max-width:320px;box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}
 .ttools .srch input{background:none;border:none;outline:none;color:var(--txt);font-size:12.5px;width:100%}
-.fsel{background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(166,124,26,.22);color:var(--txt);border-radius:10px;padding:7.5px 10px;font-size:12px;outline:none;box-shadow:inset 0 1px 2px rgba(4,23,26,.05)}
+.fsel{background:var(--ng-raise);border:1px solid var(--ng-gold-line);color:var(--txt);border-radius:10px;padding:7.5px 10px;font-size:12px;outline:none}
 .fsel option{background:#fff;color:var(--ink)}
 .tspace{flex:1}
 .tcount{font-size:11.5px;color:var(--dim)}
@@ -342,6 +357,120 @@ body.locked { overflow: hidden; }
 .theme-card span{display:block;font-size:11px;color:var(--muted);line-height:1.5}
 .theme-dots{display:flex;gap:4px;margin-bottom:8px}
 .theme-dots i{width:18px;height:18px;border-radius:6px;display:block;border:1px solid rgba(0,0,0,.08)}
+/* =====================================================================
+   THEME v10 — MIDNIGHT NAVY & GOLD, the console's surfaces
+   ---------------------------------------------------------------------
+   The tokens above flip everything that speaks in variables. What follows
+   repaints the handful of components that name a near-white literal:
+   buttons, inputs, table heads, tabs, modals, the gate and the toasts.
+   Nothing here changes behaviour — the same elements, the same handlers.
+   ===================================================================== */
+body{background:
+  radial-gradient(1200px 600px at 88% -10%,rgba(212,166,58,.10),transparent 62%),
+  radial-gradient(1000px 560px at -4% 0%,rgba(56,189,248,.06),transparent 60%),
+  linear-gradient(163deg,var(--ng-bg) 0%,#04101f 46%,var(--ng-bg) 100%);
+  background-attachment:fixed;color:var(--ng-text2)}
+::-webkit-scrollbar-thumb{background:rgba(184,138,43,.5)}
+h1,h2,h3,h4{color:var(--ng-text)}
+.topbar{background:var(--chrome);border-bottom:1px solid var(--ng-gold-line);color:var(--chrome-txt);box-shadow:0 18px 40px -34px rgba(0,0,0,.95)}
+.tbar-name, .topbar b{color:var(--ng-text)}
+.sidebar{background:var(--chrome);border-right:1px solid var(--ng-gold-line-soft);color:var(--chrome-txt)}
+.sidebar .nav a, .sidebar a{color:var(--ng-text2)}
+.sidebar .nav a:hover{background:rgba(212,166,58,.10);color:var(--ng-text)}
+.sidebar .nav a.on, .sidebar .nav a.active{background:linear-gradient(90deg,rgba(212,166,58,.20),rgba(212,166,58,.03));color:var(--ng-gold-bright);box-shadow:inset 2px 0 0 var(--ng-gold)}
+.page-h h2{color:var(--ng-text)}
+.page-h p{color:var(--ng-muted)}
+.panel .ph{background:linear-gradient(180deg,rgba(11,29,53,.95),var(--ng-card));border-bottom:1px solid var(--ng-gold-line)}
+.panel .ph h3{color:var(--ng-text)}
+.stat .sv, .stat b{color:var(--ng-text)}
+.stat .sl{color:var(--ng-muted)}
+.btn{background:rgba(11,29,53,.85);border:1px solid var(--ng-gold-line);color:var(--ng-text);box-shadow:none}
+.btn:hover{border-color:var(--ng-gold);background:rgba(212,166,58,.12);color:var(--ng-gold-bright)}
+.btn.primary{background:linear-gradient(135deg,#d4a63a 0%,#ffd166 100%);border-color:rgba(255,209,102,.55);color:#08131f;box-shadow:0 10px 24px -18px rgba(212,166,58,.9)}
+.btn.primary:hover{background:linear-gradient(135deg,#e0b44b 0%,#ffe08a 100%)}
+.btn.ghost{background:transparent;color:var(--ng-text2);border-color:var(--ng-gold-line)}
+.btn.ghost:hover{color:var(--ng-gold-bright);border-color:var(--ng-gold)}
+.btn.danger{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.4);color:#fca5a5}
+.btn.ok{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.4);color:#86efac}
+.btn.warn{background:rgba(212,166,58,.14);border-color:var(--ng-gold-line);color:var(--ng-gold-bright)}
+.btn.gold{background:var(--gold-liquid);border-color:rgba(255,209,102,.5);color:#08131f;font-weight:800}
+.fsel,.fld input,.fld select,.fld textarea,#admin-gate input{background:var(--ng-raise);border:1px solid var(--ng-gold-line);color:var(--ng-text)}
+.fsel option,.fld select option{background:var(--ng-card);color:var(--ng-text)}
+.fld input:focus,.fld select:focus,.fld textarea:focus,.fsel:focus,#admin-gate input:focus{border-color:var(--ng-gold);box-shadow:0 0 0 3px var(--ng-glow);outline:none}
+.fld label{color:var(--ng-muted)}
+.fld .hint,.tsub,.tcount{color:var(--ng-muted)}
+thead th{background:var(--ng-sunken);color:var(--ng-gold-text);border-bottom:1px solid var(--ng-gold-line)}
+tbody td{border-bottom:1px solid rgba(148,163,184,.10);color:var(--ng-text2)}
+tbody tr:nth-child(even){background:rgba(148,163,184,.04)}
+tbody tr:hover{background:rgba(212,166,58,.08)}
+tbody tr.hl{background:rgba(212,166,58,.12)}
+tbody td b{color:var(--ng-text)}
+.tid{color:var(--ng-gold-text)}
+.tamt{color:var(--ng-text)}
+.tamt.neg{color:#fca5a5}.tamt.pos{color:#86efac}
+.pgr{border-top:1px solid var(--ng-gold-line-soft);color:var(--ng-muted)}
+.pgr button{background:var(--ng-card);border:1px solid var(--ng-gold-line-soft);color:var(--ng-text2)}
+.pgr button.cur{background:rgba(212,166,58,.2);border-color:var(--ng-gold);color:var(--ng-gold-bright)}
+.tabs button,.mini-tabs button{background:var(--ng-card);border:1px solid var(--ng-gold-line-soft);color:var(--ng-muted)}
+.tabs button.on{background:rgba(212,166,58,.14);color:var(--ng-gold-bright);box-shadow:inset 0 2px 0 var(--ng-gold)}
+.mini-tabs button.on{background:linear-gradient(135deg,#d4a63a,#ffd166);color:#08131f;border-color:transparent}
+.modal{background:var(--premium-surface) padding-box,var(--gold-edge) border-box;border:1px solid transparent;box-shadow:0 50px 90px -40px rgba(0,0,0,1)}
+.modal .mh{background:linear-gradient(180deg,var(--ng-panel),var(--ng-card));border-bottom:1px solid var(--ng-gold-line)}
+.modal .mh h3{color:var(--ng-gold-text)}
+.modal .mh .x{background:var(--ng-raise);border:1px solid var(--ng-gold-line-soft);color:var(--ng-text2)}
+.modal .mf{background:var(--ng-bg2);border-top:1px solid var(--ng-gold-line-soft)}
+.overlay{background:rgba(2,8,23,.78)}
+.kv{color:var(--ng-text2)}.kv b{color:var(--ng-muted)}
+.toast{background:linear-gradient(160deg,var(--ng-panel),var(--ng-card));border:1px solid var(--ng-gold-line);border-left:3px solid var(--ng-gold);color:var(--ng-text);box-shadow:0 26px 60px -34px rgba(0,0,0,1)}
+.toast b{color:var(--ng-text)}.toast span{color:var(--ng-text2)}
+.toast.ok{border-left-color:var(--ng-ok)}.toast.err{border-left-color:var(--ng-bad)}
+.toast.ok .ti{background:rgba(34,197,94,.16);color:#86efac}
+.toast.err .ti{background:rgba(239,68,68,.16);color:#fca5a5}
+.toast.info .ti{background:rgba(56,189,248,.14);color:#7dd3fc}
+.bdg.g{background:rgba(34,197,94,.14);color:#86efac;border-color:rgba(34,197,94,.35)}
+.bdg.r{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.35)}
+.bdg.y{background:rgba(212,166,58,.16);color:var(--ng-gold-bright);border-color:var(--ng-gold-line)}
+.bdg.b{background:rgba(56,189,248,.12);color:#7dd3fc;border-color:rgba(56,189,248,.32)}
+.bdg.p{background:rgba(167,139,250,.14);color:#c4b5fd;border-color:rgba(167,139,250,.35)}
+.bdg.t{background:rgba(45,212,191,.12);color:#5eead4;border-color:rgba(45,212,191,.32)}
+.bdg.n{background:rgba(148,163,184,.14);color:var(--ng-text2);border-color:rgba(148,163,184,.24)}
+.lst .li{border-bottom:1px solid rgba(148,163,184,.10);color:var(--ng-text2)}
+.lst .li b{color:var(--ng-text)}
+.lst .li:hover{background:rgba(212,166,58,.08)}
+.lst small,.empty{color:var(--ng-muted)}
+.pbar{background:rgba(148,163,184,.18)}
+.pbar i{background:linear-gradient(90deg,#a87919,#ffd166)}
+.calc-res .cr{background:var(--ng-panel);border:1px solid var(--ng-gold-line-soft)}
+.calc-res .cr b{color:var(--ng-text)}
+.calc-res .cr span{color:var(--ng-muted)}
+.rpt-card{box-shadow:var(--premium-shadow),var(--premium-inset)}
+.rpt-card h4{color:var(--ng-text)}
+.rpt-card p{color:var(--ng-muted)}
+.rpt-card .ri{background:rgba(212,166,58,.12);color:var(--ng-gold-bright)}
+.perm{background:var(--ng-panel);border:1px solid var(--ng-gold-line-soft);color:var(--ng-text2)}
+.sw{background:rgba(148,163,184,.28)}
+.sw.on{background:var(--ng-gold)}
+.theme-card{background:var(--ng-panel);border:1px solid var(--ng-gold-line-soft)}
+.theme-card.on{border-color:var(--ng-gold);box-shadow:0 0 0 2px rgba(212,166,58,.24)}
+.theme-card b{color:var(--ng-text)}
+.theme-card span{color:var(--ng-muted)}
+.legend{color:var(--ng-muted)}
+.foot{background:var(--chrome);border-top:2px solid transparent;border-image:var(--gold-edge) 1;color:var(--ng-muted)}
+.foot h5{color:var(--ng-gold-text)}
+.foot a.fl{color:var(--ng-text2)}
+.foot a.fl:hover{color:var(--ng-gold-bright)}
+.foot .copy{color:var(--ng-muted);border-top:1px solid var(--ng-gold-line-soft)}
+#admin-gate{background:
+  radial-gradient(900px 520px at 50% -10%,rgba(212,166,58,.16),transparent 62%),
+  radial-gradient(760px 520px at 8% 108%,rgba(56,189,248,.10),transparent 60%),
+  linear-gradient(163deg,var(--ng-bg2) 0%,var(--ng-bg) 60%,#01060f 100%)}
+#admin-gate h2{color:var(--ng-text)}
+#admin-gate p,#admin-gate label{color:var(--ng-muted)}
+#admin-gate .gate-foot{color:var(--ng-muted)}
+#admin-gate .gate-foot a{color:var(--ng-gold-text)}
+#gate-status.err{color:#fca5a5}
+@media print{.panel,.stat,.rpt-card{background:#fff!important;color:#111!important}}
+
 </style>
 </head>
 <body class="no-live-toast">
@@ -683,7 +812,7 @@ function setupCanvas(cv,h){const dpr=window.devicePixelRatio||1;const w=cv.clien
  const ctx=cv.getContext&&cv.getContext('2d');if(!ctx)return[null,w,h];ctx.scale(dpr,dpr);return[ctx,w,h]}
 function chartLine(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||240);if(!ctx)return;const pad={l:56,r:16,t:14,b:30};
  const max=Math.max(...series.flatMap(s=>s.data),1)*1.15;const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
- ctx.strokeStyle='rgba(31,131,201,.12)';ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
+ ctx.strokeStyle='rgba(148,163,184,.18)';ctx.fillStyle='#94a3b8';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
  for(let i=0;i<=4;i++){const y=pad.t+ih-ih*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
   const v=max*i/4;ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v.toFixed(0),pad.l-8,y+3)}
  ctx.textAlign='center';labels.forEach((l,i)=>ctx.fillText(l,pad.l+iw*(i/(labels.length-1||1)),h-10));
@@ -694,7 +823,7 @@ function chartLine(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.
   s.data.forEach((v,i)=>{const x=pad.l+iw*(i/(labels.length-1||1)),y=pad.t+ih-(v/max)*ih;ctx.beginPath();ctx.arc(x,y,3.4,0,7);ctx.fillStyle='#ffffff';ctx.fill();ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.stroke()})})}
 function chartBar(cv,labels,series,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||240);if(!ctx)return;const pad={l:56,r:16,t:14,b:30};
  const max=Math.max(...series.flatMap(s=>s.data),1)*1.15;const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
- ctx.strokeStyle='rgba(31,131,201,.12)';ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
+ ctx.strokeStyle='rgba(148,163,184,.18)';ctx.fillStyle='#94a3b8';ctx.font='10.5px Inter,sans-serif';ctx.textAlign='right';
  for(let i=0;i<=4;i++){const y=pad.t+ih-ih*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
   const v=max*i/4;ctx.fillText(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v.toFixed(0),pad.l-8,y+3)}
  const grp=iw/labels.length,bw=Math.min(34,grp/(series.length+0.6));
@@ -707,8 +836,8 @@ function chartDonut(cv,parts,opts={}){const[ctx,w,h]=setupCanvas(cv,opts.h||230)
  let tot=parts.reduce((a,p)=>a+p.v,0),ang=-Math.PI/2;
  parts.forEach(p=>{const a2=ang+p.v/tot*Math.PI*2;ctx.beginPath();ctx.arc(cx,cy,r,ang+.02,a2-.02);ctx.arc(cx,cy,ir,a2-.02,ang+.02,true);ctx.closePath();
   const g=ctx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);g.addColorStop(0,p.color);g.addColorStop(1,p.color+'99');ctx.fillStyle=g;ctx.fill();ang=a2});
- ctx.fillStyle='#062430';ctx.font='700 20px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(opts.center||num(tot),cx,cy-2);
- ctx.fillStyle='#6d8798';ctx.font='10.5px Inter,sans-serif';ctx.fillText(opts.sub||'Total',cx,cy+15)}
+ ctx.fillStyle='#ffffff';ctx.font='700 20px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(opts.center||num(tot),cx,cy-2);
+ ctx.fillStyle='#94a3b8';ctx.font='10.5px Inter,sans-serif';ctx.fillText(opts.sub||'Total',cx,cy+15)}
 
 /* ---------------- derived computations ---------------- */
 const overdueLoans=()=>db.loans.filter(l=>l.status==='Overdue');
@@ -822,10 +951,10 @@ function vDashboard(){const c=db.customers,ap=db.applications,ln=db.loans;
   <div>
    <div class="panel"><div class="ph"><h3>Disbursements vs Collections — Last 6 Months</h3><span class="tcount">MWK</span></div>
      <div class="pb"><canvas class="chart" id="chFlow"></canvas></div>
-     <div class="legend"><span><i style="background:#1f83c9"></i>Disbursed</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
+     <div class="legend"><span><i style="background:#d4a63a"></i>Disbursed</span><span><i style="background:#22c55e"></i>Collected</span></div></div>
    <div class="panel"><div class="ph"><h3>Weekly Collections Performance</h3></div>
      <div class="pb"><canvas class="chart" id="chWeek"></canvas></div>
-     <div class="legend"><span><i style="background:#7bb8e8"></i>Expected</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
+     <div class="legend"><span><i style="background:#ffd166"></i>Expected</span><span><i style="background:#22c55e"></i>Collected</span></div></div>
   </div>
   <div>
    <div class="panel"><div class="ph"><h3>Portfolio by Product</h3></div>
@@ -841,9 +970,9 @@ function dAgo15(){const d=new Date();d.setDate(d.getDate()-15);return d}
 function loans_worst(){if(!db.loans.length)return null;return db.loans.reduce((w,l)=>dpd(l)>dpd(w)?l:w,db.loans[0])}
 const CHARTS=[];
 function dashboardCharts(){CHARTS.length=0;
- const f1=$('#chFlow');if(f1){const draw=()=>chartLine(f1,['May','Jun','Jul','Aug','Sep','Oct'],[{color:'#1f83c9',data:[5200000,3100000,7800000,2600000,4600000,7200000]},{color:'#0f7a5c',data:[2900000,3400000,3100000,3800000,3600000,4100000]}]);draw();CHARTS.push(draw)}
- const f2=$('#chWeek');if(f2){const draw=()=>chartBar(f2,['Mon','Tue','Wed','Thu','Fri'],[{color:'#7bb8e8',data:[880000,760000,940000,810000,1150000]},{color:'#0f7a5c',data:[820000,610000,900000,880000,1090000]}]);draw();CHARTS.push(draw)}
- const f3=$('#chPortfolio');if(f3){const cols=['#1f83c9','#0a373a','#0f7a5c','#c9a227','#a83b34','#6b4fa8'];
+ const f1=$('#chFlow');if(f1){const draw=()=>chartLine(f1,['May','Jun','Jul','Aug','Sep','Oct'],[{color:'#d4a63a',data:[5200000,3100000,7800000,2600000,4600000,7200000]},{color:'#22c55e',data:[2900000,3400000,3100000,3800000,3600000,4100000]}]);draw();CHARTS.push(draw)}
+ const f2=$('#chWeek');if(f2){const draw=()=>chartBar(f2,['Mon','Tue','Wed','Thu','Fri'],[{color:'#ffd166',data:[880000,760000,940000,810000,1150000]},{color:'#22c55e',data:[820000,610000,900000,880000,1090000]}]);draw();CHARTS.push(draw)}
+ const f3=$('#chPortfolio');if(f3){const cols=['#d4a63a','#a87919','#22c55e','#ffd166','#ef4444','#38bdf8'];
   const by=db.products.map((p,i)=>({label:p.name.replace(' Loan',''),color:cols[i%6],v:db.loans.filter(l=>l.product===p.name).reduce((a,l)=>a+l.balance,0)})).filter(x=>x.v>0);
   const draw=()=>chartDonut(f3,by,{center:mwk(portfolioBalance()).replace('MWK ',''),sub:'Outstanding MWK'});draw();CHARTS.push(draw);
   const lg=$('#lgdPortfolio');if(lg)lg.innerHTML=by.map(b=>`<span><i style="background:${b.color}"></i>${b.label} — ${pct(100*b.v/portfolioBalance())}</span>`).join('')}}
@@ -1263,13 +1392,13 @@ function vChangeRequests(){
    <li>Declining requires a reason; the customer sees it and can file again with better evidence.</li>
    <li>Every decision is audit-logged with the officer's name and the request reference.</li></ol></div></div>`}
 function themeOptions(){
- const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold'}];
+ const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Midnight navy & gold'}];
  return list.map(t=>({v:t.id,t:t.name}));
 }
 function themeName(id){
- const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold'}];
+ const list=(window.JCOB_THEME&&window.JCOB_THEME.list)?window.JCOB_THEME.list():[{id:'emerald',name:'Midnight navy & gold'}];
  const hit=list.filter(t=>t.id===id)[0];
- return hit?hit.name:'Emerald & liquid gold';
+ return hit?hit.name:'Midnight navy & gold';
 }
 function vSettings(){const s=db.settings;const TH=(window.JCOB_SITE&&window.JCOB_SITE.settings&&window.JCOB_SITE.settings.theme)||{};
  return pageHead('System Settings','Business profile, currency, timezone, loan rules and document configuration. Changes persist and are audit-logged.')
@@ -1289,7 +1418,7 @@ function vSettings(){const s=db.settings;const TH=(window.JCOB_SITE&&window.JCOB
   <p class="tsub" style="margin:0 0 12px;line-height:1.7;color:var(--muted)">Choose a palette from the library and publish it to the public website, the customer dashboard and this console. The choice is stored in Supabase (<code>site_docs → settings → theme</code>), so every visitor, every receipt band and every dashboard follows it.</p>
   <div class="frow">${fld('Website theme', sel('thSite', themeOptions(), TH.site||'emerald'), 'Public pages, receipts and downloaded documents.')}
    ${fld('Dashboards &amp; console', sel('thDash', themeOptions(), TH.dashboard||'emerald'), 'Customer dashboard, app bars and this console.')}</div>
-  <div class="theme-strip">${(window.JCOB_THEME?window.JCOB_THEME.list():[{id:'emerald',name:'Emerald & liquid gold',note:'House style',swatch:['#06302c','#0a3f6b','#f2e3b6']}]).map(t=>`<div class="theme-card ${(TH.site||'emerald')===t.id?'on':''}">
+  <div class="theme-strip">${(window.JCOB_THEME?window.JCOB_THEME.list():[{id:'emerald',name:'Midnight navy & gold',note:'House style',swatch:['#020817','#0b1d35','#ffd166']}]).map(t=>`<div class="theme-card ${(TH.site||'emerald')===t.id?'on':''}">
     <div class="theme-dots">${t.swatch.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
     <b>${esc(t.name)}</b><span>${esc(t.note)}</span></div>`).join('')}</div>
   <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
@@ -1326,7 +1455,7 @@ function vReports(){return pageHead('Reports & Analytics','Generate reports and 
  +`<div class="rpt-grid">${REPORTS.map(r=>`<div class="rpt-card"><div class="ri" style="background:rgba(20,88,143,.12)">${r.i}</div><h4>${r.t}</h4><p>${r.d}</p>
   <div style="display:flex;gap:8px"><button class="btn sm primary" data-act="rptRun" data-id="${r.id}">Generate</button><button class="btn sm ghost" data-act="rptRun" data-id="${r.id}" data-pdf="1">PDF</button></div></div>`).join('')}</div>
  <div class="panel" style="margin-top:16px"><div class="ph"><h3>Interest income vs operating expenses — trend</h3></div><div class="pb"><canvas class="chart" id="chRpt"></canvas></div>
- <div class="legend"><span><i style="background:#0f7a5c"></i>Interest + fee income</span><span><i style="background:#c9a227"></i>Operating expenses</span></div></div>`}
+ <div class="legend"><span><i style="background:#22c55e"></i>Interest + fee income</span><span><i style="background:#a87919"></i>Operating expenses</span></div></div>`}
 function runReport(id,asPdf){const r=REPORTS.find(x=>x.id===id);
  const rows=reportRows(id);const head='Date/Item,'+rows.head.join(',');
  const body=rows.rows.map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
@@ -1338,13 +1467,13 @@ function runReport(id,asPdf){const r=REPORTS.find(x=>x.id===id);
  modalActs.csv=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([head+'\n'+body.join('\n')],{type:'text/csv'}));a.download=r.id+'_report.csv';a.click();toast('ok','Report exported',r.t+' (CSV)')};
  modalActs.pdf=()=>{const w=window.open('','_blank');w.document.write('<html><head><title>'+r.t+'</title><style>@page{margin:14mm}body{font-family:Arial;padding:0;margin:0;color:#111}'+
   '.band{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 22px;'+
-  'background:radial-gradient(900px 420px at 88% -20%,rgba(31,131,201,.22),transparent 62%),'+
-  'linear-gradient(165deg,#06302c 0%,#04211f 62%,#041716 100%);color:#d3e7e1;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+  'background:radial-gradient(900px 420px at 88% -20%,rgba(212,166,58,.16),transparent 62%),'+
+  'linear-gradient(165deg,#061329 0%,#030d20 62%,#020817 100%);color:#cbd5e1;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
   '.band:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;'+
-  'background:linear-gradient(90deg,transparent,#c9a227 30%,#f6ecc4 50%,#c9a227 70%,transparent)}'+
-  '.band .txt{margin-left:auto;text-align:right}.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#f2e3b6;font-weight:700}'+
-  '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#f4fbf8;margin-top:3px}'+
-  '.band small{color:#b9d3ca;font-size:11px}.wrap{padding:20px 22px}'+
+  'background:linear-gradient(90deg,transparent,#d4a63a 30%,#ffd166 50%,#d4a63a 70%,transparent)}'+
+  '.band .txt{margin-left:auto;text-align:right}.kicker{display:block;font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:#ffd166;font-weight:700}'+
+  '.band strong{display:block;font-family:Georgia,serif;font-size:16px;color:#fff;margin-top:3px}'+
+  '.band small{color:#94a3b8;font-size:11px}.wrap{padding:20px 22px}'+
   'table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #dbe6ef;padding:6px 8px;text-align:left}th{background:#f4f8fc}h1{font-size:18px}'+
   '.kv{display:block;margin:0 0 10px;font-size:12px}.kv b{display:inline-block;min-width:90px;color:#5c7383;font-weight:600}'+
   '.muted{color:#5c7383;font-size:11px}</style></head><body>'+
@@ -1375,7 +1504,7 @@ function vRisk(){const buc=[[0,30],[31,60],[61,90],[91,9999]];
   <div class="panel"><div class="ph"><h3>Concentration by sector</h3></div><div class="pb">${[['Retail & trade',38],['Agriculture',24],['Salaried consumers',19],['Services',12],['Other',7]].map(([s,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${s}</span><b>${v}%</b></div><div class="pbar ${v>45?'bad':v>35?'warn':''}"><i style="width:${v}%"></i></div></div>`).join('')}</div></div>
  </div>
  <div class="grid22">
-  <div class="panel"><div class="ph"><h3>Expected vs actual collections (past 6 weeks)</h3></div><div class="pb"><canvas class="chart" id="chRisk"></canvas></div><div class="legend"><span><i style="background:#7bb8e8"></i>Expected</span><span><i style="background:#0f7a5c"></i>Collected</span></div></div>
+  <div class="panel"><div class="ph"><h3>Expected vs actual collections (past 6 weeks)</h3></div><div class="pb"><canvas class="chart" id="chRisk"></canvas></div><div class="legend"><span><i style="background:#ffd166"></i>Expected</span><span><i style="background:#22c55e"></i>Collected</span></div></div>
   <div class="panel"><div class="ph"><h3>High-risk accounts & repeat borrowers</h3></div><div class="lst flush">
    ${overdueLoans().map(l=>`<div class="li" data-nav="collections"><span class="ic" style="background:rgba(168,59,52,.12)">🚨</span><div><b>${esc(l.cust)} — ${l.id}</b><small>${dpd(l)} DPD · arrears ${mwk(l.balance)}</small></div><span class="bdg r" style="margin-left:auto">HIGH</span></div>`).join('')}
    <div class="li"><span class="ic" style="background:rgba(15,122,92,.12)">🔁</span><div><b>Repeat borrowers</b><small>${new Set(db.loans.map(l=>l.cust)).size<db.loans.length?db.loans.length-new Set(db.loans.map(l=>l.cust)).size+1:0} customers hold 2+ historical loans — strong retention signal</small></div></div>
@@ -1463,7 +1592,7 @@ function vCalculator(){const u=ui.calc=ui.calc||{p:1500000,r:12,t:12,m:'reducing
    ${fld('Desired instalment',inp('affD',u.afD||150000,'type="number"'))}
    <button class="btn primary" data-act="affRun">Check affordability</button>
    <div id="affOut"></div></div></div>
-  <div class="panel"><div class="ph"><h3>Payment breakdown</h3></div><div class="pb"><canvas class="chart" id="chCalc"></canvas></div><div class="legend"><span><i style="background:#1f83c9"></i>Principal portion</span><span><i style="background:#6b4fa8"></i>Interest portion</span></div></div></div></div>`}
+  <div class="panel"><div class="ph"><h3>Payment breakdown</h3></div><div class="pb"><canvas class="chart" id="chCalc"></canvas></div><div class="legend"><span><i style="background:#d4a63a"></i>Principal portion</span><span><i style="background:#38bdf8"></i>Interest portion</span></div></div></div></div>`}
 function renderCalc(){const P=+val('calcP')||1,r=+val('calcR')||0,t=Math.max(1,+val('calcT')||1),m=val('calcM');
  ui.calc=Object.assign({},ui.calc,{p:P,r:r,t:t,m:m,prod:val('calcProduct')});const res=calcSchedule(P,r*12,t,m);
  $('#calcOut').innerHTML=`<div class="calc-res">
@@ -1475,7 +1604,7 @@ function renderCalc(){const P=+val('calcP')||1,r=+val('calcR')||0,t=Math.max(1,+
   <div class="twrap" style="max-height:280px;overflow:auto"><table><thead><tr><th>#</th><th>Payment</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody>
   ${res.rows.map(x=>`<tr><td>${x.n}</td><td class="tamt">${num(x.pay)}</td><td>${num(x.pr)}</td><td>${num(x.int)}</td><td>${num(x.bal)}</td></tr>`).join('')}</tbody></table></div></details>`;
  const cv=$('#chCalc');if(cv){const draw=()=>{const pick=res.rows.filter((_,i)=>i%Math.ceil(res.rows.length/10)===0);
-  chartBar(cv,pick.map(x=>'P'+x.n),[{color:'#1f83c9',data:pick.map(x=>x.pr)},{color:'#6b4fa8',data:pick.map(x=>x.int)}],{h:220,multi:true})};draw();CHARTS.push(draw)}
+  chartBar(cv,pick.map(x=>'P'+x.n),[{color:'#d4a63a',data:pick.map(x=>x.pr)},{color:'#38bdf8',data:pick.map(x=>x.int)}],{h:220,multi:true})};draw();CHARTS.push(draw)}
  const affOut=$('#affOut');if(affOut&&ui.calc.aff){affOut.innerHTML=ui.calc.aff}}
 function math_approx(t){return 1+(t-1)/2*0.02}
 function runAfford(){const I=+val('affI')||0,E=+val('affE')||0,D=+val('affD')||0;ui.calc=ui.calc||{};ui.calc.afI=I;ui.calc.afE=E;ui.calc.afD=D;const free=I*db.settings.maxDTI/100-E;
@@ -1504,8 +1633,8 @@ const VIEWS={
  adminUsers:{t:'Admin Users',r:vAdminUsers},roles:{t:'Roles & Permissions',r:vRoles},workflows:{t:'Approval Workflows',r:vWorkflows},
  audit:{t:'Audit Logs',r:vAudit},security:{t:'Security & Sessions',r:vSecurity},compliance:{t:'Compliance & Risk',r:vCompliance},
  settings:{t:'System Settings',r:vSettings},backups:{t:'Backups',r:vBackups},
- reports:{t:'Reports & Analytics',r:vReports,after:()=>{const c=$('#chRpt');if(c){const f=()=>chartLine(c,['Jun','Jul','Aug','Sep','Oct'],[{color:'#0f7a5c',data:[361000,398000,442000,402000,486000]},{color:'#c9a227',data:[228000,231000,240000,235000,242000]}]);f();CHARTS.push(f)}}},
- risk:{t:'Risk & Portfolio',r:vRisk,after:()=>{const c=$('#chRisk');if(c){const f=()=>chartBar(c,['W1','W2','W3','W4','W5','W6'],[{color:'#7bb8e8',data:[2400000,2210000,2680000,2350000,2890000,2410000]},{color:'#0f7a5c',data:[2210000,2080000,2590000,2290000,2760000,2260000]}]);f();CHARTS.push(f)}}},
+ reports:{t:'Reports & Analytics',r:vReports,after:()=>{const c=$('#chRpt');if(c){const f=()=>chartLine(c,['Jun','Jul','Aug','Sep','Oct'],[{color:'#22c55e',data:[361000,398000,442000,402000,486000]},{color:'#a87919',data:[228000,231000,240000,235000,242000]}]);f();CHARTS.push(f)}}},
+ risk:{t:'Risk & Portfolio',r:vRisk,after:()=>{const c=$('#chRisk');if(c){const f=()=>chartBar(c,['W1','W2','W3','W4','W5','W6'],[{color:'#ffd166',data:[2400000,2210000,2680000,2350000,2890000,2410000]},{color:'#22c55e',data:[2210000,2080000,2590000,2290000,2760000,2260000]}]);f();CHARTS.push(f)}}},
  branches:{t:'Branches',r:vBranches},loanOfficers:{t:'Loan Officers',r:vOfficers},payroll:{t:'Payroll',r:vPayroll},
  accounting:{t:'Accounting',r:vAccounting},investors:{t:'Investors',r:vInvestors},partners:{t:'Partners & Agents',r:vPartners},
  legal:{t:'Legal & Recovery',r:vLegal},api:{t:'API & Integrations',r:vApi},fraud:{t:'Fraud Monitoring',r:vFraud},templates:{t:'Templates',r:vTemplates},

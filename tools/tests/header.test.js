@@ -16,7 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const { ROOT, reporter } = require("./lib");
 
-const t = reporter("[header — the footer's emerald]");
+const t = reporter("[header — the footer's midnight navy]");
 
 const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const site = read("assets/css/styles.css");
@@ -82,9 +82,9 @@ function token(name) {
 
 /* ---- 1. one token, two surfaces ---- */
 const chrome = token("--emerald-chrome");
-t.ok("the emerald chrome token exists", !!chrome && /linear-gradient/.test(chrome));
+t.ok("the chrome token exists", !!chrome && /linear-gradient/.test(chrome));
 t.ok("the token is the footer's gradient",
-  !!chrome && /#06302c/.test(chrome) && /#04211f/.test(chrome) && /#041716/.test(chrome), chrome || "");
+  !!chrome && /#061329/.test(chrome) && /#030d20/.test(chrome) && /#020817/.test(chrome), chrome || "");
 t.eq("the footer paints with it", lastDecl(siteRules, ".site-footer", "background"), "var(--emerald-chrome)");
 t.eq("the header paints with it", lastDecl(siteRules, ".site-header", "background"), "var(--emerald-chrome)");
 t.eq("the scrolled header keeps it", lastDecl(siteRules, ".site-header.is-scrolled", "background"), "var(--emerald-chrome)");
@@ -100,11 +100,11 @@ t.ok("the topline is ruled in gold", /var\(--chrome-rule\)/.test(lastBody(siteRu
 
 /* ---- 2. the trim ---- */
 t.ok("a gold rail runs along the header's bottom edge",
-  /var\(--gold-edge\)|rgba\(201, 162, 39/.test(lastBody(siteRules, ".site-header::before")));
+  /var\(--gold-edge\)|rgba\(212, 166, 58/.test(lastBody(siteRules, ".site-header::before")));
 t.ok("a gold rail runs along the footer's top edge",
-  /rgba\(201, 162, 39/.test(read("assets/css/styles.css").slice(read("assets/css/styles.css").indexOf(".site-footer {"))));
+  /rgba\(212, 166, 58/.test(read("assets/css/styles.css").slice(read("assets/css/styles.css").indexOf(".site-footer {"))));
 
-/* ---- 3. everything on the bar reads on emerald ---- */
+/* ---- 3. everything on the bar reads on midnight navy ---- */
 function lum(hex) {
   const h = hex.replace("#", "");
   const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
@@ -117,26 +117,26 @@ function contrast(a, b) {
   const lb = lum(b);
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
-const stops = ["#06302c", "#04211f", "#041716"];
+const stops = ["#061329", "#030d20", "#020817"];
 const text = {
   "nav link": token("--chrome-text"),
   "nav hover": token("--chrome-text-strong"),
   "topline": token("--chrome-muted-text"),
-  "active item": "#f2e3b6"
+  "active item": "#ffd166"
 };
 Object.keys(text).forEach((name) => {
   const colour = text[name];
   const worst = Math.min.apply(null, stops.map((s) => contrast(colour, s)));
-  t.ok(name + " is readable on the emerald", worst >= 4.5, (colour || "?") + " at " + worst.toFixed(2) + ":1");
+  t.ok(name + " is readable on the navy", worst >= 4.5, (colour || "?") + " at " + worst.toFixed(2) + ":1");
 });
 
 t.ok("nav links use the chrome text", /color:\s*var\(--chrome-text\)/.test(lastBody(siteRules, ".nav-link")));
-t.ok("the active item is gold", /var\(--gold-200\)/.test(lastBody(siteRules, ".nav-link.is-active")));
+t.ok("the active item is gold", /var\(--ng-gold-bright\)|var\(--gold-200\)/.test(lastBody(siteRules, ".nav-link.is-active")));
 t.ok("nav hover lifts to near-white", /var\(--chrome-text-strong\)/.test(lastBody(siteRules, ".nav-link:hover")));
 
-/* the Apply menu is an emerald panel with the gold hairline */
+/* the Apply menu is a navy panel with the gold hairline */
 const dd = lastBody(siteRules, ".nav-dd-menu");
-t.ok("the Apply menu is emerald", /linear-gradient\(168deg, #072d28/.test(dd));
+t.ok("the Apply menu is navy", /linear-gradient\(170deg, var\(--ng-panel\)/.test(dd), dd.slice(0, 90));
 t.ok("the Apply menu carries the gold edge", /var\(--gold-edge\) border-box/.test(dd));
 t.ok("the Apply menu's links are light", /color:\s*var\(--chrome-text\)/.test(lastBody(siteRules, ".nav-dd-menu a")));
 
@@ -171,12 +171,12 @@ t.eq("every header uses the light lockup", noLogo.join(", "), "");
 /* ---- 5. the console's bar is the console's footer ---- */
 const adminCss = admin.slice(admin.indexOf("<style>"), admin.indexOf("</style>"));
 const adminRules = rules(adminCss);
-t.eq("console top bar paints with --chrome", lastDecl(adminRules, ".topbar", "background"), "var(--chrome)");
+t.eq("console top bar paints with --chrome", lastDecl(adminRules, ".topbar", "background").replace(/\s+/g, " "), "var(--chrome)");
 t.eq("console footer paints with --chrome", lastDecl(adminRules, ".foot", "background"), "var(--chrome)");
 t.ok("console top bar text is the chrome text", /color:var\(--chrome-txt\)/.test(lastBody(adminRules, ".topbar")));
 t.ok("the console header uses the light lockup",
   /class="brand-logo" src="assets\/img\/logo-full-light\.svg"/.test(admin));
-t.ok("the console search field is glass on emerald",
+t.ok("the console search field is glass on navy",
   /\.topsearch\{[^}]*rgba\(255,255,255,\.10\)/.test(adminCss));
 t.ok("the console's buttons are light on the bar",
   /\.topbar \.btn\{[^}]*rgba\(255,255,255,\.08\)/.test(adminCss));
@@ -185,7 +185,7 @@ t.ok("the console's buttons are light on the bar",
 const chip = lastBody(siteRules, ".app-topbar .profile-btn");
 const chipName = lastBody(siteRules, ".app-topbar .profile-btn .profile-name");
 const chipMail = lastBody(siteRules, ".app-topbar .profile-btn .profile-name small");
-t.ok("the dashboard account chip is glass on emerald",
+t.ok("the dashboard account chip is glass on navy",
   /background:\s*rgba\(255,\s*255,\s*255,\s*0?\.1\)/.test(chip));
 t.ok("the dashboard account chip's name reads light",
   /color:\s*var\(--chrome-text-strong\)/.test(chipName));
@@ -197,15 +197,15 @@ const search = lastBody(siteRules, ".app-search input");
 const iconBtn = lastBody(siteRules, ".app-topbar .icon-btn-lg");
 const sync = lastBody(siteRules, ".app-topbar .app-sync");
 const bell = lastBody(siteRules, ".app-topbar .bell-dot");
-t.ok("the dashboard search is glass on emerald",
-  /background:\s*rgba\(255,\s*255,\s*255,\s*0?\.1\)/.test(search) &&
-  /color:\s*var\(--chrome-text-strong\)/.test(search));
+t.ok("the dashboard search is a navy well with white type",
+  /background:\s*rgba\(11,\s*29,\s*53/.test(search) &&
+  /color:\s*var\(--ng-text\)/.test(search), search.slice(0, 90));
 t.ok("the top bar's icon buttons read light",
   /color:\s*var\(--chrome-text-strong\)/.test(iconBtn));
 t.ok("the sync chip is glass, not a white label",
   /background:\s*rgba\(255,\s*255,\s*255,\s*0?\.1\)/.test(sync));
-t.ok("the notification dot is ringed in the emerald, not white",
-  /border-color:\s*#04211f/.test(bell));
+t.ok("the notification dot is ringed in the navy, not white",
+  /border-color:\s*var\(--ng-bg\)/.test(bell), bell.slice(0, 80));
 
 /* =====================================================================
    8. every inner page opens on the same band — page heroes, receipts,
@@ -277,12 +277,12 @@ t.eq("all five auth pages carry the light lockup on the band", badAuth.join(", "
 t.ok("the shared document header emits the band class", /'<div class="doc-head'/.test(ui));
 t.ok("the shared document header carries the light lockup",
   /logo-full-light\.svg/.test(ui) && /inlineLockup\(/.test(ui));
-t.ok("downloaded documents carry the emerald band",
-  /linear-gradient\(165deg,#06302c 0%,#04211f 62%,#041716 100%\)/.test(ui));
+t.ok("downloaded documents carry the navy band",
+  /linear-gradient\(165deg,#061329 0%,#030d20 62%,#020817 100%\)/.test(ui));
 t.ok("downloaded documents print their band",
   /print-color-adjust:exact/.test(ui));
 t.ok("downloaded documents carry the gold rail",
-  /#f6ecc4 50%/.test(ui));
+  /#ffd166 50%/.test(ui));
 
 /* ---- 9. print keeps the page readable ---- */
 t.ok("print strips the header colour", /@media print\{\s*\.site-header, \.app-topbar \{ background: #fff/.test(site.replace(/\n\s*/g, " ")) ||

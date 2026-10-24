@@ -1,8 +1,9 @@
 # JAY C O B FINANCIAL SERVICES — lending website (v3)
 
 A complete, responsive lending site and customer dashboard for **JAY C O B FINANCIAL SERVICES**,
-a licensed money lender in Lilongwe, Malawi. Emerald-green and blue liquid-crystal theme,
-all money in **Malawian Kwacha (MWK)**.
+a licensed money lender in Lilongwe, Malawi. Midnight-navy and gold banking theme — one palette
+across the public site, the customer dashboard and the staff console — with all money in
+**Malawian Kwacha (MWK)**.
 
 Plain HTML, CSS and JavaScript. No framework, no bundler, no runtime dependencies — deployable to
 any static host (GitHub Pages, Netlify, Cloudflare Pages, S3, cPanel).
@@ -190,7 +191,7 @@ investors, partners, legal, API integrations, fraud, templates and the calculato
 | **Live Feed** | Publish, edit, pin, unpublish or delete animated updates; choose type (announcement / card / photo / blog), section placement and one of seven motions; upload or link an image. | Home strips, live desk, ticker |
 | **Site Catalogue** | The eleven lending products: annual rate, processing fee, amount limits, term range, summary, active state. | Calculator presets, application limits, product pages, rates tables |
 | **Website Settings** | Brand, tagline, registration, licence, phones, emergency line, emails, address, hours, social links, calculator defaults, published lending policy. | Header, footer, contact blocks, support and legal pages, calculator defaults |
-| **Theme generator** (in Website Settings) | Five published themes — Emerald & liquid gold (house style), Royal blue & crystal, Midnight & champagne, Copper & ivory, Forest & brass — each applied to the **website** or to the **dashboards and console**, the two scopes chosen separately. Saved as `settings.theme = {site, dashboard, updated, updatedBy}`. | Site header, page bands, receipts and downloads; dashboard app bars and console chrome |
+| **Theme generator** (in Website Settings) | Five published themes — Midnight navy & gold (house style), Navy & sapphire, Black & champagne, Navy & copper, Navy & emerald — each applied to the **website** or to the **dashboards and console**, the two scopes chosen separately. Saved as `settings.theme = {site, dashboard, updated, updatedBy}`. | Site header, page bands, receipts and downloads; dashboard app bars and console chrome |
 | **Detail Change Requests** | Every protected-detail request: customer, field, current and requested value, category, reason, status. Approve (after confirmation) or decline with a note; the decision is written to the customer's document and a notification is raised. | Nothing directly — it decides what the customer asked for |
 
 ### How the connection works
@@ -263,15 +264,16 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 607 assertions
+npm test        # starts the Supabase stand-in + server, runs 651 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
 single-file bundle — including its copy of the theme engine — and an empty dashboard that ignores a
 stale browser copy), the product quotes (the flat-monthly rule, clamping, and every page against the
 engine), the signature pad (trace fidelity, curve rendering, undo/clear), the header chrome (the bar
-and the footer share one emerald token, every control restated on that ground, contrast maths,
-print), the theme generator (the registry, the house theme writing nothing, website and dashboard
+and the footer share one navy token, every control restated on that ground, contrast maths,
+print), the palette itself (a cascade audit: for every element on every page it resolves
+specificity, order and `var()`, then fails on a surviving light slab or dark-on-dark type), the theme generator (the registry, the house theme writing nothing, website and dashboard
 scopes staying apart, AA contrast on every theme, and a console round-trip that saves the choice to
 `site_docs` and proves `index.html` opens in it), the protected-detail flow (a reasonless request is
 refused and stores nothing, a reasoned one is stored pending, approval writes the value and a
@@ -388,14 +390,22 @@ root as-is — there is no build step at runtime.
 
 ## Design, accessibility and performance
 
-- Emerald (`#04171a` → `#0d4a4b`) with blue liquid crystal (`#0a3f6b` → `#e6f3fd`) on an ice-paper base
-  (`#eef4fa`), frosted glass surfaces, iridescent facet highlights and a slow ambient drift.
+- **Palette (theme v10):** midnight navy grounds — `#020817` page, `#061329` band, `#030D20` sidebar,
+  `#08172D` card, `#0B1D35` elevated — with gold as the accent (`#D4A63A`, highlight `#FFD166`, deep
+  `#A87919`, border `#B88A2B`, glow `rgba(212,166,58,.20)`). Type is white `#FFFFFF`, secondary
+  `#CBD5E1`, muted `#94A3B8`; green `#22C55E`, red `#EF4444` and blue `#38BDF8` appear only for real
+  financial states. Navy dominates, gold trims: edges on cards, active items and primary actions,
+  never neon, glass or particles.
+- **One family:** Inter (400–800) with the system UI stack behind it, for headings, body and figures.
+- **The card surface:** every module — panel, stat card, loan/doc/summary card, table, live strip,
+  quick action, schedule, nav item, modal, toast, segmented control — paints one navy surface with a
+  1px gold hairline, 12–18 px radius and 18–24 px padding, lifting on hover with a soft gold glow.
 - **One chrome (v7):** the header block — announcement strip, nav bar and mobile drawer — is painted
-  with the exact same `--emerald-chrome` gradient as the footer, with a gold rail along its bottom
-  edge and light `--chrome-text` type restated for every control on that ground. The customer
+  with the exact same `--emerald-chrome` navy gradient as the footer, with a thin metallic gold rail
+  along its bottom edge and light `--chrome-text` type restated for every control on that ground. The customer
   dashboard's app bar and the admin console's top bar use the same bar, so site and tools read as
   one product.
-- **The page band (v8/v9):** every content page opens on the same emerald — the inner-page hero,
+- **The page band (v8/v9):** every content page opens on the same navy — the inner-page hero,
   the auth card's lockup band, receipts and statements on screen, and the insight article's header
   (full-bleed past the reading column), each with the light lockup and the gold rail. Every
   downloaded document (`JC-receipt-*`, `JC-statement-*`, `JC-transfer-receipt-*`,

@@ -89,7 +89,7 @@
   function themeLabel(id) {
     var list = (window.JCOB_THEME && window.JCOB_THEME.list) ? window.JCOB_THEME.list() : [];
     var hit = list.filter(function (t) { return t.id === id; })[0];
-    return hit ? hit.name : "Emerald & liquid gold";
+    return hit ? hit.name : "Midnight navy & gold";
   }
 
   /* Every customer document in Supabase is a website record. There is no
