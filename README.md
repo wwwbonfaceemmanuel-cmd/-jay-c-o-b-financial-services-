@@ -235,6 +235,13 @@ endpoints and Storage uploads. Everything else keeps its existing calls (`JCOB_S
 | `audit_log` | every document change (who, what, when) | staff read, written by trigger |
 | Storage | `site-media` (public photos), `kyc-documents` (private) | staff / owning customer |
 
+Six tables is the whole platform: the website uses `site_docs` (read) and `enquiries` (insert), the
+customer portal uses `profiles` (own row) and `customer_docs` (own row), and the console uses all six
+plus both buckets. `supabase/health-check.sql` is a read-only script that prints the table list with
+row counts, the RLS and policy state of each, the `updated_at` triggers, the two buckets, the five
+`site_docs` documents, signature coverage across customers, and the staff roles — useful after a
+deploy, an import or a key change.
+
 Operational details:
 
 - **Keys never enter Git.** `server.js` answers `/env.js` from the Railway environment; the same
