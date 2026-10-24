@@ -6571,6 +6571,137 @@ table.data .num, .table-wrap .num { color: var(--ng-text); font-variant-numeric:
 .auth-recover a { background: var(--ng-raise); color: var(--ng-text-2); border: 1px solid var(--ng-gold-line-soft); }
 .auth-recover a:hover { border-color: var(--ng-gold); color: var(--ng-gold-bright); }
 
+/* =====================================================================
+   17. THE FOOTER'S CUSTOMER CARE BAND
+   ---------------------------------------------------------------------
+   Customer care used to be the fifth column of .footer-top. On a phone
+   that column was squeezed to a sliver at the right edge and pushed the
+   page wider than the screen. It is now a band of its own, inside the
+   footer container, under the four link columns - so it can never sit
+   outside the footer, and the page never scrolls sideways.
+   ===================================================================== */
+.footer-top {
+  grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.footer-top > * { min-width: 0; }
+/* the older three-column footer keeps its own shape */
+.footer-top--three { grid-template-columns: minmax(0, 1.7fr) repeat(2, minmax(0, 1fr)); }
+
+.footer-care {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr) minmax(0, auto);
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 2.2rem);
+  margin: 0 0 2.2rem;
+  padding: clamp(1.05rem, 2vw, 1.5rem) clamp(1.05rem, 2.2vw, 1.7rem);
+  border: 1px solid var(--ng-gold-line-soft);
+  border-radius: 16px;
+  background:
+    radial-gradient(620px 260px at 0% 0%, rgba(212, 166, 58, 0.10), transparent 62%),
+    linear-gradient(180deg, rgba(11, 29, 53, 0.92), rgba(8, 23, 45, 0.72));
+}
+.footer-care h4 { margin-bottom: 0.4rem; }
+.footer-care p {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--ng-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.footer-care .footer-contact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 1.6rem;
+  margin: 0;
+}
+.footer-care .footer-contact li { min-width: 0; font-size: 0.86rem; }
+.footer-care .footer-contact a,
+.footer-care .footer-contact span { overflow-wrap: anywhere; }
+.footer-care-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.footer-care-actions .btn { margin: 0 !important; white-space: nowrap; }
+/* the older footer's band keeps room for the newsletter */
+.footer-care--contact { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1.15fr); }
+/* the newsletter that used to live in the contact column */
+.footer-care .newsletter { margin: 0; min-width: 0; }
+.footer-care .newsletter-note { font-size: 0.72rem; }
+.footer-care .newsletter-row { min-width: 0; }
+.footer-care .newsletter input { min-width: 0; }
+.footer-care .btn { max-width: 100%; }
+
+@media (max-width: 1080px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-about { grid-column: 1 / -1; }
+  .footer-care { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .footer-care-actions,
+  .footer-care .newsletter { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; }
+  .footer-about { grid-column: 1 / -1; }
+  .footer-care { grid-template-columns: 1fr; gap: 1.1rem; }
+  .footer-care--contact { grid-template-columns: 1fr; }
+  .footer-care-actions { width: 100%; }
+}
+@media (max-width: 480px) {
+  .footer-top,
+  .footer-top--three { grid-template-columns: 1fr; }
+  .footer-care .footer-contact { grid-template-columns: 1fr; }
+  .footer-care-actions { flex-direction: column; }
+  .footer-care-actions .btn { width: 100%; }
+}
+
+/* =====================================================================
+   18. THE MENU BUTTONS
+   ---------------------------------------------------------------------
+   The buttons that open the navigation drawer were 38-44px with 1.6px
+   bars: hard to see, and under the 48px touch target. They are now 52px
+   with 2.4px bars in bright gold, a gold border and a filled seat.
+   ===================================================================== */
+.nav-toggle {
+  width: 52px;
+  height: 52px;
+  gap: 5.5px;
+  border-radius: 14px;
+  border: 1px solid var(--ng-gold-line);
+  background: rgba(212, 166, 58, 0.10);
+}
+.nav-toggle span {
+  width: 23px;
+  height: 2.4px;
+  border-radius: 2px;
+  background: var(--ng-gold-bright);
+}
+.nav-toggle:hover {
+  border-color: var(--ng-gold);
+  background: rgba(212, 166, 58, 0.2);
+  box-shadow: 0 0 0 3px var(--ng-glow);
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7.9px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7.9px) rotate(-45deg); }
+
+.app-menu-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  gap: 5px;
+  border: 1px solid var(--ng-gold-line);
+}
+.app-menu-btn span { width: 22px; height: 2.4px; border-radius: 2px; }
+.app-menu-btn:hover,
+.app-menu-btn[aria-expanded="true"] {
+  border-color: var(--ng-gold);
+  box-shadow: 0 0 0 3px var(--ng-glow);
+}
+
+@media (max-width: 480px) {
+  .nav-toggle { width: 48px; height: 48px; }
+  .header-inner { min-height: 68px; }
+  .nav { inset-block-start: 68px; max-height: calc(100dvh - 68px); }
+}
+
 /* ---------- 16. print stays on paper ---------- */
 @media print {
   body, .app-body { background: #fff !important; color: #111 !important; }
@@ -6954,7 +7085,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
           </div>
           <a class="link-arrow" href="#/live">Read the live blog</a>
         </div>
-        <div class="mt-2" data-live-stream data-limit="4" aria-label="Live blog posts">
+        <div class="mt-2" data-live-stream data-limit="6" aria-label="Live blog posts">
           <p class="text-small text-muted">Loading posts…</p>
         </div>
       </div>
@@ -7449,6 +7580,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
         <a class="btn btn--gold" href="#/contact">Contact form &amp; directions</a>
         <a class="btn btn--ghost" href="#/support">Help centre</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section section--cream-dark" aria-labelledby="about-live-heading">
+    <div class="container">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div class="section-head">
+          <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Customer stories</p>
+          <span class="eyebrow">From the live blog</span>
+          <h2 id="about-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">Real borrowers, in their words.</h2>
+          <p class="lead" style="margin-top:.5rem;">People who borrowed, repaid and borrowed again — what they did with the money.</p>
+        </div>
+        <a class="link-arrow" href="#/live">All live updates</a>
+      </div>
+      <div class="live-strip mt-2" data-live-stream data-topic="stories" data-limit="3" aria-label="Live blog posts"></div>
     </div>
   </section>
 </section>
@@ -8233,6 +8379,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
       </div>
     </div>
   </section>
+
+  <section class="section" aria-labelledby="howitworks-live-heading">
+    <div class="container">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div class="section-head">
+          <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Before you apply</p>
+          <span class="eyebrow">From the live blog</span>
+          <h2 id="howitworks-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">What affects your result.</h2>
+          <p class="lead" style="margin-top:.5rem;">The income, records and commitments we look at — and how to strengthen your file.</p>
+        </div>
+        <a class="link-arrow" href="#/live">All live updates</a>
+      </div>
+      <div class="live-strip mt-2" data-live-stream data-topic="eligibility" data-limit="3" aria-label="Live blog posts"></div>
+    </div>
+  </section>
 </section>
 <section class="sf-view" data-view="eligibility" data-title="Eligibility check — JAY C O B FINANCIAL SERVICES" data-desc="Check your loan eligibility in two minutes. Age, residency, employment, income and documents, with a preliminary result and clear next steps." data-page="eligibility" hidden>
 <section class="page-hero">
@@ -8542,6 +8703,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     </div>
   </section>
+
+  <section class="section section--cream-dark" aria-labelledby="interestratesfees-live-heading">
+    <div class="container">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div class="section-head">
+          <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Rate &amp; fee news</p>
+          <span class="eyebrow">From the live blog</span>
+          <h2 id="interestratesfees-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">Price changes, announced before they apply.</h2>
+          <p class="lead" style="margin-top:.5rem;">New terms, seasonal offers and changes to fees, published here first.</p>
+        </div>
+        <a class="link-arrow" href="#/live">All live updates</a>
+      </div>
+      <div class="live-strip mt-2" data-live-stream data-topic="products" data-limit="3" aria-label="Live blog posts"></div>
+    </div>
+  </section>
 </section>
 <section class="sf-view" data-view="support" data-title="Support & help centre — JAY C O B FINANCIAL SERVICES" data-desc="Contact support, browse FAQs, track a ticket, report a missing payment, raise a complaint or use the emergency contact line." data-page="support" hidden>
 <section class="page-hero">
@@ -8748,6 +8924,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
         </details>
       </div>
 
+    </div>
+  </section>
+
+  <section class="section section--cream-dark" aria-labelledby="support-live-heading">
+    <div class="container">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div class="section-head">
+          <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Security &amp; trust</p>
+          <span class="eyebrow">From the live blog</span>
+          <h2 id="support-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">How we keep your account safe.</h2>
+          <p class="lead" style="margin-top:.5rem;">What we will never ask for, and how to spot a message that is not from us.</p>
+        </div>
+        <a class="link-arrow" href="#/live">All live updates</a>
+      </div>
+      <div class="live-strip mt-2" data-live-stream data-topic="security" data-limit="3" aria-label="Live blog posts"></div>
     </div>
   </section>
 </section>
@@ -9153,6 +9344,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <p>If a lender deadline is imminent, say so in your message and call the office directly. We hold limited same-week slots for time-sensitive applications.</p>
           </details>
         </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="contact-live-heading">
+      <div class="container">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div class="section-head">
+            <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Live desk</p>
+            <span class="eyebrow">From the live blog</span>
+            <h2 id="contact-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">Notices, hours and branch news.</h2>
+            <p class="lead" style="margin-top:.5rem;">The same updates that appear on the home page and the live desk.</p>
+          </div>
+          <a class="link-arrow" href="#/live">All live updates</a>
+        </div>
+        <div class="live-strip mt-2" data-live-stream data-limit="3" aria-label="Live blog posts"></div>
       </div>
     </section>
 </section>
@@ -9997,7 +10203,7 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
 
     <section class="section section--tight" style="padding-bottom:0;">
       <div class="container">
-        <div data-live-feed data-limit="3" aria-label="Latest live updates"></div>
+        <div data-live-feed data-limit="6" aria-label="Latest live updates"></div>
       </div>
     </section>
 
@@ -10898,6 +11104,21 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
         </div>
       </div>
     </section>
+
+    <section class="section section--cream-dark" aria-labelledby="services-live-heading">
+      <div class="container">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div class="section-head">
+            <p class="brand-chip"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJKQVkgQyBPIEIgRmluYW5jaWFsIFNlcnZpY2VzIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibWFya0dyYWRpZW50IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzBkNGE0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiMwYTNmNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQxNzFhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtYXJrU2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjAuNDIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYThkOGZiIiBzdG9wLW9wYWNpdHk9IjAuMTYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE2IiBmaWxsPSJ1cmwoI21hcmtHcmFkaWVudCkiLz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNtYXJrU2hlZW4pIi8+CiAgPHJlY3QgeD0iMy41IiB5PSIzLjUiIHdpZHRoPSI1NyIgaGVpZ2h0PSI1NyIgcng9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YmI4ZTgiIHN0cm9rZS1vcGFjaXR5PSIuNTUiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnVGltZXMgTmV3IFJvbWFuJywgc2VyaWYiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNkZmYxZmYiIGxldHRlci1zcGFjaW5nPSItMSI+SkM8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="22" height="22"> Live · Why choose us</p>
+            <span class="eyebrow">From the live blog</span>
+            <h2 id="services-live-heading" style="font-size:clamp(1.4rem,2.6vw,1.9rem);">What working with us looks like.</h2>
+            <p class="lead" style="margin-top:.5rem;">Plain pricing, a person on the phone and a dashboard that shows the whole picture.</p>
+          </div>
+          <a class="link-arrow" href="#/live">All live updates</a>
+        </div>
+        <div class="live-strip mt-2" data-live-stream data-topic="why-us" data-limit="3" aria-label="Live blog posts"></div>
+      </div>
+    </section>
 </section>
 <section class="sf-view" data-view="system-check" data-title="Connection check — JAY C O B FINANCIAL SERVICES" data-desc="Live diagnostic for the Supabase connection behind the JAY C O B Financial Services website, admin console and customer dashboard." data-page="system-check" hidden>
 <div class="check-wrap">
@@ -11143,17 +11364,22 @@ body.sf-ready .sf-view { animation: sf-fade .28s var(--ease); }
             <li><a href="#/licensing">Licensing disclosures</a></li>
           </ul>
         </div>
+      </div>
 
-        <div>
-          <h4>Customer care</h4>
-          <ul class="footer-contact">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a16 16 0 0 1-16-16"/></svg><a href="tel:+265999123456">+265 999 123 456</a></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:support@jaycobfinancial.mw">support@jaycobfinancial.mw</a></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11"/><circle cx="12" cy="10" r="2.5"/></svg><span>Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon–Fri 08:00–17:00 · Sat 09:00–12:00</span></li>
-          </ul>
-          <a class="btn btn--gold btn--sm" href="#/apply" style="margin-top:1rem;">Apply for a Loan</a>
-          <a class="btn btn--line-gold btn--sm" href="#/login" style="margin-top:.5rem;">Customer login</a>
+      <div class="footer-care" id="customer-care" aria-labelledby="footer-care-heading">
+        <div class="footer-care-intro">
+          <h4 id="footer-care-heading">Customer care</h4>
+          <p>Talk to a person about your loan, a repayment or your account. Monday to Saturday, in English or Chichewa.</p>
+        </div>
+        <ul class="footer-contact">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a16 16 0 0 1-16-16"/></svg><a href="tel:+265999123456">+265 999 123 456</a></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:support@jaycobfinancial.mw">support@jaycobfinancial.mw</a></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11"/><circle cx="12" cy="10" r="2.5"/></svg><span>Plot 47/3, Area 47, Sector 3, Lilongwe, Malawi</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon–Fri 08:00–17:00 · Sat 09:00–12:00</span></li>
+        </ul>
+        <div class="footer-care-actions">
+          <a class="btn btn--gold btn--sm" href="#/apply">Apply for a Loan</a>
+          <a class="btn btn--line-gold btn--sm" href="#/login">Customer login</a>
         </div>
       </div>
 
@@ -13957,7 +14183,9 @@ window.JCOB_CONFIG = {
     toggle.addEventListener("click", function () {
       var open = sidebar.classList.toggle("is-open");
       if (scrim) scrim.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    toggle.setAttribute("aria-expanded", sidebar.classList.contains("is-open") ? "true" : "false");
     if (scrim) scrim.addEventListener("click", close);
     sidebar.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { if (window.innerWidth <= 1024) close(); });
