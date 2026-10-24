@@ -264,7 +264,7 @@ Full step-by-step, including accounts and the first-run checklist: **[DEPLOY.md]
 
 ```bash
 npm install     # once — jsdom, for the browser suites
-npm test        # starts the Supabase stand-in + server, runs 651 assertions
+npm test        # starts the Supabase stand-in + server, runs 656 assertions
 ```
 
 The suites in `tools/tests/` cover the build with no backend (public site, calculator, live desk,
@@ -396,6 +396,12 @@ root as-is — there is no build step at runtime.
   `#CBD5E1`, muted `#94A3B8`; green `#22C55E`, red `#EF4444` and blue `#38BDF8` appear only for real
   financial states. Navy dominates, gold trims: edges on cards, active items and primary actions,
   never neon, glass or particles.
+- **The ground (v11):** emerald and liquid blue crystal live in the background only. The page ground
+  runs `#073430 → #062b31 → #04212f → #03182a → #020817` under an emerald glow (top-left) and a
+  crystal glow (top-right); the section bands take turns between an emerald and a crystal tint, and
+  the header, footer and page bands carry the same two glows over their navy. Every card, panel,
+  table, modal and bar above that ground stays midnight navy with gold edges — `--liquid-emerald`,
+  `--liquid-crystal` and `--ground-liquid` are the tokens.
 - **One family:** Inter (400–800) with the system UI stack behind it, for headings, body and figures.
 - **The card surface:** every module — panel, stat card, loan/doc/summary card, table, live strip,
   quick action, schedule, nav item, modal, toast, segmented control — paints one navy surface with a

@@ -48,6 +48,16 @@
   --ng-info: #38bdf8;
   --ng-info-text: #7dd3fc;
 
+  /* ---- the ground: emerald and liquid blue crystal, in the background
+     only. Every surface above it stays navy, every edge stays gold. ---- */
+  --liquid-emerald: #07332f;
+  --liquid-crystal: #0a3f6b;
+  --liquid-crystal-light: #bae6fd;
+  --ground-liquid:
+    radial-gradient(1200px 620px at 86% -14%, rgba(56, 189, 248, 0.16), transparent 62%),
+    radial-gradient(1000px 560px at 2% -4%, rgba(16, 185, 129, 0.20), transparent 60%),
+    linear-gradient(166deg, #073430 0%, #062b31 30%, #04212f 56%, #03182a 80%, #020817 100%);
+
   /* Legacy names, kept because 5,800 lines below still speak them. They
      now point at the palette above, so a change here reaches everything. */
   --navy-900: var(--ng-bg);
@@ -139,7 +149,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--cream);
+  background: var(--ground-liquid) fixed;
   color: var(--body);
   font-family: var(--font-sans);
   font-size: 1rem;
@@ -447,7 +457,8 @@ h4 { font-size: 1.05rem; letter-spacing: 0; }
   inset: -20% -10% auto auto;
   width: 46rem;
   height: 46rem;
-  background: radial-gradient(circle at center, rgba(82, 151, 212, 0.2), transparent 62%);
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.22), transparent 62%),
+    radial-gradient(circle at 40% 55%, rgba(56, 189, 248, 0.16), transparent 58%);
   pointer-events: none;
 }
 .hero::after {
@@ -2504,11 +2515,14 @@ select,
    Shared components for the lending platform
    ===================================================================== */
 
+/* The ground: emerald at the top-left, liquid blue crystal at the
+   top-right, both settling into the midnight navy beneath. Cards,
+   panels and bars above it are untouched. */
 body {
   background:
-    radial-gradient(1100px 520px at 88% -8%, rgba(39, 125, 201, 0.13), transparent 62%),
-    radial-gradient(900px 500px at 4% 2%, rgba(15, 78, 66, 0.1), transparent 58%),
-    var(--cream);
+    radial-gradient(1200px 620px at 86% -14%, rgba(56, 189, 248, 0.16), transparent 62%),
+    radial-gradient(1000px 560px at 2% -4%, rgba(16, 185, 129, 0.20), transparent 60%),
+    linear-gradient(166deg, #073430 0%, #062b31 30%, #04212f 56%, #03182a 80%, #020817 100%);
   background-attachment: fixed;
 }
 
@@ -3132,7 +3146,7 @@ h1 em, .gold-text {
 /* =====================================================================
    APP SHELL — customer dashboard
    ===================================================================== */
-.app-body { background: var(--ng-bg); }
+.app-body { background: var(--ground-liquid) fixed; }
 .app-shell { display: grid; grid-template-columns: 258px 1fr; min-height: 100vh; }
 
 .app-sidebar {
@@ -5271,19 +5285,21 @@ summary:focus-visible {
     inset 0 -1px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* ---------- 1. The ground the pearl sits on ---------- */
+/* ---------- 1. The ground the navy sits on ----------
+   Emerald and liquid blue crystal live in the background only: the page
+   ground and the section bands under everything. Cards, panels and bars
+   above them stay midnight navy with gold edges. */
 body {
   background:
-    radial-gradient(1200px 620px at 88% -12%, rgba(212, 166, 58, 0.10), transparent 62%),
-    radial-gradient(1000px 620px at -8% 2%, rgba(56, 189, 248, 0.06), transparent 60%),
-    radial-gradient(1100px 700px at 52% 112%, rgba(212, 166, 58, 0.05), transparent 64%),
-    linear-gradient(168deg, var(--ng-bg) 0%, #04101f 44%, var(--ng-bg) 76%, #020c19 100%);
+    radial-gradient(1200px 620px at 86% -14%, rgba(56, 189, 248, 0.16), transparent 62%),
+    radial-gradient(1000px 560px at 2% -4%, rgba(16, 185, 129, 0.20), transparent 60%),
+    linear-gradient(166deg, #073430 0%, #062b31 30%, #04212f 56%, #03182a 80%, #020817 100%);
   background-attachment: fixed;
 }
 
-/* Section grounds: no more flat #fff slabs between sections */
-.section--paper { background: linear-gradient(180deg, var(--ng-bg) 0%, var(--ng-bg-2) 48%, #030e20 100%); }
-.section--cream-dark { background: linear-gradient(180deg, #030e20 0%, var(--ng-bg-2) 58%, var(--ng-bg) 100%); }
+/* Section grounds: the emerald and the crystal take turns */
+.section--paper { background: linear-gradient(180deg, #07332f 0%, #052b33 48%, #04232d 100%); }
+.section--cream-dark { background: linear-gradient(180deg, #04212f 0%, #04283b 58%, #031f34 100%); }
 
 /* ---------- 2. Modules: the premium surface ---------- */
 .card,
@@ -5502,7 +5518,9 @@ body {
 :root {
   /* the one chrome: midnight navy, warmed at the top-right by a gold glow */
   --emerald-chrome:
-    radial-gradient(900px 420px at 88% -20%, rgba(212, 166, 58, 0.16), transparent 62%),
+    radial-gradient(900px 420px at 88% -20%, rgba(212, 166, 58, 0.14), transparent 62%),
+    radial-gradient(820px 400px at 6% -18%, rgba(16, 185, 129, 0.16), transparent 64%),
+    radial-gradient(760px 380px at 58% 132%, rgba(10, 63, 107, 0.34), transparent 68%),
     linear-gradient(165deg, #061329 0%, #030d20 62%, #020817 100%);
   --chrome-text: #cbd5e1;
   --chrome-text-strong: #ffffff;
@@ -6103,7 +6121,12 @@ body::after { border-color: rgba(184, 138, 43, 0.5) !important; }
 .btn:active { transform: translateY(1px); }
 
 /* ---------- 5. sections ---------- */
-.section--navy { background: linear-gradient(180deg, #030e20 0%, var(--ng-bg) 100%); }
+.section--navy {
+  background:
+    radial-gradient(900px 460px at 82% 0%, rgba(56, 189, 248, 0.14), transparent 62%),
+    radial-gradient(760px 420px at 8% 100%, rgba(16, 185, 129, 0.14), transparent 64%),
+    linear-gradient(180deg, #06302c 0%, #04202c 70%, #020817 100%);
+}
 .section--navy h2, .section--navy h3, .section--navy h4 { color: var(--ng-text); }
 .section--navy .lead { color: var(--ng-text-2); }
 .eyebrow { color: var(--ng-gold-text); }
@@ -6355,7 +6378,7 @@ table.data .num, .table-wrap .num { color: var(--ng-text); font-variant-numeric:
 }
 
 /* ---------- 13. the customer dashboard ---------- */
-.app-body { background: var(--ng-bg); }
+.app-body { background: var(--ground-liquid) fixed; }
 .app-sidebar {
   background: linear-gradient(185deg, var(--ng-bg-2) 0%, var(--ng-sidebar) 70%);
   border-right: 1px solid var(--ng-gold-line-soft);

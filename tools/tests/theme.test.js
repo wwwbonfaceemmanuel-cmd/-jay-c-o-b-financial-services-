@@ -89,8 +89,8 @@ const adminTopbar = rule(adminCss, ".topbar");
 
 t.ok("the site's sidebar is navy",
   /linear-gradient\(185deg, (#061329|var\(--ng-bg-2\))/.test(siteSidebar), siteSidebar.slice(0, 90));
-t.ok("console sidebar copies it exactly",
-  /--chrome:linear-gradient\(165deg,#061329 0%,#030d20 62%,#020817 100%\)/.test(adminCss));
+t.ok("console sidebar is the navy chrome, tinted with the emerald and the crystal",
+  /--chrome:radial-gradient\([^;]*rgba\(16,185,129[^;]*linear-gradient\(165deg,#061329 0%,#030d20 62%,#020817 100%\)/.test(adminCss));
 t.ok("console sidebar paints with it", /background:var\(--chrome\)/.test(adminSidebar));
 t.ok("top bar is the footer's emerald", /background:var\(--chrome\)/.test(adminTopbar));
 const adminFoot = rule(adminCss, ".foot");
@@ -123,8 +123,8 @@ t.eq("no light ground survives in the console", left.join(", "), "");
 t.ok("body sits on the navy ground", /body\{[^}]*radial-gradient/.test(adminCss) &&
   /--bg-blue:#04101f/.test(adminCss) && /--bg-emerald:#020817/.test(adminCss) &&
   /linear-gradient\(163deg/.test(adminCss));
-t.ok("the ground runs navy into black",
-  /linear-gradient\(163deg,var\(--ng-bg\) 0%,#04101f 46%,var\(--ng-bg\) 100%\)/.test(adminCss));
+t.ok("the ground runs emerald and liquid crystal into black",
+  /linear-gradient\(166deg,#073430 0%,#062b31 30%,#04212f 56%,#03182a 80%,#020817 100%\)/.test(adminCss));
 t.ok("panels are navy cards",
   /\.panel\{[^}]*padding-box/.test(adminCss) && /--panel:rgba\(8,23,45/.test(adminCss));
 t.ok("top bar is no longer a light band", !/linear-gradient\(100deg/.test(rule(adminCss, ".topbar")));
